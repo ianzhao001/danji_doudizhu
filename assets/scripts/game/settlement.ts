@@ -23,12 +23,38 @@ export interface Settlement {
   scores: [number, number, number]; // 各座位得分，和为 0
 }
 
-const notImplemented = (): never => {
-  throw new Error('not implemented');
-};
+function isFarmer(seat: SeatIndex, landlord: SeatIndex): boolean {
+  return seat !== landlord;
+}
+
+function detectSpring(input: SettlementInput): Spring {
+  const landlordPlays = input.events.filter((event) => event.type === 'play' && event.seat === input.landlord).length;
+  const farmerPlays = input.events.filter((event) => event.type === 'play' && isFarmer(event.seat, input.landlord)).length;
+
+  if (input.winner === Side.Landlord && farmerPlays === 0) return 'spring';
+  if (input.winner === Side.Farmer && landlordPlays === 1) return 'anti-spring';
+  return 'none';
+}
 
 /** 由事件流 + 叫抢倍数算出最终倍数与各座位得分。 */
 export function settle(input: SettlementInput): Settlement {
-  void input;
-  return notImplemented();
+  const baseScore = input.baseScore ?? 1;
+  const bombs = input.events.filter((event) => event.type === 'bomb' || event.type === 'rocket').length;
+  const spring = detectSpring(input);
+  const multiplier = input.bidMultiplier * 2 ** bombs * (spring === 'none' ? 1 : 2);
+  const unit = baseScore * multiplier;
+  const landlordScore = input.winner === Side.Landlord ? 2 * unit : -2 * unit;
+  const farmerScore = input.winner === Side.Landlord ? -unit : unit;
+  const scores = [0, 0, 0].map((_, seat) => (seat === input.landlord ? landlordScore : farmerScore)) as [
+    number,
+    number,
+    number,
+  ];
+
+  return {
+    multiplier,
+    spring,
+    bombs,
+    scores,
+  };
 }
