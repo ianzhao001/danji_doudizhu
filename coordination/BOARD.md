@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 单局状态机（多 AI 协作）
+## 当前里程碑：M2 收尾（仅剩 M2-07）+ M4 难度 AI 并行（多 AI 协作）
 
 | ID | 模块 / 文件域 | 依赖 | 状态 | 分支 | 备注 |
 |----|----|----|----|----|----|
@@ -25,6 +25,19 @@
 - M2-07：**ready**，种子在 `task/M2-07-selfplay`（桩 `test/selfplay/runner.ts` + 失败测试 `test/selfplay/selfplay.test.ts`，断言 seeds 1..30 守恒/终止/可复现）；main 保持绿（红测试只在分支）。可立即派发实现。
 - 派发：对每个 ready 任务，在新 AI 窗口粘贴 PROTOCOL.md 的 bootstrap 提示词，把 `<ID>` 换成对应分支名（如 `M2-07-selfplay`）。
 
+## 并行里程碑：M4 难度 AI（接口契约已入 main）
+
+接口契约已合并入 main（commit a3b71b1：`ai/strategy.ts` 的 `AiLevel`/`AiStrategy`/`strategyFor`/`chooseActionByLevel` + `ai/levels/{simple,normal,hard}.ts` 桩；commit 5c4fda9：三档 spec）。三档文件域互不相交、可同时认领；失败测试只在对应分支，main 保持 72 绿（无测试调用桩）。
+
+| ID | 模块 / 文件域 | 依赖 | 状态 | 分支 | 备注 |
+|----|----|----|----|----|----|
+| M4-01 | ai-simple：`ai/levels/simple.ts` | 接口契约 | **ready** | `task/M4-01-ai-simple` (a1b60e0) | 最小化·确定性；失败测试 `test/ai/simple.test.ts` |
+| M4-02 | ai-normal：`ai/levels/normal.ts` | 接口契约 | **ready** | `task/M4-02-ai-normal` (4360ce6) | 保炸弹 + 基础拆牌；`test/ai/normal.test.ts` |
+| M4-03 | ai-hard：`ai/levels/hard.ts` | 接口契约 | **ready** | `task/M4-03-ai-hard` (e2be17b) | 积极控权 + 择时炸弹（自包含，勿运行时调 normal）；`test/ai/hard.test.ts` |
+| M4-04 | 难度差异 selfplay 回归 | M2-07 + M4-01/02/03 | **todo** | — | 各档 vs 基线胜率/控权差异；待三档合并后种 |
+
+> 三档行为契约见各 `coordination/tasks/M4-0X-*.md`。本轮可并行派发：**M2-07 + M4-01 + M4-02 + M4-03**（四个任务，文件域互不相交，红测试各在己分支）。
+
 ## 后续里程碑备忘（未出 spec）
-- **M4**：AI 难度分层（简单/普通/困难），叫抢与出牌策略升级（M2-05/09 仅基线）。
+- **M4 余项**：M4-04 难度差异 selfplay（待 M2-07 + 三档合并后种）；难度接入 flow/UI 的出牌决策替换（本轮接口未改 flow/baseline，留待后续里程碑）。
 - **M5**：断局存档防线——给 `serialize` 加 `version`/schema 校验（M2-04 当前为纯 JSON 直出直入）；战绩持久化 IO（M2-10 仅内存累计）。

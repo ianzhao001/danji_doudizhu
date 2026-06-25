@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 单局状态机进行中（多 AI 协作，派发见 coordination/BOARD.md）
+## 当前阶段：M2 收尾（仅剩 M2-07）+ M4 难度 AI 并行（多 AI 协作，派发见 coordination/BOARD.md）
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -61,14 +61,14 @@
 - [ ] 创建结算弹窗。
 - [ ] 完成 390x844 竖屏适配检查。
 
-## M4 多难度 AI
+## M4 多难度 AI（接口契约已入 main，三档失败测试已种子并行派发）
 
-- [ ] 实现简单 AI。
-- [ ] 实现普通 AI。
-- [ ] 实现困难 AI。
-- [ ] 三档难度复用 `rules` 着法枚举做分级。
-- [ ] 验证 AI 动作合法性。
-- [ ] 用自对弈 harness 验证 AI 不造成状态机死循环与难度差异。
+- [~] 实现简单 AI（最小化·确定性）。〔M4-01 ready：`task/M4-01-ai-simple`〕
+- [~] 实现普通 AI（保炸弹 + 基础拆牌）。〔M4-02 ready：`task/M4-02-ai-normal`〕
+- [~] 实现困难 AI（积极控权 + 择时炸弹）。〔M4-03 ready：`task/M4-03-ai-hard`〕
+- [~] 三档难度复用 `rules` 着法枚举做分级。〔接口 `ai/strategy.ts` 已入 main〕
+- [ ] 验证 AI 动作合法性。〔随三档失败测试覆盖〕
+- [ ] 用自对弈 harness 验证 AI 不造成状态机死循环与难度差异。〔M4-04，依赖 M2-07 + 三档〕
 
 ## M5 完整单机体验
 
