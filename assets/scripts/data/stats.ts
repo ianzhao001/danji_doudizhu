@@ -24,10 +24,30 @@ export interface RoundOutcome {
 
 /** 全 0 初始战绩。 */
 export function emptyStats(): MatchStats {
-  throw new Error('not implemented');
+  return {
+    rounds: 0,
+    asLandlord: 0,
+    landlordWins: 0,
+    asFarmer: 0,
+    farmerWins: 0,
+    netScore: 0,
+  };
 }
 
 /** 累计一局到战绩；返回新对象，不修改入参 stats。 */
 export function recordRound(stats: MatchStats, r: RoundOutcome): MatchStats {
-  throw new Error('not implemented');
+  const heroIsLandlord = r.heroSeat === r.landlord;
+  const heroWon =
+    (heroIsLandlord && r.winner === Side.Landlord) ||
+    (!heroIsLandlord && r.winner === Side.Farmer);
+
+  return {
+    ...stats,
+    rounds: stats.rounds + 1,
+    asLandlord: stats.asLandlord + (heroIsLandlord ? 1 : 0),
+    landlordWins: stats.landlordWins + (heroIsLandlord && heroWon ? 1 : 0),
+    asFarmer: stats.asFarmer + (heroIsLandlord ? 0 : 1),
+    farmerWins: stats.farmerWins + (!heroIsLandlord && heroWon ? 1 : 0),
+    netScore: stats.netScore + r.settlement.scores[r.heroSeat],
+  };
 }
