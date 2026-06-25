@@ -4,3 +4,4 @@
 
 export * from './baseline';
 export * from './bidding';
+export * from './strategy';
