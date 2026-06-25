@@ -1,0 +1,13 @@
+{
+    "name": "斗地主",
+    "type": "3d",
+    "version": "1.0.0",
+    "uuid": "",
+    "creator": {
+        "version": "3.8.8"
+    },
+    "pink": {
+        "uuid": "e7c8195e-deae-4b69-9eee-f3df838abf0f",
+        "version": "1.110.1"
+    }
+}

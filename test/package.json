@@ -1,0 +1,17 @@
+{
+  "name": "doudizhu-rules-tests",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Cocos 无关的纯逻辑测试（rules 层），不进入 Cocos 构建。",
+  "scripts": {
+    "pretest": "node ensure-tsconfig-shim.cjs",
+    "test": "vitest run",
+    "test:watch": "node ensure-tsconfig-shim.cjs && vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
