@@ -25,7 +25,7 @@ export interface FlowConfig {
   maxRedeals?: number;         // 默认 10；超出抛错（带 seed）
 }
 export type FlowEvent =
-  | { type: 'deal'; landlordBottomTo: SeatIndex | null }
+  | { type: 'deal' }
   | { type: 'bid'; action: BidAction; multiplier: number }
   | { type: 'redeal'; attempt: number }
   | { type: 'landlordDecided'; landlord: SeatIndex; bidMultiplier: number }
