@@ -19,74 +19,44 @@ export interface BiddingState {
   provisional: SeatIndex | null; // 当前临时地主
   multiplier: number; // 叫=1，每抢/反抢 ×2
   landlord: SeatIndex | null; // done 时确定
+  // M2-08：以下 4 个字段从模块级 WeakMap 显式并入公开状态，使 BiddingState 成为纯数据、可序列化。
+  caller: SeatIndex | null; // 首叫者（反抢判定用）
+  callingPasses: number; // calling 阶段累计 pass 数
+  grabQueue: SeatIndex[]; // grabbing 阶段「待行动座位」队列
+  grabbed: boolean; // 本 grabbing 轮是否已发生过 grab
 }
-
-const notImplemented = (): never => {
-  throw new Error('not implemented');
-};
-
-interface BiddingContext {
-  callingPasses: number;
-  caller: SeatIndex | null;
-  grabQueue: SeatIndex[];
-  grabbed: boolean;
-}
-
-const contexts = new WeakMap<BiddingState, BiddingContext>();
 
 function nextSeat(seat: SeatIndex): SeatIndex {
   return ((seat + 1) % 3) as SeatIndex;
-}
-
-function makeState(state: BiddingState, context: BiddingContext): BiddingState {
-  contexts.set(state, {
-    callingPasses: context.callingPasses,
-    caller: context.caller,
-    grabQueue: context.grabQueue.slice(),
-    grabbed: context.grabbed,
-  });
-  return state;
-}
-
-function contextOf(state: BiddingState): BiddingContext {
-  const context = contexts.get(state);
-  if (!context) throw new IllegalActionError('BIDDING_CONTEXT_MISSING');
-  return context;
 }
 
 function grabQueueFor(caller: SeatIndex): SeatIndex[] {
   return [nextSeat(caller), nextSeat(nextSeat(caller))];
 }
 
-function done(state: BiddingState, context: BiddingContext): BiddingState {
+function done(state: BiddingState): BiddingState {
   if (state.provisional === null) throw new IllegalActionError('NO_PROVISIONAL_LANDLORD');
-  return makeState(
-    {
-      ...state,
-      phase: 'done',
-      landlord: state.provisional,
-    },
-    { ...context, grabQueue: [] },
-  );
+  return {
+    ...state,
+    phase: 'done',
+    landlord: state.provisional,
+    grabQueue: [],
+  };
 }
 
 /** 创建叫地主初始状态：从 startSeat 开始 calling。 */
 export function createBidding(startSeat: SeatIndex): BiddingState {
-  return makeState(
-    {
-      phase: 'calling',
-      turn: startSeat,
-      provisional: null,
-      multiplier: 0,
-      landlord: null,
-    },
-    {
-      callingPasses: 0,
-      caller: null,
-      grabQueue: [],
-      grabbed: false,
-    },
-  );
+  return {
+    phase: 'calling',
+    turn: startSeat,
+    provisional: null,
+    multiplier: 0,
+    landlord: null,
+    caller: null,
+    callingPasses: 0,
+    grabQueue: [],
+    grabbed: false,
+  };
 }
 
 /** 应用一个叫/抢/不动作；非法抛 IllegalActionError；不可变更新。 */
@@ -96,81 +66,65 @@ export function applyBid(state: BiddingState, action: BidAction): BiddingState {
   }
   if (action.seat !== state.turn) throw new IllegalActionError('NOT_TURN');
 
-  const context = contextOf(state);
-
   if (state.phase === 'calling') {
     if (action.type === 'grab') throw new IllegalActionError('CANNOT_GRAB_BEFORE_CALL');
 
     if (action.type === 'call') {
       const queue = grabQueueFor(action.seat);
-      return makeState(
-        {
-          phase: 'grabbing',
-          turn: queue[0],
-          provisional: action.seat,
-          multiplier: 1,
-          landlord: null,
-        },
-        {
-          callingPasses: context.callingPasses,
-          caller: action.seat,
-          grabQueue: queue,
-          grabbed: false,
-        },
-      );
+      return {
+        phase: 'grabbing',
+        turn: queue[0],
+        provisional: action.seat,
+        multiplier: 1,
+        landlord: null,
+        caller: action.seat,
+        callingPasses: state.callingPasses,
+        grabQueue: queue,
+        grabbed: false,
+      };
     }
 
-    const callingPasses = context.callingPasses + 1;
+    const callingPasses = state.callingPasses + 1;
     if (callingPasses >= 3) {
-      return makeState(
-        {
-          ...state,
-          phase: 'redeal',
-        },
-        { ...context, callingPasses },
-      );
+      return {
+        ...state,
+        phase: 'redeal',
+        callingPasses,
+      };
     }
 
-    return makeState(
-      {
-        ...state,
-        turn: nextSeat(action.seat),
-      },
-      { ...context, callingPasses },
-    );
+    return {
+      ...state,
+      turn: nextSeat(action.seat),
+      callingPasses,
+    };
   }
 
   if (action.type === 'call') throw new IllegalActionError('CANNOT_CALL_WHILE_GRABBING');
-  if (context.caller === null) throw new IllegalActionError('CALLER_MISSING');
-  if (context.grabQueue[0] !== action.seat) throw new IllegalActionError('NOT_TURN');
+  if (state.caller === null) throw new IllegalActionError('CALLER_MISSING');
+  if (state.grabQueue[0] !== action.seat) throw new IllegalActionError('NOT_TURN');
 
-  const grabbed = context.grabbed || action.type === 'grab';
+  const grabbed = state.grabbed || action.type === 'grab';
+  const remainingQueue = state.grabQueue.slice(1);
   const nextState: BiddingState = {
     ...state,
     provisional: action.type === 'grab' ? action.seat : state.provisional,
     multiplier: action.type === 'grab' ? state.multiplier * 2 : state.multiplier,
-  };
-  const remainingQueue = context.grabQueue.slice(1);
-  const nextContext: BiddingContext = {
-    ...context,
     grabQueue: remainingQueue,
     grabbed,
   };
 
   if (remainingQueue.length > 0) {
-    return makeState({ ...nextState, turn: remainingQueue[0] }, nextContext);
+    return { ...nextState, turn: remainingQueue[0] };
   }
 
-  if (action.seat !== context.caller && grabbed) {
-    const counterQueue = [context.caller];
-    return makeState(
-      {
-        ...nextState,
-        turn: context.caller,
-      },
-      { ...nextContext, grabQueue: counterQueue },
-    );
+  if (action.seat !== state.caller && grabbed) {
+    return {
+      ...nextState,
+      turn: state.caller,
+      grabQueue: [state.caller],
+    };
   }
 
-  return done(nextState, nextContext);
+  return done(nextState);
 }
