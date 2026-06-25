@@ -20,6 +20,7 @@
    ```
    git worktree add ../斗地主.worktrees/<ID> task/<ID>
    cd ../斗地主.worktrees/<ID>
+   npm --prefix test install   # 新 worktree 不含 node_modules，先装依赖
    ```
 4. **只**在任务声明的文件域内实现，使测试转绿。可新增测试，不可改既有测试。
 5. 自检：`npm --prefix test test` 与 `npm --prefix test run typecheck` 全绿。
@@ -35,4 +36,4 @@
 - 代码：各自任务分支的提交。
 
 ## 新窗口 bootstrap 提示词（用户粘贴到每个实现方窗口，把 `<ID>` 换成任务号）
-> 你是本仓库 `斗地主`（Cocos Creator 3.8.8 单机斗地主）的**实现型 AI**。先读 `coordination/PROTOCOL.md` 与 `coordination/tasks/<ID>.md`。用 `git worktree add ../斗地主.worktrees/<ID> task/<ID>` 建独立工作树并进入；**只**在该任务声明的文件域内实现，使其测试转绿；**不得**修改测试、不得碰他人模块或 `main`、不得 import `cc`。完成后跑 `npm --prefix test test` 与 `npm --prefix test run typecheck`，把结果与说明写入 `coordination/reports/<ID>.report.md`，提交分支但**不要合并 main**。测试存疑就在报告里提问，不要改测试。
+> 你是本仓库 `斗地主`（Cocos Creator 3.8.8 单机斗地主）的**实现型 AI**。先读 `coordination/PROTOCOL.md` 与 `coordination/tasks/<ID>.md`。用 `git worktree add ../斗地主.worktrees/<ID> task/<ID>` 建独立工作树并进入，先 `npm --prefix test install` 装依赖（新 worktree 无 node_modules）；**只**在该任务声明的文件域内实现，使其测试转绿；**不得**修改测试、不得碰他人模块或 `main`、不得 import `cc`。完成后跑 `npm --prefix test test` 与 `npm --prefix test run typecheck`，把结果与说明写入 `coordination/reports/<ID>.report.md`，提交分支但**不要合并 main**。测试存疑就在报告里提问，不要改测试。
