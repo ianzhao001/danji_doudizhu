@@ -6,18 +6,12 @@
 
 import { RoundState } from './types';
 
-const notImplemented = (): never => {
-  throw new Error('not implemented');
-};
-
 /** 序列化为字符串（往返一致、纯 JSON）。 */
 export function serializeRound(state: RoundState): string {
-  void state;
-  return notImplemented();
+  return JSON.stringify(state);
 }
 
 /** 反序列化；对非法 JSON 抛错。 */
 export function deserializeRound(json: string): RoundState {
-  void json;
-  return notImplemented();
+  return JSON.parse(json) as RoundState;
 }
