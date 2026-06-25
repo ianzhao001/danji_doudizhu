@@ -6,7 +6,7 @@
 - [x] 当前只完成 M1 规则层与独立测试，不包含 M2 状态机、AI、flow 或 UI。
 - [x] 未新增 Cocos 场景或预制体。
 - [x] 未修改根 `package.json`、`tsconfig.json`、`cocos.config.json`。
-- [x] 未执行 Git 初始化。
+- [x] M1 期间未执行 Git 初始化；M2 起按用户决定启用 git + 多 AI worktree 协作（见 `coordination/`）。
 - [x] `rules` 层未 import `cc`。
 - [x] Vitest 测试工程隔离在 `test/` 下。
 - [x] `cd test && npm test` 通过（6 个测试文件，25 个用例）。

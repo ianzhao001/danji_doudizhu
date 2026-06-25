@@ -8,10 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 当前状态——动手写代码前必读
 
-仓库目前已完成 **M1 核心规则闭环**，等待用户确认是否进入 M2。M0 文档基线已完成，且用户确认过的 M0 美术资源例外已导入 `assets/resources/art/`。当前已有纯规则代码和独立规则测试，但还没有 Cocos 场景、预制体、UI、状态机、AI、flow 或本地数据层。
+M0（文档）与 M1（纯 `rules` 层 + Vitest 测试）已完成。**M2 单局状态机进行中**，采用**多 AI 协作 + git worktree**：架构（本窗口）出方案与失败测试，其他 AI 在各自 worktree 分支实现——见 [coordination/PROTOCOL.md](coordination/PROTOCOL.md)。**git 已初始化**用于该协作（取代此前 M0/M1「不 git init」的约束）。
 
-- 最新的任务/里程碑状态以 [docs/TASKS.md](docs/TASKS.md) 为准，**实现任何功能前先看它**。
-- M1/M2 交接期只允许文档修订，除非用户明确启动 M2。不要新增 `game`、`ai`、`flow`、`ui`、`data` 实现，不要创建 `.scene` / `.prefab`，不要修改根 `package.json` / `tsconfig.json` / `cocos.config.json`，也不要执行 `git init`。
+- 最新的任务/里程碑与派发状态以 [docs/TASKS.md](docs/TASKS.md) 和 [coordination/BOARD.md](coordination/BOARD.md) 为准，**动手前先看**。
+- 仍然：不修改根 `package.json` / `tsconfig.json` / `cocos.config.json`；不手写 `.meta`（交给 Cocos 编辑器）；不手建 `.scene` / `.prefab`（属 M3）。
+- 实现型 AI 按 PROTOCOL：只在自己任务的文件域 + worktree 分支内写，不改测试、不碰 `main`，纯逻辑层不 import `cc`。
 
 `docs/` 是设计的唯一事实来源，遇到问题先查这里：
 

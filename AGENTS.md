@@ -6,30 +6,21 @@ This file gives Codex and other coding agents repository-specific guidance.
 
 This is a Cocos Creator 3.8.8 single-player Dou Dizhu project. The target product is a complete offline mobile portrait game: one human player against two AI players, classic three-player rules, local settings, local records, and no network, account, payment, ads, or matchmaking in the first version.
 
-The project has completed milestone M1: pure rules logic and Cocos-independent rules tests. M0 documentation is complete, and user-approved M0 art resources have been imported under `assets/resources/art/`. There is still no gameplay scene, prefab, UI, game state machine, AI, flow layer, local data layer, or Cocos runtime component.
+The project has completed M0 (docs) and M1 (pure rules logic + Cocos-independent rules tests); user-approved M0 art is under `assets/resources/art/`. **M2 (single-round state machine) is now in progress via multi-AI collaboration on git worktrees** (see `coordination/`). On `main` there is still no merged `game`/`ai`/`flow`/`ui`/`data` module, scene, prefab, or Cocos runtime component.
 
 ## Current-Phase Guardrails
 
-Before writing implementation code, read `docs/TASKS.md`.
+Read `docs/TASKS.md` and `coordination/BOARD.md` for the current milestone and task status before writing code.
 
-If `docs/TASKS.md` still says the current phase is M0, do not:
+**M0 (docs) and M1 (pure `rules` layer + Vitest) are complete. M2 (single-round state machine) is in progress, executed via multi-AI collaboration on git worktrees — see `coordination/PROTOCOL.md`.** Git is now initialized and used for this collaboration (this supersedes the earlier M0/M1 "do not git init" guardrail).
 
-- Add `.ts`, `.js`, `.scene`, `.prefab`, or `.meta` files.
-- Modify `assets/`.
-- Modify `package.json`, `tsconfig.json`, or `cocos.config.json`.
-- Run `git init`, create commits, or otherwise establish Git history.
-- Create Cocos scene or prefab files by hand.
+Still off-limits unless a task explicitly requires it:
 
-During M0, only project documentation changes are expected unless the user explicitly moves the project into a later implementation milestone.
+- Do not modify root `package.json`, `tsconfig.json`, or `cocos.config.json`.
+- Do not hand-write `.meta`; let Cocos Creator generate them.
+- Do not create Cocos `.scene` / `.prefab` by hand (that is M3, in-editor).
 
-If `docs/TASKS.md` says M1 is complete and M2 has not been explicitly started, do not:
-
-- Add `game`, `ai`, `flow`, `ui`, or `data` implementation modules.
-- Add `.scene` or `.prefab` files.
-- Modify root `package.json`, `tsconfig.json`, or `cocos.config.json`.
-- Run `git init`, create commits, or otherwise establish Git history.
-
-During the M1/M2 handoff, expected changes are documentation-only unless the user explicitly starts M2.
+If you are an **implementer AI**, follow `coordination/PROTOCOL.md`: work only inside your task's declared file scope on its own worktree branch, never edit tests or `main`, and keep pure layers (`rules`/`game`/`ai`/`flow`/`data`) free of `cc` imports.
 
 ## Source Of Truth
 

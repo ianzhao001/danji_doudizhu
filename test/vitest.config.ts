@@ -14,7 +14,8 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['rules/**/*.test.ts'],
+    // 覆盖 rules/ 及后续 game/ ai/ flow/ selfplay/ 等所有测试目录
+    include: ['**/*.test.ts'],
     environment: 'node',
   },
   server: {

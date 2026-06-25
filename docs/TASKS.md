@@ -1,6 +1,8 @@
 # 项目任务清单
 
-## 当前阶段：M1 核心规则闭环已完成，待确认进入 M2
+## 当前阶段：M2 单局状态机进行中（多 AI 协作，派发见 coordination/BOARD.md）
+
+> M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
 状态说明：
 

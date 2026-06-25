@@ -4,7 +4,7 @@
 
 本项目是基于 Cocos Creator 3.8.8 的单机斗地主游戏。首版目标是完整单机版：手机竖屏、经典三人斗地主、多难度 AI、本地设置与战绩。
 
-当前 M0 已完成，M1 核心规则闭环已完成，等待用户确认是否进入 M2。当前仍不创建 Cocos 场景或预制体，不进入 UI、AI 或单局状态机实现。
+当前 M0、M1 已完成。**M2 单局状态机进行中**，采用多 AI 协作 + git worktree（架构出方案/测试、其他 AI 实现），见 `coordination/PROTOCOL.md` 与 `coordination/BOARD.md`；git 已初始化用于该协作。仍不创建 Cocos 场景或预制体（属 M3），不进入 UI。
 
 ## 迭代阶段
 
