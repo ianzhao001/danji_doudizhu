@@ -4,12 +4,14 @@
  * 仅依赖 rules + 只读快照，禁止 import `cc`，禁止改签名。
  */
 
-import { Rng } from '../rules';
+import { enumerateMoves, legalFollows, type Move, type Rng } from '../rules';
 import { GameSnapshot, RoundAction } from '../game';
 
-const notImplemented = (): never => {
-  throw new Error('not implemented');
-};
+function pickMove(moves: Move[], rng: Rng): Move {
+  if (moves.length === 0) throw new Error('NO_LEGAL_MOVES');
+  const index = Math.min(moves.length - 1, Math.floor(rng.next() * moves.length));
+  return moves[index];
+}
 
 /**
  * 基于只读快照选择一个合法动作：
@@ -17,7 +19,16 @@ const notImplemented = (): never => {
  * - 跟牌：legalFollows(viewerHand, top.pattern) 非空则随机 play，否则 pass。
  */
 export function chooseAction(snapshot: GameSnapshot, rng: Rng): RoundAction {
-  void snapshot;
-  void rng;
-  return notImplemented();
+  const hand = snapshot.viewerHand;
+  if (!hand || hand.length === 0) throw new Error('VIEWER_HAND_REQUIRED');
+
+  if (!snapshot.top) {
+    const move = pickMove(enumerateMoves(hand), rng);
+    return { type: 'play', seat: snapshot.turn, cards: move.cards.slice() };
+  }
+
+  const move = legalFollows(hand, snapshot.top.pattern);
+  if (move.length === 0) return { type: 'pass', seat: snapshot.turn };
+
+  return { type: 'play', seat: snapshot.turn, cards: pickMove(move, rng).cards.slice() };
 }
