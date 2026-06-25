@@ -19,6 +19,11 @@ export interface BiddingState {
   provisional: SeatIndex | null; // 当前临时地主
   multiplier: number; // 叫=1，每抢/反抢 ×2
   landlord: SeatIndex | null; // done 时确定
+  // M2-08：以下 4 个字段从模块级 WeakMap 显式并入公开状态，使 BiddingState 成为纯数据、可序列化。
+  caller: SeatIndex | null; // 首叫者（反抢判定用）
+  callingPasses: number; // calling 阶段累计 pass 数
+  grabQueue: SeatIndex[]; // grabbing 阶段「待行动座位」队列
+  grabbed: boolean; // 本 grabbing 轮是否已发生过 grab
 }
 
 const notImplemented = (): never => {

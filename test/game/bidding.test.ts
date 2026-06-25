@@ -62,4 +62,14 @@ describe('bidding 叫抢地主（抢翻倍）', () => {
     ]);
     expect(() => applyBid(s, { type: 'grab', seat: 0 })).toThrow(IllegalActionError);
   });
+
+  // M2-08：BiddingState 必须是纯数据——JSON 往返后仍能继续推进叫抢（去 WeakMap 后转绿）。
+  it('BiddingState 可 JSON 往返后继续叫抢', () => {
+    let s = createBidding(0);
+    s = applyBid(s, { type: 'call', seat: 0 }); // grabbing：provisional=0, multiplier=1
+    const revived = JSON.parse(JSON.stringify(s)) as BiddingState;
+    const s2 = applyBid(revived, { type: 'grab', seat: 1 }); // 抢 → ×2、临时地主=1
+    expect(s2.multiplier).toBe(2);
+    expect(s2.provisional).toBe(1);
+  });
 });
