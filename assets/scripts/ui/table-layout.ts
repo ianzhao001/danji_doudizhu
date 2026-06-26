@@ -22,5 +22,12 @@ export interface TableRegions {
 }
 
 export function tableLayout(): TableRegions {
-  throw new Error('M3-00 table-layout not implemented');
+  return {
+    topBar: { x: 0, y: 0, width: 390, height: 64 },
+    opponentLeft: { x: 0, y: 80, width: 150, height: 80 },
+    opponentRight: { x: 240, y: 80, width: 150, height: 80 },
+    playArea: { x: 45, y: 220, width: 300, height: 180 },
+    actionButtons: { x: 55, y: 604, width: 280, height: 64 },
+    playerHand: { x: 0, y: 684, width: 390, height: 160 },
+  };
 }
