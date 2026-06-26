@@ -11,7 +11,8 @@
  *   import { strategyFor, AiLevel } from '../../assets/scripts/ai';
  */
 
-import { AiLevel } from '../../assets/scripts/ai';
+import { AiLevel, strategyFor } from '../../assets/scripts/ai';
+import { runHeadlessRound, type PlayPolicy } from '../../assets/scripts/flow';
 
 export interface MatchSummary {
   seed: number;
@@ -25,7 +26,19 @@ export async function runDifficultyMatchup(
   levels: [AiLevel, AiLevel, AiLevel],
   seeds: number[],
 ): Promise<MatchSummary[]> {
-  void levels;
-  void seeds;
-  throw new Error('M4-04 not implemented: runDifficultyMatchup');
+  const playPolicy: PlayPolicy = ({ snapshot, rng }) => strategyFor(levels[snapshot.turn])(snapshot, rng);
+  const summaries: MatchSummary[] = [];
+
+  for (const seed of seeds) {
+    const result = await runHeadlessRound({ seed, playPolicy });
+    summaries.push({
+      seed,
+      landlord: result.landlord,
+      winner: result.winner,
+      turns: result.turns,
+      scores: result.settlement.scores,
+    });
+  }
+
+  return summaries;
 }
