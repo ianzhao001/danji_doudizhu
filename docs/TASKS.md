@@ -50,8 +50,8 @@
 - [x] 战绩统计累计（纯函数）。〔M2-10 已并 main〕
 - [x] 实现自对弈 harness（N 局 AI vs AI）。〔M2-07 已并 main 6ac5832：runSeeds 复用 runHeadlessRound，零和/终止/可复现〕
 - [x] flow 增强：HeadlessRoundError 诊断 + playPolicy 注入（为 M2-07-D 诊断与 M4-04 难度差异铺路）。〔M-FLOW 已并 main〕
-- [~] flow 出牌循环异常诊断：policy/apply 抛错包成 HeadlessRoundError（保留 cause）。〔M-FLOW-02 下一并行批次种子中〕
-- [~] selfplay 诊断消费：runner 用 HeadlessRoundError 字段组富 partial（非空 seed/turns/landlord/lastEvents）。〔M2-07-D 下一并行批次种子中〕
+- [~] flow 出牌循环异常诊断：policy/apply 抛错包成 HeadlessRoundError（保留 cause）。〔M-FLOW-02 ready·下一并行批次可派发〕
+- [~] selfplay 诊断消费：runner 用 HeadlessRoundError 字段组富 partial（非空 seed/turns/landlord/lastEvents）。〔M2-07-D ready·下一并行批次可派发〕
 
 ## M3 手机竖屏 UI
 
@@ -72,13 +72,13 @@
 - [x] 三档难度复用 `rules` 着法枚举做分级。〔接口 `ai/strategy.ts` 已入 main〕
 - [x] 验证 AI 动作合法性。〔三档失败测试覆盖，已绿〕
 - [x] AI 强化：`_shared` 收敛 + 全序 tie-breaker + hard 跟牌大牌压制。〔M4-05 已并 main；tie-breaker 回归测试已补〕
-- [~] 用自对弈 harness 验证难度差异与无死循环。〔M4-04 已解锁（M-FLOW + M4-05 已并），下一并行批次种子中〕
+- [~] 用自对弈 harness 验证难度差异与无死循环。〔M4-04 已解锁（M-FLOW + M4-05 已并），ready·下一并行批次可派发〕
 
 ## M5 完整单机体验
 
 - [x] 存档版本化（serialize 加 version + 反序列化浅校验，向后兼容往返）。〔M5-01 已并 main；浅校验 7/8 字段，`top` + 深层校验顺延 M5-02〕
-- [~] 存档深校验（补 `top` 必需 + 有界深层结构校验，断局重开前置）。〔M5-02 下一并行批次种子中〕
-- [~] 本地设置（纯数据层：difficulty/音效/震动/动画开关 + 默认值 + 迁移版本）。〔M5-03 下一并行批次种子中〕
+- [~] 存档深校验（补 `top` 必需 + 有界深层结构校验，断局重开前置）。〔M5-02 ready·下一并行批次可派发〕
+- [~] 本地设置（纯数据层：difficulty/音效/震动/动画开关 + 默认值 + 迁移版本）。〔M5-03 ready·下一并行批次可派发〕
 - [ ] 战绩统计。
 - [ ] 断局重开（复用序列化存档）。
 - [ ] 音效开关。
