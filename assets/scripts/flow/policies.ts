@@ -14,9 +14,8 @@ export function levelPolicies(levels: [AiLevel, AiLevel, AiLevel]): {
   bidPolicy: BidPolicy;
   playPolicy: PlayPolicy;
 } {
-  throw new Error('M-FLOW-03 not implemented');
+  return {
+    bidPolicy: ({ state, hand }) => chooseBid(hand, state),
+    playPolicy: ({ snapshot, rng }) => strategyFor(levels[snapshot.turn])(snapshot, rng),
+  };
 }
-
-// 复用引用，避免未使用告警（实现方删除本行即可）
-void strategyFor;
-void chooseBid;
