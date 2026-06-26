@@ -53,14 +53,14 @@
 - [x] flow 出牌循环异常诊断：policy/apply 抛错包成 HeadlessRoundError（保留 cause）。〔M-FLOW-02 已并 main 7fd395e〕
 - [x] selfplay 诊断消费：runner 用 HeadlessRoundError 字段组富 partial（非空 seed/turns/landlord/lastEvents）。〔M2-07-D 已并 main b2df6d8〕
 - [x] 难度策略工厂（levelPolicies→{bidPolicy,playPolicy} 按座位注入 flow）。〔M-FLOW-03 已并 main a10b8db；bidPolicy 仍委派 chooseBid，切 chooseBidByLevel 顺延 M-FLOW-04〕
-- [~] 叫抢策略切到难度分层（bidPolicy → chooseBidByLevel）。〔M-FLOW-04 ready·第四批可派发〕
+- [x] 叫抢策略切到难度分层（bidPolicy → chooseBidByLevel）。〔M-FLOW-04 已并 main a2f4828〕
 - [~] 回放/调试 trace（事件流→可复盘 trace + 摘要）。〔M2-11 ready·第四批可派发〕
 
 ## M3 手机竖屏 UI
 
 > M3-00 纯逻辑岛先行（worktree 模式，禁 cc）：hand-layout / selection 已 ready，见 BOARD.md 第三批；后续 view-model 等同模式。场景/预制体属编辑器（非 worktree）。
 
-- [x] 手牌布局算法（390×844 居中/步距/压缩，纯函数）。〔M3-00-hand-layout 已并 main 32b78bc〕
+- [x] 手牌布局算法（390×844 居中/步距/压缩，纯函数）。〔M3-00-hand-layout 已并 main 32b78bc；输入前置条件守卫 aaac57f〕
 - [x] 手牌选中模型（选中/取消/排序，纯不可变）。〔M3-00-selection 已并 main f5d9252〕
 - [~] 牌面视图模型（Card→assetKey/rankLabel/suitKey/sortKey）。〔M3-00-card-view ready·第四批〕
 - [~] 桌面布局坐标模型（390×844 各区）。〔M3-00-table-layout ready·第四批〕
@@ -99,9 +99,9 @@
 - [~] 存档 top.pattern 语义校验（recognize(cards) 与声明 pattern 一致）。〔M5-02C ready·第四批〕
 - [x] 本地设置（纯数据层：difficulty/音效/震动/动画开关 + 默认值 + 迁移版本）。〔M5-03 已并 main ed456c0〕
 - [x] 本地设置编解码（serialize/deserialize + 复用 migrateSettings，为 localStorage 前置）。〔M5-05 已并 main 5aaae99〕
-- [x] 断局存档槽位纯模型（{version,savedAt,round} + 编解码，无 IO）。〔M5-04 已并 main 9b73391〕
+- [x] 断局存档槽位纯模型（{version,savedAt,round} + 编解码，无 IO）。〔M5-04 已并 main 9b73391；canonical wire 收紧 05a3ae9：serializeSave 恒输出 SAVE_VERSION + invalid JSON 前缀〕
 - [~] 设置存储适配器（注入 StorageLike，load/save/remove，无浏览器依赖）。〔M5-06 ready·第四批〕
-- [~] 断局槽位存储适配器（损坏抛错，区别设置）。〔M5-07 ready·第四批〕
+- [x] 断局槽位存储适配器（损坏抛错，区别设置）。〔M5-07 已并 main 4c92572〕
 - [~] 战绩统计编解码（JSON + 容错迁移）。〔M5-08 ready·第四批〕
 - [~] 对局历史记录纯模型（追加/裁剪/倒序/迁移）。〔M5-09 ready·第四批〕
 - [ ] 战绩统计。

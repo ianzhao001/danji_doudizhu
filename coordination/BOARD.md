@@ -55,16 +55,16 @@ main 现状：**36 测试文件 / 160 用例全绿**（rules + game + ai 三档 
 |----|----|----|----|----|
 | M-FLOW-03 | `flow/policies.ts` | **done** | a10b8db | levelPolicies→{bidPolicy,playPolicy}；**bidPolicy 仍委派 chooseBid，切 chooseBidByLevel 顺延 M-FLOW-04** |
 
-## 下一并行批次（15 任务 · 文件域互不相交 · 全部 ready · 可认领）
+## 下一并行批次（M5-07 / M-FLOW-04 已并 main · 余 13 ready · 可认领）
 
 > 种子已落：每任务 spec 入 main、失败测试+桩在各自分支（14 分支独立 typecheck 绿、种子测试红；M4-08 为绿护栏锁不变量）。文件域两两不相交，可同时认领。spec 见 `coordination/tasks/<ID>.md`。**优先级**（执行者建议+架构认同）：第一波 `M-FLOW-04`/`M5-02C`/`M5-06`/`M5-07`（接主线「可玩 UI + 可保存」最快）；第二波 `M3-00-card-view/table-layout/action-buttons`；其余 M3-00 视图模型 + M2-11/M4-08/M5-08/M5-09 可同批。
 
 | ID | 实现文件域 | 依赖 | 分支 | 备注 |
 |----|----|----|----|----|
 | M5-02C | `game/serialize.ts` | M5-02B | `task/M5-02C-serialize-pattern-semantic` | `recognize(cards)` 与声明 pattern 比对（评审意见 #1 语义层）|
-| M-FLOW-04 | `flow/policies.ts` | M-FLOW-03+M4-07 | `task/M-FLOW-04-bid-level-policy` | bidPolicy 切 `chooseBidByLevel`（评审意见 #5 集成）|
+| M-FLOW-04 ✅**done** | `flow/policies.ts` | M-FLOW-03+M4-07 | 已并 main `a2f4828`（**未走分支**：实现方直接落 main） | bidPolicy 切 `chooseBidByLevel`（评审意见 #5 闭合）；分支 `task/M-FLOW-04-bid-level-policy` 已废弃 |
 | M5-06 | `data/settingsStorage.ts`（新；桶已加）| M5-05 | `task/M5-06-settings-storage-adapter` | 设置 load/save/remove 注入 StorageLike，无浏览器依赖 |
-| M5-07 | `data/saveStorage.ts`（新；桶已加）| M5-04 | `task/M5-07-save-storage-adapter` | 槽位 load/save/remove；损坏抛错（区别设置）|
+| M5-07 ✅**done** | `data/saveStorage.ts` | M5-04 | 已并 main `4c92572`（**未走分支**：实现方直接落 main） | 槽位 load/save/remove；损坏抛错（区别设置）；分支 `task/M5-07-save-storage-adapter` 已废弃；StorageLike 仍自含，待 M5-06 并后统一 |
 | M5-08 | `data/statsCodec.ts`（新；桶已加）| M2-10 | `task/M5-08-stats-codec` | 战绩 JSON 编解码 + 容错迁移 |
 | M5-09 | `data/records.ts`（新；桶已加）| M2-03 | `task/M5-09-records-model` | 对局历史纯模型（追加/裁剪/倒序/迁移）|
 | M3-00-card-view | `ui/card-view.ts`（新）| — | `task/M3-00-card-view-model` | Card→assetKey/rankLabel/suitKey/sortKey |
@@ -81,9 +81,9 @@ main 现状：**36 测试文件 / 160 用例全绿**（rules + game + ai 三档 
 
 ## 评审遗留处理（本批 · 执行者 5 意见）
 - **#1 top.pattern 偏浅** → M5-02B 已补**形状**；**语义**层（recognize 比对）→ 开 **M5-02C**。
-- **#2 save wire format 未钉死** → M5-04 当前 `serializeSave` 用 `slot.version`、`deserializeSave` 归一为 `SAVE_VERSION` 且兼容 string/object round；**canonical wire 钉死**记入后续（M5-04 已绿， Wire 收紧可作为 M5-07 adapter 合并后的小加固）。
+- **#2 save wire format 未钉死** → ✅ **已落实（`05a3ae9`）**：`serializeSave` 恒写 `SAVE_VERSION`（不再透传 `slot.version`），与 `deserializeSave` 归一对称、自洽闭环；非法 JSON 归一为 `corrupted('invalid JSON')`。**遗留**：「`slot.version≠SAVE_VERSION` 仍输出 `SAVE_VERSION`」尚无专用回归断言（见「整合后待办」）。
 - **#3 非法 AiLevel 静默保守化** → M4-07 非 Hard 落 Simple 阈值；记入后续改 exhaustive switch 或由 settings 层保证（低优先，type 层已挡）。
-- **#4 hand-layout 输入域理想化** → M3-00-hand-layout 已并 main（满足 spec）；**前置条件/容错**纳入后续 UI 纯函数 spec 模板（评审建议「UI 纯逻辑岛提前定义异常输入」已写入第四批各 UI spec 的验收）。
+- **#4 hand-layout 输入域理想化** → ✅ **前置条件守卫已并 main（`aaac57f`）**：非法 `count`/尺寸、`count>1` 且 `cardWidth>containerWidth` 一律抛错。**遗留**：throw 路径尚无测试（见「整合后待办」）。后续 UI 纯函数 spec 模板仍统一要求提前定义异常输入。
 - **#5 M-FLOW-03 未接 M4-07 易遗忘** → 立即开 **M-FLOW-04** 集成任务。
 
 ## 规划者优化（本批落实，写入后续 spec 模板）
@@ -100,6 +100,8 @@ main 现状：**36 测试文件 / 160 用例全绿**（rules + game + ai 三档 
   - 结构：**M5-09 分支漏了 `data/index.ts` 桶导出**（其种子 commit 消息写了「data 桶导出」却未落地，且测试只直引 `./records` 故无测试能发现）→ 补 `export * from './records';`，amend 入种子 `f7e2e29`，分支 typecheck 仍绿。
   - 文案：4 处 spec 与实际 API 不符（种入的测试本身是对的）→ ① `M3-00-action-buttons`/`M4-08` 把 `validatePlay(...).valid` 更正为 `.ok`（`RuleResult.ok`）；② `M3-00-result-view` 删去并不存在的 `winner` 入参说明，改为「按 `settlement.scores[heroSeat]` 符号判胜负」；③ `M3-00-card-view` 更正「双王 rankLabel 与 RANK_LABEL 一致」的错述（`RANK_LABEL` 中王为 `'x'/'X'`）。
   - 复核后 main 仍 **160 绿**；其余 11 个种子（含 M-FLOW-04 不破坏既有 `policies.test.ts`、M5-02C/06/07/08 等）核对无误。
+- **第四批首批整合（实现方直接落 main、架构复核后拆分提交）**：M5-07 saveStorage（`4c92572`）、M-FLOW-04 bidPolicy 分层（`a2f4828`）按任务拆独立提交；另含两项**超域整合项**——save canonical wire（`05a3ae9`，闭合 #2）、hand-layout 输入守卫（`aaac57f`，闭合 #4）。实现方**未走 worktree/分支、直接改 main 工作区**（不合 PROTOCOL），架构复核后按文件域拆 4 commit 落盘：种入测试逐字未改、`.meta` 由编辑器生成（UUID 唯一）、`38 files / 168 tests` 全绿、typecheck 净、无 cc。**废弃分支** `task/M5-07-*`、`task/M-FLOW-04-*`（桩已被 main 实现取代，**勿再 `merge`**，建议删除）。
+- **整合后待办（低优先、非阻塞，记录执行方评审建议处置）**：① save canonical 回归断言（`slot.version≠SAVE_VERSION→仍输出 SAVE_VERSION`）；② hand-layout throw 路径测试；③ `policies.test.ts`（M-FLOW-03）第 40–48 行断言语义已过时（仍写「深相等 `chooseBid`」，靠 Hard==Normal 巧合为绿），宜改述为 `chooseBidByLevel(...,LEVELS[seat])`；④ M-FLOW-04 spec 验收 #3 的 `runHeadlessRound` 注入性实由 `policies.test.ts` 兜底、`policies-bid.test.ts` 未含，宜对齐 spec 文案；⑤ M5-06 并后统一 `StorageLike` 单一真相源；⑥ `bidding-levels` 判强逻辑与 `chooseBid` 重复、`level===Hard?1:3` 非 exhaustive（与 `strategyFor` 风格对齐）。**均不在本轮「仅审查+提交」范围，留作后续任务。**
 
 ## 后续（本批次之后）
 - **M3 UI 主体**：第四批 UI 纯逻辑岛（card-view/table-layout/action-buttons/hand-interaction/bidding-view/result-view/event-cues）落齐后，进入 Cocos 编辑器场景/预制体/组件（import cc，非 worktree）；view-model/replay 已在第四批。
