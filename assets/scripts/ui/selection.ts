@@ -6,18 +6,27 @@
 
 import type { Card } from '../rules';
 
+function sameCard(a: Card, b: Card): boolean {
+  return a.rank === b.rank && a.suit === b.suit;
+}
+
 export function isSelected(selected: Card[], card: Card): boolean {
-  throw new Error('M3-00 selection isSelected not implemented');
+  return selected.some((candidate) => sameCard(candidate, card));
 }
 
 export function toggle(selected: Card[], card: Card): Card[] {
-  throw new Error('M3-00 selection toggle not implemented');
+  return isSelected(selected, card)
+    ? selected.filter((candidate) => !sameCard(candidate, card))
+    : [...selected, card];
 }
 
 export function sortByRank(cards: Card[]): Card[] {
-  throw new Error('M3-00 selection sortByRank not implemented');
+  return cards
+    .map((card, index) => ({ card, index }))
+    .sort((a, b) => (a.card.rank - b.card.rank) || (a.index - b.index))
+    .map(({ card }) => card);
 }
 
 export function clearSelection(): Card[] {
-  throw new Error('M3-00 selection clearSelection not implemented');
+  return [];
 }
