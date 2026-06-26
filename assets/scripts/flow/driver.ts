@@ -33,13 +33,25 @@ const defaultPlayPolicy: PlayPolicy = ({ snapshot, rng }) => chooseAction(snapsh
 
 function roundError(
   message: string,
-  info: { seed: number; turns: number; landlord: SeatIndex | null; events: FlowEvent[] },
+  info: { seed: number; turns: number; landlord: SeatIndex | null; events: FlowEvent[]; cause?: unknown },
 ): HeadlessRoundError {
   return new HeadlessRoundError(message, {
     seed: info.seed,
     turns: info.turns,
     landlord: info.landlord,
     lastEvents: info.events.slice(-DIAGNOSTIC_EVENT_COUNT),
+    cause: info.cause,
+  });
+}
+
+function throwPlayLoopError(
+  error: unknown,
+  info: { seed: number; turns: number; landlord: SeatIndex | null; events: FlowEvent[] },
+): never {
+  if (error instanceof HeadlessRoundError) throw error;
+  throw roundError(`Headless round play loop failed seed=${info.seed} turn=${info.turns}`, {
+    ...info,
+    cause: error,
   });
 }
 
@@ -93,9 +105,31 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
         }
 
         const snap = snapshot(state, state.turn);
-        const action = playPolicy({ seat: state.turn, snapshot: snap, rng });
+        const action = (() => {
+          try {
+            return playPolicy({ seat: state.turn, snapshot: snap, rng });
+          } catch (error) {
+            throwPlayLoopError(error, {
+              seed: config.seed,
+              turns,
+              landlord: bidding.landlord,
+              events,
+            });
+          }
+        })();
         await clock.sleep(thinkingDelayMs);
-        const result = apply(state, action);
+        const result = (() => {
+          try {
+            return apply(state, action);
+          } catch (error) {
+            throwPlayLoopError(error, {
+              seed: config.seed,
+              turns,
+              landlord: bidding.landlord,
+              events,
+            });
+          }
+        })();
         state = result.state;
         gameEvents.push(...result.events);
         for (const event of result.events) events.push({ type: 'round', event });
