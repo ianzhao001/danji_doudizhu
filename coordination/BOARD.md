@@ -100,10 +100,24 @@ main 现状：**36 测试文件 / 160 用例全绿**（rules + game + ai 三档 
   - 结构：**M5-09 分支漏了 `data/index.ts` 桶导出**（其种子 commit 消息写了「data 桶导出」却未落地，且测试只直引 `./records` 故无测试能发现）→ 补 `export * from './records';`，amend 入种子 `f7e2e29`，分支 typecheck 仍绿。
   - 文案：4 处 spec 与实际 API 不符（种入的测试本身是对的）→ ① `M3-00-action-buttons`/`M4-08` 把 `validatePlay(...).valid` 更正为 `.ok`（`RuleResult.ok`）；② `M3-00-result-view` 删去并不存在的 `winner` 入参说明，改为「按 `settlement.scores[heroSeat]` 符号判胜负」；③ `M3-00-card-view` 更正「双王 rankLabel 与 RANK_LABEL 一致」的错述（`RANK_LABEL` 中王为 `'x'/'X'`）。
   - 复核后 main 仍 **160 绿**；其余 11 个种子（含 M-FLOW-04 不破坏既有 `policies.test.ts`、M5-02C/06/07/08 等）核对无误。
-- **第四批首批整合（实现方直接落 main、架构复核后拆分提交）**：M5-07 saveStorage（`4c92572`）、M-FLOW-04 bidPolicy 分层（`a2f4828`）按任务拆独立提交；另含两项**超域整合项**——save canonical wire（`05a3ae9`，闭合 #2）、hand-layout 输入守卫（`aaac57f`，闭合 #4）。实现方**未走 worktree/分支、直接改 main 工作区**（不合 PROTOCOL），架构复核后按文件域拆 4 commit 落盘：种入测试逐字未改、`.meta` 由编辑器生成（UUID 唯一）、`38 files / 168 tests` 全绿、typecheck 净、无 cc。**废弃分支** `task/M5-07-*`、`task/M-FLOW-04-*`（桩已被 main 实现取代，**勿再 `merge`**，建议删除）。
-- **整合后待办（低优先、非阻塞，记录执行方评审建议处置）**：① save canonical 回归断言（`slot.version≠SAVE_VERSION→仍输出 SAVE_VERSION`）；② hand-layout throw 路径测试；③ `policies.test.ts`（M-FLOW-03）第 40–48 行断言语义已过时（仍写「深相等 `chooseBid`」，靠 Hard==Normal 巧合为绿），宜改述为 `chooseBidByLevel(...,LEVELS[seat])`；④ M-FLOW-04 spec 验收 #3 的 `runHeadlessRound` 注入性实由 `policies.test.ts` 兜底、`policies-bid.test.ts` 未含，宜对齐 spec 文案；⑤ M5-06 并后统一 `StorageLike` 单一真相源；⑥ `bidding-levels` 判强逻辑与 `chooseBid` 重复、`level===Hard?1:3` 非 exhaustive（与 `strategyFor` 风格对齐）。**均不在本轮「仅审查+提交」范围，留作后续任务。**
+- **第四批首批整合（实现方直接落 main、架构复核后拆分提交）**：M5-07 saveStorage（`4c92572`）、M-FLOW-04 bidPolicy 分层（`a2f4828`）按任务拆独立提交；另含两项**超域整合项**——save canonical wire（`05a3ae9`，闭合 #2）、hand-layout 输入守卫（`aaac57f`，闭合 #4）。实现方**未走 worktree/分支、直接改 main 工作区**（不合 PROTOCOL），架构复核后按文件域拆 4 commit 落盘：种入测试逐字未改、`.meta` 由编辑器生成（UUID 唯一）、`38 files / 168 tests` 全绿、typecheck 净、无 cc。**废弃分支** `task/M5-07-*`、`task/M-FLOW-04-*` 已**删除**（worktree 移除 + 分支 `-D`）：经核对其分支产物与 main 等价（M5-07 `saveStorage.ts` 与 main 逐字相同；M-FLOW-04 分支劣于 main 已审版本），main 为唯一真相源，避免双份 `merge`。
+- **整合后待办 → 已转任务书派发**（见下「优化批」）：①→**M5-04B**、②→**M3-00-hand-layout-guards**、③④→**M-FLOW-05**、⑥→**M4-09**。仅 ⑤ `StorageLike` 统一**暂不派**（阻塞于 M5-06 合并，待其落 main 再开）。
+
+## 优化批（4 任务 · 种子已落 · ready · 可认领）
+
+> 由「整合后待办 + 执行方评审建议」转化。spec 入 main `51e3af5`；4 分支已建于 main HEAD。**M4-09** 含失败测试+桩（`1b5531b`：typecheck 绿、`bidding-strength` 3 红、余 168 绿）；其余 3 个为**测试补全/维护型**（行为已实现，分支=main HEAD 无桩，实现方新建/就地改测试应直接全绿）。派发用 PROTOCOL bootstrap（`<ID>` 换分支名）。
+
+| ID | 类型 | 实现文件域 | 分支 | 备注 |
+|----|----|----|----|----|
+| M5-04B | 绿护栏(测试) | `test/data/save-wire.test.ts`（新） | `task/M5-04B-save-wire-regression` | 锁 canonical wire（`05a3ae9`）：version 归一输出 + invalid JSON |
+| M3-00-hand-layout-guards | 绿护栏(测试) | `test/ui/hand-layout-guards.test.ts`（新） | `task/M3-00-hand-layout-guards` | 锁输入守卫（`aaac57f`）throw 路径 |
+| M4-09 | 重构 | `ai/bidding.ts` + `ai/bidding-levels.ts`（+`test/ai/bidding-strength.test.ts`） | `task/M4-09-bidding-strength-helper` | 抽 `isStrongHand` 单一真相源 + 阈值 exhaustive；既有 bidding 测试须保持绿 |
+| M-FLOW-05 | 测试/文档维护 | `test/flow/policies.test.ts`（**例外授权改指定断言**）+ `tasks/M-FLOW-04-*.md` | `task/M-FLOW-05-bid-test-align` | 低优先：断言改述 `chooseBidByLevel`、spec #3 文案对齐 |
+
+> 文件域与在跑的 13 个第四批任务**互不相交**（M4-09 的 `ai/bidding*.ts` 无人占用；测试新增文件独立）。M-FLOW-05 为唯一「改既有测试」任务，spec 已**显式授权**且限定就地改一条断言。
 
 ## 后续（本批次之后）
 - **M3 UI 主体**：第四批 UI 纯逻辑岛（card-view/table-layout/action-buttons/hand-interaction/bidding-view/result-view/event-cues）落齐后，进入 Cocos 编辑器场景/预制体/组件（import cc，非 worktree）；view-model/replay 已在第四批。
 - **M5 持久化 IO**：M5-06/M5-07 adapter + M5-04 槽位 + M5-05 codec + M5-08/M5-09 → 真实 localStorage 接入 + 断局重开（消费 M5-02/02C 校验）。
-- Wire 收紧（M5-04 canonical）、AiLevel 非法值 exhaustive（M4-07）、hand-layout 前置条件——低优先加固项，单列。
+- 加固项收口：Wire 收紧（M5-04 canonical）已 `05a3ae9`、hand-layout 前置条件已 `aaac57f`；AiLevel/叫抢阈值 exhaustive → 并入 **M4-09**。
+- **设计型待办（需专门 spec，暂未种）**：① 落盘数值字段不变量（`passesInARow`/`bombsPlayed`/`savedAt` 非负整数、`netScore` 允许负，收紧 serialize/save/stats/records 校验）；② 进 Cocos 前的整屏 VM 集成层（`GameSnapshot+selected+settings → {手牌slots,按钮态,叫抢VM,桌面区域,cue队列}`，让组件变薄）。二者涉及跨域设计，待出 spec 再开。
