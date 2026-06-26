@@ -4,7 +4,7 @@
  * 复用 rules 的 validatePlay/legalFollows/enumerateMoves。
  */
 
-import { type Card } from '../rules';
+import { enumerateMoves, legalFollows, validatePlay, type Card } from '../rules';
 import { type GameSnapshot, type SeatIndex } from '../game';
 
 export interface ActionButtonsState {
@@ -18,5 +18,19 @@ export function deriveActionButtons(args: {
   selectedCards: Card[];
   viewerSeat?: SeatIndex;
 }): ActionButtonsState {
-  throw new Error('M3-00 action-buttons not implemented');
+  const { snapshot, selectedCards } = args;
+  const viewerSeat = args.viewerSeat ?? snapshot.turn;
+  if (snapshot.turn !== viewerSeat) return { play: false, pass: false, hint: false };
+
+  const current = snapshot.top?.pattern ?? null;
+  const hand = snapshot.viewerHand ?? [];
+  const hasHint = snapshot.top === null
+    ? enumerateMoves(hand).length > 0
+    : legalFollows(hand, snapshot.top.pattern).length > 0;
+
+  return {
+    play: selectedCards.length > 0 && validatePlay(selectedCards, current).ok,
+    pass: snapshot.top !== null,
+    hint: hasHint,
+  };
 }
