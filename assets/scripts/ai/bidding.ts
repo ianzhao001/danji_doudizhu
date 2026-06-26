@@ -42,3 +42,11 @@ export function chooseBid(hand: Card[], state: BiddingState): BidAction {
 
   throw new Error('chooseBid cannot act during closed bidding phase');
 }
+
+/**
+ * M4-09 单一真相源判强（架构落桩——实现方实现函数体，并让 chooseBid 与 chooseBidByLevel 复用本函数）。
+ * 语义：火箭(双王) 或 炸弹(四同点) 或 highCardCount(点数 ≥ Rank.R2，含 2 与双王) ≥ highCardThreshold。
+ */
+export function isStrongHand(hand: Card[], highCardThreshold: number): boolean {
+  throw new Error('M4-09 isStrongHand not implemented');
+}
