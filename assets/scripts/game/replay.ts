@@ -4,6 +4,7 @@
  */
 
 import { type GameEvent, type SeatIndex, type Side } from './types';
+import { Category, Rank } from '../rules';
 
 export interface TraceLine {
   turn: number;
@@ -13,9 +14,43 @@ export interface TraceLine {
 }
 
 export function buildTrace(events: GameEvent[]): TraceLine[] {
-  throw new Error('M2-11 buildTrace not implemented');
+  const trace: TraceLine[] = [];
+  for (const event of events) {
+    if (event.type === 'win') continue;
+    const turn = trace.length + 1;
+    if (event.type === 'play') {
+      trace.push({
+        turn,
+        seat: event.seat,
+        kind: 'play',
+        summary: `play ${Category[event.pattern.category]} ${Rank[event.pattern.mainRank]}`,
+      });
+    } else if (event.type === 'pass') {
+      trace.push({ turn, seat: event.seat, kind: 'pass', summary: 'pass' });
+    } else if (event.type === 'bomb') {
+      trace.push({ turn, seat: event.seat, kind: 'bomb', summary: 'bomb' });
+    } else if (event.type === 'rocket') {
+      trace.push({ turn, seat: event.seat, kind: 'rocket', summary: 'rocket' });
+    } else {
+      trace.push({ turn, seat: event.leader, kind: 'reset', summary: 'reset' });
+    }
+  }
+  return trace;
 }
 
 export function traceSummary(events: GameEvent[]): { turns: number; bombs: number; winner: Side | null } {
-  throw new Error('M2-11 traceSummary not implemented');
+  let turns = 0;
+  let bombs = 0;
+  let winner: Side | null = null;
+
+  for (const event of events) {
+    if (event.type === 'win') {
+      winner = event.side;
+      continue;
+    }
+    turns += 1;
+    if (event.type === 'bomb' || event.type === 'rocket') bombs += 1;
+  }
+
+  return { turns, bombs, winner };
 }
