@@ -12,7 +12,7 @@
 不直接碰浏览器 `localStorage`。损坏存档应**抛错**而非静默回默认（与设置不同：存档损坏需让 UI 提示「无可用断局」）。
 
 ## 行为要求
-1. 复用 M5-06 的 `StorageLike`（从 `./settingsStorage` import type，单一真相源）；若耦合不便则在本文件 `export interface StorageLike` 并在 spec 注明二者须保持一致（实现方择一，建议复用）。
+1. `StorageLike`：本文件**独立定义**（与 M5-06 `settingsStorage.ts` 形状一致；二者尚未合并，避免跨分支依赖。合并后由架构统一为单一真相源——届时改 M5-07 从 `./settingsStorage` import type，删除本地定义）。
 2. `loadSave(storage: StorageLike, key: string): SaveSlot | null`：
    - `raw = storage.getItem(key)`；`null` → 返回 `null`（无断局）。
    - 否则 `deserializeSave(raw)`（损坏 → 透传抛错，**不**吞）。
