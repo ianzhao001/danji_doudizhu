@@ -19,11 +19,37 @@ export const SETTINGS_VERSION = 1;
 
 /** 稳定默认设置。 */
 export function defaultSettings(): Settings {
-  throw new Error('M5-03 not implemented: defaultSettings');
+  return {
+    version: SETTINGS_VERSION,
+    difficulty: AiLevel.Normal,
+    sound: true,
+    vibration: true,
+    animation: true,
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isAiLevel(value: unknown): value is AiLevel {
+  return Object.values(AiLevel).includes(value as AiLevel);
+}
+
+function booleanOrDefault(value: unknown, fallback: boolean): boolean {
+  return typeof value === 'boolean' ? value : fallback;
 }
 
 /** 容错迁移：尽量恢复、不抛错，返回完整当前形 Settings。 */
 export function migrateSettings(raw: unknown): Settings {
-  void raw;
-  throw new Error('M5-03 not implemented: migrateSettings');
+  const defaults = defaultSettings();
+  if (!isRecord(raw)) return defaults;
+
+  return {
+    version: SETTINGS_VERSION,
+    difficulty: isAiLevel(raw.difficulty) ? raw.difficulty : defaults.difficulty,
+    sound: booleanOrDefault(raw.sound, defaults.sound),
+    vibration: booleanOrDefault(raw.vibration, defaults.vibration),
+    animation: booleanOrDefault(raw.animation, defaults.animation),
+  };
 }
