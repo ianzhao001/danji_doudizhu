@@ -46,6 +46,12 @@ function assertNonNegativeNumber(value: unknown, field: string): void {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) fail(`${field} must be a non-negative number`);
 }
 
+function assertNonNegativeInteger(value: unknown, field: string): void {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || !Number.isInteger(value)) {
+    fail(`${field} must be a non-negative integer`);
+  }
+}
+
 function assertCard(value: unknown, field: string): void {
   if (!isRecord(value)) fail(`${field} must be a card object`);
   if (!RANKS.has(value.rank as Rank)) fail(`${field}.rank is invalid`);
@@ -78,6 +84,10 @@ function assertTop(value: unknown): void {
   if (!isRecord(value.pattern)) fail('top.pattern must be an object');
   if (!CATEGORIES.has(value.pattern.category as Category)) fail('top.pattern.category is invalid');
   if (!RANKS.has(value.pattern.mainRank as Rank)) fail('top.pattern.mainRank is invalid');
+  assertNonNegativeInteger(value.pattern.length, 'top.pattern.length');
+  if (!Array.isArray(value.pattern.cards)) fail('top.pattern.cards must be an array');
+  value.pattern.cards.forEach((card, index) => assertCard(card, `top.pattern.cards[${index}]`));
+  if (value.pattern.length !== value.pattern.cards.length) fail('top.pattern.length must match cards length');
 }
 
 function assertRoundState(value: Record<string, unknown>): RoundState {
