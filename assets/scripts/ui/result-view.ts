@@ -24,5 +24,19 @@ export function deriveResultView(args: {
   landlord: SeatIndex;
   heroSeat: SeatIndex;
 }): ResultView {
-  throw new Error('M3-00 result-view not implemented');
+  const { settlement, landlord, heroSeat } = args;
+  const springText =
+    settlement.spring === 'spring' ? '春天' : settlement.spring === 'anti-spring' ? '反春天' : '';
+
+  return {
+    resultText: settlement.scores[heroSeat] > 0 ? '胜利' : '失败',
+    multiplier: settlement.multiplier,
+    bombs: settlement.bombs,
+    springText,
+    scores: ([0, 1, 2] as SeatIndex[]).map((seat) => ({
+      seat,
+      score: settlement.scores[seat],
+      isLandlord: seat === landlord,
+    })),
+  };
 }
