@@ -16,9 +16,32 @@ import {
   settle,
   snapshot,
 } from '../game';
-import type { GameEvent } from '../game';
+import type { GameEvent, SeatIndex } from '../game';
 import { realClock } from './clock';
-import { defaultBidPolicy, type FlowConfig, type FlowEvent, type FlowResult } from './types';
+import {
+  HeadlessRoundError,
+  defaultBidPolicy,
+  type FlowConfig,
+  type FlowEvent,
+  type FlowResult,
+  type PlayPolicy,
+} from './types';
+
+const DIAGNOSTIC_EVENT_COUNT = 10;
+
+const defaultPlayPolicy: PlayPolicy = ({ snapshot, rng }) => chooseAction(snapshot, rng);
+
+function roundError(
+  message: string,
+  info: { seed: number; turns: number; landlord: SeatIndex | null; events: FlowEvent[] },
+): HeadlessRoundError {
+  return new HeadlessRoundError(message, {
+    seed: info.seed,
+    turns: info.turns,
+    landlord: info.landlord,
+    lastEvents: info.events.slice(-DIAGNOSTIC_EVENT_COUNT),
+  });
+}
 
 export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> {
   const rng = createRng(config.seed);
@@ -27,6 +50,7 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
   const thinkingDelayMs = config.thinkingDelayMs ?? 0;
   const clock = config.clock ?? realClock;
   const bidPolicy = config.bidPolicy ?? defaultBidPolicy;
+  const playPolicy = config.playPolicy ?? defaultPlayPolicy;
   const maxTurns = config.maxTurns ?? 300;
   const maxRedeals = config.maxRedeals ?? 10;
 
@@ -60,11 +84,16 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
 
       while (state.phase !== GamePhase.Settled) {
         if (turns >= maxTurns) {
-          throw new Error(`Headless round exceeded maxTurns seed=${config.seed} turn=${turns}`);
+          throw roundError(`Headless round exceeded maxTurns seed=${config.seed} turn=${turns}`, {
+            seed: config.seed,
+            turns,
+            landlord: bidding.landlord,
+            events,
+          });
         }
 
         const snap = snapshot(state, state.turn);
-        const action = chooseAction(snap, rng);
+        const action = playPolicy({ seat: state.turn, snapshot: snap, rng });
         await clock.sleep(thinkingDelayMs);
         const result = apply(state, action);
         state = result.state;
@@ -74,7 +103,14 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
       }
 
       const win = gameEvents.find((event): event is Extract<GameEvent, { type: 'win' }> => event.type === 'win');
-      if (!win) throw new Error(`Settled round missing win event seed=${config.seed} turn=${turns}`);
+      if (!win) {
+        throw roundError(`Settled round missing win event seed=${config.seed} turn=${turns}`, {
+          seed: config.seed,
+          turns,
+          landlord: bidding.landlord,
+          events,
+        });
+      }
 
       const settlement = settle({
         landlord: bidding.landlord,
