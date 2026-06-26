@@ -25,14 +25,19 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export function serializeSave(slot: SaveSlot): string {
   return JSON.stringify({
-    version: slot.version,
+    version: SAVE_VERSION,
     savedAt: slot.savedAt,
     round: serializeRound(slot.round),
   });
 }
 
 export function deserializeSave(json: string): SaveSlot {
-  const parsed: unknown = JSON.parse(json);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    corrupted('invalid JSON');
+  }
   if (!isRecord(parsed)) corrupted('expected object');
   if (parsed.version !== SAVE_VERSION) corrupted(`unsupported version: ${String(parsed.version)}`);
   if (typeof parsed.savedAt !== 'number' || !Number.isFinite(parsed.savedAt)) corrupted('savedAt must be a finite number');
