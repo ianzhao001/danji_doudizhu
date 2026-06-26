@@ -14,11 +14,15 @@ export interface CardView {
 }
 
 export function cardView(card: Card): CardView {
-  throw new Error('M3-00 card-view not implemented');
+  const isJoker = card.rank === Rank.SmallJoker || card.rank === Rank.BigJoker;
+  return {
+    assetKey: `${card.rank}-${card.suit}`,
+    rankLabel: isJoker ? (card.rank === Rank.SmallJoker ? '小王' : '大王') : RANK_LABEL[card.rank],
+    suitKey: isJoker ? 'joker' : card.suit,
+    sortKey: card.rank,
+  };
 }
 
 export function cardsView(cards: Card[]): CardView[] {
-  throw new Error('M3-00 cardsView not implemented');
+  return cards.map(cardView);
 }
-
-void Rank; void Suit; void RANK_LABEL;
