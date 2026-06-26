@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 收尾（仅剩 M2-07）+ M4 难度 AI 并行（多 AI 协作，派发见 coordination/BOARD.md）
+## 当前阶段：M2 完成 ✅ + M4 三档基线完成 ✅ + 强化批次（M4-05 / M-FLOW / M5-01）并行（多 AI 协作，派发见 coordination/BOARD.md）
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -48,7 +48,8 @@
 - [x] 叫抢状态纯数据化（去 WeakMap，可序列化）。〔M2-08 已并 main〕
 - [x] 基线叫抢决策 `chooseBid`。〔M2-09 已并 main〕
 - [x] 战绩统计累计（纯函数）。〔M2-10 已并 main〕
-- [~] 实现自对弈 harness（N 局 AI vs AI）。〔M2-07 种子就绪 ready，待派发实现 `runSeeds`〕
+- [x] 实现自对弈 harness（N 局 AI vs AI）。〔M2-07 已并 main 6ac5832：runSeeds 复用 runHeadlessRound，零和/终止/可复现〕
+- [~] flow 增强：HeadlessRoundError 诊断 + playPolicy 注入（为 M2-07-D 诊断与 M4-04 难度差异铺路）。〔M-FLOW ready：`task/M-FLOW-diagnostics`，接口桩已入 main c47d92b〕
 
 ## M3 手机竖屏 UI
 
@@ -61,17 +62,19 @@
 - [ ] 创建结算弹窗。
 - [ ] 完成 390x844 竖屏适配检查。
 
-## M4 多难度 AI（接口契约已入 main，三档失败测试已种子并行派发）
+## M4 多难度 AI（三档基线已入 main；强化批次进行中）
 
-- [~] 实现简单 AI（最小化·确定性）。〔M4-01 ready：`task/M4-01-ai-simple`〕
-- [~] 实现普通 AI（保炸弹 + 基础拆牌）。〔M4-02 ready：`task/M4-02-ai-normal`〕
-- [~] 实现困难 AI（积极控权 + 择时炸弹）。〔M4-03 ready：`task/M4-03-ai-hard`〕
-- [~] 三档难度复用 `rules` 着法枚举做分级。〔接口 `ai/strategy.ts` 已入 main〕
-- [ ] 验证 AI 动作合法性。〔随三档失败测试覆盖〕
-- [ ] 用自对弈 harness 验证 AI 不造成状态机死循环与难度差异。〔M4-04，依赖 M2-07 + 三档〕
+- [x] 实现简单 AI（最小化·确定性）。〔M4-01 已并 main 2aafc7f〕
+- [x] 实现普通 AI（保炸弹 + 基础拆牌）。〔M4-02 已并 main 7ec2148〕
+- [x] 实现困难 AI（积极控权 + 择时炸弹）。〔M4-03 已并 main 0849a1e〕
+- [x] 三档难度复用 `rules` 着法枚举做分级。〔接口 `ai/strategy.ts` 已入 main〕
+- [x] 验证 AI 动作合法性。〔三档失败测试覆盖，已绿〕
+- [~] AI 强化：`_shared` 收敛 + 全序 tie-breaker + hard 跟牌大牌压制。〔M4-05 ready：`task/M4-05-ai-hardening`〕
+- [ ] 用自对弈 harness 验证难度差异与无死循环。〔M4-04 todo，依赖 M-FLOW playPolicy + M4-05〕
 
 ## M5 完整单机体验
 
+- [~] 存档版本化（serialize 加 version/schema 校验，向后兼容往返）。〔M5-01 ready：`task/M5-01-serialize-version`〕
 - [ ] 本地设置。
 - [ ] 战绩统计。
 - [ ] 断局重开（复用序列化存档）。
