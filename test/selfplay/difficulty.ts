@@ -14,6 +14,13 @@
 import { AiLevel, strategyFor } from '../../assets/scripts/ai';
 import { runHeadlessRound, type PlayPolicy } from '../../assets/scripts/flow';
 
+
+/** M4-04B：抽离 routing 构造，便于逐座位证明分发。架构落桩——实现方实现函数体（复用已导入的 AiLevel/PlayPolicy）。 */
+export function buildRoutingPolicy(levels: [AiLevel, AiLevel, AiLevel]): PlayPolicy {
+  throw new Error("M4-04B buildRoutingPolicy not implemented");
+}
+
+
 export interface MatchSummary {
   seed: number;
   landlord: number;
