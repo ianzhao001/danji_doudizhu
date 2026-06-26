@@ -14,23 +14,7 @@ import { type BiddingState, type BidAction } from '../game';
  * isStrong：含火箭(双王) 或 炸弹(四同点) 或 ≥2 张点数 ≥ Rank.R2。
  */
 export function chooseBid(hand: Card[], state: BiddingState): BidAction {
-  let hasSmallJoker = false;
-  let hasBigJoker = false;
-  let highCardCount = 0;
-  let hasBomb = false;
-  const rankCounts = new Map<Rank, number>();
-
-  for (const card of hand) {
-    hasSmallJoker = hasSmallJoker || card.rank === Rank.SmallJoker;
-    hasBigJoker = hasBigJoker || card.rank === Rank.BigJoker;
-    if (card.rank >= Rank.R2) highCardCount += 1;
-
-    const count = (rankCounts.get(card.rank) ?? 0) + 1;
-    rankCounts.set(card.rank, count);
-    hasBomb = hasBomb || count >= 4;
-  }
-
-  const isStrong = (hasSmallJoker && hasBigJoker) || hasBomb || highCardCount >= 2;
+  const isStrong = isStrongHand(hand, 2);
 
   if (state.phase === 'calling') {
     return { type: isStrong ? 'call' : 'pass', seat: state.turn };
@@ -48,5 +32,21 @@ export function chooseBid(hand: Card[], state: BiddingState): BidAction {
  * 语义：火箭(双王) 或 炸弹(四同点) 或 highCardCount(点数 ≥ Rank.R2，含 2 与双王) ≥ highCardThreshold。
  */
 export function isStrongHand(hand: Card[], highCardThreshold: number): boolean {
-  throw new Error('M4-09 isStrongHand not implemented');
+  let hasSmallJoker = false;
+  let hasBigJoker = false;
+  let highCardCount = 0;
+  let hasBomb = false;
+  const rankCounts = new Map<Rank, number>();
+
+  for (const card of hand) {
+    hasSmallJoker = hasSmallJoker || card.rank === Rank.SmallJoker;
+    hasBigJoker = hasBigJoker || card.rank === Rank.BigJoker;
+    if (card.rank >= Rank.R2) highCardCount += 1;
+
+    const count = (rankCounts.get(card.rank) ?? 0) + 1;
+    rankCounts.set(card.rank, count);
+    hasBomb = hasBomb || count >= 4;
+  }
+
+  return (hasSmallJoker && hasBigJoker) || hasBomb || highCardCount >= highCardThreshold;
 }
