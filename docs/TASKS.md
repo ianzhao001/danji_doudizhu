@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 三档+强化+legality ✅ + 第三批（8）✅ + 第四批（13）+ 优化批（4）已并 main ✅（54 测试文件 / 296 用例全绿）。下一步：M3 进 Cocos 编辑器场景/预制体 + M5 持久化 IO 接入。派发见 coordination/BOARD.md
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化批 ✅ 已并 main（54 文件 / 296 绿）· **第五批（15 任务）种子 ready 可派发**（3 功能 + 4 加固 + 8 green-guard，派发见 coordination/BOARD.md）
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -76,7 +76,7 @@
 - [ ] 提示按钮复用 `rules` 着法枚举。
 - [ ] 接入 `GameEvent` 驱动动画与音效。
 - [ ] 创建结算弹窗。
-- [ ] 完成 390x844 竖屏适配检查。
+- [ ] 完成 390x844 竖屏适配检查。〔前置 M3-01 screen-view（第五批 ready）：整屏 VM 整合层，组件变薄〕
 
 ## M4 多难度 AI（三档基线已入 main；强化批次进行中）
 
@@ -105,8 +105,8 @@
 - [x] 断局槽位存储适配器（损坏抛错，区别设置）。〔M5-07 已并 main 4c92572；StorageLike 改 import settingsStorage〕
 - [x] 战绩统计编解码（JSON + 容错迁移）。〔M5-08 已并 main（第四批）〕
 - [x] 对局历史记录纯模型（追加/裁剪/倒序/迁移）。〔M5-09 已并 main（第四批）〕
-- [ ] 战绩统计。
-- [ ] 断局重开（复用序列化存档）。
+- [ ] 战绩统计。〔前置 M5-11 aggregate（第五批 ready）：FlowResult→stats/records 聚合〕
+- [ ] 断局重开（复用序列化存档）。〔前置 M5-10 resume（第五批 ready）：SaveSlot→可继续对局〕
 - [ ] 音效开关。
 - [ ] 基础动画。
 

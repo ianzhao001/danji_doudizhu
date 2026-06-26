@@ -2,11 +2,36 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M4（含 M4-09）✅ · 第三批（8）✅ · 第四批（13）✅ · 优化批（4）✅ —— 全部已并 main
+## 当前里程碑：M2 ✅ · M4 ✅ · 第三/四/优化批 ✅ 已并 main · **第五批（15 任务）种子 ready · 可派发**
 
-main 现状：**54 测试文件 / 296 用例全绿、typecheck 净、无 cc 泄漏**。第四批 13 任务（M5-02C/M5-06/07→已先并/08/09、M2-11、M4-08、7×M3-00 view-model）+ 优化批 4 任务（M5-04B、M3-00-hand-layout-guards、M4-09、M-FLOW-05）已全部 `merge --no-ff` 入 main（168→296 绿）。合并要点：`data/index.ts` 桶 M5-09 与 saveStorage 冲突已解（8 导出并存）；**`StorageLike` 已统一单一真相源**（saveStorage 从 settingsStorage import，闭合评审 ⑤，消 TS2308）；11 个新脚本 `.meta`（编辑器生成、UUID 唯一）已补提；17 个 worktree+分支已清理。**下一步非 worktree**：M3 进 Cocos 编辑器（场景/预制体，import cc）+ M5 持久化 IO 接入。
+main 现状：**54 测试文件 / 296 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已种、全部 ready**（3 功能 + 4 加固 + 8 green-guard，文件域两两不相交；spec 入 main、各分支含失败测试/桩或 green-guard 测试，独立 typecheck 绿）。下一步见下「第五批派发表」。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
+
+## 第五批（15 任务 · 文件域互不相交 · 全部 ready · 可认领）
+
+> 三路并行审计（代码优化/路线缺口/测试盲区）+ Plan agent 验证后派发。spec 入 main；15 分支已建于 main HEAD。**T1–T7** 含失败测试+桩（typecheck 绿、种入测试红、其余绿）；**T8–T15** 为 green-guard（现码即绿，锁回归）。文件域经核对两两不相交（`game/index.ts` 仅 T1 写、`data/index.ts` 仅 T2 写、`ui/index.ts` 由 T3 独占创建——无桶冲突）。**时序**：T1（resume）须在 T4（serialize 加固）**之后**合并（依赖 serialize 错误约定）。
+
+| # | ID | 类型 | 实现文件域 | 分支 | 红/绿 |
+|---|----|----|----|----|----|
+| T1 | M5-10-resume | 功能(keystone) | `data/save.ts`、新 `game/resume.ts`、`game/index.ts` 桶 | `task/M5-10-resume` | 红桩（resumeRound not impl） |
+| T2 | M5-11-aggregate | 功能 | 新 `data/aggregate.ts`、`data/index.ts` 桶 | `task/M5-11-aggregate` | 红桩（3 fn not impl） |
+| T3 | M3-01-screen-view | 功能 | 新 `ui/screen-view.ts`、新 `ui/index.ts` 桶 | `task/M3-01-screen-view` | 红桩（deriveScreenVM not impl） |
+| T4 | M5-12a-serialize-hardening | 加固 | `game/serialize.ts` | `task/M5-12a-serialize-hardening` | green-guard（整数字段已拒；Settled 往返锁） |
+| T5 | M5-12b-data-codec-hardening | 加固 | `data/records.ts`、`data/statsCodec.ts` | `task/M5-12b-data-codec-hardening` | 红桩（records 数值 8 红：现接受负数/小数） |
+| T6 | M3-00-table-layout-metrics | 加固 | `ui/table-layout.ts` | `task/M3-00-table-layout-metrics` | 红桩（LAYOUT_METRICS 未提取，3 红） |
+| T7 | M4-10-bid-dispatch-dedup | 加固(重构) | `ai/bidding.ts`、`ai/bidding-levels.ts` | `task/M4-10-bid-dispatch-dedup` | green-guard（等价不变量；actionForStrength 已导出） |
+| T8 | M5-G1-core-bombs | green-guard | 新 `test/game/core-bombs.test.ts` | `task/M5-G1-core-bombs` | 绿（3） |
+| T9 | M5-G2-illegal-reasons | green-guard | 新 `test/game/illegal-action-reasons.test.ts` | `task/M5-G2-illegal-reasons` | 绿（8） |
+| T10 | M5-G3-storage-empty-string | green-guard | 新 `test/data/{save,settings}-storage-empty-string.test.ts` | `task/M5-G3-storage-empty-string` | 绿（7） |
+| T11 | M5-G4-compare-edges | green-guard | 新 `test/rules/compare-edges.test.ts` | `task/M5-G4-compare-edges` | 绿（4） |
+| T12 | M5-G5-spring-boundaries | green-guard | 新 `test/game/settlement-spring-boundaries.test.ts` | `task/M5-G5-spring-boundaries` | 绿（5） |
+| T13 | M5-G6-action-buttons-edges | green-guard | 新 `test/ui/action-buttons-edges.test.ts` | `task/M5-G6-action-buttons-edges` | 绿（4） |
+| T14 | M5-G7-conservative-paths | green-guard | 新 `test/ai/conservative-action-paths.test.ts`（仅出牌阶段，**不碰 ai/bidding*.ts**） | `task/M5-G7-conservative-paths` | 绿（3） |
+| T15 | M5-G8-driver-diagnostics | green-guard | 新 `test/flow/driver-diagnostics.test.ts`（仅 maxTurns:0+maxRedeals） | `task/M5-G8-driver-diagnostics` | 绿（2） |
+
+> 派发用 PROTOCOL bootstrap（`<ID>` 换上表分支名）。**T5 是唯一会改产品码的红桩**（records 数值收紧，heroScore 允许负）；T1/T2/T3 为新功能填桩；T4/T6/T7/T8–T15 实现方主要在测试侧/微重构。**跨域提示**：T14 不得 import `ai/bidding*.ts`（T7 域）；T1 后于 T4 合并。
 
 ## M2 单局状态机（全部 done）
+
 
 | ID | 模块 / 文件域 | 状态 | 合并 | 备注 |
 |----|----|----|----|----|
@@ -116,6 +141,12 @@ main 现状：**54 测试文件 / 296 用例全绿、typecheck 净、无 cc 泄�
 | M-FLOW-05 | 测试/文档维护 | `test/flow/policies.test.ts`（**例外授权改指定断言**）+ `tasks/M-FLOW-04-*.md` | `task/M-FLOW-05-bid-test-align` | 低优先：断言改述 `chooseBidByLevel`、spec #3 文案对齐 |
 
 > 文件域与在跑的 13 个第四批任务**互不相交**（M4-09 的 `ai/bidding*.ts` 无人占用；测试新增文件独立）。M-FLOW-05 为唯一「改既有测试」任务，spec 已**显式授权**且限定就地改一条断言。
+
+## 第五批派发记录
+- **种子已落、全部 ready**（15 spec 入 main；15 分支建于 main HEAD，各领先 1 commit）。三路并行审计（代码优化/路线缺口/测试盲区）+ Plan agent 验证文件域不相交、类型接地、合并时序后派发。
+- **逐分支红绿态已验证**：T1/T2/T3/T5/T6 为红桩（typecheck 绿、种入测试红、main 基线绿）；T4/T7/T8–T15 为 green-guard（全绿，锁现码）。main 仍 296 绿、typecheck 净。
+- **核查修正（种子质量门）**：① T1 新 `SaveSlot` 字段定 **optional**（否则既有 `save.test.ts:30` 字面量 `import type SaveSlot` 编译失败，且不可改）；② T4 整数字段实为 **green-guard**（现码已拒非整数，原以为 red）；③ T6 `LAYOUT_METRICS` 桩须让「派生一致」断言红（`typeof null==='object'` 陷阱，改用空对象+派生断言）；④ T13 `hint` 用例手牌须含 2(15) 压 A(14)（K<A 压不住，原用例误）；⑤ T12 无春用例须地主赢+农民≥1 手（地主 1 手+农民赢=anti-spring，非 none）。**T1 须后于 T4 合并**（resume 依赖 serialize 错误约定）。
+- 按上「第五批派发表」+ PROTOCOL bootstrap（`<ID>` 换分支名）派发到各实现方窗口。**T5 是唯一会改产品码的红桩**；其余填桩或测试侧。
 
 ## 后续（本批次之后）
 - **M3 UI 主体**：第四批 UI 纯逻辑岛（card-view/table-layout/action-buttons/hand-interaction/bidding-view/result-view/event-cues）落齐后，进入 Cocos 编辑器场景/预制体/组件（import cc，非 worktree）；view-model/replay 已在第四批。
