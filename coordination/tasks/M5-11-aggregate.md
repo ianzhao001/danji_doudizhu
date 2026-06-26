@@ -32,6 +32,7 @@ export function applyFinishedRound(
 - `toRecordEntry`：`heroScore===settlement.scores[heroSeat]`、其余字段对齐。
 - `applyFinishedRound`：`stats.rounds`+1、`records.entries` 末尾追加该 entry、入参 `stats`/`records` 不被改动（不可变）。
 - 连续两局：`applyFinishedRound(applyFinishedRound(s0,r0,res1,...), r1, res2, ...)` 的 `stats.rounds===2`、`records.entries.length===2`。
+- **stats 语义（加固）**：hero 为地主且赢→`asLandlord`/`landlordWins`+1、`netScore=+scores[hero]`；hero 为农民且赢→`asFarmer`/`farmerWins`+1、`netScore` 正；hero 为农民但地主赢→`farmerWins` 不增、`netScore` 负；多局 `netScore` = 各局 `scores[hero]` 之和、`entries` 顺序（playedAt/heroScore）保真。
 - `npm --prefix test test` 全绿、`typecheck` 无错、未 import `cc`。
 
 ## 测试命令

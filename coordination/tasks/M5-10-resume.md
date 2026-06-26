@@ -44,7 +44,8 @@
 - `resumeRound(完整 slot)`：返回 `{state,heroSeat,bidMultiplier,events}` 深相等入参字段。
 - `resumeRound(缺 heroSeat/bidMultiplier/events 的 v1 slot)`：`heroSeat===round.landlord`、`bidMultiplier===1`、`events===[]`。
 - `deserializeSave` 拒绝非法 `heroSeat`（如 `9`）、负 `bidMultiplier`（如 `-1`）、非整数 `bidMultiplier`（如 `1.5`）、`events` 非数组（如 `'x'`）。
-- `savedAt` 非整数（如 `1.5`）或负（如 `-1`）→ 抛错。
+- `savedAt` 非整数（如 `1.5`）或负（如 `-1`）→ 抛错；`savedAt: 0` → 不抛（非负下界）。**这是行为要求 #4 的强制项**（`save-resume-fields.test.ts` 种入·红，须收紧 `save.ts` 后转绿）。
+- canonical wire（绿护栏，`save-resume-fields.test.ts`）：缺省可选字段时 `serializeSave` 输出**不含** `heroSeat`/`bidMultiplier`/`events` 键；存在时写入并往返保真；`bidMultiplier: 0` 边界往返保真。
 - 往返：完整 slot `serializeSave`→`deserializeSave`→`resumeRound` 深相等（绿护栏）。
 - 既有 `save.test.ts` 全绿不改、`npm --prefix test test` 全绿、`typecheck` 无错、未 import `cc`。
 

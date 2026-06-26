@@ -18,7 +18,9 @@
    - spring：地主赢 + 农民 0 手 → `spring==='spring'`。
    - 全倍数：`bidMultiplier=3`、`bombs=2`（两个炸弹事件）、`spring='anti-spring'` → `settlement.multiplier === 24`（3×4×2）。
    - 无春天无炸弹：`multiplier === bidMultiplier`。
-3. 纯测试、禁 cc。**实现方先核 `settlement.ts` 实际公式**——若倍数含 baseScore 乘子，以代码为准调期望值并记报告。
+   - 加固倍数：单炸 `bid=2×2^1=4`；火箭计入炸弹数 `bid=1×2^1=2`；多炸 3 个 → `2^3=8`。
+   - 加固得分（已核实 `multiplier` **不含** baseScore）：地主赢→`scores[landlord]>0` 且两农民 `<0`、三方零和、值 `=2·unit`；农民赢→符号反转、零和；`baseScore` 线性缩放 `scores` 而不改 `multiplier`。
+3. 纯测试、禁 cc。**实现方先核 `settlement.ts` 实际公式**——倍数公式 `bidMultiplier × 2^bombs × (spring?2:1)`，`unit=baseScore×multiplier`，地主 `±2·unit`/农民 `∓unit`。
 
 ## 验收
 - 新测试全绿、`npm --prefix test test` 全绿、`typecheck` 无错。

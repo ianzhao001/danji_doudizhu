@@ -14,10 +14,10 @@
 
 ## 行为要求（纯测试、禁 cc）
 1. 从 `../../assets/scripts/ai` 取 `strategyFor`/`AiLevel`（**不取 `chooseBid`/`chooseBidByLevel`**），构造 `GameSnapshot`。
-2. 断言（用固定 rng）：
-   - 跟牌阶段、手牌含炸弹且非收尾 → Normal/Hard 可能出炸弹压牌（`action.type==='play'` 且 `validatePlay` 过）。
-   - 自由领出、手牌仅剩炸弹 → 出炸弹（`action.type==='play'`）。
-   - `isPressing` 边界：`handCounts` 某对手 `===2` 时 Hard 行为与 `===3` 不同（锁 `<=2` 阈值——具体差异以代码为准）。
+2. 断言（用固定 rng，**确定性具体值**，非"可能/以代码为准"）：
+   - 跟牌、含炸弹且非收尾（Normal，手 `3 3 3 3 5 9` 跟 single3）→ 出**最小安全跟牌单 5**、不拆炸弹（产出无 rank-3）。
+   - 自由领出、手仅剩炸弹（Hard，手 `3 3 3 3`）→ 走 `finishingBomb` 出整副 **4 张炸弹**（`recognize().category===Bomb`）。
+   - `isPressing` 边界（Hard，手 `5 9 K` 跟 single3）：对手 `handCounts===2` → 出**最大 K**（pressing pickLargest）；`===3` → 出**最小 5**（conservative pickSmallest）；二者不同（锁 `<=2` 阈值）。
    - 所有产出动作 `validatePlay(action.cards, snapshot.top?.pattern ?? null).ok === true`（合法性护栏）。
 3. 纯测试、禁 cc、不 import `ai/bidding*.ts`。
 

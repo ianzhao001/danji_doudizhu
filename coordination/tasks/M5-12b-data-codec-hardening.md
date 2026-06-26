@@ -24,8 +24,10 @@
 - `migrateEntry` 各字段缺失→默认（`multiplier→1`、`bombs→0`、`heroScore→0`、`playedAt→0`、`heroSeat→0`、`winner→Farmer`、`spring→'none'`）。
 - `multiplier: -5` → 1；`multiplier: 1.5` → 1；`bombs: -1` → 0；`bombs: 2.5` → 0；`playedAt: -1` → 0；`playedAt: 1.5` → 0。
 - `heroScore: -10`（负整数）→ **保留 -10**（允许负）；`heroScore: 1.5` → 0。
-- `winner: 'x'` → `Side.Farmer`；`spring: 'x'` → `'none'`。
+- `winner: 'x'`（非法）→ `Side.Farmer`；`winner` **缺省**→ `Farmer`；合法 `winner: 'landlord'` **保留** `'landlord'`（**勿**误测合法值期望 farmer）；`spring: 'x'` → `'none'`。
 - 合法 records 经 `migrateRecords` 幂等（深相等）。
+- 超 `MAX_RECORDS`（50）→ 截断为**末 50 条**且保序（绿护栏）。
+- 红绿态：**7 红**（multiplier/bombs/playedAt 各负+小数 6 条 + heroScore 小数 1 条）；其余为绿护栏（heroScore 负整数保留、缺省默认、winner 保留/回退、幂等、截断）。
 - 既有 `records.test.ts`/`stats-codec.test.ts` 全绿。
 - `npm --prefix test test` 全绿、`typecheck` 无错、未 import `cc`。
 

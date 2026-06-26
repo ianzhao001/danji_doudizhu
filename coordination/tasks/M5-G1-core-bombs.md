@@ -17,6 +17,7 @@
    - 出炸弹（四同点）后：`state.bombsPlayed` +1、`events` 含一个 `{type:'bomb'}`。
    - 出火箭（双王）后：`state.bombsPlayed` +1、`events` 含一个 `{type:'rocket'}`。
    - 出普通单张/对子后：`state.bombsPlayed` 不变、`events` 不含 bomb/rocket。
+   - 加固边界：**四带二**（`4 4 4 4 6 7`，含四同点但属 `FourPlusTwoSingles` 非 `Bomb`）→ `bombsPlayed` **不变**、无 bomb 事件（防"见四同即记炸"）；出三张同理不变。
 3. 纯测试、禁 cc、不改既有测试。
 
 ## 验收

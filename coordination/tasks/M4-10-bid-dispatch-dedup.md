@@ -21,7 +21,7 @@ M4-09 抽出了 `isStrongHand` 单一真相源，但 `chooseBid`（`bidding.ts`�
 ## 验收（test/ai/bid-dispatch.test.ts，架构种入·不可改）
 - `chooseBid(hand, calling)` 与 `actionForStrength(calling, isStrongHand(hand,2))` 深相等（多手牌）。
 - `chooseBid(hand, grabbing)` 同理。
-- `chooseBid(hand, done)` 与 `actionForStrength(done, ...)` 同抛错（同一文案）。
+- `chooseBid(hand, done)` 与 `actionForStrength(done, ...)` 同抛错（同一文案）；**`redeal` 子态同样同抛错**（两个 `BIDDING_CLOSED` 子态都锁）。
 - `chooseBidByLevel` 既有行为不变（Normal≡chooseBid、Simple/Hard 阈值分层）——**既有 `bidding-levels.test.ts`/`bidding.test.ts` 全绿不改**。
 - `npm --prefix test test` 全绿、`typecheck` 无错、未 import `cc`。
 

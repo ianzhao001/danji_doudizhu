@@ -48,8 +48,10 @@ export function deriveScreenVM(args: {
 - playing 快照（有 viewerHand、selectedCards、recentEvents 含一个 `round` play）：`hand`/`actions`/`cues` 非空、`bidding===undefined`、`result===undefined`、`topBar.landlordSeat===snapshot.landlord`。
 - 叫抢阶段（给 `bidding`、无 snapshot）：`bidding` 非空、`hand===[]`、`actions` 全 false。
 - settled（给 `settlement`+快照）：`result` 非空、`result.resultText` 正确、`topBar.multiplier===settlement.multiplier`。
-- `cues` 过滤掉 `cueForFlowEvent` 返回 null 的事件（如有）。
-- 入参不被改动。
+- `cues` 过滤掉 `cueForFlowEvent` 返回 null 的事件（如有）；**保序**（按 `recentEvents` 次序）。
+- **空 VM 边界（加固）**：既无 `snapshot` 也无 `bidding` → `hand===[]`、`actions` 全 false、`bidding/result===undefined`、`cues===[]`、`topBar==={multiplier:1,bombs:0,landlordSeat:0}`、`layout` 仍给。
+- **topBar 默认（加固）**：playing 无 `settlement` → `topBar.multiplier===1`、`bombs===0`。
+- 入参不被改动（加固：`selectedCards`/`recentEvents` 调用后与原值深相等）。
 - `npm --prefix test test` 全绿、`typecheck` 无错、未 import `cc`。
 
 ## 测试命令
