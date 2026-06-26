@@ -3,7 +3,8 @@
  * 当前 saveStorage.ts 为桩（throw not implemented）→ 应先红。
  */
 import { describe, it, expect } from 'vitest';
-import { loadSave, saveSave, removeSave, type StorageLike } from '../../assets/scripts/data/saveStorage';
+import { loadSave, saveSave, removeSave } from '../../assets/scripts/data/saveStorage';
+import { type StorageLike } from '../../assets/scripts/data/settingsStorage';
 import { type SaveSlot, SAVE_VERSION } from '../../assets/scripts/data/save';
 import { GamePhase, type RoundState } from '../../assets/scripts/game';
 import { Rank, Suit } from '../../assets/scripts/rules';
