@@ -4,6 +4,7 @@
  */
 
 export * from './stats';
+export * from './statsCodec';
 export * from './settings';
 export * from './settingsCodec';
 export * from './settingsStorage';
