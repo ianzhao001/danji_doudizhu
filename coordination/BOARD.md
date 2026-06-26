@@ -2,9 +2,9 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M4 三档+强化+legality 护栏 ✅ · 第三批（8 任务）已并 main ✅ · 第四批（15 任务）全部 ready · 可派发
+## 当前里程碑：M2 ✅ · M4（含 M4-09）✅ · 第三批（8）✅ · 第四批（13）✅ · 优化批（4）✅ —— 全部已并 main
 
-main 现状：**36 测试文件 / 160 用例全绿**（rules + game + ai 三档 + 强化 + flow + selfplay + data + ui 纯逻辑岛）。第三批 8 任务按序 `merge --no-ff` 入 main（M5-05→M5-04→M5-02B→M4-04B→M4-07→M-FLOW-03→M3-00-hand-layout→M3-00-selection，121→160 绿；M5-04 与 M5-05 共改 `data/index.ts` 已合并两行）；新脚本 `.meta` 已补提。第四批 **15 个文件域互不相交**纯逻辑任务**已种、全部 ready**（见「下一并行批次」）。
+main 现状：**54 测试文件 / 296 用例全绿、typecheck 净、无 cc 泄漏**。第四批 13 任务（M5-02C/M5-06/07→已先并/08/09、M2-11、M4-08、7×M3-00 view-model）+ 优化批 4 任务（M5-04B、M3-00-hand-layout-guards、M4-09、M-FLOW-05）已全部 `merge --no-ff` 入 main（168→296 绿）。合并要点：`data/index.ts` 桶 M5-09 与 saveStorage 冲突已解（8 导出并存）；**`StorageLike` 已统一单一真相源**（saveStorage 从 settingsStorage import，闭合评审 ⑤，消 TS2308）；11 个新脚本 `.meta`（编辑器生成、UUID 唯一）已补提；17 个 worktree+分支已清理。**下一步非 worktree**：M3 进 Cocos 编辑器（场景/预制体，import cc）+ M5 持久化 IO 接入。
 
 ## M2 单局状态机（全部 done）
 
@@ -55,7 +55,7 @@ main 现状：**36 测试文件 / 160 用例全绿**（rules + game + ai 三档 
 |----|----|----|----|----|
 | M-FLOW-03 | `flow/policies.ts` | **done** | a10b8db | levelPolicies→{bidPolicy,playPolicy}；**bidPolicy 仍委派 chooseBid，切 chooseBidByLevel 顺延 M-FLOW-04** |
 
-## 下一并行批次（M5-07 / M-FLOW-04 已并 main · 余 13 ready · 可认领）
+## 第四批（13 任务）—— ✅ 全部已并 main（下表存档；逐一评审通过：API/类型/文件域/红绿态核对无误）
 
 > 种子已落：每任务 spec 入 main、失败测试+桩在各自分支（14 分支独立 typecheck 绿、种子测试红；M4-08 为绿护栏锁不变量）。文件域两两不相交，可同时认领。spec 见 `coordination/tasks/<ID>.md`。**优先级**（执行者建议+架构认同）：第一波 `M-FLOW-04`/`M5-02C`/`M5-06`/`M5-07`（接主线「可玩 UI + 可保存」最快）；第二波 `M3-00-card-view/table-layout/action-buttons`；其余 M3-00 视图模型 + M2-11/M4-08/M5-08/M5-09 可同批。
 
@@ -101,9 +101,10 @@ main 现状：**36 测试文件 / 160 用例全绿**（rules + game + ai 三档 
   - 文案：4 处 spec 与实际 API 不符（种入的测试本身是对的）→ ① `M3-00-action-buttons`/`M4-08` 把 `validatePlay(...).valid` 更正为 `.ok`（`RuleResult.ok`）；② `M3-00-result-view` 删去并不存在的 `winner` 入参说明，改为「按 `settlement.scores[heroSeat]` 符号判胜负」；③ `M3-00-card-view` 更正「双王 rankLabel 与 RANK_LABEL 一致」的错述（`RANK_LABEL` 中王为 `'x'/'X'`）。
   - 复核后 main 仍 **160 绿**；其余 11 个种子（含 M-FLOW-04 不破坏既有 `policies.test.ts`、M5-02C/06/07/08 等）核对无误。
 - **第四批首批整合（实现方直接落 main、架构复核后拆分提交）**：M5-07 saveStorage（`4c92572`）、M-FLOW-04 bidPolicy 分层（`a2f4828`）按任务拆独立提交；另含两项**超域整合项**——save canonical wire（`05a3ae9`，闭合 #2）、hand-layout 输入守卫（`aaac57f`，闭合 #4）。实现方**未走 worktree/分支、直接改 main 工作区**（不合 PROTOCOL），架构复核后按文件域拆 4 commit 落盘：种入测试逐字未改、`.meta` 由编辑器生成（UUID 唯一）、`38 files / 168 tests` 全绿、typecheck 净、无 cc。**废弃分支** `task/M5-07-*`、`task/M-FLOW-04-*` 已**删除**（worktree 移除 + 分支 `-D`）：经核对其分支产物与 main 等价（M5-07 `saveStorage.ts` 与 main 逐字相同；M-FLOW-04 分支劣于 main 已审版本），main 为唯一真相源，避免双份 `merge`。
-- **整合后待办 → 已转任务书派发**（见下「优化批」）：①→**M5-04B**、②→**M3-00-hand-layout-guards**、③④→**M-FLOW-05**、⑥→**M4-09**。仅 ⑤ `StorageLike` 统一**暂不派**（阻塞于 M5-06 合并，待其落 main 再开）。
+- **整合后待办 → 已全部闭合**：①→M5-04B、②→M3-00-hand-layout-guards、③④→M-FLOW-05、⑥→M4-09 均已并 main；⑤ `StorageLike` 统一在第四批合并时**随手闭合**（M5-06+M5-07 共存触发 TS2308，按 M5-07 spec 既定方案统一到 settingsStorage 单一源）。
+- **第四批 + 优化批合并（架构评审后批量并入）**：17 分支逐一审范围/实现/红绿，再 `merge --no-ff` 入 main（168→**296 绿**）。先并 14 个无桶冲突任务，后并 3 个 data 桶任务（M5-09 桶冲突解为 8 导出并存）；集成期补一处架构修复（StorageLike 统一，`save-storage` 测试同步改 import 源）。`.meta` 11 个补提、17 worktree+分支清理。**实现方均规范走 worktree/分支 + 落 report**，文件域零越界、种入测试零篡改。
 
-## 优化批（4 任务 · 种子已落 · ready · 可认领）
+## 优化批（4 任务）—— ✅ 全部已并 main
 
 > 由「整合后待办 + 执行方评审建议」转化。spec 入 main `51e3af5`；4 分支已建于 main HEAD。**M4-09** 含失败测试+桩（`1b5531b`：typecheck 绿、`bidding-strength` 3 红、余 168 绿）；其余 3 个为**测试补全/维护型**（行为已实现，分支=main HEAD 无桩，实现方新建/就地改测试应直接全绿）。派发用 PROTOCOL bootstrap（`<ID>` 换分支名）。
 

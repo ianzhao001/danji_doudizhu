@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 三档+强化+legality 护栏 ✅ + 第三批（8 任务）已并 main ✅ + 第四批（15 任务）种子 ready（多 AI 协作，派发见 coordination/BOARD.md）
+## 当前阶段：M2 ✅ + M4 三档+强化+legality ✅ + 第三批（8）✅ + 第四批（13）+ 优化批（4）已并 main ✅（54 测试文件 / 296 用例全绿）。下一步：M3 进 Cocos 编辑器场景/预制体 + M5 持久化 IO 接入。派发见 coordination/BOARD.md
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -54,7 +54,7 @@
 - [x] selfplay 诊断消费：runner 用 HeadlessRoundError 字段组富 partial（非空 seed/turns/landlord/lastEvents）。〔M2-07-D 已并 main b2df6d8〕
 - [x] 难度策略工厂（levelPolicies→{bidPolicy,playPolicy} 按座位注入 flow）。〔M-FLOW-03 已并 main a10b8db；bidPolicy 仍委派 chooseBid，切 chooseBidByLevel 顺延 M-FLOW-04〕
 - [x] 叫抢策略切到难度分层（bidPolicy → chooseBidByLevel）。〔M-FLOW-04 已并 main a2f4828〕
-- [~] 回放/调试 trace（事件流→可复盘 trace + 摘要）。〔M2-11 ready·第四批可派发〕
+- [x] 回放/调试 trace（事件流→可复盘 trace + 摘要）。〔M2-11 已并 main（第四批）〕
 
 ## M3 手机竖屏 UI
 
@@ -62,13 +62,13 @@
 
 - [x] 手牌布局算法（390×844 居中/步距/压缩，纯函数）。〔M3-00-hand-layout 已并 main 32b78bc；输入前置条件守卫 aaac57f〕
 - [x] 手牌选中模型（选中/取消/排序，纯不可变）。〔M3-00-selection 已并 main f5d9252〕
-- [~] 牌面视图模型（Card→assetKey/rankLabel/suitKey/sortKey）。〔M3-00-card-view ready·第四批〕
-- [~] 桌面布局坐标模型（390×844 各区）。〔M3-00-table-layout ready·第四批〕
-- [~] 操作按钮状态模型（出牌/过牌/提示 enabled）。〔M3-00-action-buttons ready·第四批〕
-- [~] 手牌交互桥（layout+selection 组合，选中上浮）。〔M3-00-selection-layout-bridge ready·第四批〕
-- [~] 叫抢视图模型（按钮文案/可用/座提示）。〔M3-00-bidding-view ready·第四批〕
-- [~] 结算弹窗视图模型（Settlement→VM）。〔M3-00-result-view ready·第四批〕
-- [~] 事件提示映射（GameEvent/FlowEvent→cue id）。〔M3-00-event-cues ready·第四批〕
+- [x] 牌面视图模型（Card→assetKey/rankLabel/suitKey/sortKey）。〔M3-00-card-view 已并 main（第四批）〕
+- [x] 桌面布局坐标模型（390×844 各区）。〔M3-00-table-layout 已并 main（第四批）〕
+- [x] 操作按钮状态模型（出牌/过牌/提示 enabled）。〔M3-00-action-buttons 已并 main（第四批）〕
+- [x] 手牌交互桥（layout+selection 组合，选中上浮）。〔M3-00-selection-layout-bridge 已并 main（第四批）〕
+- [x] 叫抢视图模型（按钮文案/可用/座提示）。〔M3-00-bidding-view 已并 main（第四批）〕
+- [x] 结算弹窗视图模型（Settlement→VM）。〔M3-00-result-view 已并 main（第四批）〕
+- [x] 事件提示映射（GameEvent/FlowEvent→cue id）。〔M3-00-event-cues 已并 main（第四批）〕
 - [ ] 创建大厅场景。
 - [ ] 创建游戏主场景。
 - [ ] 创建手牌交互。
@@ -89,21 +89,22 @@
 - [x] 叫抢难度分层（按 AiLevel 给叫抢策略分层；Normal 委派 chooseBid）。〔M4-07 已并 main 5fe97b6〕
 - [x] 用自对弈 harness 验证难度差异与无死循环。〔M4-04 已并 main 815df75：routing playPolicy 按 seat 分发 + 不变量回归〕
 - [x] 难度 routing 按座位分发证明（buildRoutingPolicy 逐座位深相等）。〔M4-04B 已并 main b775254〕
-- [~] AI 合法性不变量审计（三档横切护栏）。〔M4-08 ready·第四批（绿护栏，锁回归）〕
+- [x] AI 合法性不变量审计（三档横切护栏）。〔M4-08 已并 main（第四批，绿护栏）〕
+- [x] 叫抢判强逻辑单一真相源 + 阈值 exhaustive。〔M4-09 已并 main（优化批）：抽 isStrongHand，chooseBid/chooseBidByLevel 复用〕
 
 ## M5 完整单机体验
 
 - [x] 存档版本化（serialize 加 version + 反序列化浅校验，向后兼容往返）。〔M5-01 已并 main；浅校验 7/8 字段，`top` + 深层校验顺延 M5-02〕
 - [x] 存档深校验（补 `top` 必需 + 有界深层结构校验，断局重开前置）。〔M5-02 已并 main 44b86b8；`top.pattern` 完整形（length/cards）顺延 M5-02B〕
 - [x] 存档 top.pattern 完整形校验（length/cards/牌结构/一致性）。〔M5-02B 已并 main a934a70；语义校验（recognize 比对）顺延 M5-02C〕
-- [~] 存档 top.pattern 语义校验（recognize(cards) 与声明 pattern 一致）。〔M5-02C ready·第四批〕
+- [x] 存档 top.pattern 语义校验（recognize(cards) 与声明 pattern 一致）。〔M5-02C 已并 main（第四批）〕
 - [x] 本地设置（纯数据层：difficulty/音效/震动/动画开关 + 默认值 + 迁移版本）。〔M5-03 已并 main ed456c0〕
 - [x] 本地设置编解码（serialize/deserialize + 复用 migrateSettings，为 localStorage 前置）。〔M5-05 已并 main 5aaae99〕
-- [x] 断局存档槽位纯模型（{version,savedAt,round} + 编解码，无 IO）。〔M5-04 已并 main 9b73391；canonical wire 收紧 05a3ae9：serializeSave 恒输出 SAVE_VERSION + invalid JSON 前缀〕
-- [~] 设置存储适配器（注入 StorageLike，load/save/remove，无浏览器依赖）。〔M5-06 ready·第四批〕
-- [x] 断局槽位存储适配器（损坏抛错，区别设置）。〔M5-07 已并 main 4c92572〕
-- [~] 战绩统计编解码（JSON + 容错迁移）。〔M5-08 ready·第四批〕
-- [~] 对局历史记录纯模型（追加/裁剪/倒序/迁移）。〔M5-09 ready·第四批〕
+- [x] 断局存档槽位纯模型（{version,savedAt,round} + 编解码，无 IO）。〔M5-04 已并 main 9b73391；canonical wire 收紧 05a3ae9；回归护栏 M5-04B（优化批）〕
+- [x] 设置存储适配器（注入 StorageLike，load/save/remove，无浏览器依赖）。〔M5-06 已并 main（第四批）；StorageLike 已统一单一真相源〕
+- [x] 断局槽位存储适配器（损坏抛错，区别设置）。〔M5-07 已并 main 4c92572；StorageLike 改 import settingsStorage〕
+- [x] 战绩统计编解码（JSON + 容错迁移）。〔M5-08 已并 main（第四批）〕
+- [x] 对局历史记录纯模型（追加/裁剪/倒序/迁移）。〔M5-09 已并 main（第四批）〕
 - [ ] 战绩统计。
 - [ ] 断局重开（复用序列化存档）。
 - [ ] 音效开关。
