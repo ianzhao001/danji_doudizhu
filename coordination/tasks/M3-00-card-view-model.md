@@ -14,7 +14,7 @@ Cocos 手牌渲染需要从 `Card` 得到「用哪张图、显示什么点数、
 ## 行为要求（纯函数、确定性、禁 cc）
 1. `cardView(card: Card): { assetKey: string; rankLabel: string; suitKey: Suit | 'joker'; sortKey: number }`：
    - `assetKey`：稳定字符串，如 `${rank}-${suit}`（实现方定形，须**确定性**且**唯一**到牌）。
-   - `rankLabel`：复用 `RANK_LABEL[card.rank]`（rules 已导出）；双王用 `'小王'`/`'大王'`（与 RANK_LABEL 一致）。
+   - `rankLabel`：普通牌复用 `RANK_LABEL[card.rank]`（rules 已导出）；双王建议用 UI 友好文案 `'小王'`/`'大王'`（**注意 `RANK_LABEL` 中王为 `'x'`/`'X'`，并非 `'小王'`/`'大王'`，此处不复用**）。测试只校验普通牌与 `RANK_LABEL` 一致，王的具体文案不限定。
    - `suitKey`：`card.suit`；王为 `'joker'`。
    - `sortKey`：等于 `card.rank`（数值，便于升序排）。
 2. `cardsView(cards: Card[]): ReturnType<cardView>[]`：对每张牌 `cardView`，**保持入参顺序**、返回新数组。

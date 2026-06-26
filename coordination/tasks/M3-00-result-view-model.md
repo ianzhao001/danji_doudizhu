@@ -13,7 +13,7 @@
 ## 行为要求（纯函数、确定性、禁 cc）
 1. `ResultView { resultText: string; multiplier: number; bombs: number; springText: string; scores: { seat: SeatIndex; score: number; isLandlord: boolean }[] }`。
 2. `deriveResultView(args: { settlement: Settlement; landlord: SeatIndex; heroSeat: SeatIndex }): ResultView`：
-   - `resultText`：hero 赢 → `'胜利'`，输 → `'失败'`（hero 是否地主由 `heroSeat===landlord` 判；winner===Landlord 则地主方赢）。
+   - `resultText`：hero 赢 → `'胜利'`，输 → `'失败'`。胜负**由 hero 得分符号判定**：`settlement.scores[heroSeat] > 0` 即胜（三家分和为 0、地主方与农民方符号相反、无平局，故符号即胜负）。**`Settlement` 不含 winner 字段、入参也不传 winner**，不要去找。`heroSeat===landlord` 只用于标注 `isLandlord`，不参与胜负判定。
    - `multiplier`/`bombs`：透传 `settlement.multiplier`/`settlement.bombs`。
    - `springText`：`spring==='none'→''`、`'spring'→'春天'`、`'anti-spring'→'反春天'`。
    - `scores`：三座，每项 `{ seat, score: settlement.scores[seat], isLandlord: seat===landlord }`。

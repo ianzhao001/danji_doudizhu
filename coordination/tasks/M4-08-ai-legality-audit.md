@@ -16,7 +16,7 @@
 2. 对每个快照 × `{Simple, Normal, Hard}` × 固定 rng 集：`strategyFor(level)(snapshot, rng)` 产出 `RoundAction`。
 3. 断言（**不变量，架构种入，实现方可加快照不可改这些断言**）：
    - `action.type ∈ {'play','pass'}`。
-   - `play` 时：`validatePlay(action.cards, snapshot.top?.pattern ?? null).valid === true`；
+   - `play` 时：`validatePlay(action.cards, snapshot.top?.pattern ?? null).ok === true`（`RuleResult` 的字段是 `ok`）；
      且 `action.cards` 每张牌在 `viewerHand` 内（不偷牌）。
    - `pass` 仅当 `snapshot.top !== null`（自由领出不得 pass）。
 4. 纯测试、禁 cc。从 `../../assets/scripts/rules` 取 `validatePlay`，`../../assets/scripts/ai` 取 `strategyFor`/`AiLevel`。

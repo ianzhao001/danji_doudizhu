@@ -15,7 +15,7 @@
 1. `ActionButtonsState { play: boolean; pass: boolean; hint: boolean }`。
 2. `deriveActionButtons(args: { snapshot: GameSnapshot; selectedCards: Card[] }): ActionButtonsState`：
    - 只在玩家轮（`snapshot.turn === viewerSeat`，viewer 由 `snapshot.viewerHand` 存在判定或入参带 `viewerSeat`——实现方择一，建议入参增可选 `viewerSeat?: SeatIndex`，缺省用 `snapshot.turn`）时按钮可操作；非玩家轮全 false。
-   - `play`：`selectedCards` 非空且 `validatePlay(selectedCards, snapshot.top?.pattern ?? null).valid`（复用 rules）。
+   - `play`：`selectedCards` 非空且 `validatePlay(selectedCards, snapshot.top?.pattern ?? null).ok`（复用 rules；`RuleResult` 的字段是 `ok` 不是 `valid`）。
    - `pass`：`snapshot.top !== null`（有牌可过才允许过；自由领出时不能过）。
    - `hint`：`legalFollows(viewerHand, snapshot.top?.pattern)` 或 `enumerateMoves(viewerHand)` 非空（有合法着法可提示）。
 3. 纯函数、禁 cc、不改入参。从 `../rules` 取 `validatePlay`/`legalFollows`/`enumerateMoves`，从 `../game` 取 `GameSnapshot`。
