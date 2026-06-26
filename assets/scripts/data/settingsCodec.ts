@@ -7,13 +7,13 @@
 import { type Settings, defaultSettings, migrateSettings } from './settings';
 
 export function serializeSettings(s: Settings): string {
-  throw new Error('M5-05 not implemented');
+  return JSON.stringify(s);
 }
 
 export function deserializeSettings(json: string): Settings {
-  throw new Error('M5-05 not implemented');
+  try {
+    return migrateSettings(JSON.parse(json));
+  } catch {
+    return defaultSettings();
+  }
 }
-
-// 复用引用，避免未使用告警（实现方删除本行即可）
-void defaultSettings;
-void migrateSettings;
