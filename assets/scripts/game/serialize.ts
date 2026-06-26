@@ -4,7 +4,7 @@
  * 规则见 coordination/tasks/M2-04-serialization.md。纯函数，禁止 import `cc`，禁止改签名。
  */
 
-import { Category, Rank, Suit } from '../rules';
+import { Category, Rank, Suit, recognize } from '../rules';
 import { GamePhase, Side, type RoundState } from './types';
 
 const CURRENT_VERSION = 1;
@@ -88,6 +88,16 @@ function assertTop(value: unknown): void {
   if (!Array.isArray(value.pattern.cards)) fail('top.pattern.cards must be an array');
   value.pattern.cards.forEach((card, index) => assertCard(card, `top.pattern.cards[${index}]`));
   if (value.pattern.length !== value.pattern.cards.length) fail('top.pattern.length must match cards length');
+
+  const recognized = recognize(value.pattern.cards);
+  if (recognized === null) fail('top.pattern.cards is not a valid pattern');
+  if (
+    recognized.category !== value.pattern.category ||
+    recognized.mainRank !== value.pattern.mainRank ||
+    recognized.length !== value.pattern.length
+  ) {
+    fail('top.pattern semantics mismatch');
+  }
 }
 
 function assertRoundState(value: Record<string, unknown>): RoundState {
