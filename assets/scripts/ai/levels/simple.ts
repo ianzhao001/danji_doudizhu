@@ -4,23 +4,9 @@
  * 仅依赖 rules + 只读快照，禁止 import `cc`，禁止改签名。
  */
 
-import { enumerateMoves, legalFollows, type Move } from '../../rules';
+import { enumerateMoves, legalFollows } from '../../rules';
 import type { AiStrategy } from '../strategy';
-
-function requireHand(snapshot: Parameters<AiStrategy>[0]) {
-  if (!snapshot.viewerHand || snapshot.viewerHand.length === 0) throw new Error('VIEWER_HAND_REQUIRED');
-  return snapshot.viewerHand;
-}
-
-function compareMoves(a: Move, b: Move): number {
-  if (a.cards.length !== b.cards.length) return a.cards.length - b.cards.length;
-  return a.pattern.mainRank - b.pattern.mainRank;
-}
-
-function pickSmallest(moves: Move[]): Move {
-  if (moves.length === 0) throw new Error('NO_LEGAL_MOVES');
-  return moves.slice().sort(compareMoves)[0];
-}
+import { pickSmallest, requireHand, toPlay } from './_shared';
 
 /** 最小化策略桩：实现见 M4-01。 */
 export const simpleStrategy: AiStrategy = (snapshot) => {
@@ -28,12 +14,12 @@ export const simpleStrategy: AiStrategy = (snapshot) => {
 
   if (!snapshot.top) {
     const move = pickSmallest(enumerateMoves(hand));
-    return { type: 'play', seat: snapshot.turn, cards: move.cards.slice() };
+    return toPlay(snapshot, move);
   }
 
   const follows = legalFollows(hand, snapshot.top.pattern);
   if (follows.length === 0) return { type: 'pass', seat: snapshot.turn };
 
   const move = pickSmallest(follows);
-  return { type: 'play', seat: snapshot.turn, cards: move.cards.slice() };
+  return toPlay(snapshot, move);
 };
