@@ -7,12 +7,43 @@ import { type MatchStats, emptyStats } from './stats';
 
 export const STATS_VERSION = 1;
 
+const STAT_FIELDS = [
+  'rounds',
+  'asLandlord',
+  'landlordWins',
+  'asFarmer',
+  'farmerWins',
+  'netScore',
+] as const;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function numberOrDefault(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
 export function serializeStats(stats: MatchStats): string {
-  throw new Error('M5-08 serializeStats not implemented');
+  return JSON.stringify({ version: STATS_VERSION, stats });
 }
 
 export function deserializeStats(json: string): MatchStats {
-  throw new Error('M5-08 deserializeStats not implemented');
-}
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    return emptyStats();
+  }
 
-void emptyStats;
+  if (!isRecord(parsed) || parsed.version !== STATS_VERSION || !isRecord(parsed.stats)) {
+    return emptyStats();
+  }
+
+  const defaults = emptyStats();
+  const result: MatchStats = { ...defaults };
+  for (const field of STAT_FIELDS) {
+    result[field] = numberOrDefault(parsed.stats[field], defaults[field]);
+  }
+  return result;
+}
