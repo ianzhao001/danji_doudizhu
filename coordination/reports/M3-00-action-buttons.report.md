@@ -25,6 +25,7 @@ no matches
 - 无偏差。
 - 缺省 `viewerSeat` 使用 `snapshot.turn`；显式 viewer 非当前座时三个按钮全 false。
 - `play` 复用 `validatePlay(...).ok`，`hint` 按 top 有无选择 `legalFollows` 或 `enumerateMoves`。
+- 二次审查补充加固：当 `snapshot.viewerHand` 存在时，`play` 还要求 `selectedCards` 均仍在当前手牌中，避免旧选择残留或状态刷新后把“手里没有的牌”点亮为可出。
 
 ## 疑问（给架构）
 - 无。

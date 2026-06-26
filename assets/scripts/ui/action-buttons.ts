@@ -13,6 +13,14 @@ export interface ActionButtonsState {
   hint: boolean;
 }
 
+function sameCard(a: Card, b: Card): boolean {
+  return a.rank === b.rank && a.suit === b.suit;
+}
+
+function selectedCardsAreInHand(selectedCards: Card[], hand: Card[] | undefined): boolean {
+  return hand === undefined || selectedCards.every((selected) => hand.some((card) => sameCard(card, selected)));
+}
+
 export function deriveActionButtons(args: {
   snapshot: GameSnapshot;
   selectedCards: Card[];
@@ -29,7 +37,10 @@ export function deriveActionButtons(args: {
     : legalFollows(hand, snapshot.top.pattern).length > 0;
 
   return {
-    play: selectedCards.length > 0 && validatePlay(selectedCards, current).ok,
+    play:
+      selectedCards.length > 0 &&
+      selectedCardsAreInHand(selectedCards, snapshot.viewerHand) &&
+      validatePlay(selectedCards, current).ok,
     pass: snapshot.top !== null,
     hint: hasHint,
   };
