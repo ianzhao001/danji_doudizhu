@@ -67,9 +67,11 @@ export class HeadlessRoundError extends Error {
   readonly turns: number;
   readonly landlord: SeatIndex | null;
   readonly lastEvents: FlowEvent[];
+  /** 原始错误（如出牌循环内非法动作 / apply 抛错）；ES2020 lib 无 Error.cause，显式声明。M-FLOW-02 填充。 */
+  readonly cause?: unknown;
   constructor(
     message: string,
-    info: { seed: number; turns: number; landlord: SeatIndex | null; lastEvents: FlowEvent[] },
+    info: { seed: number; turns: number; landlord: SeatIndex | null; lastEvents: FlowEvent[]; cause?: unknown },
   ) {
     super(message);
     this.name = 'HeadlessRoundError';
@@ -77,6 +79,7 @@ export class HeadlessRoundError extends Error {
     this.turns = info.turns;
     this.landlord = info.landlord;
     this.lastEvents = info.lastEvents;
+    this.cause = info.cause;
   }
 }
 
