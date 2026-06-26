@@ -21,7 +21,19 @@ export function layoutHandInteractive(args: {
   cardWidth: number;
   liftOffset: number;
 }): InteractiveSlot[] {
-  throw new Error('M3-00 hand-interaction not implemented');
-}
+  const sortedHand = sortByRank(args.hand);
+  const baseSlots = layoutHand(sortedHand.length, {
+    containerWidth: args.containerWidth,
+    cardWidth: args.cardWidth,
+  });
 
-void layoutHand; void sortByRank; void isSelected;
+  return sortedHand.map((card, index) => {
+    const selected = isSelected(args.selected, card);
+    return {
+      card,
+      x: baseSlots[index].x,
+      y: selected ? -args.liftOffset : 0,
+      selected,
+    };
+  });
+}
