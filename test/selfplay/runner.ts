@@ -11,7 +11,7 @@
  *   import { runHeadlessRound, type FlowEvent } from '../../assets/scripts/flow';
  */
 
-import { runHeadlessRound, type FlowEvent, type FlowResult } from '../../assets/scripts/flow';
+import { HeadlessRoundError, runHeadlessRound, type FlowEvent, type FlowResult } from '../../assets/scripts/flow';
 
 export interface SeedSummary {
   seed: number;
@@ -79,6 +79,14 @@ export async function runSeeds(seeds: number[], opts: RunOpts = {}): Promise<See
       summaries.push(assertSummary(seed, result));
     } catch (error) {
       if (error instanceof Error && error.message.startsWith('selfplay invariant failed:')) throw error;
+      if (error instanceof HeadlessRoundError) {
+        const partial: Partial<FlowResult> = {
+          events: error.lastEvents,
+          turns: error.turns,
+        };
+        if (error.landlord !== null) partial.landlord = error.landlord;
+        throw formatFailure(error.seed, partial, error.message);
+      }
       throw formatFailure(seed, {}, error instanceof Error ? error.message : String(error));
     }
   }
