@@ -58,16 +58,24 @@ function assertSummary(seed: number, result: FlowResult): SeedSummary {
   };
 }
 
+/** 可注入触发失败的配置（架构种子；M2-07-D 用于触发并消费诊断）。 */
+export interface RunOpts {
+  maxTurns?: number;
+}
+
 /**
- * 对每个 seed 调 runHeadlessRound({ seed })，把 FlowResult 收敛成 SeedSummary[]。
- * 返回数组顺序必须与 seeds 一致。
+ * 对每个 seed 调 runHeadlessRound({ seed, ...opts })，把 FlowResult 收敛成 SeedSummary[]。
+ * 返回数组顺序必须与 seeds 一致。runSeeds(seeds) 向后兼容。
+ *
+ * TODO(M2-07-D 实现方)：catch 块中识别 `error instanceof HeadlessRoundError`，
+ * 用其 seed/turns/landlord/lastEvents 组富 partial 交 formatFailure（替代空 `{}`）。
  */
-export async function runSeeds(seeds: number[]): Promise<SeedSummary[]> {
+export async function runSeeds(seeds: number[], opts: RunOpts = {}): Promise<SeedSummary[]> {
   const summaries: SeedSummary[] = [];
 
   for (const seed of seeds) {
     try {
-      const result = await runHeadlessRound({ seed });
+      const result = await runHeadlessRound({ seed, maxTurns: opts.maxTurns });
       summaries.push(assertSummary(seed, result));
     } catch (error) {
       if (error instanceof Error && error.message.startsWith('selfplay invariant failed:')) throw error;
