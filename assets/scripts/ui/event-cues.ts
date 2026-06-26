@@ -10,9 +10,10 @@ import { type FlowEvent } from '../flow';
 export type CueId = string;
 
 export function cueForGameEvent(event: GameEvent): CueId {
-  throw new Error('M3-00 event-cues cueForGameEvent not implemented');
+  return event.type;
 }
 
 export function cueForFlowEvent(event: FlowEvent): CueId | null {
-  throw new Error('M3-00 event-cues cueForFlowEvent not implemented');
+  if (event.type === 'round') return cueForGameEvent(event.event);
+  return event.type;
 }
