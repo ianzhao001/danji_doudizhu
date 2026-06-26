@@ -1,7 +1,7 @@
 /**
- * M5-06 设置存储适配器（localStorage 前置，无浏览器依赖）。架构落桩——实现方实现函数体，
+ * M5-06 设置存储适配器（浏览器存储前置，无浏览器依赖）。架构落桩——实现方实现函数体，
  * 使 test/data/settings-storage.test.ts 转绿。规则见 coordination/tasks/M5-06-settings-storage-adapter.md。
- * 纯逻辑、确定性、禁止 import `cc`、不引用 localStorage/window。
+ * 纯逻辑、确定性、禁止 import `cc`、不引用浏览器全局。
  */
 
 import { type Settings, defaultSettings } from './settings';
@@ -14,18 +14,14 @@ export interface StorageLike {
 }
 
 export function loadSettings(storage: StorageLike, key: string): Settings {
-  throw new Error('M5-06 loadSettings not implemented');
+  const raw = storage.getItem(key);
+  return raw === null ? defaultSettings() : deserializeSettings(raw);
 }
 
 export function saveSettings(storage: StorageLike, key: string, s: Settings): void {
-  throw new Error('M5-06 saveSettings not implemented');
+  storage.setItem(key, serializeSettings(s));
 }
 
 export function removeSettings(storage: StorageLike, key: string): void {
-  throw new Error('M5-06 removeSettings not implemented');
+  storage.removeItem(key);
 }
-
-// 复用引用，避免未使用告警（实现方删除本行即可）
-void defaultSettings;
-void serializeSettings;
-void deserializeSettings;
