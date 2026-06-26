@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { levelPolicies } from '../../assets/scripts/flow/policies';
-import { AiLevel, strategyFor, chooseBid } from '../../assets/scripts/ai';
+import { AiLevel, strategyFor, chooseBidByLevel } from '../../assets/scripts/ai';
 import { GamePhase, type GameSnapshot, type TopPlay } from '../../assets/scripts/game';
 import { createRng, recognize, Rank } from '../../assets/scripts/rules';
 import { cards } from '../rules/_util';
@@ -37,13 +37,13 @@ describe('M-FLOW-03 难度策略工厂', () => {
     }
   });
 
-  it('bidPolicy calling 强手 → call 且深相等 chooseBid；弱手 → pass', () => {
+  it('bidPolicy calling 按座位难度路由，深相等 chooseBidByLevel(..., LEVELS[seat])', () => {
     const { bidPolicy } = levelPolicies(LEVELS);
     const strong = cards('x X 3 4 5');
     const weak = cards('3 4 5 6 7');
     const calling = createBidding(0);
-    expect(bidPolicy({ seat: 0, state: calling, hand: strong })).toEqual(chooseBid(strong, calling));
-    expect(bidPolicy({ seat: 0, state: calling, hand: weak })).toEqual(chooseBid(weak, calling));
+    expect(bidPolicy({ seat: 0, state: calling, hand: strong })).toEqual(chooseBidByLevel(strong, calling, LEVELS[0]));
+    expect(bidPolicy({ seat: 0, state: calling, hand: weak })).toEqual(chooseBidByLevel(weak, calling, LEVELS[0]));
     expect(bidPolicy({ seat: 0, state: calling, hand: strong }).type).toBe('call');
     expect(bidPolicy({ seat: 0, state: calling, hand: weak }).type).toBe('pass');
   });
