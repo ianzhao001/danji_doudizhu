@@ -14,5 +14,15 @@ export interface CardSlot {
 }
 
 export function layoutHand(count: number, opts: HandLayoutOpts): CardSlot[] {
-  throw new Error('M3-00 hand-layout not implemented');
+  if (count <= 0) return [];
+
+  const { containerWidth, cardWidth } = opts;
+  if (count === 1) return [{ x: (containerWidth - cardWidth) / 2 }];
+
+  const fitsWithoutOverlap = count * cardWidth <= containerWidth;
+  const step = fitsWithoutOverlap ? cardWidth : (containerWidth - cardWidth) / (count - 1);
+  const totalWidth = cardWidth + step * (count - 1);
+  const start = (containerWidth - totalWidth) / 2;
+
+  return Array.from({ length: count }, (_, index) => ({ x: start + step * index }));
 }
