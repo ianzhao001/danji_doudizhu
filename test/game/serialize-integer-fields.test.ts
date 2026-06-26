@@ -25,8 +25,11 @@ function validRound(): RoundState {
   };
 }
 
+// 必须产出 deserializeRound 期望的版本化 wire（{version,state}），否则会先因「missing version」
+// 抛错而到不了字段校验——那样「应抛错」断言会因错误原因变绿、永远逼不出整数化收紧（本任务初版种子之误）。
 function roundWith(over: Partial<RoundState>): string {
-  return JSON.stringify({ ...validRound(), ...over });
+  const wire = JSON.parse(serializeRound(validRound())) as { version: number; state: Record<string, unknown> };
+  return JSON.stringify({ ...wire, state: { ...wire.state, ...over } });
 }
 
 describe('M5-12a 序列化数值整数化', () => {
@@ -38,5 +41,14 @@ describe('M5-12a 序列化数值整数化', () => {
   });
   it('bombsPlayed 非整数 → 抛错', () => {
     expect(() => deserializeRound(roundWith({ bombsPlayed: 1.5 }))).toThrow();
+  });
+  it('bombsPlayed 负数 → 抛错（与 passesInARow 对称）', () => {
+    expect(() => deserializeRound(roundWith({ bombsPlayed: -1 }))).toThrow();
+  });
+  it('整数 0 边界 → 不抛（收紧后仍接受合法值）', () => {
+    expect(() => deserializeRound(roundWith({ passesInARow: 0, bombsPlayed: 0 }))).not.toThrow();
+  });
+  it('非数值类型（字符串）→ 抛错（收紧前后均拒，类型护栏）', () => {
+    expect(() => deserializeRound(roundWith({ passesInARow: '0' as unknown as number }))).toThrow();
   });
 });

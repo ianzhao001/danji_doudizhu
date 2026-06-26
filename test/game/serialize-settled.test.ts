@@ -33,4 +33,25 @@ describe('M5-12a Settled 终局态往返', () => {
     const bad = JSON.stringify({ ...r, winner: 'x' });
     expect(() => deserializeRound(bad)).toThrow();
   });
+  it('Settled + Bomb top（四同点·多卡 pattern）+ bombsPlayed=2 往返深相等', () => {
+    const r: RoundState = {
+      ...settledRound(),
+      top: {
+        seat: 0,
+        pattern: {
+          category: Category.Bomb,
+          mainRank: Rank.R7,
+          length: 4,
+          cards: [
+            { rank: Rank.R7, suit: Suit.Spade },
+            { rank: Rank.R7, suit: Suit.Heart },
+            { rank: Rank.R7, suit: Suit.Club },
+            { rank: Rank.R7, suit: Suit.Diamond },
+          ],
+        },
+      },
+      bombsPlayed: 2,
+    };
+    expect(deserializeRound(serializeRound(r))).toEqual(r);
+  });
 });
