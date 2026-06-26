@@ -3,12 +3,28 @@
  * 纯逻辑、只做编排，禁止 import `cc`。
  */
 
-import { Card } from '../rules';
-import { SeatIndex, Side, BiddingState, BidAction, GameEvent, RoundState, Settlement } from '../game';
+import { Card, Rng } from '../rules';
+import {
+  SeatIndex,
+  Side,
+  BiddingState,
+  BidAction,
+  GameEvent,
+  GameSnapshot,
+  RoundAction,
+  RoundState,
+  Settlement,
+} from '../game';
 import { Clock } from './clock';
 
 /** 叫抢策略：依当前叫抢态与该座手牌产出一个 BidAction（seat 必须等于 state.turn）。 */
 export type BidPolicy = (args: { seat: SeatIndex; state: BiddingState; hand: Card[] }) => BidAction;
+
+/**
+ * 出牌策略（M-FLOW 注入点）：依当前座位、只读快照与 rng 产出一个 RoundAction（seat 必须等于 snapshot.turn）。
+ * 默认包装 baseline `chooseAction`；可用于让不同座位采用不同难度（M4-04 难度差异 selfplay）。
+ */
+export type PlayPolicy = (args: { seat: SeatIndex; snapshot: GameSnapshot; rng: Rng }) => RoundAction;
 
 export interface FlowConfig {
   seed: number;
@@ -17,7 +33,8 @@ export interface FlowConfig {
   thinkingDelayMs?: number; // 默认 0；每个 AI 行动前 await clock.sleep
   clock?: Clock; // 默认 realClock
   bidPolicy?: BidPolicy; // 默认 defaultBidPolicy
-  maxTurns?: number; // 默认 300；超出抛错（消息含 seed/turn）
+  playPolicy?: PlayPolicy; // 默认 = baseline chooseAction（M-FLOW 实现消费）
+  maxTurns?: number; // 默认 300；超出抛 HeadlessRoundError（携带 seed/turns/landlord/lastEvents）
   maxRedeals?: number; // 默认 10；超出抛错（消息含 seed）
 }
 
@@ -38,6 +55,29 @@ export interface FlowResult {
   turns: number;
   redeals: number;
   finalState: RoundState;
+}
+
+/**
+ * headless 跑局异常（M-FLOW）：携带局部诊断，便于 selfplay 定位超 maxTurns / 缺 win / 非法动作。
+ * `message` 必须含 seed（向后兼容既有 `rejects.toThrow(seed)` 断言）。
+ * 实现方在 driver 的异常路径抛出本错误并填充字段。
+ */
+export class HeadlessRoundError extends Error {
+  readonly seed: number;
+  readonly turns: number;
+  readonly landlord: SeatIndex | null;
+  readonly lastEvents: FlowEvent[];
+  constructor(
+    message: string,
+    info: { seed: number; turns: number; landlord: SeatIndex | null; lastEvents: FlowEvent[] },
+  ) {
+    super(message);
+    this.name = 'HeadlessRoundError';
+    this.seed = info.seed;
+    this.turns = info.turns;
+    this.landlord = info.landlord;
+    this.lastEvents = info.lastEvents;
+  }
 }
 
 /**
