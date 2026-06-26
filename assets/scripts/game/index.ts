@@ -7,3 +7,4 @@ export * from './core';
 export * from './bidding';
 export * from './settlement';
 export * from './serialize';
+export * from './replay';
