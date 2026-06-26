@@ -14,9 +14,22 @@ export interface CardSlot {
 }
 
 export function layoutHand(count: number, opts: HandLayoutOpts): CardSlot[] {
+  if (!Number.isInteger(count) || count < 0) {
+    throw new Error('layoutHand: count must be a non-negative integer');
+  }
   if (count <= 0) return [];
 
   const { containerWidth, cardWidth } = opts;
+  if (!Number.isFinite(containerWidth) || containerWidth <= 0) {
+    throw new Error('layoutHand: containerWidth must be a positive finite number');
+  }
+  if (!Number.isFinite(cardWidth) || cardWidth <= 0) {
+    throw new Error('layoutHand: cardWidth must be a positive finite number');
+  }
+  if (count > 1 && cardWidth > containerWidth) {
+    throw new Error('layoutHand: cardWidth must not exceed containerWidth when count > 1');
+  }
+
   if (count === 1) return [{ x: (containerWidth - cardWidth) / 2 }];
 
   const fitsWithoutOverlap = count * cardWidth <= containerWidth;
