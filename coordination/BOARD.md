@@ -2,33 +2,33 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M4 ✅ · 第三/四/优化批 ✅ 已并 main · **第五批：T4 已并 main，余 14 ready · 第六批：6 已并 main，2 blocked**
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · **M5-13 已解锁并并 main，M5-12c 已折叠闭合**
 
-main 现状：**62 测试文件 / 336 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批：T4(M5-12a) 已并 main（`2820b8c`，实现方 Codex）；余 14 任务 ready**（文件域两两不相交；spec 入 main、各分支含失败测试/桩或 green-guard 测试，独立 typecheck 绿，并经本窗口「加固+提升雄心」升级）。**第六批：6 ready 任务已全部实现并并 main（`2e4cc93`，纯 spec 模式：实现方自写测试+实现）；2 blocked**（M5-13 依赖阻塞、M5-12c 决策已拍板·仍依赖阻塞——见下）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
+main 现状：**79 测试文件 / 416 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
-## 第五批（15 任务 · 文件域互不相交 · 全部 ready · 可认领）
+## 第五批（15 任务 · 文件域互不相交）—— ✅ 全部已并 main
 
-> 三路并行审计（代码优化/路线缺口/测试盲区）+ Plan agent 验证后派发。spec 入 main；15 分支已建于 main HEAD。**T1–T7** 含失败测试+桩（typecheck 绿、种入测试红、其余绿）；**T8–T15** 为 green-guard（现码即绿，锁回归）。文件域经核对两两不相交（`game/index.ts` 仅 T1 写、`data/index.ts` 仅 T2 写、`ui/index.ts` 由 T3 独占创建——无桶冲突）。**时序**：T1（resume）须在 T4（serialize 加固）**之后**合并（依赖 serialize 错误约定）。
+> 三路并行审计（代码优化/路线缺口/测试盲区）+ Plan agent 验证后派发。T4 已先行并入；余 14 个旧任务分支在执行前均已备份为 `backup/<ID>-seed` 并从当时最新 `main` 刷新，避免旧基线删除第六批成果。T1/T2/T5 完成后解锁 M5-13；M5-12c 的倍数正整数规则按最高权限授权直接折叠进 T1/T5。
 
 > 已经「**加固+提升雄心**」升级（见下「第五批升级」）。红/绿态、测试数为**升级后**真实值。
 
 | # | ID | 类型 | 实现文件域 | 分支 | 红/绿（升级后） |
 |---|----|----|----|----|----|
-| T1 | M5-10-resume | 功能(keystone) | `data/save.ts`、新 `game/resume.ts`、`game/index.ts` 桶 | `task/M5-10-resume` | 红桩（resumeRound + **savedAt 整数化**；resume.test 4 + save-resume-fields 6[2红4绿]） |
-| T2 | M5-11-aggregate | 功能 | 新 `data/aggregate.ts`、`data/index.ts` 桶 | `task/M5-11-aggregate` | 红桩（3 fn；**8 红**，含 stats 语义聚合） |
-| T3 | M3-01-screen-view | 功能 | 新 `ui/screen-view.ts`、新 `ui/index.ts` 桶 | `task/M3-01-screen-view` | 红桩（deriveScreenVM；**8 红**，含空 VM/保序/不变量） |
+| T1 | M5-10-resume | 功能(keystone) | `data/save.ts`、新 `game/resume.ts`、`game/index.ts` 桶 | `task/M5-10-resume` | ✅ done · 已并 main（SaveSlot 扩展、resumeRound、savedAt 整数化、bidMultiplier 正整数迁移） |
+| T2 | M5-11-aggregate | 功能 | 新 `data/aggregate.ts`、`data/index.ts` 桶 | `task/M5-11-aggregate` | ✅ done · 已并 main（FlowResult→stats/records 聚合） |
+| T3 | M3-01-screen-view | 功能 | 新 `ui/screen-view.ts`、新 `ui/index.ts` 桶 | `task/M3-01-screen-view` | ✅ done · 已并 main（9 UI 岛 + 第六批 view 桶导出） |
 | ~~T4~~ | M5-12a-serialize-hardening | 加固(改产品码) | `game/serialize.ts` | — | ✅ **done · 已并 main `2820b8c`**（实现方 Codex：整数化+错误约定统一；审查通过，305 绿） |
-| T5 | M5-12b-data-codec-hardening | 加固(**改产品码**) | `data/records.ts`、`data/statsCodec.ts` | `task/M5-12b-data-codec-hardening` | 红桩（records 数值 **7 红**[原"8红"含 1 broken false-red 已修] + 5 绿） |
-| T6 | M3-00-table-layout-metrics | 加固(**改产品码**) | `ui/table-layout.ts` | `task/M3-00-table-layout-metrics` | 红桩（LAYOUT_METRICS 提取 **4 红** + 6 绿不变量） |
-| T7 | M4-10-bid-dispatch-dedup | 加固(重构产品码) | `ai/bidding.ts`、`ai/bidding-levels.ts` | `task/M4-10-bid-dispatch-dedup` | green-guard（等价不变量 **4 绿**；含 redeal 子态） |
-| T8 | M5-G1-core-bombs | green-guard | 新 `test/game/core-bombs.test.ts` | `task/M5-G1-core-bombs` | 绿（**5**；+四带二/三张非炸边界） |
-| T9 | M5-G2-illegal-reasons | green-guard | 新 `test/game/illegal-action-reasons.test.ts` | `task/M5-G2-illegal-reasons` | 绿（**10**；+INVALID_PATTERN/CANNOT_BEAT） |
-| T10 | M5-G3-storage-empty-string | green-guard | 新 `test/data/{save,settings}-storage-empty-string.test.ts` | `task/M5-G3-storage-empty-string` | 绿（**9**；+空白/坏 JSON） |
-| T11 | M5-G4-compare-edges | green-guard | 新 `test/rules/compare-edges.test.ts` | `task/M5-G4-compare-edges` | 绿（**10**；+炸弹序/跨型不可比） |
-| T12 | M5-G5-spring-boundaries | green-guard | 新 `test/game/settlement-spring-boundaries.test.ts` | `task/M5-G5-spring-boundaries` | 绿（**11**；+炸弹倍数/得分符号/baseScore） |
-| T13 | M5-G6-action-buttons-edges | green-guard | 新 `test/ui/action-buttons-edges.test.ts` | `task/M5-G6-action-buttons-edges` | 绿（**6**；+play:true 正例） |
-| T14 | M5-G7-conservative-paths | green-guard | 新 `test/ai/conservative-action-paths.test.ts`（仅出牌阶段，**不碰 ai/bidding*.ts**） | `task/M5-G7-conservative-paths` | 绿（3·**软断言→确定性**） |
-| T15 | M5-G8-driver-diagnostics | green-guard | 新 `test/flow/driver-diagnostics.test.ts`（仅 maxTurns:0+maxRedeals） | `task/M5-G8-driver-diagnostics` | 绿（2·+诊断字段断言） |
+| T5 | M5-12b-data-codec-hardening | 加固(**改产品码**) | `data/records.ts`、`data/statsCodec.ts` | `task/M5-12b-data-codec-hardening` | ✅ done · 已并 main（records 数值收紧；multiplier 按 M5-12c 正整数落地） |
+| T6 | M3-00-table-layout-metrics | 加固(**改产品码**) | `ui/table-layout.ts` | `task/M3-00-table-layout-metrics` | ✅ done · 已并 main（LAYOUT_METRICS 提取） |
+| T7 | M4-10-bid-dispatch-dedup | 加固(重构产品码) | `ai/bidding.ts`、`ai/bidding-levels.ts` | `task/M4-10-bid-dispatch-dedup` | ✅ done · 已并 main（actionForStrength 单一真相源） |
+| T8 | M5-G1-core-bombs | green-guard | 新 `test/game/core-bombs.test.ts` | `task/M5-G1-core-bombs` | ✅ done · 已并 main |
+| T9 | M5-G2-illegal-reasons | green-guard | 新 `test/game/illegal-action-reasons.test.ts` | `task/M5-G2-illegal-reasons` | ✅ done · 已并 main |
+| T10 | M5-G3-storage-empty-string | green-guard | 新 `test/data/{save,settings}-storage-empty-string.test.ts` | `task/M5-G3-storage-empty-string` | ✅ done · 已并 main |
+| T11 | M5-G4-compare-edges | green-guard | 新 `test/rules/compare-edges.test.ts` | `task/M5-G4-compare-edges` | ✅ done · 已并 main |
+| T12 | M5-G5-spring-boundaries | green-guard | 新 `test/game/settlement-spring-boundaries.test.ts` | `task/M5-G5-spring-boundaries` | ✅ done · 已并 main |
+| T13 | M5-G6-action-buttons-edges | green-guard | 新 `test/ui/action-buttons-edges.test.ts` | `task/M5-G6-action-buttons-edges` | ✅ done · 已并 main |
+| T14 | M5-G7-conservative-paths | green-guard | 新 `test/ai/conservative-action-paths.test.ts`（仅出牌阶段，**不碰 ai/bidding*.ts**） | `task/M5-G7-conservative-paths` | ✅ done · 已并 main |
+| T15 | M5-G8-driver-diagnostics | green-guard | 新 `test/flow/driver-diagnostics.test.ts`（仅 maxTurns:0+maxRedeals） | `task/M5-G8-driver-diagnostics` | ✅ done · 已并 main |
 
 > 派发用 PROTOCOL bootstrap（`<ID>` 换上表分支名）。**会改产品码的任务：T4（serialize 整数化）/T5（records 收紧）/T6（table-layout 提取）/T7（bidding 去重）+ T1（save.ts savedAt）**——非"T5 唯一"（原 BOARD 此断言已订正）；T1/T2/T3 另含新功能填桩。**跨域提示**：T14 不得 import `ai/bidding*.ts`（T7 域）；T1 后于 T4 合并。
 
@@ -163,6 +163,7 @@ main 现状：**62 测试文件 / 336 用例全绿、typecheck 净、无 cc 泄�
 
 ## 第五批合并记录
 - **T4 / M5-12a ✅ 并入 main `2820b8c`**（实现方 Codex，worktree 规范）：`serialize.ts` 两数值字段 `assertNonNegativeNumber→assertNonNegativeInteger`、`assertVersionedSave` 4 处裸 `throw` 统一 `fail()`。审查：文件域仅 `serialize.ts`(+report)、未碰测试/签名、无 cc；worktree 与并入后 main 均 **56 文件 / 305 用例全绿、typecheck 净**。worktree+分支已按 PROTOCOL 清理。**T1（resume）合并前置已满足**（T4 先行）。
+- **余 14 ready + 解锁 M5-13 ✅ 批量并入 main（Codex）**：先备份并刷新旧任务分支，避免旧基线删除第六批成果；逐任务提交并 `merge --no-ff` 入 main。完成 M5-10/M5-11/M3-01/M5-12b/M3-00-table-layout-metrics/M4-10 与 M5-G1..G8；随后解锁并完成 M5-13。M5-12c 不再单独开冲突分支，按用户授权折叠进 M5-10/M5-12b。最终验证 **79 测试文件 / 416 用例全绿、typecheck 净、无 cc 泄漏**。
 
 ## 第六批（后续派发 · 纯 spec 模式 · 规划者派发）
 
@@ -182,11 +183,11 @@ main 现状：**62 测试文件 / 336 用例全绿、typecheck 净、无 cc 泄�
 
 > ⚠️ **桶导出待补（架构 follow-up · 非阻塞）**：6 模块按 spec 未入各自 `index.ts` 桶（测试均 import 直引、不影响绿）。桶统一导出留作架构整合步——见「后续」。
 
-### Blocked ×2（spec 已入 main，待依赖并入再建分支）
-| ID | 文件 | 解锁条件 |
+### ✅ 解锁并闭合 ×2
+| ID | 文件 | 结果 |
 |----|----|----|
-| M5-13-persist-session | `data/session.ts`（新） | T1(resume)+T2(aggregate) 并 main |
-| M5-12c-multiplier-positive | `save.ts`+`records.ts` | **决策已拍板（见下）**；仍待 T1+T5 并 main 后建分支 |
+| M5-13-persist-session | `data/session.ts`（新） | ✅ 已在 T1(resume)+T2(aggregate) 并 main 后解锁并并 main；新增 `persistRound`/`restoreRound`/`commitFinishedRound` |
+| M5-12c-multiplier-positive | `save.ts`+`records.ts` | ✅ 按用户最高权限授权折叠进 T1+T5：`bidMultiplier`/`multiplier` 合法域统一为正整数（≥1），非法回退 1 |
 
 ### 🟢 产品决策 · M5-12c 倍数下界（架构据 RULES 拍板 · 2026-06-27）
 > 用户授权架构自行决策并执行。
@@ -194,7 +195,7 @@ main 现状：**62 测试文件 / 336 用例全绿、typecheck 净、无 cc 泄�
 - **决策：倍数（`multiplier` / save `bidMultiplier`）合法域 = 正整数（≥1）；下界 = 1。**
 - **依据**：RULES.md「倍数从 1 起；叫地主=1、每抢/反抢翻倍、每炸/火箭翻倍、春天/反春天翻倍——最终为各来源连乘」。倍数是若干 **≥1 因子的连乘，永不为 0**，故 `0`/负/小数/非数均非法。
 - **非法值处置：统一回退默认 `1`**（不标 corrupted）——与 codec 层既有宽松迁移一致（`records.ts` 已 `finiteNumberOrDefault(value.multiplier, 1)`）。**解决 spec 中 save `bidMultiplier:0` 的「corrupted vs 回退」二选一 → 取回退 1。**
-- **效果**：解除 M5-12c 的**决策**阻塞；spec 已据此定稿（去掉「需用户确认」门）。任务仍**依赖**阻塞——T1(save bidMultiplier 字段) + T5(records 数值收紧) 与之文件域冲突，须先并 main，届时架构建 `task/M5-12c-multiplier-positive` 分支转 ready。
+- **效果**：M5-12c 已闭合。执行时未再单独建冲突分支，而是按用户授权直接折叠进 T1(save `bidMultiplier`) 与 T5(records `multiplier`)：`0`/负数/小数/非数均迁移回默认 `1`。
 
 ### 编辑器阶段 backlog（M3 UI 主体 · import cc · 非 worktree · architect/指定 cc 实现方 · 依赖 T3 screen-view + 各 view-model）
 > 进 Cocos 编辑器建场景/预制体/组件，绑定既有 view-model（组件变薄）。**不走 worktree 纯逻辑协议**，需专门 spec + 编辑器操作；待 T3 并 main 后开。
@@ -204,10 +205,10 @@ main 现状：**62 测试文件 / 336 用例全绿、typecheck 净、无 cc 泄�
 - **M6-01** 异常流程检查清单 ｜ **M6-02** 构建验证 + 发布验收记录 ｜ **M6-03** 性能/移动端适配回归。
 
 ## 后续（本批次之后）
-- **设计型待办进展**：① 落盘数值不变量——`serialize`(passesInARow/bombsPlayed) 由 **T4 已并 main**、`records`(multiplier/bombs/heroScore/playedAt) 由 **T5 在跑**、`save.savedAt` 由 **T1 在跑**、倍数下界 **决策已拍板=1**（M5-12c 待 T1+T5 解依赖）；② 整屏 VM 集成层 = **T3 M3-01 在跑**。两项设计待办已转为具体任务。
-- **持久化 IO 收口**：storage 适配器（M5-06/07）+ resume(T1) + aggregate(T2) → **M5-13 集成**（blocked）；之后进编辑器接真实 localStorage。
-- **桶导出整合（架构 follow-up · 进行中）**：
+- **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
+- **持久化 IO 收口**：storage 适配器（M5-06/07）+ resume(T1) + aggregate(T2) + session(M5-13) 已闭合；之后进编辑器接真实 localStorage。
+- **桶导出整合（架构 follow-up）**：
   - ✅ `ai/index.ts` += `hint`、`data/index.ts` += `difficultyConfig`（`5a4d2be`，仅 re-export、typecheck 净、336 绿；`hint` 名称不与现有 ai 导出冲突，`flow/driver`+`flow/policies`+`data/settings` 等 barrel 消费方 typecheck 通过）。
-  - ⏳ `ui/index.ts` **暂不创建**——T3(M3-01) spec **独占建桶**（`新桶；由本任务创建`），T3 分支已种入 `ui/index.ts`（含 9 岛+screen-view，**未含**第六批 4 个 view）。架构在 main 上建桶会窃取 T3 的独占创建并致合并冲突。**待 T3 并 main 后**，架构在 T3 既有桶上 **追加** `export * from './{stats,records,settings,lobby}-view'`（不重建、只加 4 行）。
-  - ⏳ `data/index.ts` 中 `aggregate` 导出行由 **T2 分支已种**（main 上无 aggregate，待 T2 并 main 即带上）；架构已加的 `difficultyConfig` 不与之冲突。
-  - ⏳ `game/index.ts` 中 `resume` 导出由 **T1 独占写**（T1 并 main 时带上）。
+  - ✅ `ui/index.ts` 由 M3-01 创建，已导出 9 个 UI 岛、`screen-view`，以及第六批 `stats/records/settings/lobby-view`。
+  - ✅ `data/index.ts` 已随 M5-11 导出 `aggregate`，并保留 `difficultyConfig`。
+  - ✅ `game/index.ts` 已随 M5-10 导出 `resume`。

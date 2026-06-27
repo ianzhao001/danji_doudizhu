@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化批 ✅ 已并 main（**62 文件 / 336 绿**）· **第五批：T4(M5-12a) 已并 main，余 14 ready 可派发** · **第六批：6 ready 已全部实现并并 main（`2e4cc93`）、2 blocked**（M5-13 依赖阻塞；M5-12c 倍数下界**决策已拍板=1**·仍待 T1+T5 解依赖）·（派发/决策见 coordination/BOARD.md）· **已「加固+提升雄心」升级**（修 T4 false-green / T5 false-red 两个阻断 bug + T1 漏种文件，富化全部 15 测试契约；见 BOARD「第五批升级」）
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main（**79 文件 / 416 绿**）· M5-13 已解锁并并 main · M5-12c 倍数正整数约束已折叠闭合 ·（派发/决策见 coordination/BOARD.md）
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -69,6 +69,7 @@
 - [x] 叫抢视图模型（按钮文案/可用/座提示）。〔M3-00-bidding-view 已并 main（第四批）〕
 - [x] 结算弹窗视图模型（Settlement→VM）。〔M3-00-result-view 已并 main（第四批）〕
 - [x] 事件提示映射（GameEvent/FlowEvent→cue id）。〔M3-00-event-cues 已并 main（第四批）〕
+- [x] 整屏 VM 集成层（9 个 UI 岛 → 单一渲染 VM）。〔M3-01-screen-view 已并 main；`ui/index.ts` 已含第六批 view 导出〕
 - [ ] 创建大厅场景。
 - [ ] 创建游戏主场景。
 - [ ] 创建手牌交互。
@@ -91,6 +92,7 @@
 - [x] 难度 routing 按座位分发证明（buildRoutingPolicy 逐座位深相等）。〔M4-04B 已并 main b775254〕
 - [x] AI 合法性不变量审计（三档横切护栏）。〔M4-08 已并 main（第四批，绿护栏）〕
 - [x] 叫抢判强逻辑单一真相源 + 阈值 exhaustive。〔M4-09 已并 main（优化批）：抽 isStrongHand，chooseBid/chooseBidByLevel 复用〕
+- [x] 叫抢 dispatch 去重。〔M4-10 已并 main：`actionForStrength` 单一真相源，chooseBid/chooseBidByLevel 复用〕
 
 ## M5 完整单机体验
 
@@ -105,8 +107,10 @@
 - [x] 断局槽位存储适配器（损坏抛错，区别设置）。〔M5-07 已并 main 4c92572；StorageLike 改 import settingsStorage〕
 - [x] 战绩统计编解码（JSON + 容错迁移）。〔M5-08 已并 main（第四批）〕
 - [x] 对局历史记录纯模型（追加/裁剪/倒序/迁移）。〔M5-09 已并 main（第四批）〕
-- [ ] 战绩统计。〔前置 M5-11 aggregate（第五批 ready）：FlowResult→stats/records 聚合〕
-- [ ] 断局重开（复用序列化存档）。〔前置 M5-10 resume（第五批 ready）：SaveSlot→可继续对局〕
+- [x] 战绩统计聚合。〔M5-11 aggregate 已并 main：FlowResult→stats/records〕
+- [x] 断局重开（复用序列化存档）。〔M5-10 resume 已并 main：SaveSlot→可继续对局〕
+- [x] 单局会话持久化集成。〔M5-13 已并 main：save↔resume↔aggregate 串联，注入 StorageLike〕
+- [x] 落盘倍数字段正整数迁移。〔M5-12c 已折叠进 M5-10/M5-12b：`bidMultiplier`/`multiplier` 非法值回 1〕
 - [ ] 音效开关。
 - [ ] 基础动画。
 
