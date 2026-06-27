@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main（**79 文件 / 416 绿**）· M5-13 已并 main · M5-12c 已折叠闭合 · 合并后 6 维对抗式审查（0 blocker / 25 latent）已派发 **M5-14 架构债收口**（纯 spec）·（审查/派发见 coordination/BOARD.md）
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main（**82 文件 / 422 绿**）· M5-13 已并 main · M5-12c 已折叠闭合 · 合并后 6 维对抗式审查（0 blocker / 25 latent）派发 **M5-14 架构债收口**，**已验收并入 main（`578d378`，分层零违规）**· 余 1 行 statsCodec 注释 follow-up（低）·（审查/验收见 coordination/BOARD.md）
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
