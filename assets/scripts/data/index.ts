@@ -11,3 +11,4 @@ export * from './settingsStorage';
 export * from './save';
 export * from './saveStorage';
 export * from './records';
+export * from './difficultyConfig';

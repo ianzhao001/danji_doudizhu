@@ -6,3 +6,4 @@ export * from './baseline';
 export * from './bidding';
 export * from './strategy';
 export * from './bidding-levels';
+export * from './hint';
