@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化批 ✅ 已并 main（**56 文件 / 305 绿**）· **第五批：T4(M5-12a) 已并 main，余 14 ready 可派发**（派发见 coordination/BOARD.md）· **已「加固+提升雄心」升级**（修 T4 false-green / T5 false-red 两个阻断 bug + T1 漏种文件，富化全部 15 测试契约；见 BOARD「第五批升级」）
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化批 ✅ 已并 main（**62 文件 / 336 绿**）· **第五批：T4(M5-12a) 已并 main，余 14 ready 可派发** · **第六批：6 ready 已全部实现并并 main（`2e4cc93`）、2 blocked**（M5-13 依赖阻塞；M5-12c 倍数下界**决策已拍板=1**·仍待 T1+T5 解依赖）·（派发/决策见 coordination/BOARD.md）· **已「加固+提升雄心」升级**（修 T4 false-green / T5 false-red 两个阻断 bug + T1 漏种文件，富化全部 15 测试契约；见 BOARD「第五批升级」）
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 

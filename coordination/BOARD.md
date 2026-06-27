@@ -2,9 +2,9 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M4 ✅ · 第三/四/优化批 ✅ 已并 main · **第五批：T4 已并 main，余 14 ready · 可派发**
+## 当前里程碑：M2 ✅ · M4 ✅ · 第三/四/优化批 ✅ 已并 main · **第五批：T4 已并 main，余 14 ready · 第六批：6 已并 main，2 blocked**
 
-main 现状：**56 测试文件 / 305 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批：T4(M5-12a) 已并 main（`2820b8c`，实现方 Codex）；余 14 任务 ready**（文件域两两不相交；spec 入 main、各分支含失败测试/桩或 green-guard 测试，独立 typecheck 绿，并经本窗口「加固+提升雄心」升级）。下一步见下「第五批派发表」。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
+main 现状：**62 测试文件 / 336 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批：T4(M5-12a) 已并 main（`2820b8c`，实现方 Codex）；余 14 任务 ready**（文件域两两不相交；spec 入 main、各分支含失败测试/桩或 green-guard 测试，独立 typecheck 绿，并经本窗口「加固+提升雄心」升级）。**第六批：6 ready 任务已全部实现并并 main（`2e4cc93`，纯 spec 模式：实现方自写测试+实现）；2 blocked**（M5-13 依赖阻塞、M5-12c 决策已拍板·仍依赖阻塞——见下）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
 ## 第五批（15 任务 · 文件域互不相交 · 全部 ready · 可认领）
 
@@ -168,21 +168,33 @@ main 现状：**56 测试文件 / 305 用例全绿、typecheck 净、无 cc 泄�
 
 > 用户指令「派发后续任务·尽可能多·架构不写代码」。**纯 spec 派发**：架构只出任务定义（API 契约/文件域/验收/依赖），**不种失败测试/桩**；实现方按 spec 自写 vitest 测试 + 实现。所有新文件 **import 直引、不改 `index.ts` 桶**（架构合并时统一补桶导出，避免桶冲突）。文件域经核对：6 个 ready 任务两两不相交，且与第五批在跑的 14 任务不相交。spec 入 main `f829a91`。
 
-### Ready ×6（分支已建于 main HEAD，可立即认领）
-| ID | 类型 | 新文件 | 分支 | 依赖 |
-|----|----|----|----|----|
-| M5-15-difficulty-config | 数据 | `data/difficultyConfig.ts` | `task/M5-15-difficulty-config` | ai/strategy, data/settings |
-| M3-20-stats-view | UI-VM | `ui/stats-view.ts` | `task/M3-20-stats-view` | data/stats |
-| M3-21-records-view | UI-VM | `ui/records-view.ts` | `task/M3-21-records-view` | data/records |
-| M3-22-settings-view | UI-VM | `ui/settings-view.ts` | `task/M3-22-settings-view` | data/settings, ai/strategy |
-| M3-23-lobby-view | UI-VM | `ui/lobby-view.ts` | `task/M3-23-lobby-view` | data/save, data/stats |
-| M4-20-hint-suggest | ai | `ai/hint.ts`（**不碰 bidding\***） | `task/M4-20-hint-suggest` | rules/moves |
+### ✅ 已并 main ×6（`2e4cc93` · `merge --no-ff` 各分支 · 纯 spec：实现方自写测试+实现）
+> 审查：6 个新文件均纯函数、零 `cc`、文件域无越界（仅各自新文件 + 自写测试 + report）；导入符号全部对齐 main 真实类型（`AiLevel` 枚举、`isBombLike(category)`、`compareMoves`、`Settings`/`RecordEntry`/`SaveSlot`/`MatchStats` 形状均核对）。各分支基于「本地 BOARD 旧版」的改动已在合并时丢弃（保留 main BOARD 字节不变）。并入后 main **62 文件 / 336 用例全绿、typecheck 净**（+6 测试文件 / +31 用例）。worktree + 分支已按 PROTOCOL 清理。
+
+| ID | 类型 | 文件 | 审查要点 |
+|----|----|----|----|
+| M5-15-difficulty-config | 数据 | `data/difficultyConfig.ts` | 三档配置 + `difficultyConfig()`/`difficultyOptions()`，非法 level 回 Normal |
+| M3-20-stats-view | UI-VM | `ui/stats-view.ts` | `deriveStatsView`：胜/负/胜率/净分标签，rounds=0→0% |
+| M3-21-records-view | UI-VM | `ui/records-view.ts` | `deriveRecordsView`：倒序行 VM + 可选 limit（≤0→空） |
+| M3-22-settings-view | UI-VM | `ui/settings-view.ts` | toggles + 不可变 `toggleSetting`/`setDifficulty` |
+| M3-23-lobby-view | UI-VM | `ui/lobby-view.ts` | `deriveLobbyView`：续局标签 + 战绩摘要 |
+| M4-20-hint-suggest | ai | `ai/hint.ts` | `hintSuggestions`/`nextHint`：炸弹靠后稳定序、循环回绕、未碰 bidding |
+
+> ⚠️ **桶导出待补（架构 follow-up · 非阻塞）**：6 模块按 spec 未入各自 `index.ts` 桶（测试均 import 直引、不影响绿）。桶统一导出留作架构整合步——见「后续」。
 
 ### Blocked ×2（spec 已入 main，待依赖并入再建分支）
 | ID | 文件 | 解锁条件 |
 |----|----|----|
 | M5-13-persist-session | `data/session.ts`（新） | T1(resume)+T2(aggregate) 并 main |
-| M5-12c-multiplier-positive | `save.ts`+`records.ts` | T1+T5 并 main **且** 用户确认「倍数下界=1」 |
+| M5-12c-multiplier-positive | `save.ts`+`records.ts` | **决策已拍板（见下）**；仍待 T1+T5 并 main 后建分支 |
+
+### 🟢 产品决策 · M5-12c 倍数下界（架构据 RULES 拍板 · 2026-06-27）
+> 用户授权架构自行决策并执行。
+
+- **决策：倍数（`multiplier` / save `bidMultiplier`）合法域 = 正整数（≥1）；下界 = 1。**
+- **依据**：RULES.md「倍数从 1 起；叫地主=1、每抢/反抢翻倍、每炸/火箭翻倍、春天/反春天翻倍——最终为各来源连乘」。倍数是若干 **≥1 因子的连乘，永不为 0**，故 `0`/负/小数/非数均非法。
+- **非法值处置：统一回退默认 `1`**（不标 corrupted）——与 codec 层既有宽松迁移一致（`records.ts` 已 `finiteNumberOrDefault(value.multiplier, 1)`）。**解决 spec 中 save `bidMultiplier:0` 的「corrupted vs 回退」二选一 → 取回退 1。**
+- **效果**：解除 M5-12c 的**决策**阻塞；spec 已据此定稿（去掉「需用户确认」门）。任务仍**依赖**阻塞——T1(save bidMultiplier 字段) + T5(records 数值收紧) 与之文件域冲突，须先并 main，届时架构建 `task/M5-12c-multiplier-positive` 分支转 ready。
 
 ### 编辑器阶段 backlog（M3 UI 主体 · import cc · 非 worktree · architect/指定 cc 实现方 · 依赖 T3 screen-view + 各 view-model）
 > 进 Cocos 编辑器建场景/预制体/组件，绑定既有 view-model（组件变薄）。**不走 worktree 纯逻辑协议**，需专门 spec + 编辑器操作；待 T3 并 main 后开。
@@ -192,5 +204,6 @@ main 现状：**56 测试文件 / 305 用例全绿、typecheck 净、无 cc 泄�
 - **M6-01** 异常流程检查清单 ｜ **M6-02** 构建验证 + 发布验收记录 ｜ **M6-03** 性能/移动端适配回归。
 
 ## 后续（本批次之后）
-- **设计型待办进展**：① 落盘数值不变量——`serialize`(passesInARow/bombsPlayed) 由 **T4 已并 main**、`records`(multiplier/bombs/heroScore/playedAt) 由 **T5 在跑**、`save.savedAt` 由 **T1 在跑**、倍数下界由 **M5-12c blocked**；② 整屏 VM 集成层 = **T3 M3-01 在跑**。两项设计待办已转为具体任务。
+- **设计型待办进展**：① 落盘数值不变量——`serialize`(passesInARow/bombsPlayed) 由 **T4 已并 main**、`records`(multiplier/bombs/heroScore/playedAt) 由 **T5 在跑**、`save.savedAt` 由 **T1 在跑**、倍数下界 **决策已拍板=1**（M5-12c 待 T1+T5 解依赖）；② 整屏 VM 集成层 = **T3 M3-01 在跑**。两项设计待办已转为具体任务。
 - **持久化 IO 收口**：storage 适配器（M5-06/07）+ resume(T1) + aggregate(T2) → **M5-13 集成**（blocked）；之后进编辑器接真实 localStorage。
+- **桶导出整合（架构 follow-up）**：第六批 6 模块（`ui/{stats,records,settings,lobby}-view`、`ai/hint`、`data/difficultyConfig`）+ 后续 T1/T2/T3 落地后，统一补 `ui/index.ts`/`ai/index.ts`/`data/index.ts` 桶导出（消费方/编辑器组件按桶引用）。当前测试 import 直引、不阻塞。
