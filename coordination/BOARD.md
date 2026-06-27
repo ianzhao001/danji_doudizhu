@@ -206,4 +206,8 @@ main 现状：**62 测试文件 / 336 用例全绿、typecheck 净、无 cc 泄�
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量——`serialize`(passesInARow/bombsPlayed) 由 **T4 已并 main**、`records`(multiplier/bombs/heroScore/playedAt) 由 **T5 在跑**、`save.savedAt` 由 **T1 在跑**、倍数下界 **决策已拍板=1**（M5-12c 待 T1+T5 解依赖）；② 整屏 VM 集成层 = **T3 M3-01 在跑**。两项设计待办已转为具体任务。
 - **持久化 IO 收口**：storage 适配器（M5-06/07）+ resume(T1) + aggregate(T2) → **M5-13 集成**（blocked）；之后进编辑器接真实 localStorage。
-- **桶导出整合（架构 follow-up）**：第六批 6 模块（`ui/{stats,records,settings,lobby}-view`、`ai/hint`、`data/difficultyConfig`）+ 后续 T1/T2/T3 落地后，统一补 `ui/index.ts`/`ai/index.ts`/`data/index.ts` 桶导出（消费方/编辑器组件按桶引用）。当前测试 import 直引、不阻塞。
+- **桶导出整合（架构 follow-up · 进行中）**：
+  - ✅ `ai/index.ts` += `hint`、`data/index.ts` += `difficultyConfig`（`5a4d2be`，仅 re-export、typecheck 净、336 绿；`hint` 名称不与现有 ai 导出冲突，`flow/driver`+`flow/policies`+`data/settings` 等 barrel 消费方 typecheck 通过）。
+  - ⏳ `ui/index.ts` **暂不创建**——T3(M3-01) spec **独占建桶**（`新桶；由本任务创建`），T3 分支已种入 `ui/index.ts`（含 9 岛+screen-view，**未含**第六批 4 个 view）。架构在 main 上建桶会窃取 T3 的独占创建并致合并冲突。**待 T3 并 main 后**，架构在 T3 既有桶上 **追加** `export * from './{stats,records,settings,lobby}-view'`（不重建、只加 4 行）。
+  - ⏳ `data/index.ts` 中 `aggregate` 导出行由 **T2 分支已种**（main 上无 aggregate，待 T2 并 main 即带上）；架构已加的 `difficultyConfig` 不与之冲突。
+  - ⏳ `game/index.ts` 中 `resume` 导出由 **T1 独占写**（T1 并 main 时带上）。
