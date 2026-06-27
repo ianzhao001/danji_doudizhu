@@ -4,7 +4,7 @@
 
 ## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · **M5-13 已解锁并并 main，M5-12c 已折叠闭合**
 
-main 现状：**79 测试文件 / 416 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
+main 现状：**79 测试文件 / 416 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。合并后架构对 `b511c08..main` 跑 6 维对抗式审查：**0 blocker、25 确认均 latent**，main 可发布；架构债（分层违规 + 校验/原子性）已登记并派发 **M5-14** 修正（纯 spec·待建分支）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
 ## 第五批（15 任务 · 文件域互不相交）—— ✅ 全部已并 main
 
@@ -197,6 +197,19 @@ main 现状：**79 测试文件 / 416 用例全绿、typecheck 净、无 cc 泄�
 - **非法值处置：统一回退默认 `1`**（不标 corrupted）——与 codec 层既有宽松迁移一致（`records.ts` 已 `finiteNumberOrDefault(value.multiplier, 1)`）。**解决 spec 中 save `bidMultiplier:0` 的「corrupted vs 回退」二选一 → 取回退 1。**
 - **效果**：M5-12c 已闭合。执行时未再单独建冲突分支，而是按用户授权直接折叠进 T1(save `bidMultiplier`) 与 T5(records `multiplier`)：`0`/负数/小数/非数均迁移回默认 `1`。
 
+### 🔍 第六/五批合并后对抗式审查（2026-06-27 · 架构 6 维审查 workflow · 36 agent / 25 确认 / 4 驳回）
+> 用户指令「检查优化后合并代码」。实测：第五批 15 + M5-13 + M5-12c 已由实现方 Codex 全部 `merge --no-ff` 入 main（`57fff44`），工作树净、**79 文件 / 416 用例全绿、typecheck 净、纯逻辑层零 `cc`、无运行时环**——**main 本身可发布**，无 blocker。架构对 `b511c08..main`（14 产品文件 / +296−26）跑 6 维（正确性/数据完整性/分层/契约/边界/测试覆盖）对抗式审查 + 逐条验证 + 完整性 critic。**25 条确认均为 latent（无产品调用方走 resume/commit 流），0 blocker / 0 high-correctness**。按「不写代码」约束，**未自改产品码**，转为登记架构债 + 派发 M5-14 修正任务。
+
+**审查结论分级（确认项·均经独立 agent 验证 grounding）**
+- **分层违规（架构 spec 缺陷·非实现方过错）**：① `game/resume.ts:5` `import type { SaveSlot } from '../data/save'`（game→data type 边，违反「game 只依赖 rules」）；② `data/aggregate.ts:5`+`data/session.ts:5` `import type { FlowResult } from '../flow'`（data→flow type 边）；③ `data/session.ts:6` `import { resumeRound } from '../game'`（data→game 运行时边）。**均为本架构 M5-10/M5-13 spec 明确指派写出**——是 spec 缺陷，非 Codex 过错。无运行时环（game→data 仅 type-only 擦除；data→game serialize 既存）。→ **派发 M5-14 修正**（DTO 上移 + 窄输入 DTO）。
+- **校验缺口（medium·latent）**：① `data/save.ts` `deserializeSave` 对 `events` 仅 `Array.isArray`+裸转 `as GameEvent[]`，**无元素校验**（与已收紧的数值字段不对称）；② `data/statsCodec.ts` unknown-version 静默 `emptyStats()` 丢弃全部战绩，**注释辩「可推导」不成立**（records 无胜负方归因，version 恒 1 故 latent）；③ `data/session.ts` `commitFinishedRound` **非原子**（stats→records→清槽，中途失败重试双计 stats）；④ `loadRecords` 损坏静默吞历史（与 save 槽「损坏抛错」不一致）。→ 均入 M5-14。
+- **low/nit（登记·不入紧急修）**：`resume.ts` heroSeat 缺省回退 `round.landlord`（spec 强制、test 锁；latent）；`screen-view.ts` `landlord ?? 0` settlement-without-snapshot 误标（无产品调用方，留编辑器阶段）；records 写入裸 `JSON.stringify` 与读 `migrateRecords` 不对称；`ui/index.ts` 导出 14 模块而 M3-01 spec 写「10」（实现方 report 已自披露，无功能影响）；`M5-10-resume.md` 验收 #48 文案 stale（代码正确遵循 M5-12c）。
+- **驳回 4 条（审查噪声·记录备查）**：`playedAt:0`/`savedAt:0` 哨位混淆（无调用方传 0、属既定 fallback 语义）；`bidding-levels` Normal 不再委派 chooseBid（M4-10 去重**正确**、非缺陷）；session commit 仅在已 persist 后测（测试覆盖充分性误读）。
+- **完整性 critic 补强**：cc 规则经独立 grep 显式确认（零泄漏）；`ai/` 波（M4-10 三文件）行为保持已验证；events-Validation 的「→settle 错算」叙事在 HEAD 不成立（resume 无产品消费方）；`data→ai` 既存边（difficultyConfig）非本批引入。
+
+### 📋 M5-14 持久化层分层校正 + 校验/原子性加固（架构债收口 · 纯 spec · ready）
+- 派发 M5-14（`coordination/tasks/M5-14-resume-layering.md`）：收口上述分层违规（DTO 上移 `ResumePayload`/`RoundFinishInput` 到 `game`、消除 `game→data` 与 `data→flow` 边）+ events 元素校验 + commit 原子化（幂等顺序）+ records 对称 `serializeRecords` + 损坏可观测。文件域：`game/{resume,types}.ts`、`data/{save,aggregate,session,records}.ts` + 3 新测试。**不拆既存 `data→game/serialize` 运行时边**（风险大、非本批引入）。分支 `task/M5-14-resume-layering`（架构待建）。
+
 ### 编辑器阶段 backlog（M3 UI 主体 · import cc · 非 worktree · architect/指定 cc 实现方 · 依赖 T3 screen-view + 各 view-model）
 > 进 Cocos 编辑器建场景/预制体/组件，绑定既有 view-model（组件变薄）。**不走 worktree 纯逻辑协议**，需专门 spec + 编辑器操作；待 T3 并 main 后开。
 - **M3-30** 大厅场景（绑 lobby-view/stats-view）｜ **M3-31** 游戏主场景骨架（绑 screen-view）｜ **M3-32** 手牌交互组件（绑 hand-interaction）｜ **M3-33** 操作按钮+提示组件（绑 action-buttons + M4-20 hint）｜ **M3-34** 结算弹窗（绑 result-view）｜ **M3-35** GameEvent/FlowEvent→动画/音效驱动（绑 event-cues）｜ **M3-36** 390×844 适配回归。
@@ -207,6 +220,7 @@ main 现状：**79 测试文件 / 416 用例全绿、typecheck 净、无 cc 泄�
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
 - **持久化 IO 收口**：storage 适配器（M5-06/07）+ resume(T1) + aggregate(T2) + session(M5-13) 已闭合；之后进编辑器接真实 localStorage。
+- **架构债 M5-14（已派发·纯 spec）**：合并后审查发现分层违规（`game→data`/`data→flow` type 边 + `data→game` 运行时边，均架构 spec 缺陷）+ 校验/原子性缺口（events 无元素校验、statsCodec unknown-version 静默丢、commit 非原子、records 写入不对称）——详见上「对抗式审查」段。0 blocker、均 latent，main 可发布；M5-14 收口。
 - **桶导出整合（架构 follow-up）**：
   - ✅ `ai/index.ts` += `hint`、`data/index.ts` += `difficultyConfig`（`5a4d2be`，仅 re-export、typecheck 净、336 绿；`hint` 名称不与现有 ai 导出冲突，`flow/driver`+`flow/policies`+`data/settings` 等 barrel 消费方 typecheck 通过）。
   - ✅ `ui/index.ts` 由 M3-01 创建，已导出 9 个 UI 岛、`screen-view`，以及第六批 `stats/records/settings/lobby-view`。

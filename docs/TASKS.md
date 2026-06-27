@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main（**79 文件 / 416 绿**）· M5-13 已解锁并并 main · M5-12c 倍数正整数约束已折叠闭合 ·（派发/决策见 coordination/BOARD.md）
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main（**79 文件 / 416 绿**）· M5-13 已并 main · M5-12c 已折叠闭合 · 合并后 6 维对抗式审查（0 blocker / 25 latent）已派发 **M5-14 架构债收口**（纯 spec）·（审查/派发见 coordination/BOARD.md）
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
