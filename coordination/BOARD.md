@@ -2,9 +2,9 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M4 ✅ · 第三/四/优化批 ✅ 已并 main · **第五批（15 任务）种子 ready · 可派发**
+## 当前里程碑：M2 ✅ · M4 ✅ · 第三/四/优化批 ✅ 已并 main · **第五批：T4 已并 main，余 14 ready · 可派发**
 
-main 现状：**54 测试文件 / 296 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已种、全部 ready**（3 功能 + 4 加固 + 8 green-guard，文件域两两不相交；spec 入 main、各分支含失败测试/桩或 green-guard 测试，独立 typecheck 绿）。下一步见下「第五批派发表」。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
+main 现状：**56 测试文件 / 305 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批：T4(M5-12a) 已并 main（`2820b8c`，实现方 Codex）；余 14 任务 ready**（文件域两两不相交；spec 入 main、各分支含失败测试/桩或 green-guard 测试，独立 typecheck 绿，并经本窗口「加固+提升雄心」升级）。下一步见下「第五批派发表」。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
 ## 第五批（15 任务 · 文件域互不相交 · 全部 ready · 可认领）
 
@@ -17,7 +17,7 @@ main 现状：**54 测试文件 / 296 用例全绿、typecheck 净、无 cc 泄�
 | T1 | M5-10-resume | 功能(keystone) | `data/save.ts`、新 `game/resume.ts`、`game/index.ts` 桶 | `task/M5-10-resume` | 红桩（resumeRound + **savedAt 整数化**；resume.test 4 + save-resume-fields 6[2红4绿]） |
 | T2 | M5-11-aggregate | 功能 | 新 `data/aggregate.ts`、`data/index.ts` 桶 | `task/M5-11-aggregate` | 红桩（3 fn；**8 红**，含 stats 语义聚合） |
 | T3 | M3-01-screen-view | 功能 | 新 `ui/screen-view.ts`、新 `ui/index.ts` 桶 | `task/M3-01-screen-view` | 红桩（deriveScreenVM；**8 红**，含空 VM/保序/不变量） |
-| T4 | M5-12a-serialize-hardening | 加固(**改产品码**) | `game/serialize.ts` | `task/M5-12a-serialize-hardening` | **红**（serialize 整数化 2 红 + 7 绿护栏）— 原误标 green-guard，因 helper 漏版本包裹假绿，已修 |
+| ~~T4~~ | M5-12a-serialize-hardening | 加固(改产品码) | `game/serialize.ts` | — | ✅ **done · 已并 main `2820b8c`**（实现方 Codex：整数化+错误约定统一；审查通过，305 绿） |
 | T5 | M5-12b-data-codec-hardening | 加固(**改产品码**) | `data/records.ts`、`data/statsCodec.ts` | `task/M5-12b-data-codec-hardening` | 红桩（records 数值 **7 红**[原"8红"含 1 broken false-red 已修] + 5 绿） |
 | T6 | M3-00-table-layout-metrics | 加固(**改产品码**) | `ui/table-layout.ts` | `task/M3-00-table-layout-metrics` | 红桩（LAYOUT_METRICS 提取 **4 红** + 6 绿不变量） |
 | T7 | M4-10-bid-dispatch-dedup | 加固(重构产品码) | `ai/bidding.ts`、`ai/bidding-levels.ts` | `task/M4-10-bid-dispatch-dedup` | green-guard（等价不变量 **4 绿**；含 redeal 子态） |
@@ -160,6 +160,9 @@ main 现状：**54 测试文件 / 296 用例全绿、typecheck 净、无 cc 泄�
 - **spec 文案订正**：T6 魔法数列表补 45/55；T4 行号 121→121–127；多处验收按真实红绿态重写。
 
 - 按上「第五批派发表」+ PROTOCOL bootstrap（`<ID>` 换分支名）派发到各实现方窗口。会改产品码者见上表注。
+
+## 第五批合并记录
+- **T4 / M5-12a ✅ 并入 main `2820b8c`**（实现方 Codex，worktree 规范）：`serialize.ts` 两数值字段 `assertNonNegativeNumber→assertNonNegativeInteger`、`assertVersionedSave` 4 处裸 `throw` 统一 `fail()`。审查：文件域仅 `serialize.ts`(+report)、未碰测试/签名、无 cc；worktree 与并入后 main 均 **56 文件 / 305 用例全绿、typecheck 净**。worktree+分支已按 PROTOCOL 清理。**T1（resume）合并前置已满足**（T4 先行）。
 
 ## 后续（本批次之后）
 - **M3 UI 主体**：第四批 UI 纯逻辑岛（card-view/table-layout/action-buttons/hand-interaction/bidding-view/result-view/event-cues）落齐后，进入 Cocos 编辑器场景/预制体/组件（import cc，非 worktree）；view-model/replay 已在第四批。
