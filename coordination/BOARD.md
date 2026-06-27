@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · **M5-13 已解锁并并 main，M5-12c 已折叠闭合**
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13 已并 main · M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）已派发**（2026-06-27）
 
 main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。合并后架构对 `b511c08..main` 跑 6 维对抗式审查：**0 blocker、25 确认均 latent**，main 可发布；架构债（分层违规 + 校验/原子性）派发 **M5-14**，**已验收并入 main（`578d378`，82/422 绿）**，分层修复在 main 实测零 `game→data`/`data→flow` 命中；余 1 行 `statsCodec` 注释 follow-up（低）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
@@ -212,12 +212,36 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 - **验收结论**：① **分层修复落地**——`grep game→data` / `data→flow` 在 main 上**零命中**；`ResumePayload`/`RoundFinishInput` 两 DTO 上移到 `game/types.ts`，`resumeRound` 改收 `ResumePayload`，`data/save.ts` 加 `toResumePayload` 投影，`aggregate`/`session` 改用 `RoundFinishInput`（去 `FlowResult`）；② **events 逐元素校验**——`parseEvents`/`isGameEvent` 5 种违规形态（null/未知 type/seat 非法/side 非法/play 缺 pattern）均 `corrupted` 抛错并测；③ **commit 幂等原子**——`removeSave` 先行 + 记录级 `sameRecord` 去重，注入 `setItem` 失败重试不双计 `stats.rounds`（测覆盖）；④ **records 对称**——`serializeRecords`（过 `migrateRecords` 规范化）与读对称；⑤ **损坏可观测**——`loadRecords` 损坏 `console.warn`（禁 cc）区分 absent/corrupt。
 - **遗留 follow-up（低·仅文档）**：spec 验收 C-② 的 `statsCodec.ts` 误导性注释（「stats are derivable」**不成立**）未改——实现方 report 自披露「不在文件域·未改」（spec 列了但漏做）。行为已由既有 `stats-codec.test.ts:42-43` 锁（unknown-version→emptyStats），故仅**一行注释订正**未做。登记为 `M5-14-followup-statscodec-comment`（待派发·纯文档改 1 行，可并入下一批）。
 
-### 编辑器阶段 backlog（M3 UI 主体 · import cc · 非 worktree · architect/指定 cc 实现方 · 依赖 T3 screen-view + 各 view-model）
-> 进 Cocos 编辑器建场景/预制体/组件，绑定既有 view-model（组件变薄）。**不走 worktree 纯逻辑协议**，需专门 spec + 编辑器操作；待 T3 并 main 后开。
-- **M3-30** 大厅场景（绑 lobby-view/stats-view）｜ **M3-31** 游戏主场景骨架（绑 screen-view）｜ **M3-32** 手牌交互组件（绑 hand-interaction）｜ **M3-33** 操作按钮+提示组件（绑 action-buttons + M4-20 hint）｜ **M3-34** 结算弹窗（绑 result-view）｜ **M3-35** GameEvent/FlowEvent→动画/音效驱动（绑 event-cues）｜ **M3-36** 390×844 适配回归。
+### 编辑器阶段 backlog（M3 UI 主体 · import cc · 编辑器执行者 · 依赖 T3 screen-view + 各 view-model）
+> 进 Cocos 编辑器建场景/预制体/组件，绑定既有 view-model（组件变薄）。**不走 worktree 纯逻辑协议**，需专门 spec + 编辑器操作。
+- **M3-29 / M3-30 / M3-31 已在第七批派发**（见下「第七批」）。
+- 仍 backlog：**M3-32** 手牌交互组件（绑 hand-interaction）｜ **M3-33** 操作按钮+提示组件（绑 action-buttons + M4-20 hint）｜ **M3-34** 结算弹窗（绑 result-view）｜ **M3-35** GameEvent/FlowEvent→动画/音效驱动（绑 event-cues）｜ **M3-36** 390×844 适配回归。
 
 ### M6 发布前打磨 backlog（待 M3 主体落地后）
 - **M6-01** 异常流程检查清单 ｜ **M6-02** 构建验证 + 发布验收记录 ｜ **M6-03** 性能/移动端适配回归。
+
+## 第七批（编辑器集成 + 运行时桥接 · 规划者派发 · 2026-06-27）
+
+> 从「纯逻辑并行 worktree」切到「编辑器集成 + 运行时桥接」，目标跑通第一版可玩闭环：大厅→新局/续局→游戏桌面→操作/AI→结算→本地保存。计划见 `~/.claude/plans/main-noble-starlight.md`，已据仓库现状核对，**premises 全部成立**（main 净、82/422 绿、所引文件签名一致、6 个新号在 `tasks/` 不存在）。
+
+**执行路径**：① 两 worktree 纯逻辑**并行**（M5-20 runtime/storage、M5-21 flow 门面）；② 单分支 `task/M3-editor-integration` **串行**编辑器三任务（M3-29→30→31，单写者保 .meta UUID 一致）。M5-14-followup 为独立微任务。
+
+**对原计划两处订正（架构据分层硬律 + 用户指令落定）：**
+- **M5-21 resume 签名**：计划草案 `resumeRoundRuntime(storage, keys, config)` 会逼 flow→data 运行时 import（调 `restoreRound`），违反计划自定的「flow→data 仅 type」硬律。**改为** `resumeRoundRuntime(resume: ResumeSnapshot, config)`——组合根先 `restoreRound` 再传入。结果 flow→data **零 import**（优于「type-only」）。persist/commit 仍走注入回调（`persist`/`onSettled`，类型 `RoundFinishInput`）。
+- **编辑器三任务派发对象**：计划写「architect-only 亲自推进」；按用户指令「规划者不写代码、全部派发执行者」，**改为派发编辑器执行者**（需 Cocos Creator）。单写者约束由「单分支 + 单执行者串行」保证，不再由架构自做。
+
+| ID | 类型 | 实现文件域 | 分支 | 状态 |
+|----|----|----|----|----|
+| M5-14-followup-statscodec-comment | 纯文档(1 行) | `data/statsCodec.ts` 注释 | `task/M5-14-followup-statscodec-comment` | **ready** |
+| M5-20-cocos-storage-adapter | runtime 桥接(import cc·薄) | 新 `runtime/storage-adapter.ts`(禁cc)+`runtime/cocos-storage.ts`(cc) | `task/M5-20-cocos-storage-adapter` | **ready**(worktree) |
+| M5-21-round-runtime-session | flow 门面(无cc·Vitest) | 新 `flow/round-runtime.ts` + 重构 `flow/driver.ts` | `task/M5-21-round-runtime-session` | **ready**(worktree) |
+| M3-29-resource-baseline-import | 编辑器·资源 | `assets/resources/{art/cards,audio,fonts}` + 新 `ui/asset-keys.ts` | `task/M3-editor-integration` | **ready**(编辑器执行者) |
+| M3-30-lobby-scene | 编辑器·场景 | `assets/scene` + `ui/components`(cc) | `task/M3-editor-integration` | **blocked**(待 M3-29) |
+| M3-31-game-scene-skeleton | 编辑器·场景 | `assets/scene` + `ui/components`(cc) | `task/M3-editor-integration` | **blocked**(待 M3-29) |
+
+> **文件域不相交核对**：M5-20=新 `runtime/`；M5-21=`flow/{round-runtime(新),driver(重构)}`；M3-29/30/31=`assets/resources` + `assets/scene` + `ui/{asset-keys(新),components/(新)}`；M5-14-followup=`data/statsCodec.ts` 注释。两两不相交。M5-20/M5-21 可真并行；编辑器三任务因共享 .scene/.meta 串行单分支。
+> **硬验收**：纯逻辑层零 cc（`runtime/storage-adapter.ts`/`flow/round-runtime.ts` 零 cc，仅 `runtime/cocos-storage.ts` import cc 且**无测试 import**）；M5-21 `driver.test.ts`/`driver-diagnostics.test.ts` 重构后全绿；M5-20 对 `../data` 仅 type import、M5-21 对 `../data` 零 import；编辑器任务出 390×844 截图。
+> **第二批（本批不派）**：M3-32 手牌交互、M3-33 操作按钮+提示、M3-34 叫抢/结算弹窗、M3-35 动画音效、M3-36 适配——待大厅/游戏骨架能打开后接。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
