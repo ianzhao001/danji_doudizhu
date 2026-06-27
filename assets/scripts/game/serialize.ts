@@ -110,21 +110,21 @@ function assertRoundState(value: Record<string, unknown>): RoundState {
   assertSeats(value.seats);
   if (!isSeat(value.turn)) fail('turn is invalid');
   assertTop(value.top);
-  assertNonNegativeNumber(value.passesInARow, 'passesInARow');
+  assertNonNegativeInteger(value.passesInARow, 'passesInARow');
   if (value.winner !== null && !SIDES.has(value.winner as Side)) fail('winner is invalid');
-  assertNonNegativeNumber(value.bombsPlayed, 'bombsPlayed');
+  assertNonNegativeInteger(value.bombsPlayed, 'bombsPlayed');
 
   return value as unknown as RoundState;
 }
 
 function assertVersionedSave(value: unknown): RoundState {
-  if (!isRecord(value)) throw new Error('corrupted save data: expected object');
-  if (!hasOwn(value, 'version')) throw new Error('unsupported save version: missing version');
+  if (!isRecord(value)) fail('expected versioned save object');
+  if (!hasOwn(value, 'version')) fail('missing version');
   if (value.version !== CURRENT_VERSION) {
-    throw new Error(`unsupported save version: ${String(value.version)}`);
+    fail(`unsupported version: ${String(value.version)}`);
   }
   if (!hasOwn(value, 'state') || !isRecord(value.state)) {
-    throw new Error('corrupted round state: missing state');
+    fail('missing state');
   }
 
   return assertRoundState(value.state);
