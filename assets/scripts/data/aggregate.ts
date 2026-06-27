@@ -1,13 +1,12 @@
 /**
- * M5-11 一局结束结果聚合：FlowResult -> stats + records。
+ * M5-11 一局结束结果聚合：RoundFinishInput -> stats + records。
  */
 
-import type { FlowResult } from '../flow';
-import type { SeatIndex } from '../game';
+import type { RoundFinishInput, SeatIndex } from '../game';
 import { appendRecord, type RecordEntry, type RecordsState } from './records';
 import { recordRound, type MatchStats, type RoundOutcome } from './stats';
 
-export function toRoundOutcome(result: FlowResult, heroSeat: SeatIndex): RoundOutcome {
+export function toRoundOutcome(result: RoundFinishInput, heroSeat: SeatIndex): RoundOutcome {
   return {
     heroSeat,
     landlord: result.landlord,
@@ -16,7 +15,7 @@ export function toRoundOutcome(result: FlowResult, heroSeat: SeatIndex): RoundOu
   };
 }
 
-export function toRecordEntry(result: FlowResult, heroSeat: SeatIndex, playedAt: number): RecordEntry {
+export function toRecordEntry(result: RoundFinishInput, heroSeat: SeatIndex, playedAt: number): RecordEntry {
   return {
     heroSeat,
     landlord: result.landlord,
@@ -32,7 +31,7 @@ export function toRecordEntry(result: FlowResult, heroSeat: SeatIndex, playedAt:
 export function applyFinishedRound(
   stats: MatchStats,
   records: RecordsState,
-  result: FlowResult,
+  result: RoundFinishInput,
   heroSeat: SeatIndex,
   playedAt: number,
 ): { stats: MatchStats; records: RecordsState } {

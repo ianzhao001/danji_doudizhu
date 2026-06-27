@@ -4,6 +4,7 @@
  */
 
 import { Card, HandPattern } from '../rules';
+import type { Settlement } from './settlement';
 
 export type SeatIndex = 0 | 1 | 2;
 
@@ -43,6 +44,14 @@ export interface RoundState {
   bombsPlayed: number; // 炸弹/火箭累计（供 settlement）
 }
 
+/** 断局恢复所需的纯数据负载（不含 savedAt/version 等 IO 元数据）。 */
+export interface ResumePayload {
+  round: RoundState;
+  heroSeat?: SeatIndex;
+  bidMultiplier?: number;
+  events?: GameEvent[];
+}
+
 export type GameEvent =
   | { type: 'play'; seat: SeatIndex; pattern: HandPattern }
   | { type: 'pass'; seat: SeatIndex }
@@ -65,6 +74,13 @@ export interface GameSnapshot {
 export interface ApplyResult {
   state: RoundState; // 新状态（不可变更新）
   events: GameEvent[]; // 发生了什么
+}
+
+/** 结束一局后，战绩/历史聚合所需的最小纯数据。 */
+export interface RoundFinishInput {
+  landlord: SeatIndex;
+  winner: Side;
+  settlement: Settlement;
 }
 
 export class IllegalActionError extends Error {

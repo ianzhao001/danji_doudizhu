@@ -2,13 +2,12 @@
  * M5-13 单局会话持久化编排。纯逻辑、注入 StorageLike，不引用浏览器全局。
  */
 
-import type { FlowResult } from '../flow';
-import { resumeRound, type GameEvent, type ResumeSnapshot, type RoundState, type SeatIndex } from '../game';
-import { applyFinishedRound } from './aggregate';
-import { emptyRecords, migrateRecords, type RecordsState } from './records';
-import { SAVE_VERSION, type SaveSlot } from './save';
+import { resumeRound, type GameEvent, type ResumeSnapshot, type RoundFinishInput, type RoundState, type SeatIndex } from '../game';
+import { applyFinishedRound, toRecordEntry, toRoundOutcome } from './aggregate';
+import { emptyRecords, migrateRecords, serializeRecords, type RecordEntry, type RecordsState } from './records';
+import { SAVE_VERSION, toResumePayload, type SaveSlot } from './save';
 import { loadSave, removeSave, saveSave } from './saveStorage';
-import { emptyStats, type MatchStats } from './stats';
+import { emptyStats, recordRound, type MatchStats } from './stats';
 import { deserializeStats, serializeStats } from './statsCodec';
 import type { StorageLike } from './settingsStorage';
 
@@ -36,7 +35,7 @@ export function persistRound(
 
 export function restoreRound(storage: StorageLike, keys: SessionKeys): ResumeSnapshot | null {
   const slot = loadSave(storage, keys.save);
-  return slot === null ? null : resumeRound(slot);
+  return slot === null ? null : resumeRound(toResumePayload(slot));
 }
 
 function loadStats(storage: StorageLike, key: string): MatchStats {
@@ -50,22 +49,55 @@ function loadRecords(storage: StorageLike, key: string): RecordsState {
   try {
     return migrateRecords(JSON.parse(raw));
   } catch {
+    console.warn(`corrupted records data for key "${key}"`);
     return emptyRecords();
   }
+}
+
+type CommitFinishedRoundArgs =
+  | { finish: RoundFinishInput; heroSeat: SeatIndex; playedAt: number }
+  | { result: RoundFinishInput; heroSeat: SeatIndex; playedAt: number };
+
+function finishOf(args: CommitFinishedRoundArgs): RoundFinishInput {
+  return 'finish' in args ? args.finish : args.result;
+}
+
+function sameRecord(a: RecordEntry, b: RecordEntry): boolean {
+  return (
+    a.heroSeat === b.heroSeat &&
+    a.landlord === b.landlord &&
+    a.winner === b.winner &&
+    a.multiplier === b.multiplier &&
+    a.bombs === b.bombs &&
+    a.spring === b.spring &&
+    a.heroScore === b.heroScore &&
+    a.playedAt === b.playedAt
+  );
 }
 
 export function commitFinishedRound(
   storage: StorageLike,
   keys: SessionKeys,
-  args: { result: FlowResult; heroSeat: SeatIndex; playedAt: number },
+  args: CommitFinishedRoundArgs,
 ): { stats: MatchStats; records: RecordsState } {
   const currentStats = loadStats(storage, keys.stats);
   const currentRecords = loadRecords(storage, keys.records);
-  const next = applyFinishedRound(currentStats, currentRecords, args.result, args.heroSeat, args.playedAt);
+  const finish = finishOf(args);
+  const record = toRecordEntry(finish, args.heroSeat, args.playedAt);
+  const alreadyRecorded = currentRecords.entries.some((entry) => sameRecord(entry, record));
+  const next = alreadyRecorded
+    ? {
+        stats:
+          currentRecords.entries.length > currentStats.rounds
+            ? recordRound(currentStats, toRoundOutcome(finish, args.heroSeat))
+            : currentStats,
+        records: currentRecords,
+      }
+    : applyFinishedRound(currentStats, currentRecords, finish, args.heroSeat, args.playedAt);
 
-  storage.setItem(keys.stats, serializeStats(next.stats));
-  storage.setItem(keys.records, JSON.stringify(next.records));
   removeSave(storage, keys.save);
+  storage.setItem(keys.records, serializeRecords(next.records));
+  storage.setItem(keys.stats, serializeStats(next.stats));
 
   return next;
 }
