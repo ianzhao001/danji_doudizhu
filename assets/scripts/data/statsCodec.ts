@@ -36,6 +36,7 @@ export function deserializeStats(json: string): MatchStats {
     return emptyStats();
   }
 
+  // Unknown versions intentionally fall back to defaults; stats are derivable, so a stale wire should not block boot.
   if (!isRecord(parsed) || parsed.version !== STATS_VERSION || !isRecord(parsed.stats)) {
     return emptyStats();
   }

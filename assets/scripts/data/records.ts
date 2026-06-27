@@ -35,8 +35,16 @@ function isSeat(value: unknown): value is SeatIndex {
   return SEATS.includes(value as SeatIndex);
 }
 
-function finiteNumberOrDefault(value: unknown, fallback: number): number {
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+function positiveIntOrDefault(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 1 ? value : fallback;
+}
+
+function nonNegIntOrDefault(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : fallback;
+}
+
+function intOrDefault(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isInteger(value) ? value : fallback;
 }
 
 function sideOrDefault(value: unknown): Side {
@@ -53,11 +61,11 @@ function migrateEntry(value: unknown): RecordEntry | null {
     heroSeat: isSeat(value.heroSeat) ? value.heroSeat : 0,
     landlord: isSeat(value.landlord) ? value.landlord : 0,
     winner: sideOrDefault(value.winner),
-    multiplier: finiteNumberOrDefault(value.multiplier, 1),
-    bombs: finiteNumberOrDefault(value.bombs, 0),
+    multiplier: positiveIntOrDefault(value.multiplier, 1),
+    bombs: nonNegIntOrDefault(value.bombs, 0),
     spring: springOrDefault(value.spring),
-    heroScore: finiteNumberOrDefault(value.heroScore, 0),
-    playedAt: finiteNumberOrDefault(value.playedAt, 0),
+    heroScore: intOrDefault(value.heroScore, 0),
+    playedAt: nonNegIntOrDefault(value.playedAt, 0),
   };
 }
 
