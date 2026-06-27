@@ -12,3 +12,4 @@ export * from './save';
 export * from './saveStorage';
 export * from './records';
 export * from './difficultyConfig';
+export * from './aggregate';
