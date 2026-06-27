@@ -14,8 +14,10 @@ import { type BiddingState, type BidAction } from '../game';
  * isStrong：含火箭(双王) 或 炸弹(四同点) 或 ≥2 张点数 ≥ Rank.R2。
  */
 export function chooseBid(hand: Card[], state: BiddingState): BidAction {
-  const isStrong = isStrongHand(hand, 2);
+  return actionForStrength(state, isStrongHand(hand, 2));
+}
 
+export function actionForStrength(state: BiddingState, isStrong: boolean): BidAction {
   if (state.phase === 'calling') {
     return { type: isStrong ? 'call' : 'pass', seat: state.turn };
   }
