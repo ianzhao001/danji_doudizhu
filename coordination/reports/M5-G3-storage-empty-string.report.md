@@ -1,0 +1,32 @@
+# M5-G3-storage-empty-string 实现报告
+
+- 实现方标识：Codex
+- 分支：`task/M5-G3-storage-empty-string`
+- 状态：in-review
+
+## 改了哪些文件
+- 新增 `test/data/save-storage-empty-string.test.ts`。
+- 新增 `test/data/settings-storage-empty-string.test.ts`。
+
+## 测试与类型检查输出
+```
+npm --prefix test test
+Test Files 64 passed (64)
+Tests 340 passed (340)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+```
+
+## 与 spec 的偏差 / 关键决策
+- 无偏差；仅新增 green-guard 测试，不改产品码。
+
+## 疑问（给架构）
+- 无。
+
+## 自检（对照验收项）
+- [x] 测试全绿
+- [x] typecheck 无错
+- [x] 仅改声明文件域
+- [x] 未改既有测试、未碰 main / 他人模块
+- [x] 未 import cc
