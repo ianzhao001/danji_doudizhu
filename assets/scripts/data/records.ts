@@ -90,3 +90,8 @@ export function migrateRecords(raw: unknown): RecordsState {
     .slice(-MAX_RECORDS);
   return { version: RECORDS_VERSION, entries };
 }
+
+export function serializeRecords(records: RecordsState): string {
+  const migrated = migrateRecords(records);
+  return JSON.stringify({ version: RECORDS_VERSION, entries: migrated.entries });
+}

@@ -4,7 +4,7 @@
  * 复用 game 层已校验的 serializeRound/deserializeRound 做内层 round 编解码。
  */
 
-import type { GameEvent, RoundState, SeatIndex } from '../game';
+import { Side, type GameEvent, type ResumePayload, type RoundState, type SeatIndex } from '../game/types';
 import { deserializeRound, serializeRound } from '../game/serialize';
 
 export interface SaveSlot {
@@ -44,6 +44,31 @@ function isSeat(value: unknown): value is SeatIndex {
   return value === 0 || value === 1 || value === 2;
 }
 
+function isGameEvent(value: unknown): value is GameEvent {
+  if (!isRecord(value) || typeof value.type !== 'string') return false;
+  switch (value.type) {
+    case 'play':
+      return isSeat(value.seat) && isRecord(value.pattern);
+    case 'pass':
+    case 'bomb':
+    case 'rocket':
+      return isSeat(value.seat);
+    case 'reset':
+      return isSeat(value.leader);
+    case 'win':
+      return isSeat(value.seat) && (value.side === Side.Landlord || value.side === Side.Farmer);
+    default:
+      return false;
+  }
+}
+
+function parseEvents(value: unknown): GameEvent[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) corrupted('events must be an array');
+  if (!value.every(isGameEvent)) corrupted('events contains invalid entry');
+  return value;
+}
+
 function positiveIntOrDefault(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 1 ? value : fallback;
 }
@@ -61,7 +86,7 @@ export function deserializeSave(json: string): SaveSlot {
     corrupted('savedAt must be a non-negative integer');
   }
   if (parsed.heroSeat !== undefined && !isSeat(parsed.heroSeat)) corrupted('heroSeat must be a valid seat');
-  if (parsed.events !== undefined && !Array.isArray(parsed.events)) corrupted('events must be an array');
+  const events = parseEvents(parsed.events);
 
   const roundJson = typeof parsed.round === 'string' ? parsed.round : JSON.stringify(parsed.round);
   const slot: SaveSlot = {
@@ -71,6 +96,15 @@ export function deserializeSave(json: string): SaveSlot {
   };
   if (parsed.heroSeat !== undefined) slot.heroSeat = parsed.heroSeat;
   if (parsed.bidMultiplier !== undefined) slot.bidMultiplier = positiveIntOrDefault(parsed.bidMultiplier, 1);
-  if (parsed.events !== undefined) slot.events = parsed.events as GameEvent[];
+  if (events !== undefined) slot.events = events;
   return slot;
+}
+
+export function toResumePayload(slot: SaveSlot): ResumePayload {
+  return {
+    round: slot.round,
+    heroSeat: slot.heroSeat,
+    bidMultiplier: slot.bidMultiplier,
+    events: slot.events,
+  };
 }
