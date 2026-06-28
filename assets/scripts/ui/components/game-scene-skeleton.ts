@@ -2,8 +2,10 @@ import {
   _decorator,
   AudioClip,
   AudioSource,
+  Button,
   Color,
   Component,
+  Graphics,
   Label,
   Node,
   Sprite,
@@ -42,8 +44,24 @@ const SESSION_KEYS: SessionKeys = {
   records: 'doudizhu.records',
 };
 
-const CARD_SIZE = { width: 56, height: 78 };
+const CARD_SIZE = { width: 46, height: 64 };
 const HAND_LIFT = 18;
+const SCAFFOLD_NODE_NAMES = [
+  'phase-label',
+  'landlord-label',
+  'multiplier-label',
+  'hand-count-label',
+  'action-label',
+  'bottom-cards-label',
+  'ai-left-label',
+  'ai-right-label',
+  'table-area-label',
+  'hero-hand-label',
+  'card-template-001',
+  'card-template-002',
+  'card-template-003',
+  'card-template-004',
+];
 
 function sameCard(a: Card, b: Card): boolean {
   return a.rank === b.rank && a.suit === b.suit;
@@ -98,12 +116,14 @@ export class GameSceneSkeleton extends Component {
   private selected: Card[] = [];
   private recentEvents: FlowEvent[] = [];
   private settings: Settings = defaultSettings();
+  private statusText = '';
   private submitting = false;
   private readonly spriteFrames = new Map<string, SpriteFrame>();
 
   onLoad(): void {
     this.loadSprite(RESOURCE_PATHS.gameTableBg, this.background);
     if (this.cardTemplate) this.cardTemplate.node.active = false;
+    this.hideSceneScaffold();
     this.audioSource = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
     this.uiRoot = this.ensureNode('runtime-ui', this.node);
     this.startGame(false);
@@ -122,6 +142,7 @@ export class GameSceneSkeleton extends Component {
     this.unsubscribe = null;
     this.selected = clearSelection();
     this.recentEvents = [];
+    this.statusText = '';
 
     const storage = cocosStorage();
     this.settings = loadSettings(storage, SETTINGS_KEY);
@@ -176,45 +197,43 @@ export class GameSceneSkeleton extends Component {
     }
 
     const width = this.canvasSize().width;
+    const handWidth = Math.max(1, width - 32);
     const vm = deriveScreenVM({
       snapshot,
       bidding,
       heroSeat: HERO_SEAT,
       selectedCards: this.selected,
       recentEvents: this.recentEvents,
-      layoutOpts: { containerWidth: width, cardWidth: CARD_SIZE.width, liftOffset: HAND_LIFT },
+      layoutOpts: { containerWidth: handWidth, cardWidth: CARD_SIZE.width, liftOffset: HAND_LIFT },
       settlement,
     });
 
     this.clearNode(this.uiRoot);
-    this.setText(this.phaseLabel, this.runtime.phase());
-    this.setText(this.landlordLabel, `地主 ${vm.topBar.landlordSeat + 1}`);
-    this.setText(this.multiplierLabel, `倍数 ×${vm.topBar.multiplier}`);
-    this.setText(this.handCountLabel, `手牌 ${snapshot?.viewerHand?.length ?? 0}`);
-    this.setText(this.actionLabel, this.runtime.isPlayerTurn() ? '轮到你' : '等待');
 
-    this.renderTopBar(vm.topBar);
+    this.renderTopBar(this.runtime.phase(), vm.topBar, snapshot?.viewerHand?.length ?? 0);
     this.renderSeats(snapshot?.handCounts ?? [0, 0, 0], snapshot?.landlord ?? null);
     this.renderPlayArea(snapshot?.top ? String(snapshot.top.pattern.category) : '自由出牌');
     this.renderBidding(bidding ? vm.bidding : undefined);
-    this.renderHand(vm.hand, width);
+    this.renderHand(vm.hand, handWidth);
+    this.renderStatus(this.statusText || (this.runtime.isPlayerTurn() ? '轮到你' : '等待'));
     this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint);
     this.renderResult(vm.result);
   }
 
-  private renderTopBar(topBar: { multiplier: number; bombs: number; landlordSeat: number }): void {
-    this.addLabel(`地主 ${topBar.landlordSeat + 1}`, -132, 368, 20);
-    this.addLabel(`倍数 ×${topBar.multiplier}`, 0, 368, 20);
-    this.addLabel(`炸弹 ${topBar.bombs}`, 132, 368, 20);
+  private renderTopBar(phase: string, topBar: { multiplier: number; bombs: number; landlordSeat: number }, handCount: number): void {
+    this.addLabel(phase, 0, 382, 18, this.uiRoot!, 140, 30);
+    this.addLabel(`地主 ${topBar.landlordSeat + 1}`, -128, 350, 16, this.uiRoot!, 110, 30);
+    this.addLabel(`倍数 ×${topBar.multiplier}`, 0, 350, 16, this.uiRoot!, 110, 30);
+    this.addLabel(`手牌 ${handCount}`, 128, 350, 16, this.uiRoot!, 110, 30);
   }
 
   private renderSeats(handCounts: [number, number, number], landlord: number | null): void {
-    this.addLabel(`AI 左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, -145, 160, 18);
-    this.addLabel(`AI 右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, 145, 160, 18);
+    this.addLabel(`AI 左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, -132, 158, 16, this.uiRoot!, 108, 64);
+    this.addLabel(`AI 右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, 132, 158, 16, this.uiRoot!, 108, 64);
   }
 
   private renderPlayArea(text: string): void {
-    const label = this.addLabel(`出牌区\n${text}`, 0, 62, 22);
+    const label = this.addLabel(`出牌区\n${text}`, 0, 62, 20, this.uiRoot!, 180, 64);
     label.lineHeight = 28;
   }
 
@@ -232,18 +251,22 @@ export class GameSceneSkeleton extends Component {
   }
 
   private renderHand(hand: ReturnType<typeof deriveScreenVM>['hand'], containerWidth: number): void {
-    this.addLabel('玩家手牌', 0, -244, 18);
+    this.addLabel('玩家手牌', 0, -286, 16, this.uiRoot!, 140, 30);
     for (const slot of hand) {
       const x = slot.x + CARD_SIZE.width / 2 - containerWidth / 2;
-      const y = -308 - slot.y;
+      const y = -336 - slot.y;
       this.addCard(slot.card, x, y, slot.selected);
     }
   }
 
   private renderActions(play: boolean, pass: boolean, hint: boolean): void {
-    this.addButton('出牌', -112, -380, 84, 42, play, () => void this.submitPlay());
-    this.addButton('不要', 0, -380, 84, 42, pass, () => void this.submitPass());
-    this.addButton('提示', 112, -380, 84, 42, hint, () => this.applyHint());
+    this.addButton('出牌', -112, -232, 84, 38, play, () => void this.submitPlay());
+    this.addButton('不要', 0, -232, 84, 38, pass, () => void this.submitPass());
+    this.addButton('提示', 112, -232, 84, 38, hint, () => this.applyHint());
+  }
+
+  private renderStatus(text: string): void {
+    this.addLabel(text, 0, -264, 18, this.uiRoot!, 180, 32);
   }
 
   private renderResult(result: ReturnType<typeof deriveScreenVM>['result']): void {
@@ -267,6 +290,7 @@ export class GameSceneSkeleton extends Component {
     const type = id === 'call' ? 'call' : id === 'grab' ? 'grab' : 'pass';
     const result = await this.runtime.submitPlayerAction({ kind: 'bid', action: { type, seat: HERO_SEAT } });
     if (!result.ok) this.showStatus(result.error?.reason ?? '叫抢失败');
+    else this.statusText = '';
     this.submitting = false;
     this.render();
   }
@@ -280,6 +304,7 @@ export class GameSceneSkeleton extends Component {
     });
     if (result.ok) this.selected = clearSelection();
     else this.showStatus(result.error?.reason ?? '出牌失败');
+    if (result.ok) this.statusText = '';
     this.submitting = false;
     this.render();
   }
@@ -289,6 +314,7 @@ export class GameSceneSkeleton extends Component {
     this.submitting = true;
     const result = await this.runtime.submitPlayerAction({ kind: 'play', action: { type: 'pass', seat: HERO_SEAT } });
     if (!result.ok) this.showStatus(result.error?.reason ?? '不能过牌');
+    else this.statusText = '';
     this.submitting = false;
     this.render();
   }
@@ -312,7 +338,7 @@ export class GameSceneSkeleton extends Component {
     this.loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite);
     node.on(Node.EventType.TOUCH_END, () => this.toggleCard(card), this);
 
-    const label = this.addLabel(`${view.rankLabel}${suitText(view.suitKey)}`, 0, 20, 14, node);
+    const label = this.addLabel(`${view.rankLabel}${suitText(view.suitKey)}`, -12, 18, 10, node, 30, 18);
     label.color =
       view.suitKey === Suit.Heart || view.suitKey === Suit.Diamond
         ? new Color(205, 96, 124, 255)
@@ -338,29 +364,52 @@ export class GameSceneSkeleton extends Component {
     const node = this.ensureNode(`button-${text}-${x}-${y}`, parent);
     node.setPosition(x, y, 0);
     this.addUiTransform(node, width, height);
-    node.on(Node.EventType.TOUCH_END, cb, this);
-    const label = node.addComponent(Label);
+    const button = node.addComponent(Button);
+    button.target = this.drawButtonBackground(node, width, height, enabled);
+    button.transition = Button.Transition.COLOR;
+    button.interactable = enabled;
+    button.normalColor = enabled ? new Color(255, 255, 255, 70) : new Color(255, 255, 255, 30);
+    button.pressedColor = new Color(255, 214, 226, 150);
+    button.hoverColor = new Color(255, 255, 255, 100);
+    button.disabledColor = new Color(255, 255, 255, 24);
+    node.on(Button.EventType.CLICK, cb, this);
+
+    const labelNode = this.ensureNode('button-label', node);
+    this.addUiTransform(labelNode, width, height);
+    const label = labelNode.addComponent(Label);
     label.string = text;
     label.fontSize = 20;
     label.lineHeight = 24;
+    label.horizontalAlign = Label.HorizontalAlign.CENTER;
+    label.verticalAlign = Label.VerticalAlign.CENTER;
     label.color = labelColor(enabled);
     return label;
   }
 
-  private addLabel(text: string, x: number, y: number, fontSize: number, parent: Node = this.uiRoot!): Label {
+  private addLabel(
+    text: string,
+    x: number,
+    y: number,
+    fontSize: number,
+    parent: Node = this.uiRoot!,
+    width = 220,
+    height = 72,
+  ): Label {
     const node = this.ensureNode(`label-${text}-${x}-${y}`, parent);
     node.setPosition(x, y, 0);
-    this.addUiTransform(node, 220, 72);
+    this.addUiTransform(node, width, height);
     const label = node.addComponent(Label);
     label.string = text;
     label.fontSize = fontSize;
     label.lineHeight = fontSize + 5;
+    label.horizontalAlign = Label.HorizontalAlign.CENTER;
+    label.verticalAlign = Label.VerticalAlign.CENTER;
     label.color = new Color(255, 255, 255, 255);
     return label;
   }
 
   private showStatus(text: string): void {
-    this.setText(this.actionLabel, text);
+    this.statusText = text;
   }
 
   private playCue(event: FlowEvent): void {
@@ -388,14 +437,43 @@ export class GameSceneSkeleton extends Component {
 
   private ensureNode(name: string, parent: Node): Node {
     const existing = parent.getChildByName(name);
-    if (existing) return existing;
+    if (existing) {
+      existing.active = true;
+      existing.layer = parent.layer;
+      existing.setSiblingIndex(parent.children.length - 1);
+      return existing;
+    }
     const node = new Node(name);
     node.parent = parent;
+    node.layer = parent.layer;
+    node.active = true;
+    node.setSiblingIndex(parent.children.length - 1);
     return node;
   }
 
   private clearNode(node: Node): void {
-    for (const child of node.children.slice()) child.destroy();
+    for (const child of node.children.slice()) {
+      child.removeFromParent();
+      child.destroy();
+    }
+  }
+
+  private hideSceneScaffold(): void {
+    for (const name of SCAFFOLD_NODE_NAMES) {
+      const child = this.node.getChildByName(name);
+      if (child) child.active = false;
+    }
+  }
+
+  private drawButtonBackground(parent: Node, width: number, height: number, enabled: boolean): Node {
+    const node = this.ensureNode('button-bg', parent);
+    this.addUiTransform(node, width, height);
+    const graphics = node.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = enabled ? new Color(255, 255, 255, 70) : new Color(255, 255, 255, 30);
+    graphics.roundRect(-width / 2, -height / 2, width, height, 8);
+    graphics.fill();
+    return node;
   }
 
   private addUiTransform(node: Node, width: number, height: number): UITransform {
@@ -410,10 +488,6 @@ export class GameSceneSkeleton extends Component {
       width: Math.max(1, size?.width ?? 390),
       height: Math.max(1, size?.height ?? 844),
     };
-  }
-
-  private setText(label: Label | null, text: string): void {
-    if (label) label.string = text;
   }
 
   private loadSprite(path: string, sprite: Sprite | null): void {

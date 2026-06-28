@@ -414,7 +414,7 @@
     "_priority": 1073741824,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 422,
+    "_orthoHeight": 1205.7283950617284,
     "_near": 1,
     "_far": 2000,
     "_color": {
@@ -724,8 +724,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 69.70408280398868,
-      "height": 50.39999999999999
+      "width": 69.716796875,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -757,7 +757,7 @@
     "_string": "playing",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 39.77725118483412,
+    "_actualFontSize": 22,
     "_fontSize": 22,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -856,8 +856,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 46.003633151673085,
-      "height": 50.39999999999999
+      "width": 46.0107421875,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -889,7 +889,7 @@
     "_string": "地主1",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32.54502369668246,
+    "_actualFontSize": 18,
     "_fontSize": 18,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -988,8 +988,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 61.51392377500922,
-      "height": 50.39999999999999
+      "width": 61.5234375,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1021,7 +1021,7 @@
     "_string": "倍数 ×1",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32.54502369668246,
+    "_actualFontSize": 18,
     "_fontSize": 18,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1120,8 +1120,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 51.003835055649986,
-      "height": 50.39999999999999
+      "width": 51.01171875,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1153,7 +1153,7 @@
     "_string": "手牌 5",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32.54502369668246,
+    "_actualFontSize": 18,
     "_fontSize": 18,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1252,7 +1252,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 71.99441576316504,
+      "width": 72,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -1285,7 +1285,7 @@
     "_string": "可出牌",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 43.39336492890995,
+    "_actualFontSize": 24,
     "_fontSize": 24,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1384,8 +1384,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 53.99165334239075,
-      "height": 50.39999999999999
+      "width": 54,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1417,7 +1417,7 @@
     "_string": "底牌区",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32.54502369668246,
+    "_actualFontSize": 18,
     "_fontSize": 18,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1516,8 +1516,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 111.02385390695395,
-      "height": 50.39999999999999
+      "width": 111.041015625,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1549,7 +1549,7 @@
     "_string": "AI 左家\\n17张",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32.54502369668246,
+    "_actualFontSize": 18,
     "_fontSize": 18,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1648,7 +1648,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 123.37497408205685,
+      "width": 123.37890625,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -1681,7 +1681,7 @@
     "_string": "AI 右家\\n20张",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 36.161137440758296,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1780,8 +1780,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 65.9879503162629,
-      "height": 50.39999999999999
+      "width": 66,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1813,7 +1813,7 @@
     "_string": "出牌区",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 39.77725118483412,
+    "_actualFontSize": 22,
     "_fontSize": 22,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1912,8 +1912,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 71.98887112318766,
-      "height": 50.39999999999999
+      "width": 72,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1945,7 +1945,7 @@
     "_string": "玩家手牌",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32.54502369668246,
+    "_actualFontSize": 18,
     "_fontSize": 18,
     "_fontFamily": "Arial",
     "_lineHeight": 40,

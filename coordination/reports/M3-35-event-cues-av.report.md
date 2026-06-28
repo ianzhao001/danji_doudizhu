@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/M3-interaction`
-- 状态：blocked（代码接线完成；Cocos Creator 音效/动效预览待执行）
+- 状态：blocked（代码接线完成；音效/动效和设置开关仍未覆盖）
 
 ## 改了哪些文件
 - `assets/scripts/ui/components/game-scene-skeleton.ts`
@@ -18,6 +18,11 @@ tsc --noEmit
 
 git diff --check
 <no output>
+
+2026-06-28 复验：
+npm --prefix test test -- --testTimeout=10000
+Test Files  85 passed (85)
+Tests       437 passed (437)
 ```
 
 ## 与 spec 的偏差 / 关键决策
@@ -27,7 +32,7 @@ git diff --check
 - 轻动效先实现为 root 层短促 scale 强调，覆盖 deal/play/bomb/rocket 的反馈；更细的逐牌 tween 留给后续 polish。
 
 ## 疑问（给架构）
-- 需要 Creator 预览确认 WAV 加载、声音开关、动画开关与炸弹/火箭强调。
+- 需要 Creator 预览确认 WAV 加载、声音开关、动画开关与炸弹/火箭强调；当前交互验证未覆盖声音/动画。
 
 ## 自检（对照验收项）
 - [x] FlowEvent→CueId→AudioClip 接线
