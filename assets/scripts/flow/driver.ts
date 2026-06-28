@@ -7,6 +7,7 @@
 
 import { chooseAction } from '../ai';
 import { createRng, deal as dealCards } from '../rules';
+import type { Deal, Rng } from '../rules';
 import {
   apply,
   applyBid,
@@ -16,7 +17,17 @@ import {
   settle,
   snapshot,
 } from '../game';
-import type { GameEvent, SeatIndex } from '../game';
+import type {
+  ApplyResult,
+  BidAction,
+  BiddingState,
+  GameEvent,
+  RoundAction,
+  RoundState,
+  SeatIndex,
+  Settlement,
+  Side,
+} from '../game';
 import { realClock } from './clock';
 import {
   HeadlessRoundError,
@@ -29,7 +40,67 @@ import {
 
 const DIAGNOSTIC_EVENT_COUNT = 10;
 
-const defaultPlayPolicy: PlayPolicy = ({ snapshot, rng }) => chooseAction(snapshot, rng);
+export const defaultPlayPolicy: PlayPolicy = ({ snapshot, rng }) => chooseAction(snapshot, rng);
+
+export function createRoundDeal(rng: Rng): Deal {
+  return dealCards(rng);
+}
+
+export function decideBidAction(args: {
+  bidding: BiddingState;
+  deal: Deal;
+  bidPolicy: FlowConfig['bidPolicy'];
+}): BidAction {
+  const bidPolicy = args.bidPolicy ?? defaultBidPolicy;
+  return bidPolicy({
+    seat: args.bidding.turn,
+    state: args.bidding,
+    hand: args.deal.hands[args.bidding.turn].slice(),
+  });
+}
+
+export function applyBiddingStep(bidding: BiddingState, action: BidAction): BiddingState {
+  return applyBid(bidding, action);
+}
+
+export function biddingEvent(action: BidAction, bidding: BiddingState): FlowEvent {
+  return { type: 'bid', action, multiplier: bidding.multiplier };
+}
+
+export function createPlayingState(deal: Deal, landlord: SeatIndex): RoundState {
+  return createPlayingRound(deal, landlord);
+}
+
+export function decidePlayAction(args: { state: RoundState; playPolicy: PlayPolicy; rng: Rng }): RoundAction {
+  return args.playPolicy({
+    seat: args.state.turn,
+    snapshot: snapshot(args.state, args.state.turn),
+    rng: args.rng,
+  });
+}
+
+export function applyPlayStep(state: RoundState, action: RoundAction): ApplyResult {
+  return apply(state, action);
+}
+
+export function pushRoundEvents(events: FlowEvent[], gameEvents: GameEvent[], result: ApplyResult): void {
+  gameEvents.push(...result.events);
+  for (const event of result.events) events.push({ type: 'round', event });
+}
+
+export function winEventFrom(events: GameEvent[]): Extract<GameEvent, { type: 'win' }> | null {
+  return events.find((event): event is Extract<GameEvent, { type: 'win' }> => event.type === 'win') ?? null;
+}
+
+export function settleFromGameEvents(args: {
+  landlord: SeatIndex;
+  winner: Side;
+  bidMultiplier: number;
+  events: GameEvent[];
+  baseScore: number;
+}): Settlement {
+  return settle(args);
+}
 
 function roundError(
   message: string,
@@ -68,20 +139,16 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
 
   const events: FlowEvent[] = [];
   let redeals = 0;
-  let currentDeal = dealCards(rng);
+  let currentDeal = createRoundDeal(rng);
 
   while (true) {
     events.push({ type: 'deal' });
     let bidding = createBidding(startSeat);
 
     while (bidding.phase !== 'done' && bidding.phase !== 'redeal') {
-      const action = bidPolicy({
-        seat: bidding.turn,
-        state: bidding,
-        hand: currentDeal.hands[bidding.turn].slice(),
-      });
-      bidding = applyBid(bidding, action);
-      events.push({ type: 'bid', action, multiplier: bidding.multiplier });
+      const action = decideBidAction({ bidding, deal: currentDeal, bidPolicy });
+      bidding = applyBiddingStep(bidding, action);
+      events.push(biddingEvent(action, bidding));
     }
 
     if (bidding.phase === 'done') {
@@ -90,7 +157,7 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
       }
       events.push({ type: 'landlordDecided', landlord: bidding.landlord, bidMultiplier: bidding.multiplier });
 
-      let state = createPlayingRound(currentDeal, bidding.landlord);
+      let state = createPlayingState(currentDeal, bidding.landlord);
       const gameEvents: GameEvent[] = [];
       let turns = 0;
 
@@ -120,7 +187,7 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
         await clock.sleep(thinkingDelayMs);
         const result = (() => {
           try {
-            return apply(state, action);
+            return applyPlayStep(state, action);
           } catch (error) {
             throwPlayLoopError(error, {
               seed: config.seed,
@@ -131,12 +198,11 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
           }
         })();
         state = result.state;
-        gameEvents.push(...result.events);
-        for (const event of result.events) events.push({ type: 'round', event });
+        pushRoundEvents(events, gameEvents, result);
         turns++;
       }
 
-      const win = gameEvents.find((event): event is Extract<GameEvent, { type: 'win' }> => event.type === 'win');
+      const win = winEventFrom(gameEvents);
       if (!win) {
         throw roundError(`Settled round missing win event seed=${config.seed} turn=${turns}`, {
           seed: config.seed,
@@ -146,7 +212,7 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
         });
       }
 
-      const settlement = settle({
+      const settlement = settleFromGameEvents({
         landlord: bidding.landlord,
         winner: win.side,
         bidMultiplier: bidding.multiplier,
@@ -171,6 +237,6 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
     if (redeals > maxRedeals) {
       throw new Error(`Headless round exceeded maxRedeals seed=${config.seed} redeals=${redeals}`);
     }
-    currentDeal = dealCards(rng);
+    currentDeal = createRoundDeal(rng);
   }
 }
