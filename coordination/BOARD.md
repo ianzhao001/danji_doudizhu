@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；余新脚本 .meta 待编辑器补）
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）
 
 main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。合并后架构对 `b511c08..main` 跑 6 维对抗式审查：**0 blocker、25 确认均 latent**，main 可发布；架构债（分层违规 + 校验/原子性）派发 **M5-14**，**已验收并入 main（`578d378`，82/422 绿）**，分层修复在 main 实测零 `game→data`/`data→flow` 命中；余 1 行 `statsCodec` 注释 follow-up（低）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
@@ -252,7 +252,7 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 - **M5-21 门面要点核对**：`resumeRoundRuntime(ResumeSnapshot, config)`（非 storage）落地；`persist` 在 `enterPlaying`(landlordDecided 后)、`onSettled` 在 `finishIfSettled`(settled 后) 各一次；dispose 后 `advanceUntilPause` 于每次 `sleep` 之后查 disposed 即返回、`emit` 守 disposed——中断正确。
 - **M3 编辑器**：7 牌面 + 9 音效(WAV) + 2 字体物理导入 `assets/resources/`，.meta 由编辑器生成；`lobby.scene`/`game.scene` + 两 cc 组件绑既有 view-model；`ui/asset-keys.ts` 纯对照表（键→`resources/` 路径）；各出 390×844 截图（见 reports）。
 
-> **遗留 follow-up（低·非阻塞·待编辑器会话补）**：① worktree 新建的纯逻辑脚本 `runtime/storage-adapter.ts`、`runtime/cocos-storage.ts`、`flow/round-runtime.ts` **缺 .meta**（连同 `runtime/` 文件夹 .meta）——非编辑器创建故无；Vitest/typecheck 不需，仅 Cocos 编辑器识别需要，下次开编辑器自动生成或架构补（沿用第四批「合并后统一补 .meta」惯例）。② 音效为 WAV（mp3 转码 follow-up，见 M3-29 report）；实际播放置 M3-35。③ `ui/index.ts` 桶未导出 `asset-keys`（测试直引，不阻塞）。
+> **遗留 follow-up**：① ✅ **已闭合**——`runtime/storage-adapter.ts`、`runtime/cocos-storage.ts`、`flow/round-runtime.ts` 及 `runtime/` 文件夹 .meta 由运行中的 Cocos 编辑器在合并后**自动生成并已提交**（`typescript`/`directory` importer、唯一 uuid，非手写）。② 音效为 WAV（mp3 转码 follow-up，见 M3-29 report）；实际播放置 M3-35。③ `ui/index.ts` 桶未导出 `asset-keys`（测试直引，不阻塞·架构整合步补）。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
