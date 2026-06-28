@@ -29,7 +29,43 @@ export interface TableRegions {
   topBar: Rect;
 }
 
-export function tableLayout(): TableRegions {
+export function tableLayout(): TableRegions;
+export function tableLayout(containerWidth: number, containerHeight: number): TableRegions;
+export function tableLayout(containerWidth?: number, containerHeight?: number): TableRegions {
+  if (containerWidth === undefined || containerHeight === undefined) {
+    return fixedPortraitLayout();
+  }
+
+  if (containerWidth === PORTRAIT.width && containerHeight === PORTRAIT.height) {
+    return fixedPortraitLayout();
+  }
+
+  const width = Math.max(1, Math.round(containerWidth));
+  const height = Math.max(1, Math.round(containerHeight));
+  const topBarHeight = Math.min(64, Math.max(48, Math.round(height * 0.08)));
+  const opponentWidth = Math.min(150, Math.max(96, Math.round(width * 0.34)));
+  const opponentHeight = Math.min(80, Math.max(64, Math.round(height * 0.09)));
+  const opponentY = topBarHeight + 16;
+  const playAreaWidth = Math.min(300, Math.max(220, width - 90));
+  const playAreaHeight = Math.min(180, Math.max(140, Math.round(height * 0.2)));
+  const playAreaY = opponentY + opponentHeight + 48;
+  const playerHandHeight = Math.min(160, Math.max(140, Math.round(height * 0.19)));
+  const actionHeight = 64;
+  const actionWidth = Math.min(280, Math.max(220, width - 80));
+  const playerHandY = height - playerHandHeight;
+  const actionY = playerHandY - 16 - actionHeight;
+
+  return {
+    topBar: { x: 0, y: 0, width, height: topBarHeight },
+    opponentLeft: { x: 0, y: opponentY, width: opponentWidth, height: opponentHeight },
+    opponentRight: { x: width - opponentWidth, y: opponentY, width: opponentWidth, height: opponentHeight },
+    playArea: { x: Math.round((width - playAreaWidth) / 2), y: playAreaY, width: playAreaWidth, height: playAreaHeight },
+    actionButtons: { x: Math.round((width - actionWidth) / 2), y: actionY, width: actionWidth, height: actionHeight },
+    playerHand: { x: 0, y: playerHandY, width, height: playerHandHeight },
+  };
+}
+
+function fixedPortraitLayout(): TableRegions {
   return {
     topBar: { ...LAYOUT_METRICS.topBar },
     opponentLeft: {

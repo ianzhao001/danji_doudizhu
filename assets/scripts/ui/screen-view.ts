@@ -32,7 +32,7 @@ export function deriveScreenVM(args: {
   heroSeat: SeatIndex;
   selectedCards: Card[];
   recentEvents: FlowEvent[];
-  layoutOpts: { containerWidth: number; cardWidth: number; liftOffset: number };
+  layoutOpts: { containerWidth: number; containerHeight?: number; cardWidth: number; liftOffset: number };
   settlement?: Settlement;
 }): ScreenVM {
   const { snapshot, bidding, heroSeat, selectedCards, recentEvents, layoutOpts, settlement } = args;
@@ -48,7 +48,10 @@ export function deriveScreenVM(args: {
     .filter((cue): cue is CueId => cue !== null);
 
   return {
-    layout: tableLayout(),
+    layout:
+      layoutOpts.containerHeight === undefined
+        ? tableLayout()
+        : tableLayout(layoutOpts.containerWidth, layoutOpts.containerHeight),
     hand,
     actions: snapshot ? deriveActionButtons({ snapshot, selectedCards, viewerSeat: heroSeat }) : emptyActions(),
     bidding: bidding ? deriveBiddingView(bidding, heroSeat) : undefined,
