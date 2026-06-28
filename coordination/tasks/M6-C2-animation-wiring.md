@@ -3,6 +3,7 @@
 - 状态：blocked（待 M6-L2 + M6-C1 入 main；同 `task/M6-editor` 串行 #2，编辑器单写者）
 - 派发模式：编辑器执行者（Cocos Creator 3.8.8·非 worktree·单写者）
 - 执行分支：`task/M6-editor`
+- **worktree 路径**：与 C1 同一 `task/M6-editor` 工作树（`../斗地主.worktrees/M6-editor`），串行于 C1 之后；不复用历史残留目录。
 - 文件域（**只允许改这些**）：
   - `assets/scripts/ui/components/game-scene-skeleton.ts`（playEffect/addCard/renderHand/renderResult 改调 animation-params + 修双重 lift）
   - `assets/scene/game.scene`（出牌区/动效节点编排）

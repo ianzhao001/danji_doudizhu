@@ -10,6 +10,7 @@
 - 风格锚（**具体引用**）：`asset-previews/pink-cartoon-production-v2/backgrounds/PROMPTS.md` 的 **Shared Art Direction**（甜美卡通粉、软萌贴纸、禁赌场/金钱/文字/logo）+ 各图的 Color palette / Constraints 行，是本任务每图 prompt 的风格基准。
 - v1 可复用 prompt 来源（**显式路径**）：升级自 `asset-previews/pink-cartoon-avatars-v1/PROMPTS.md` 的 `player-avatar` / `ai-cheerful-avatar` / `ai-calm-avatar` / `avatar-frame-set` 四图 prompt。
 - 工具：同 ART-01——`image_gen` 出图 → 复制进 `source/` → `#00ff00` chroma-key + `remove_chroma_key.py` 抠透明 → Pillow 裁 alpha 边/缩放到目标画布。全程零 `cc` import、零测试、不进 `assets/`、不手写 `.meta`。
+- **提交注意**：`asset-previews/` 被 `.gitignore` 忽略（`:35`），完成后必须用 `git add -f asset-previews/pink-cartoon-production-v2/avatars/ coordination/reports/ART-02-avatars.report.md` 提交，否则生成成功但提交不含资产（照 ART-01 `a181d45` 先例）。
 
 ## 共享美术方向
 同 ART-01（甜美卡通粉、软萌贴纸、禁赌场/金钱/文字/logo）。头像为半身/头部吉祥物，性格区分：cheerful=活泼暖色、calm=温和冷调、player=中性友好。身份徽章=可叠加在头像角的小图标（地主=皇冠/纸扇王座意象但**非金币宝座**；农民=草帽/锄头/麦穗软萌意象），**不含「地主/农民」汉字**（文字由 Cocos 渲染）。

@@ -10,6 +10,7 @@
 - 风格锚（**具体引用**）：`asset-previews/pink-cartoon-production-v2/backgrounds/PROMPTS.md` 的 **Shared Art Direction**。
 - v1 可复用 prompt 来源（**显式路径**）：大小王升级自 `asset-previews/pink-cartoon-production-v1/PROMPTS.md:38-88` 的 joker prompt（保「2.5:3.5 单张牌、居中、无字无牌点、#00ff00 纯背景、无投影」约束）。
 - 工具：插画类（牌背/大小王）用 `image_gen` + chroma-key；几何底板（card-template/suit）可 Python+Pillow 确定性生成（照 v1 做法）。全程零 `cc`、零测试、不进 `assets/`、不手写 `.meta`。
+- **提交注意**：`asset-previews/` 被 `.gitignore` 忽略（`:35`），完成后必须用 `git add -f asset-previews/pink-cartoon-production-v2/cards/ coordination/reports/ART-04-cards.report.md` 提交，否则生成成功但提交不含资产（照 ART-01 `a181d45` 先例）。
 
 ## 命名对齐（**必读**——与代码键名一致，否则导入阶段会断）
 - 牌框底板输出文件名必须是 **`card-template.png`**，沿用 v1/MANIFEST 与代码 `assets/scripts/ui/asset-keys.ts` 的 `cardTemplate: 'art/cards/card-template'` 键名。

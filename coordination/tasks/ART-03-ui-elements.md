@@ -13,6 +13,7 @@
 - 风格锚（**具体引用**）：`asset-previews/pink-cartoon-production-v2/backgrounds/PROMPTS.md` 的 **Shared Art Direction**（甜美卡通粉、软萌贴纸、禁赌场/金钱/文字/logo）+ 各图 Color palette / Constraints 行。
 - v1 可复用 prompt 来源（**显式路径**）：升级自 `asset-previews/pink-cartoon-ui-v1/PROMPTS.md` + `SELECTED.md`（采纳方向为 variant B）。**注意关键升级**：v1 生成的是多图概念板（每图 8–12 元素网格），**本批要求每文件一张独立透明 sprite**（如 `btn-primary.png` 单图 + `#00ff00` chroma-key 抠出），**勿沿用 v1 板式 prompt**——每张必须单独出图。
 - 工具：同 ART-01——`image_gen` 出单图 → 复制进 `source/` → `#00ff00` chroma-key + `remove_chroma_key.py` 抠透明 → Pillow 裁 alpha 边/缩放到目标画布。全程零 `cc`、零测试、不进 `assets/`、不手写 `.meta`。
+- **提交注意**：`asset-previews/` 被 `.gitignore` 忽略（`:35`），完成后必须用 `git add -f asset-previews/pink-cartoon-production-v2/ui/ coordination/reports/ART-03-ui-elements.report.md` 提交，否则生成成功但提交不含资产（照 ART-01 `a181d45` 先例）。
 
 ## 共享美术方向
 同 ART-01（甜美卡通粉、软萌贴纸、禁赌场/金钱/文字/logo）。按钮=圆角软糖质感底板（primary 草莓粉、secondary 柔蓝/奶油、disabled 灰粉去饱和）；图标=简洁高辨识线面结合；徽章=小巧圆润。**按钮与徽章一律不含文字**（文字层 Cocos 加）。

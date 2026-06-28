@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（.meta 编辑器已补全）· **第八批 ✅ 已验收并入 main**：A 交互层 M3-32~36 已并 main（`291b53b`，全链路可玩通一整局）+ B 文生图 ART-01 背景包已并 main（`a181d45`，`asset-previews/...v2/backgrounds/`，详见 coordination/BOARD.md）；ART-01 风格锚已被用户采纳· **第九批已派发**（2026-06-29）：A 美术串行 ART-02→03→04 · B M6 发布前打磨（L1-L5 纯逻辑 worktree 并行·失败测试已 seed + C1-C4 编辑器串行 + D1 文档收尾），详见 coordination/BOARD.md
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（.meta 编辑器已补全）· **第八批 ✅ 已验收并入 main**：A 交互层 M3-32~36 已并 main（`291b53b`，全链路可玩通一整局）+ B 文生图 ART-01 背景包已并 main（`a181d45`，`asset-previews/...v2/backgrounds/`，详见 coordination/BOARD.md）；ART-01 风格锚已被用户采纳· **第九批已派发并修正**（2026-06-29）：A 美术串行 ART-02→03→04 · B M6 发布前打磨（L1-L4 纯逻辑 worktree 并行·失败测试住 task 分支 + C1-C4 编辑器串行 + D1 文档收尾 + L5 后置验证），详见 coordination/BOARD.md；Phase-0 修正后 main `74da789` 恢复常绿 437 绿、typecheck 净
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -121,7 +121,7 @@
 ## M6 发布前打磨
 
 - [~] 移动端适配回归。〔M6-C3 已派发·SafeArea/Canvas/去硬编码坐标/clearNode 差分/6 截图·消费 M6-L3·task/M6-editor〕
-- [~] 性能检查。〔M6-C3 内含·render 差分更新 + 去抖；M6-L5 selfplay 长回归 1..50〕
+- [~] 性能检查。〔M6-C3 内含·render 差分更新 + 去抖；M6-L5 selfplay 长回归 1..50·L4 merge 后置验证〕
 - [~] 异常流程检查。〔M6-L4 已派发·resume-to-settled/redead 超限/bidding reason·worktree〕
 - [~] 构建验证。〔M6-C4 已派发·web-mobile 构建 + 发布验收记录·task/M6-editor〕
 - [ ] 发布验收记录。〔M6-D1 待所有轨 merge·架构收尾〕

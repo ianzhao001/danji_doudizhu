@@ -5,9 +5,9 @@
 - 执行分支：`task/M6-editor`
 - 文件域（**只允许改这些**）：
   - `cocos.config.json`（补平台/build 配置；**不动根 package.json/tsconfig**）
-  - `profiles/v2/packages/builder.json`（构建配置，编辑器生成）
-  - `coordination/reports/M6-02-build-verification.report.md`（发布验收记录）
+  - `coordination/reports/M6-02-build-verification.report.md`（发布验收记录：产物路径/平台/Editor 版本/通过截图/构建面板配置摘要）
 - 依赖：**M6-C1/C2/C3**（场景/.meta 定型才能构建）
+- **不入库说明**：`/profiles/` 被 `.gitignore` 忽略（`:10`），`profiles/v2/packages/builder.json` **不作为提交文件**——构建面板配置/截图只记入 report；不走 `git add -f profiles/`（避免违反 AGENTS「不手动编辑 profiles」）。提交仅含 `cocos.config.json` + report。
 
 ## 目标
 确定目标平台、Cocos Creator 3.8.8 构建产物验证、发布验收记录模板落盘。这是发布前最后一道硬门。

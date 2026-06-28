@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批已派发**（2026-06-29）：A 美术串行 ART-02→03→04（用户已采纳 ART-01 风格锚）· B M6 发布前打磨（L1-L5 纯逻辑 worktree 并行 + C1-C4 编辑器串行 + D1 文档收尾）
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批已派发并修正**（2026-06-29）：A 美术串行 ART-02→03→04（用户已采纳 ART-01 风格锚）· B M6 发布前打磨（L1-L4 纯逻辑 worktree 并行·失败测试住 task 分支 + C1-C4 编辑器串行 + D1 文档收尾 + L5 后置验证）；Phase-0 修正后 main `74da789` 恢复常绿 437 绿、typecheck 净
 
 main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。合并后架构对 `b511c08..main` 跑 6 维对抗式审查：**0 blocker、25 确认均 latent**，main 可发布；架构债（分层违规 + 校验/原子性）派发 **M5-14**，**已验收并入 main（`578d378`，82/422 绿）**，分层修复在 main 实测零 `game→data`/`data→flow` 命中；余 1 行 `statsCodec` 注释 follow-up（低）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
@@ -325,7 +325,17 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 
 > **派发顺序**：Phase-0（架构·已完成）更新 ART 规格 + seed L1-L5 失败测试。Phase-1 并行：Track A 串行 02→03→04 ‖ Track B 五逻辑 worktree 并行（L1/L2 串行 merge）。Phase-2 串行编辑器 C1→C2→C3（待 L1/L2/L3 入 main）。Phase-3 C4 构建。Phase-4 D1 文档收尾。
 > **文件域零碰撞**：Track A（`asset-previews/+coordination 的 ART-*`）与 Track B（`assets/scripts+test+assets/scene+cocos.config.json+docs`）不相交。Track B 内 L1/L2 共享 `ui/index.ts` 桶（串行 merge）；C1-C3 共享 keystone（串行单写者）。无与 main 现有文件的写冲突。
-> **门控现状（Phase-0 后）**：85 测试文件 / 451 用例，其中 437 现有绿、5 seed 测试中 4 红（audio-gate/animation-params/table-layout-resolutions/round-runtime-exceptions）+ 2 绿护栏（bidding-reasons/selfplay-long）。typecheck 待 L 实现后验。Phase-0 不改任何源码。
+> **门控现状（Phase-0 修正后）**：main `74da789` 恢复常绿——85 测试文件 / 437 全绿、typecheck 净。seed 测试已从 main 移出，住各自 task 分支（详见下方修正记录）。
+
+> **Phase-0 修正记录（2026-06-29，用户验收反馈后）**：
+> - **恢复 main 常绿（核心）**：原 Phase-0 把 5 个 seed 测试种进 main（`f10a9ad`），致 main 停红、违反 PROTOCOL line 6「架构维护 main 常绿」。修正：main `74da789` 删 6 个 seed 测试 → main 回 437 全绿、typecheck 净。seed 测试改为住各自 task 分支（前批 M3-00 先例：失败测试住分支而非 main）；每个 L merge 时测试随实现一起并入 main 并转绿。
+> - **M6-L1 解 parse 死锁**：原 seed 用保留字 `function with(...)` → tsc TS1359 parse 失败，即便实现 audio-gate.ts 也 typecheck 红，协议禁改测试 → 死锁。架构在 `task/M6-L1`（`ac561a3`）改名 `with`→`settingsWith`（5 处），解死锁；测试仍红（import 失败，预期先红）。
+> - **M6-L4 重写 redead 测试**：原 `alwaysPassBid` 期望三家自动 pass，但 runtime 遇 hero bidding turn 暂停（`round-runtime.ts:242`）→ 测试卡在 bidding 没进 redead。重写为循环里检测 hero turn 显式 `submitPlayerAction(pass)`、AI 回合 flush。验证后：缺口1 resume-to-settled（2 FAIL·真红·实现补 settle 投影后转绿）+ 缺口2 redead 超限（1 PASS·绿护栏·锁死现有「超限→disposed 不发 settled」契约）+ bidding-reasons（绿护栏）。
+> - **M6-L5 改后置验证**：从「worktree 并行实现」改为「L4 merge 后的回归验证/报告任务」（L4 改 settle 行为，L5 须基于改后 main 跑 1..50），状态 ready→blocked（待 M6-L4 merge），删 `task/M6-L5` 分支。
+> - **ART-02/03/04 补 `git add -f`**：`asset-previews/` 被 `.gitignore:35` 忽略（ART-01 当年 `add -f` 提交），三 spec 补「完成后必须 `git add -f asset-previews/...v2/<subdir>/ coordination/reports/<ID>.report.md`，否则生成成功但提交不含资产」。
+> - **M6-C4 去 profiles/**：`profiles/` 被 `.gitignore:10` 忽略，`profiles/v2/packages/builder.json` 移出文件域——构建面板配置/截图只记入 report，提交仅含 `cocos.config.json`+report，不走 `add -f profiles/`（守 AGENTS「不手动编辑 profiles」）。
+> - **清理残留 worktree**：`../斗地主.worktrees/M3-editor-integration`（非 git 登记、仅 Cocos 生成缓存）已删；C1-C3 spec 标注编辑器串行用新 worktree `../斗地主.worktrees/M6-editor`，不复用历史目录。
+> - **task 分支基线**：`task/M6-L1/L2/L3/L4` + `task/art-gen-v2` + `task/M6-editor` 已 rebase 到 `74da789`（清理提交后），各分支已重 seed 对应测试（L1 改名版、L4 重写版、L2/L3 原版）。`task/M6-L5` 已删。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
