@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13 已并 main · M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）已派发**（2026-06-27）
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；余新脚本 .meta 待编辑器补）
 
 main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。合并后架构对 `b511c08..main` 跑 6 维对抗式审查：**0 blocker、25 确认均 latent**，main 可发布；架构债（分层违规 + 校验/原子性）派发 **M5-14**，**已验收并入 main（`578d378`，82/422 绿）**，分层修复在 main 实测零 `game→data`/`data→flow` 命中；余 1 行 `statsCodec` 注释 follow-up（低）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
@@ -232,16 +232,27 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 
 | ID | 类型 | 实现文件域 | 分支 | 状态 |
 |----|----|----|----|----|
-| M5-14-followup-statscodec-comment | 纯文档(1 行) | `data/statsCodec.ts` 注释 | `task/M5-14-followup-statscodec-comment` | **ready** |
-| M5-20-cocos-storage-adapter | runtime 桥接(import cc·薄) | 新 `runtime/storage-adapter.ts`(禁cc)+`runtime/cocos-storage.ts`(cc) | `task/M5-20-cocos-storage-adapter` | **ready**(worktree) |
-| M5-21-round-runtime-session | flow 门面(无cc·Vitest) | 新 `flow/round-runtime.ts` + 重构 `flow/driver.ts` | `task/M5-21-round-runtime-session` | **ready**(worktree) |
-| M3-29-resource-baseline-import | 编辑器·资源 | `assets/resources/{art/cards,audio,fonts}` + 新 `ui/asset-keys.ts` | `task/M3-editor-integration` | **ready**(编辑器执行者) |
-| M3-30-lobby-scene | 编辑器·场景 | `assets/scene` + `ui/components`(cc) | `task/M3-editor-integration` | **blocked**(待 M3-29) |
-| M3-31-game-scene-skeleton | 编辑器·场景 | `assets/scene` + `ui/components`(cc) | `task/M3-editor-integration` | **blocked**(待 M3-29) |
+| M5-14-followup-statscodec-comment | 纯文档(1 行) | `data/statsCodec.ts` 注释 | `task/M5-14-followup-statscodec-comment` | ✅ **done·并 main `b51032c`** |
+| M5-20-cocos-storage-adapter | runtime 桥接(import cc·薄) | 新 `runtime/storage-adapter.ts`(禁cc)+`runtime/cocos-storage.ts`(cc) | `task/M5-20-cocos-storage-adapter` | ✅ **done·并 main `d9033c3`** |
+| M5-21-round-runtime-session | flow 门面(无cc·Vitest) | 新 `flow/round-runtime.ts` + 重构 `flow/driver.ts` | `task/M5-21-round-runtime-session` | ✅ **done·并 main `0f31900`** |
+| M3-29-resource-baseline-import | 编辑器·资源 | `assets/resources/{art/cards,audio,fonts}` + 新 `ui/asset-keys.ts` | `task/M3-editor-integration` | ✅ **done·并 main `fc821cc`** |
+| M3-30-lobby-scene | 编辑器·场景 | `assets/scene/lobby.scene` + `ui/components/lobby-scene.ts`(cc) | `task/M3-editor-integration` | ✅ **done·并 main `fc821cc`** |
+| M3-31-game-scene-skeleton | 编辑器·场景 | `assets/scene/game.scene` + `ui/components/game-scene-skeleton.ts`(cc) | `task/M3-editor-integration` | ✅ **done·并 main `fc821cc`** |
 
 > **文件域不相交核对**：M5-20=新 `runtime/`；M5-21=`flow/{round-runtime(新),driver(重构)}`；M3-29/30/31=`assets/resources` + `assets/scene` + `ui/{asset-keys(新),components/(新)}`；M5-14-followup=`data/statsCodec.ts` 注释。两两不相交。M5-20/M5-21 可真并行；编辑器三任务因共享 .scene/.meta 串行单分支。
 > **硬验收**：纯逻辑层零 cc（`runtime/storage-adapter.ts`/`flow/round-runtime.ts` 零 cc，仅 `runtime/cocos-storage.ts` import cc 且**无测试 import**）；M5-21 `driver.test.ts`/`driver-diagnostics.test.ts` 重构后全绿；M5-20 对 `../data` 仅 type import、M5-21 对 `../data` 零 import；编辑器任务出 390×844 截图。
 > **第二批（本批不派）**：M3-32 手牌交互、M3-33 操作按钮+提示、M3-34 叫抢/结算弹窗、M3-35 动画音效、M3-36 适配——待大厅/游戏骨架能打开后接。
+
+### ✅ 验收并入 main（2026-06-28 · 架构 6 维审查 + 客观门）
+> 4 分支逐一审范围/实现/红绿后 `merge --no-ff` 入 main（`b51032c`→`d9033c3`→`0f31900`→`fc821cc`）。文件域两两不相交、零越界、既有测试零篡改、PROTOCOL 规范走 worktree+report。
+
+- **客观门全绿**：`npm --prefix test test` **85 文件 / 437 用例全绿**（+3 测试文件 / +15 用例：storage-adapter / round-runtime / asset-keys）；`typecheck` 净。
+- **分层/cc 不变量**（整合后 grep 实测）：纯逻辑层 `rules/game/ai/flow/data` **零 cc**；cc 仅现于 `ui/components/*`(组件) 与 `runtime/cocos-storage.ts`(桥接)，均为允许层；`flow/round-runtime.ts` 对 `../data` **零 import**（守分层硬律）；`runtime/*` 对 `../data` 仅 `import type`；`test/` **零** import `cocos-storage.ts`/`ui/components/*`（故 Vitest/tsc 不触 cc）。
+- **M5-21 driver 重构验证**：`flow/types.ts`（FlowResult/FlowEvent 契约）零改；`driver.test.ts`/`driver-diagnostics.test.ts`/`selfplay` 全绿——抽 step helper 后对外行为/形状不变。
+- **M5-21 门面要点核对**：`resumeRoundRuntime(ResumeSnapshot, config)`（非 storage）落地；`persist` 在 `enterPlaying`(landlordDecided 后)、`onSettled` 在 `finishIfSettled`(settled 后) 各一次；dispose 后 `advanceUntilPause` 于每次 `sleep` 之后查 disposed 即返回、`emit` 守 disposed——中断正确。
+- **M3 编辑器**：7 牌面 + 9 音效(WAV) + 2 字体物理导入 `assets/resources/`，.meta 由编辑器生成；`lobby.scene`/`game.scene` + 两 cc 组件绑既有 view-model；`ui/asset-keys.ts` 纯对照表（键→`resources/` 路径）；各出 390×844 截图（见 reports）。
+
+> **遗留 follow-up（低·非阻塞·待编辑器会话补）**：① worktree 新建的纯逻辑脚本 `runtime/storage-adapter.ts`、`runtime/cocos-storage.ts`、`flow/round-runtime.ts` **缺 .meta**（连同 `runtime/` 文件夹 .meta）——非编辑器创建故无；Vitest/typecheck 不需，仅 Cocos 编辑器识别需要，下次开编辑器自动生成或架构补（沿用第四批「合并后统一补 .meta」惯例）。② 音效为 WAV（mp3 转码 follow-up，见 M3-29 report）；实际播放置 M3-35。③ `ui/index.ts` 桶未导出 `asset-keys`（测试直引，不阻塞）。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。

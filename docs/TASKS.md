@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main（**82 文件 / 422 绿**）· M5-13 已并 main · M5-12c 已折叠闭合 · M5-14 架构债收口**已并入 main（`578d378`，分层零违规）**· **第七批（编辑器集成 + 运行时桥接）已派发**：M5-20/M5-21 worktree + M3-29/30/31 编辑器串行 + M5-14-followup（详见 coordination/BOARD.md）
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（详见 coordination/BOARD.md；余新脚本 .meta 待编辑器补）
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -70,9 +70,9 @@
 - [x] 结算弹窗视图模型（Settlement→VM）。〔M3-00-result-view 已并 main（第四批）〕
 - [x] 事件提示映射（GameEvent/FlowEvent→cue id）。〔M3-00-event-cues 已并 main（第四批）〕
 - [x] 整屏 VM 集成层（9 个 UI 岛 → 单一渲染 VM）。〔M3-01-screen-view 已并 main；`ui/index.ts` 已含第六批 view 导出〕
-- [~] 资源基线导入（预览包 → assets/resources + asset-keys 对照表）。〔M3-29 已派发·编辑器集成分支〕
-- [~] 创建大厅场景。〔M3-30 已派发·待 M3-29〕
-- [~] 创建游戏主场景。〔M3-31 骨架·mock 门面占位·已派发·待 M3-29〕
+- [x] 资源基线导入（预览包 → assets/resources + asset-keys 对照表）。〔M3-29 已并 main `fc821cc`：7 牌面/9 音效WAV/2 字体 + ui/asset-keys.ts〕
+- [x] 创建大厅场景。〔M3-30 已并 main `fc821cc`：lobby.scene + lobby-scene.ts 绑 lobby/stats/records/settings-view；390×844 截图〕
+- [x] 创建游戏主场景（骨架）。〔M3-31 已并 main `fc821cc`：game.scene + game-scene-skeleton.ts 绑 screen-view；390×844 截图〕
 - [ ] 创建手牌交互。
 - [ ] 创建操作按钮。
 - [ ] 提示按钮复用 `rules` 着法枚举。
@@ -112,9 +112,9 @@
 - [x] 断局重开（复用序列化存档）。〔M5-10 resume 已并 main：SaveSlot→可继续对局〕
 - [x] 单局会话持久化集成。〔M5-13 已并 main：save↔resume↔aggregate 串联，注入 StorageLike〕
 - [x] 落盘倍数字段正整数迁移。〔M5-12c 已折叠进 M5-10/M5-12b：`bidMultiplier`/`multiplier` 非法值回 1〕
-- [~] Cocos 存储适配器（sys.localStorage → StorageLike，runtime 桥接层）。〔M5-20 已派发·worktree·两文件拆分 storage-adapter(禁cc)/cocos-storage(cc)〕
-- [~] 交互式单局运行时门面（round-runtime：start/resume/玩家动作/AI 自动，对齐 deriveScreenVM）。〔M5-21 已派发·worktree·重构 driver 抽 step helper〕
-- [~] statsCodec unknown-version 注释订正（容灾兜底非可逆迁移）。〔M5-14-followup 已派发·纯文档 1 行〕
+- [x] Cocos 存储适配器（sys.localStorage → StorageLike，runtime 桥接层）。〔M5-20 已并 main `d9033c3`：storage-adapter(禁cc·可测)/cocos-storage(cc 隔离)〕
+- [x] 交互式单局运行时门面（round-runtime：start/resume/玩家动作/AI 自动，对齐 deriveScreenVM）。〔M5-21 已并 main `0f31900`：重构 driver 抽 step helper·flow→data 零 import·dispose 中断〕
+- [x] statsCodec unknown-version 注释订正（容灾兜底非可逆迁移）。〔M5-14-followup 已并 main `b51032c`·纯文档 1 行·行为零改〕
 - [ ] 音效开关。
 - [ ] 基础动画。
 
