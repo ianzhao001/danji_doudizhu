@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29；85/437 绿、typecheck 净、纯层零 cc、flow→data 零 import）
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批已派发**（2026-06-29）：A 美术串行 ART-02→03→04（用户已采纳 ART-01 风格锚）· B M6 发布前打磨（L1-L5 纯逻辑 worktree 并行 + C1-C4 编辑器串行 + D1 文档收尾）
 
 main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。合并后架构对 `b511c08..main` 跑 6 维对抗式审查：**0 blocker、25 确认均 latent**，main 可发布；架构债（分层违规 + 校验/原子性）派发 **M5-14**，**已验收并入 main（`578d378`，82/422 绿）**，分层修复在 main 实测零 `game→data`/`data→flow` 命中；余 1 行 `statsCodec` 注释 follow-up（低）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
@@ -286,6 +286,46 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 > - **轨道 A（`task/M3-interaction`）✅ 已并 main `291b53b`**：keystone `game-scene-skeleton.ts` 移除 mock 门面，接线真实 `round-runtime`+`cocosStorage`+`session`，全链路可玩通一整局（叫抢→出牌→过牌→提示→结算→重开/返回）；事件→`cueForFlowEvent`→音效+轻动效；Canvas/Widget 390×844 竖屏自适应。门控：437 绿、typecheck 净、纯层零 `cc`（仅 `ui/components/*`+`runtime/cocos-storage.ts`）、`flow→data` 零 import。worktree/分支已清理。
 > - **轨道 B（`task/art-gen-v2`）✅ ART-01 已并 main `a181d45`**：三件背景（lobby-bg/game-table-bg 1080×2340 不透明、settlement-panel 900×1200 真·透明 chroma-key 抠净）+source 备查 + `PROMPTS.md` 可复现 + 技术验收 report。三方合并非冲突（main 未触碰 `asset-previews/`，零脚本/零 `assets/`/零测试影响）。架构只验技术规格通过，置 `in-review`；**视觉终审归用户**。
 > - **ART-02/03/04 未交付**：执行者正确在 ART-01 风格锚处停笔，待用户对背景视觉拍板后串行续做（头像/UI 元素/牌面）。worktree/分支已清理。
+
+## 第九批（美术串行 + M6 发布前打磨 · 规划者派发 · 2026-06-29）
+
+> 用户决定（AskUserQuestion 回执）：① **采纳 ART-01 风格锚** → 解锁 ART-02/03/04；② **美术 + M6 并行** → 两条独立轨道。规划者用多 AI 侦察工作流（5 只读读客 + 1 设计）扫描音频/动画/移动端/发布硬化/美术续做，所有结论已对照源码逐条核验（playCue:420 已读 sound、vibration 死数据、addCard:334 双重 lift、round-runtime:121 resume-to-settled gap、asset-keys:5 cardTemplate 键名冲突）后落 spec。
+
+### 轨道 A · 美术串行（Codex 执行者 · `task/art-gen-v2` 串行 02→03→04 · 单执行者保风格一致）
+> ART-01 风格锚 `a181d45` 已被用户采纳。三规格已 Phase-0 更新：flip blocked→ready、具体引用 `v2/backgrounds/PROMPTS.md` Shared Art Direction、指明 v1 包路径、补 source/+report 约定；ART-02 厘清 role-badge vs role-avatar；ART-03 补「概念板→单图透明 sprite」升级；**ART-04 命名对齐 card-template.png（与 `asset-keys.ts:5` cardTemplate 键一致，否则导入断）**。
+
+| ID | 任务 | 输出子目录 | 状态 |
+|----|----|----|----|
+| ART-02-avatars | 头像/两AI/地主农民徽章/头像框 | `…v2/avatars/` | **ready** |
+| ART-03-ui-elements | 按钮/图标/状态徽章/面板（单图透明 sprite） | `…v2/ui/` | **ready** |
+| ART-04-cards | 牌背/大小王/牌框（card-template 命名对齐） | `…v2/cards/` | **ready** |
+
+### 轨道 B · M6 发布前打磨（拆两组：纯逻辑 worktree 并行 + CC 编辑器串行）
+> 纯逻辑组 L1-L5 架构已 seed 失败测试（先红后绿），文件域两两不相交（仅 L1/L2 共享 `ui/index.ts` 桶→串行 merge 解决）。CC 组 C1-C4 串行单写者于 `task/M6-editor`（共享 keystone `game-scene-skeleton.ts`+`game.scene`/`lobby.scene`/`.meta`，任一并行即 UUID 冲突）。D1 文档收尾由架构在所有轨 merge 后统一写入。
+
+#### B-1 纯逻辑 worktree 并行组（零 cc import · 失败测试先行）
+
+| ID | 任务 | 文件域 | 状态 |
+|----|----|----|----|
+| M6-L1-audio-gate | sound/animation/vibration 门控决策纯函数 | `ui/audio-gate.ts`+`index.ts`+test | **ready**（测试已 seed·红） |
+| M6-L2-animation-params | cue→tween 参数纯映射表 | `ui/animation-params.ts`+`index.ts`+test | **ready**（测试已 seed·红） |
+| M6-L3-table-layout-resolutions | tableLayout 参数化+多分辨率 sweep | `ui/table-layout.ts`+`screen-view.ts`+test | **ready**（测试已 seed·红） |
+| M6-L4-round-runtime-exceptions | resume-to-settled/redead 超限/bidding reason | `flow/round-runtime.ts`+`game/bidding.ts`+test | **ready**（测试已 seed·缺口1红） |
+| M6-L5-selfplay-long | selfplay seeds 1..50 回归护栏 | `test/selfplay/selfplay-long.test.ts` | **ready**（绿护栏·扩面） |
+
+#### B-2 CC 接线/编辑器/构建串行单写者组（`task/M6-editor` · C1→C2→C3→C4）
+
+| ID | 任务 | 文件域 | 状态 |
+|----|----|----|----|
+| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`+`lobby.scene` | blocked（待 L1） |
+| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | blocked（待 L2+C1） |
+| M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | `game.scene`+`lobby.scene`+`game-scene-skeleton`+report | blocked（待 L3+C2） |
+| M6-C4-build-verification | 构建验证+发布验收记录 | `cocos.config.json`+report | blocked（待 C1-C3） |
+| M6-D1-release-docs | 发布/QA 文档收尾（架构·非派发） | `docs/*`+`BOARD.md` | blocked（待所有轨） |
+
+> **派发顺序**：Phase-0（架构·已完成）更新 ART 规格 + seed L1-L5 失败测试。Phase-1 并行：Track A 串行 02→03→04 ‖ Track B 五逻辑 worktree 并行（L1/L2 串行 merge）。Phase-2 串行编辑器 C1→C2→C3（待 L1/L2/L3 入 main）。Phase-3 C4 构建。Phase-4 D1 文档收尾。
+> **文件域零碰撞**：Track A（`asset-previews/+coordination 的 ART-*`）与 Track B（`assets/scripts+test+assets/scene+cocos.config.json+docs`）不相交。Track B 内 L1/L2 共享 `ui/index.ts` 桶（串行 merge）；C1-C3 共享 keystone（串行单写者）。无与 main 现有文件的写冲突。
+> **门控现状（Phase-0 后）**：85 测试文件 / 451 用例，其中 437 现有绿、5 seed 测试中 4 红（audio-gate/animation-params/table-layout-resolutions/round-runtime-exceptions）+ 2 绿护栏（bidding-reasons/selfplay-long）。typecheck 待 L 实现后验。Phase-0 不改任何源码。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
