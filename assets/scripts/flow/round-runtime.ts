@@ -119,6 +119,7 @@ class RoundRuntimeImpl implements RoundRuntime {
     if (resume) {
       this.state = resume.state;
       this.currentPhase = resume.state.phase === GamePhase.Settled ? 'settled' : 'playing';
+      this.finishIfSettled();
     } else {
       this.startDeal();
     }
