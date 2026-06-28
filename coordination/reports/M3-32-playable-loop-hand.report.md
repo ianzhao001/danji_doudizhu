@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/M3-interaction`
-- 状态：in-review（390×844 预览已进入真实运行时；手牌选中上浮仍建议 review 时复点确认）
+- 状态：in-review（390×844 预览已进入真实运行时；手牌选中上浮已由用户验收）
 
 ## 改了哪些文件
 - `assets/scripts/ui/components/game-scene-skeleton.ts`
@@ -23,6 +23,10 @@ git diff --check
 npm --prefix test test -- --testTimeout=10000
 Test Files  85 passed (85)
 Tests       437 passed (437)
+
+2026-06-28 用户手动验收：
+- 新局进入桌面，AI 自动推进。
+- 玩家手牌可点击，选中后上浮。
 ```
 
 ## 与 spec 的偏差 / 关键决策
@@ -34,8 +38,8 @@ Tests       437 passed (437)
 - 隐藏 M3-31 静态骨架 label / 占位牌，避免与运行时 UI 叠加。
 
 ## 疑问（给架构）
-- 用户已用 Cocos Creator 3.8.8 / Chrome 预览验证：390×844 可从叫抢进入 playing，AI 自动推进，手牌与操作区可见。
-- 仍建议 review 时复点手牌选中上浮，并保存无 DevTools / 无 vConsole 的正式截图。
+- 用户已用 Cocos Creator 3.8.8 / Chrome 预览验证：390×844 可从叫抢进入 playing，AI 自动推进，手牌可点击并上浮。
+- 仍建议 review 时保存无 DevTools / 无 vConsole 的正式截图。
 
 ## 自检（对照验收项）
 - [x] 真实 runtime start/resume/persist/settle 接线
@@ -45,4 +49,5 @@ Tests       437 passed (437)
 - [x] 纯层零 `cc` import
 - [x] Cocos Creator 打开本 worktree 无红色编译错误
 - [x] 390x844 运行中预览（用户截图，未落盘）
+- [x] 用户确认手牌点击选中上浮
 - [ ] 正式截图落盘到 `coordination/reports/`
