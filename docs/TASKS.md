@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（.meta 编辑器已补全）· **第八批已派发**：A 交互层 M3-32~36（`task/M3-interaction`）+ B 文生图美术 ART-01~04（`task/art-gen-v2`→`asset-previews/...v2`，详见 coordination/BOARD.md）
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（.meta 编辑器已补全）· **第八批 ✅ 已验收并入 main**：A 交互层 M3-32~36 已并 main（`291b53b`，全链路可玩通一整局）+ B 文生图 ART-01 背景包已并 main（`a181d45`，`asset-previews/...v2/backgrounds/`，详见 coordination/BOARD.md）；ART-02/03/04 待用户对 ART-01 风格锚视觉确认后串行续做
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -73,12 +73,12 @@
 - [x] 资源基线导入（预览包 → assets/resources + asset-keys 对照表）。〔M3-29 已并 main `fc821cc`：7 牌面/9 音效WAV/2 字体 + ui/asset-keys.ts〕
 - [x] 创建大厅场景。〔M3-30 已并 main `fc821cc`：lobby.scene + lobby-scene.ts 绑 lobby/stats/records/settings-view；390×844 截图〕
 - [x] 创建游戏主场景（骨架）。〔M3-31 已并 main `fc821cc`：game.scene + game-scene-skeleton.ts 绑 screen-view；390×844 截图〕
-- [~] 创建手牌交互。〔M3-32 已派发·keystone：真实 round-runtime 接线 + 选牌上浮·task/M3-interaction〕
-- [~] 创建操作按钮。〔M3-33 已派发·出牌/不要/提示→submitPlayerAction·待 M3-32〕
-- [~] 提示按钮复用 `rules` 着法枚举。〔M3-33 内含·复用 ai/hint(M4-20) + legalFollows〕
-- [~] 接入 `GameEvent` 驱动动画与音效。〔M3-35 已派发·FlowEvent→cueForFlowEvent→音效+轻动效·待 M3-32〕
-- [~] 创建结算弹窗。〔M3-34 已派发·叫抢输入 + result-view 结算弹窗 + 重开/返回·待 M3-32〕
-- [~] 完成 390x844 竖屏适配检查。〔M3-36 已派发·Canvas/Widget/安全区·待 M3-32~35〕
+- [x] 创建手牌交互。〔M3-32 已并 main `291b53b`：真实 round-runtime 接线 + 选牌上浮·keystone〕
+- [x] 创建操作按钮。〔M3-33 已并 main `291b53b`：出牌/不要/提示→submitPlayerAction〕
+- [x] 提示按钮复用 `rules` 着法枚举。〔M3-33 已并 main `291b53b`：复用 ai/hint(M4-20) + legalFollows〕
+- [x] 接入 `GameEvent` 驱动动画与音效。〔M3-35 已并 main `291b53b`：FlowEvent→cueForFlowEvent→音效+轻动效〕
+- [x] 创建结算弹窗。〔M3-34 已并 main `291b53b`：叫抢输入 + result-view 结算弹窗 + 重开/返回〕
+- [x] 完成 390x844 竖屏适配检查。〔M3-36 已并 main `291b53b`：Canvas/Widget/安全区自适应〕
 
 ## M4 多难度 AI（三档基线已入 main；强化批次进行中）
 
