@@ -36,7 +36,9 @@ export function deserializeStats(json: string): MatchStats {
     return emptyStats();
   }
 
-  // Unknown versions intentionally fall back to defaults; stats are derivable, so a stale wire should not block boot.
+  // Unknown versions fall back to empty stats as graceful degradation (not a reversible migration):
+  // stats are not derivable from records, which lack winner-side attribution. version is currently
+  // always STATS_VERSION; if it is ever bumped, add an explicit migration here instead.
   if (!isRecord(parsed) || parsed.version !== STATS_VERSION || !isRecord(parsed.stats)) {
     return emptyStats();
   }
