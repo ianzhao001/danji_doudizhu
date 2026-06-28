@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批已派发**（A: M3-32~36 交互层 · B: ART-01~04 文生图）
 
 main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。合并后架构对 `b511c08..main` 跑 6 维对抗式审查：**0 blocker、25 确认均 latent**，main 可发布；架构债（分层违规 + 校验/原子性）派发 **M5-14**，**已验收并入 main（`578d378`，82/422 绿）**，分层修复在 main 实测零 `game→data`/`data→flow` 命中；余 1 行 `statsCodec` 注释 follow-up（低）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
 
@@ -253,6 +253,34 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 - **M3 编辑器**：7 牌面 + 9 音效(WAV) + 2 字体物理导入 `assets/resources/`，.meta 由编辑器生成；`lobby.scene`/`game.scene` + 两 cc 组件绑既有 view-model；`ui/asset-keys.ts` 纯对照表（键→`resources/` 路径）；各出 390×844 截图（见 reports）。
 
 > **遗留 follow-up**：① ✅ **已闭合**——`runtime/storage-adapter.ts`、`runtime/cocos-storage.ts`、`flow/round-runtime.ts` 及 `runtime/` 文件夹 .meta 由运行中的 Cocos 编辑器在合并后**自动生成并已提交**（`typescript`/`directory` importer、唯一 uuid，非手写）。② 音效为 WAV（mp3 转码 follow-up，见 M3-29 report）；实际播放置 M3-35。③ `ui/index.ts` 桶未导出 `asset-keys`（测试直引，不阻塞·架构整合步补）。
+
+## 第八批（M3 交互层 + 文生图美术生成 · 规划者派发 · 2026-06-28）
+
+> 两条独立轨道并行：**A** 让游戏从「能打开」到「能玩通一整局」；**B** 让 Codex 文生图把占位美术升级为 production 预览包。文件域不相交（A=`assets/scene`+`ui/components`；B=`asset-previews/`），可同时派发给不同执行者。
+
+### 轨道 A · M3 交互层（编辑器执行者 · 串行 `task/M3-interaction` · 单写者保 game.scene 一致）
+> 建立在 M3-31 骨架 + M5-21 `round-runtime` + M5-20 `cocosStorage` + M5-13 `session` + 各 view-model 之上；M3-32 把 mock 门面换真实运行时（keystone），其余按序补交互。
+
+| ID | 任务 | 依赖 | 状态 |
+|----|----|----|----|
+| M3-32-playable-loop-hand | 运行时接线 + 手牌交互（keystone） | M5-21/20/13 + 骨架 | **ready** |
+| M3-33-action-buttons-hint | 出牌/不要/提示 → submitPlayerAction | M3-32 | blocked(待 32) |
+| M3-34-bidding-settlement-popups | 叫抢输入 + 结算弹窗 + 重开/返回 | M3-32 | blocked(待 32) |
+| M3-35-event-cues-av | FlowEvent→cue→音效 + 轻动效 | M3-32 | blocked(待 32) |
+| M3-36-portrait-adaptation | 390×844 竖屏适配回归 | M3-32~35 | blocked(待链) |
+
+### 轨道 B · 文生图美术生成（Codex 执行者 · 串行 `task/art-gen-v2` · 单执行者保风格一致）
+> 输出 **只写** `asset-previews/pink-cartoon-production-v2/`，**不进 `assets/`**（导入另开任务，照 M3-29 流程）。沿用 v1 粉卡通方向 + `image_gen`/chroma-key 工作流（见 `pink-cartoon-production-v1/PROMPTS.md`）。**验收特殊**：架构只验技术规格（尺寸/透明/命名/无字），**视觉终审归用户**，过技术门后置 `in-review` 待用户拍板。
+
+| ID | 任务 | 输出子目录 | 状态 |
+|----|----|----|----|
+| ART-01-backgrounds | 大厅/桌面/结算面板 | `…v2/backgrounds/` | **ready** |
+| ART-02-avatars | 玩家/两AI/地主农民/头像框 | `…v2/avatars/` | blocked(待 ART-01 风格锚) |
+| ART-03-ui-elements | 按钮/图标/状态徽章/面板 | `…v2/ui/` | blocked(待 ART-01) |
+| ART-04-cards | 牌背/大小王/牌框 | `…v2/cards/` | blocked(待 ART-01) |
+
+> **派发要点**：轨道 A 用编辑器 bootstrap（worktree 开 Cocos）；轨道 B 用 Codex `image_gen` bootstrap（worktree + imagegen 技能）。两轨可并行（不同执行者）。A 内部 / B 内部各自串行单分支。
+> **不阻塞关系**：A 用已导入的占位美术，**不**等 B 的 v2 产出；B 的 v2 导入与重绑是后续独立任务。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
