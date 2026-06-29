@@ -14,6 +14,7 @@ import {
   Vec3,
   director,
   resources,
+  sys,
   tween,
 } from 'cc';
 import { AiLevel } from '../../ai';
@@ -21,7 +22,7 @@ import { nextHint } from '../../ai/hint';
 import { commitFinishedRound, persistRound, restoreRound, type SessionKeys } from '../../data/session';
 import { difficultyConfig } from '../../data/difficultyConfig';
 import { defaultSettings, type Settings } from '../../data/settings';
-import { loadSettings } from '../../data/settingsStorage';
+import { loadSettings, saveSettings } from '../../data/settingsStorage';
 import { startRoundRuntime, resumeRoundRuntime, type RoundRuntime } from '../../flow/round-runtime';
 import { realClock } from '../../flow/clock';
 import type { FlowEvent } from '../../flow/types';
@@ -29,9 +30,11 @@ import type { ResumeSnapshot, RoundFinishInput, SeatIndex } from '../../game';
 import { type Card, Suit } from '../../rules';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { cardView } from '../card-view';
-import { cueForFlowEvent } from '../event-cues';
+import { cueForFlowEvent, type CueId } from '../event-cues';
+import { decideCuePlayback } from '../audio-gate';
 import { clearSelection, isSelected, toggle } from '../selection';
 import { deriveScreenVM } from '../screen-view';
+import { toggleSetting, type ToggleKey } from '../settings-view';
 import { RESOURCE_PATHS, cardAssetPath, cueAudioPath } from '../asset-keys';
 
 const { ccclass, property } = _decorator;
@@ -211,6 +214,7 @@ export class GameSceneSkeleton extends Component {
     this.clearNode(this.uiRoot);
 
     this.renderTopBar(this.runtime.phase(), vm.topBar, snapshot?.viewerHand?.length ?? 0);
+    this.renderRuntimeSettings();
     this.renderSeats(snapshot?.handCounts ?? [0, 0, 0], snapshot?.landlord ?? null);
     this.renderPlayArea(snapshot?.top ? String(snapshot.top.pattern.category) : '自由出牌');
     this.renderBidding(bidding ? vm.bidding : undefined);
@@ -225,6 +229,26 @@ export class GameSceneSkeleton extends Component {
     this.addLabel(`地主 ${topBar.landlordSeat + 1}`, -128, 350, 16, this.uiRoot!, 110, 30);
     this.addLabel(`倍数 ×${topBar.multiplier}`, 0, 350, 16, this.uiRoot!, 110, 30);
     this.addLabel(`手牌 ${handCount}`, 128, 350, 16, this.uiRoot!, 110, 30);
+  }
+
+  private renderRuntimeSettings(): void {
+    const settings = this.reloadSettings();
+    const controls: { key: ToggleKey; label: string; on: boolean; x: number }[] = [
+      { key: 'sound', label: '音效', on: settings.sound, x: -108 },
+      { key: 'animation', label: '动效', on: settings.animation, x: 0 },
+      { key: 'vibration', label: '震动', on: settings.vibration, x: 108 },
+    ];
+    for (const control of controls) {
+      this.addButton(
+        `${control.label}${control.on ? '开' : '关'}`,
+        control.x,
+        314,
+        88,
+        32,
+        true,
+        () => this.toggleRuntimeSetting(control.key),
+      );
+    }
   }
 
   private renderSeats(handCounts: [number, number, number], landlord: number | null): void {
@@ -415,9 +439,12 @@ export class GameSceneSkeleton extends Component {
   private playCue(event: FlowEvent): void {
     const cue = cueForFlowEvent(event);
     if (!cue) return;
+    const settings = this.reloadSettings();
+    const decision = decideCuePlayback(settings, cue);
     const path = cueAudioPath(cue);
-    if (this.settings.animation) this.playEffect(cue);
-    if (!this.settings.sound || !path || !this.audioSource) return;
+    if (decision.effect) this.playEffect(cue);
+    if (decision.vibrate) this.vibrate();
+    if (!decision.sound || !path || !this.audioSource) return;
     resources.load(path, AudioClip, (error, clip) => {
       if (!error && clip && this.audioSource) {
         this.audioSource.clip = clip;
@@ -426,13 +453,42 @@ export class GameSceneSkeleton extends Component {
     });
   }
 
-  private playEffect(cue: string): void {
+  private playEffect(cue: CueId): void {
     if (!this.uiRoot || (cue !== 'bomb' && cue !== 'rocket' && cue !== 'deal' && cue !== 'play')) return;
     const scaleUp = cue === 'bomb' || cue === 'rocket' ? 1.12 : 1.04;
     tween(this.uiRoot)
       .to(0.1, { scale: new Vec3(scaleUp, scaleUp, 1) })
       .to(0.16, { scale: new Vec3(1, 1, 1) })
       .start();
+  }
+
+  private reloadSettings(): Settings {
+    this.settings = loadSettings(cocosStorage(), SETTINGS_KEY);
+    return this.settings;
+  }
+
+  private toggleRuntimeSetting(key: ToggleKey): void {
+    const next = toggleSetting(this.reloadSettings(), key);
+    try {
+      saveSettings(cocosStorage(), SETTINGS_KEY, next);
+      this.settings = next;
+    } catch (error) {
+      console.warn('saveSettings failed', error);
+    }
+    this.render();
+  }
+
+  private vibrate(): void {
+    try {
+      const navigatorLike = (globalThis as { navigator?: { vibrate?: (pattern: number | number[]) => boolean } }).navigator;
+      if (navigatorLike?.vibrate) {
+        navigatorLike.vibrate(30);
+        return;
+      }
+      (sys as unknown as { vibrate?: () => void }).vibrate?.();
+    } catch {
+      // Vibration is optional across platforms; unsupported targets should stay silent.
+    }
   }
 
   private ensureNode(name: string, parent: Node): Node {
