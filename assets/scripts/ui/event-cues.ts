@@ -7,7 +7,21 @@
 import { type GameEvent } from '../game';
 import { type FlowEvent } from '../flow';
 
-export type CueId = string;
+export const CUE_IDS = [
+  'play',
+  'pass',
+  'bomb',
+  'rocket',
+  'reset',
+  'win',
+  'deal',
+  'bid',
+  'redeal',
+  'landlordDecided',
+  'settled',
+] as const;
+
+export type CueId = (typeof CUE_IDS)[number];
 
 export function cueForGameEvent(event: GameEvent): CueId {
   return event.type;
