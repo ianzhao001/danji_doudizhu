@@ -435,7 +435,7 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 | M6-C2-animation-wiring | `game-scene-skeleton`+`game.scene` | C1✓·L2✓ | **done `17b96f3`**（Creator 3.8.8 预览·390×844 bomb 局部动效截图·Console 零 Error） |
 | M6-C3a-safearea-screenshots | `*.scene`+`.meta`+M3-36 report+QA | C2✓ | **done `98b0ec1`**（Creator 3.8.8 预览·6 张三档截图·SafeArea/fit-width；`settings/v2/packages/project.json` 范围例外已审查采纳） |
 | M6-C3b-relative-layout-render-diff | `game-scene-skeleton`+report | L3✓·C2✓·C3a✓ | **done `b51dce5`**（Creator 3.8.8 三分辨率 Preview·相对布局+render 差分复用·交叉审查 approve） |
-| M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | **ready**（C1/C2/C3a/C3b 已满足·下一编辑器单写者任务） |
+| M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | **done `4c314b9`**（Creator 3.8.8 web-mobile build success·390×844 运行烟测·交叉审查 approve） |
 | M3-45-stats-records-screens | scene+新 cc 组件 | L7✓/L8✓/M3-40/41 | blocked（待 M3-40/41 + 编辑器档期） |
 | M3-46a-help-screen（拆自 M3-46） | `lobby.scene`+新组件 | M3-42✓ | blocked（编辑器档期·C3 后） |
 | M3-46b-pause-overlay（拆自 M3-46） | `game.scene`+新组件 | L12✓ | blocked（编辑器档期·C3 后） |
@@ -546,7 +546,7 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 > 按用户批准的「全量接收与执行顺序计划」执行：先第一波解锁器与独立纯任务，再第二波消费依赖，最后 M3-61→M6-G13→M6-I1。编辑器/美术/视觉 gate 未抢跑。
 - **已并 main**：第十一批剩余 VM（M3-40/41/43/44）、第十二批纯逻辑/文档（M4-30/31/32、M3-50/51/52/53/54/58、M6-L13、M6-G13/14、M6-D4）、第十三批纯逻辑（M2-12、M6-G15、M3-60/62、M4-40/41、M3-61）以及 **M6-I1 桶整合**。
 - **客观门**：最终 main `7c7b427` 上 `npm --prefix test test -- --run` **127 文件 / 623 用例全绿**；`npm --prefix test run typecheck` 通过；新增纯层/纯 UI 文件 `cc` 搜索零命中。
-- **仍保持 gate**：C4 已解锁为下一编辑器单写者任务；M3-55/56/57/59/63/64、M3-45/46 仍等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 `PLAYTEST.md` 骨架已并 main，后续随 C4/发布验收填实测记录。
+- **仍保持 gate**：C4 已并 main，M3-55/56/57/59/63/64、M3-45/46 继续等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 `PLAYTEST.md` 骨架已并 main，后续随发布验收填实测记录。
 - **本地注意**：~~工作区若干未跟踪新脚本 `.meta`~~ → ✅ **已闭合**：20 个 Creator 生成 `.meta`（ver 4.0.24·typescript importer·uuid 唯一·零逻辑改动）已统一提交（采纳建议#6 late .meta sync）。
 
 ### 🔍 架构复核 + 执行者 13 条建议落实（2026-06-29）
