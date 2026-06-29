@@ -129,5 +129,5 @@
 - [x] CueId 类型收紧 + cue 一致性护栏。〔M6-L6 已并 main `4c840ed`·`CueId` string→11 字面量联合（CUE_IDS 派生）·绿护栏锁 audio-gate/animation 引用真实·5/5 绿·零 cc〕
 - [x] 异常流程检查。〔M6-L4 已并 main `c08de19`·resume-to-settled/redead 超限/bidding reason·5/5 绿〕
 - [x] 构建验证。〔M6-C4 已并 main `4c314b9`·Creator 3.8.8 web-mobile build success·390×844 运行烟测·交叉审查 approve〕
-- [~] 发布硬化（三方审查转化·第十四批）。〔M6-G16 已并 main `d9cc851`·`round-runtime.ts` 生命周期/错误边界/死状态（RR-1..10）·128/632 绿·RR-1 settled replay 登记后续契约取舍；M6-G17 ready·`event-cues.ts` cue 编译期穷尽断言 + 签名诚实化（EC-1/EC-3，驳回 EC-2）·纯逻辑·文件域不相交〕
+- [x] 发布硬化（三方审查转化·第十四批）。〔M6-G16 已并 main `d9cc851`·`round-runtime.ts` 生命周期/错误边界/死状态（RR-1..10）·RR-1 settled replay 登记后续契约取舍；M6-G17 已并 main `422411c`·`event-cues.ts` cue 编译期穷尽断言 + 签名诚实化（EC-1/EC-3，驳回 EC-2）·最终 128/632 绿·typecheck 净〕
 - [ ] 发布验收记录。〔M6-D1 待所有轨 merge·架构收尾〕

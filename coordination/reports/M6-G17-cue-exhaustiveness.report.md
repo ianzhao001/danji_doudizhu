@@ -13,13 +13,13 @@
 
 ## 测试与类型检查输出
 ```
-npm --prefix test test -- ui/cue-id-consistency.test.ts ui/event-cues.test.ts --run
+npm --prefix test test -- ui/cue-id-consistency.test.ts ui/event-cues.test.ts --testTimeout=60000
 Test Files  2 passed (2)
 Tests       9 passed (9)
 
-npm --prefix test test -- --run
-Test Files  127 passed (127)
-Tests       623 passed (623)
+npm --prefix test test -- --testTimeout=60000
+Test Files  128 passed (128)
+Tests       632 passed (632)
 
 npm --prefix test run typecheck
 tsc --noEmit passed
