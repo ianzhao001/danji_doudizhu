@@ -74,12 +74,12 @@
 ## UI 验收
 
 - [x] 390x844 竖屏下手牌不遮挡主要按钮。← `test/ui/hand-layout.test.ts`; `test/ui/table-layout.test.ts`; `coordination/reports/M3-33-action-buttons-hint.report.md`; `coordination/reports/M3-36-portrait-adaptation.report.md`
-- [ ] 当前出牌区域清晰。← 待 M6-C2 渲染真实出牌区卡牌并截图复核
+- [x] 当前出牌区域清晰。← `coordination/reports/M6-C2-bomb-effect-390x844.png`; `coordination/reports/M6-C3a-game-390x844.png`; `coordination/reports/M6-C3a-game-412x915.png`; `coordination/reports/M6-C3a-game-360x780.png`
 - [x] 地主、农民身份可辨认。← `test/ui/screen-view.test.ts`; `coordination/reports/M3-31-game-scene-skeleton.report.md`
 - [x] 叫地主/抢地主流程提示明确。← `test/ui/bidding-view.test.ts`; `coordination/reports/M3-34-bidding-settlement-popups.report.md`
 - [x] 出牌、提示、不要按钮状态正确。← `test/ui/action-buttons.test.ts`; `test/ui/action-buttons-edges.test.ts`; `coordination/reports/M3-33-action-buttons-hint.report.md`
 - [x] 结算弹窗不溢出屏幕。← `test/ui/result-view.test.ts`; `coordination/reports/M3-34-bidding-settlement-popups.report.md`
-- [ ] 设置弹窗不溢出屏幕。← 当前为大厅运行时设置控件，正式弹窗/多尺寸截图待 M6-C3/M6-C4 复核
+- [ ] 设置弹窗不溢出屏幕。← C3a 已覆盖大厅运行时设置控件三档截图；正式设置弹窗 / 构建态仍待 M6-C4 复核
 
 ## 发布前检查
 
