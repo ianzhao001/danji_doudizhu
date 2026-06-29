@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（.meta 编辑器已补全）· **第八批 ✅ 已验收并入 main**：A 交互层 M3-32~36 已并 main（`291b53b`，全链路可玩通一整局）+ B 文生图 ART-01 背景包已并 main（`a181d45`，`asset-previews/...v2/backgrounds/`，详见 coordination/BOARD.md）；ART-01 风格锚已被用户采纳· **第九批已派发并修正**（2026-06-29）：A 美术串行 ART-02→03→04 · B M6 发布前打磨（L1-L4 纯逻辑 worktree 并行·失败测试住 task 分支 + C1-C4 编辑器串行 + D1 文档收尾 + L5 后置验证），详见 coordination/BOARD.md；Phase-0 修正后 main `74da789` 恢复常绿 437 绿、typecheck 净
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（.meta 编辑器已补全）· **第八批 ✅ 已验收并入 main**：A 交互层 M3-32~36 已并 main（`291b53b`，全链路可玩通一整局）+ B 文生图 ART-01 背景包已并 main（`a181d45`，`asset-previews/...v2/backgrounds/`，详见 coordination/BOARD.md）；ART-01 风格锚已被用户采纳· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待执行 · D1 文档收尾 + L5 后置验证待完成，详见 coordination/BOARD.md
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -115,13 +115,15 @@
 - [x] Cocos 存储适配器（sys.localStorage → StorageLike，runtime 桥接层）。〔M5-20 已并 main `d9033c3`：storage-adapter(禁cc·可测)/cocos-storage(cc 隔离)〕
 - [x] 交互式单局运行时门面（round-runtime：start/resume/玩家动作/AI 自动，对齐 deriveScreenVM）。〔M5-21 已并 main `0f31900`：重构 driver 抽 step helper·flow→data 零 import·dispose 中断〕
 - [x] statsCodec unknown-version 注释订正（容灾兜底非可逆迁移）。〔M5-14-followup 已并 main `b51032c`·纯文档 1 行·行为零改〕
-- [~] 音效开关。〔M6-C1 已派发·编辑器串行·写侧接线 + 消费 M6-L1 audio-gate·task/M6-editor〕
-- [~] 基础动画。〔M6-C2 已派发·编辑器串行·card/弹窗级动效 + 消费 M6-L2 animation-params·task/M6-editor〕
+- [~] 音效开关写侧接线 + 热重载。〔M6-C1 待执行·编辑器串行·消费 M6-L1·task/M6-editor 待重建〕
+- [~] 基础动画接线 + card/弹窗级动效。〔M6-C2 待执行·编辑器串行·消费 M6-L2·待 C1 完成〕
+- [ ] 发布验收记录。〔M6-D1 待所有轨 merge·架构收尾〕
 
 ## M6 发布前打磨
 
-- [~] 移动端适配回归。〔M6-C3 已派发·SafeArea/Canvas/去硬编码坐标/clearNode 差分/6 截图·消费 M6-L3·task/M6-editor〕
+- [x] 移动端适配纯逻辑件。〔M6-L3 已并 main `99d13b8`·tableLayout 参数化+多分辨率 sweep·15/15 绿〕
+- [~] 移动端适配回归 + 渲染性能。〔M6-C3 待执行·编辑器串行·消费 L3·待 C2 完成〕
 - [~] 性能检查。〔M6-C3 内含·render 差分更新 + 去抖；M6-L5 selfplay 长回归 1..50·L4 merge 后置验证〕
-- [~] 异常流程检查。〔M6-L4 已派发·resume-to-settled/redead 超限/bidding reason·worktree〕
-- [~] 构建验证。〔M6-C4 已派发·web-mobile 构建 + 发布验收记录·task/M6-editor〕
+- [x] 异常流程检查。〔M6-L4 已并 main `c08de19`·resume-to-settled/redead 超限/bidding reason·5/5 绿〕
+- [~] 构建验证。〔M6-C4 待执行·web-mobile 构建 + 发布验收记录·待 C1-C3〕
 - [ ] 发布验收记录。〔M6-D1 待所有轨 merge·架构收尾〕

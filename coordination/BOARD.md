@@ -2,9 +2,9 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批已派发并修正**（2026-06-29）：A 美术串行 ART-02→03→04（用户已采纳 ART-01 风格锚）· B M6 发布前打磨（L1-L4 纯逻辑 worktree 并行·失败测试住 task 分支 + C1-C4 编辑器串行 + D1 文档收尾 + L5 后置验证）；Phase-0 修正后 main `74da789` 恢复常绿 437 绿、typecheck 净
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证
 
-main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄漏**（纯逻辑层零 `cc`）。前批全部 `merge --no-ff` 入 main。**第五批 15 任务已全部并 main**：T4 先行，余 14 个 ready 任务由 Codex 批量刷新旧分支基线后逐分支实现/提交/合并；green-guard 与功能/加固任务均有 report。**第六批 6 ready 已并 main，M5-13 已在 T1/T2 解锁后并 main，M5-12c 倍数字段正整数约束已按用户授权折叠进 T1/T5 闭合**。合并后架构对 `b511c08..main` 跑 6 维对抗式审查：**0 blocker、25 确认均 latent**，main 可发布；架构债（分层违规 + 校验/原子性）派发 **M5-14**，**已验收并入 main（`578d378`，82/422 绿）**，分层修复在 main 实测零 `game→data`/`data→flow` 命中；余 1 行 `statsCodec` 注释 follow-up（低）。本批**不动 Cocos 编辑器**（场景/预制体属下一批 architect-only）。
+main 现状：**90 测试文件 / 462 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`）、`flow→data` 零 import。第九批 L1-L4 已全部 `merge --no-ff` 入 main；L5 selfplay 长回归（1..50）待验证（L4 settle 修改已入 main）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**C1-C4 编辑器串行待执行**（依赖 L1/L2/L3 已在 main，C1→C2→C3→C4 串行）。
 
 ## 第五批（15 任务 · 文件域互不相交）—— ✅ 全部已并 main
 
@@ -296,9 +296,9 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 
 | ID | 任务 | 输出子目录 | 状态 |
 |----|----|----|----|
-| ART-02-avatars | 头像/两AI/地主农民徽章/头像框 | `…v2/avatars/` | **ready** |
-| ART-03-ui-elements | 按钮/图标/状态徽章/面板（单图透明 sprite） | `…v2/ui/` | **ready** |
-| ART-04-cards | 牌背/大小王/牌框（card-template 命名对齐） | `…v2/cards/` | **ready** |
+| ART-02-avatars | 头像/两AI/地主农民徽章/头像框 | `…v2/avatars/` | **done `6eb8995`**（6 张·256²/128²·全透明·`in-review` 待用户视觉终审） |
+| ART-03-ui-elements | 按钮/图标/状态徽章/面板（单图透明 sprite） | `…v2/ui/` | **done `6eb8995`**（15 张·240×96/96²/128²/900×1100·全透明·`in-review`） |
+| ART-04-cards | 牌背/大小王/牌框（card-template 命名对齐） | `…v2/cards/` | **done `6eb8995`**（4 张·400×560·card-template 命名对齐·`in-review`） |
 
 ### 轨道 B · M6 发布前打磨（拆两组：纯逻辑 worktree 并行 + CC 编辑器串行）
 > 纯逻辑组 L1-L5 架构已 seed 失败测试（先红后绿），文件域两两不相交（仅 L1/L2 共享 `ui/index.ts` 桶→串行 merge 解决）。CC 组 C1-C4 串行单写者于 `task/M6-editor`（共享 keystone `game-scene-skeleton.ts`+`game.scene`/`lobby.scene`/`.meta`，任一并行即 UUID 冲突）。D1 文档收尾由架构在所有轨 merge 后统一写入。
@@ -307,19 +307,19 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 
 | ID | 任务 | 文件域 | 状态 |
 |----|----|----|----|
-| M6-L1-audio-gate | sound/animation/vibration 门控决策纯函数 | `ui/audio-gate.ts`+`index.ts`+test | **ready**（测试已 seed·红） |
-| M6-L2-animation-params | cue→tween 参数纯映射表 | `ui/animation-params.ts`+`index.ts`+test | **ready**（测试已 seed·红） |
-| M6-L3-table-layout-resolutions | tableLayout 参数化+多分辨率 sweep | `ui/table-layout.ts`+`screen-view.ts`+test | **ready**（测试已 seed·红） |
-| M6-L4-round-runtime-exceptions | resume-to-settled/redead 超限/bidding reason | `flow/round-runtime.ts`+`game/bidding.ts`+test | **ready**（测试已 seed·缺口1红） |
-| M6-L5-selfplay-long | selfplay seeds 1..50 回归护栏 | `test/selfplay/selfplay-long.test.ts` | **ready**（绿护栏·扩面） |
+| M6-L1-audio-gate | sound/animation/vibration 门控决策纯函数 | `ui/audio-gate.ts`+`index.ts`+test | **done `97b0895`**（6/6 绿） |
+| M6-L2-animation-params | cue→tween 参数纯映射表 | `ui/animation-params.ts`+`index.ts`+test | **done `7d93e65`**（7/7 绿·桶冲突串行解） |
+| M6-L3-table-layout-resolutions | tableLayout 参数化+多分辨率 sweep | `ui/table-layout.ts`+`screen-view.ts`+test | **done `99d13b8`**（15/15 绿·兼容性铁律） |
+| M6-L4-round-runtime-exceptions | resume-to-settled/redead 超限/bidding reason | `flow/round-runtime.ts`+`game/bidding.ts`+test | **done `c08de19`**（5/5 绿·+1 行 settle 投影） |
+| M6-L5-selfplay-long | selfplay seeds 1..50 回归护栏 | `test/selfplay/selfplay-long.test.ts` | blocked（待 L4 merge 后验证） |
 
 #### B-2 CC 接线/编辑器/构建串行单写者组（`task/M6-editor` · C1→C2→C3→C4）
 
 | ID | 任务 | 文件域 | 状态 |
 |----|----|----|----|
-| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`+`lobby.scene` | blocked（待 L1） |
-| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | blocked（待 L2+C1） |
-| M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | `game.scene`+`lobby.scene`+`game-scene-skeleton`+report | blocked（待 L3+C2） |
+| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`+`lobby.scene` | **ready**（L1 已入 main） |
+| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | blocked（待 C1） |
+| M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | `game.scene`+`lobby.scene`+`game-scene-skeleton`+report | blocked（待 C2+L3） |
 | M6-C4-build-verification | 构建验证+发布验收记录 | `cocos.config.json`+report | blocked（待 C1-C3） |
 | M6-D1-release-docs | 发布/QA 文档收尾（架构·非派发） | `docs/*`+`BOARD.md` | blocked（待所有轨） |
 
@@ -336,6 +336,24 @@ main 现状：**82 测试文件 / 422 用例全绿、typecheck 净、无 cc 泄�
 > - **M6-C4 去 profiles/**：`profiles/` 被 `.gitignore:10` 忽略，`profiles/v2/packages/builder.json` 移出文件域——构建面板配置/截图只记入 report，提交仅含 `cocos.config.json`+report，不走 `add -f profiles/`（守 AGENTS「不手动编辑 profiles」）。
 > - **清理残留 worktree**：`../斗地主.worktrees/M3-editor-integration`（非 git 登记、仅 Cocos 生成缓存）已删；C1-C3 spec 标注编辑器串行用新 worktree `../斗地主.worktrees/M6-editor`，不复用历史目录。
 > - **task 分支基线**：`task/M6-L1/L2/L3/L4` + `task/art-gen-v2` + `task/M6-editor` 已 rebase 到 `74da789`（清理提交后），各分支已重 seed 对应测试（L1 改名版、L4 重写版、L2/L3 原版）。`task/M6-L5` 已删。
+
+> **第九批验收记录（2026-06-29）**：
+> - **Track A 美术串行（ART-02/03/04·`task/art-gen-v2`）✅ 已并 main `6eb8995`**：
+>   · ART-02 avatars：6 张（256² 头像 + 128² 徽章 + 256² 框）全 RGBA 透明 + 6 source + PROMPTS + report
+>   · ART-03 ui：15 张（240×96 按钮 + 96² 图标 + 128² 徽章 + 900×1100 面板）全透明 + 15 source + PROMPTS + report
+>   · ART-04 cards：4 张（card-back 400×560 不透明 + joker-small/big + card-template 400×560 透明）+ 4 source + PROMPTS + report
+>   · 命名对齐 `card-template.png`（与 `asset-keys.ts:5` cardTemplate 键一致）、PROMPTS 含 no-text constraints 可复现、三 report `in-review`
+>   · 58 文件·`asset-previews/` 预览包·`git add -f` 提交（.gitignore 忽略）·未导入 `assets/`·零 cc·零测试影响
+>   · 视觉终审归用户；架构验技术规格通过（尺寸/透明/命名/无字/PROMPTS），置 `in-review`
+> - **Track B 纯逻辑 L1-L4（5 worktree 并行）✅ 全部已并 main：**
+>   · **M6-L1** `97b0895`：`decideCuePlayback(settings,cue)→{sound,effect,vibrate}`，6/6 绿，零 cc，`audio-gate.ts` 19 行纯函数
+>   · **M6-L2** `7d93e65`：`pulseParams(cue)`/`dealCardDelay`/`playFlyFromTo`，7/7 绿，零 cc；`ui/index.ts` 桶冲突串行解（保留两行 export）
+>   · **M6-L3** `99d13b8`：`tableLayout(w?,h?)` 函数重载·无参兼容·多分辨率 9 绿 + 现有 6 不退化，零 cc
+>   · **M6-L4** `c08de19`：`round-runtime.ts` +1 行 `this.finishIfSettled()` 补 resume-to-settled 缺口，5/5 绿 + 现有 5 不退化，零 cc
+> - **门控**：90 测试文件 / 462 全绿（437 现有 + 25 新增）、typecheck 净、纯层零 cc（仅 `ui/components/*`+`runtime/cocos-storage.ts`）、`flow→data` 零 import
+> - **L5 selfplay 长回归**（1..50）待 L4 merge 后验证（`test/selfplay/selfplay-long.test.ts` 已删除，待重新引入）
+> - **C1-C4 编辑器串行**：C1 已解除 blocked（L1 在 main），C2/C3 仍 blocked（串行）；`task/M6-editor` 分支已删，编辑器执行者需重新 `git worktree add`（C1-C3 顺序执行于同一分支）
+> - **worktree/分支已清理**：5 worktree 已 remove、6 task 分支已 delete；仅剩 main · 残留 `M3-editor-integration` 目录已删
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
