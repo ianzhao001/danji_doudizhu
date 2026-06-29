@@ -8,4 +8,6 @@ export * from './bidding';
 export * from './settlement';
 export * from './serialize';
 export * from './replay';
+export * from './trick-replay';
+export * from './replay-codec';
 export * from './resume';
