@@ -62,10 +62,12 @@ describe('CueId consistency guard', () => {
 
   it('maps every FlowEvent type to a valid CueId and unwraps round events', () => {
     expect(FLOW_EVENTS.map(cueForFlowEvent)).toEqual(['deal', 'bid', 'redeal', 'landlordDecided', 'bomb', 'settled']);
+    const cues: CueId[] = FLOW_EVENTS.map(cueForFlowEvent);
+    expect(cues).toHaveLength(FLOW_EVENTS.length);
     for (const event of FLOW_EVENTS) {
       const cue = cueForFlowEvent(event);
       expect(cue).not.toBeNull();
-      expect(CUE_ID_SET.has(cue!)).toBe(true);
+      expect(CUE_ID_SET.has(cue)).toBe(true);
     }
   });
 
