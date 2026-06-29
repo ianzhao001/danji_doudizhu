@@ -2,9 +2,9 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批进行中**：A 线纯逻辑 7（L7-L12+M3-42）+ G 4（G9-G12）+ D2/D3 ✅ 已并 main（103 文件/507 绿）；M3-40/41/43/44 已并 main；C2/C3a 已并 main，C3b ready；R 待用户视觉终审；新增桶整合 M6-I1 已并 main（见下「第十一批」+「验收记录」） · **第十二批已派发**（18 任务·P AI 纵深 / V 视图 / L 文案 / G 护栏 / C 编辑器 / D 文档 / R 美术·spec 全部入 main，见下「第十二批」） · **第十三批已派发**（10 任务·AI 模块组合/平衡度量/回放编码/剩余视图·M6-D5 已并 main·见下「第十三批」·纯逻辑尾部）
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批进行中**：A 线纯逻辑 7（L7-L12+M3-42）+ G 4（G9-G12）+ D2/D3 ✅ 已并 main（103 文件/507 绿）；M3-40/41/43/44 已并 main；C2/C3a/C3b 已并 main（C3b `b51dce5`），C4 ready；R 待用户视觉终审；新增桶整合 M6-I1 已并 main（见下「第十一批」+「验收记录」） · **第十二批已派发**（18 任务·P AI 纵深 / V 视图 / L 文案 / G 护栏 / C 编辑器 / D 文档 / R 美术·spec 全部入 main，见下「第十二批」） · **第十三批已派发**（10 任务·AI 模块组合/平衡度量/回放编码/剩余视图·M6-D5 已并 main·见下「第十三批」·纯逻辑尾部）
 
-main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 字面量联合）、`flow→data` 零 import；第十一/十二/十三批纯逻辑尾部与 M6-I1 桶导出已并 main（`7c7b427`），编辑器 C2/C3a 与 D5 冒烟脚本已并 main（最新 `98b0ec1`）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**编辑器/美术线继续按 gate 串行**：C3b 已解锁 ready；C4 待 C3b；ART-IMPORT/ART-05 仍待用户视觉终审。
+main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 字面量联合）、`flow→data` 零 import；第十一/十二/十三批纯逻辑尾部与 M6-I1 桶导出已并 main（`7c7b427`），编辑器 C2/C3a/C3b 与 D5 冒烟脚本已并 main（C3b `b51dce5`）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**编辑器/美术线继续按 gate 串行**：C4 ready；ART-IMPORT/ART-05 仍待用户视觉终审。
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
@@ -321,7 +321,7 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 | M6-L6-cue-id-union | CueId string→字面量联合 + cue 一致性绿护栏 | `ui/event-cues.ts`+`test/ui/cue-id-consistency.test.ts` | **done `4c840ed`**（第十批已并 main） |
 
 #### B-2 CC 接线/编辑器/构建串行单写者组（`task/M6-editor`）
-> **⚠️ 历史存档（勿据此认领）**——C2-C4 的**当前**状态以「第十一批 › C 编辑器/UI」表 + 各批验收记录为准（采纳建议#1 统一状态源）：**C1 done · C2 done · C3 已拆 C3a/C3b · C4 待 C3a/b**。下表为批9 派发时快照，仅留档。
+> **⚠️ 历史存档（勿据此认领）**——C2-C4 的**当前**状态以「第十一批 › C 编辑器/UI」表 + 各批验收记录为准（采纳建议#1 统一状态源）：**C1 done · C2 done · C3a/C3b done · C4 ready**。下表为批9 派发时快照，仅留档。
 | ID | 任务 | 文件域 | 状态（当前·见上） |
 |----|----|----|----|
 | M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | **done `31b5668`** |
@@ -418,8 +418,8 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 |----|----|----|----|
 | M6-C2-animation-wiring | `game-scene-skeleton`+`game.scene` | C1✓·L2✓ | **done `17b96f3`**（Creator 3.8.8 预览·390×844 bomb 局部动效截图·Console 零 Error） |
 | M6-C3a-safearea-screenshots | `*.scene`+`.meta`+M3-36 report+QA | C2✓ | **done `98b0ec1`**（Creator 3.8.8 预览·6 张三档截图·SafeArea/fit-width；`settings/v2/packages/project.json` 范围例外已审查采纳） |
-| M6-C3b-relative-layout-render-diff | `game-scene-skeleton`+report | L3✓·C2✓·C3a✓ | **ready**（C3a 已并 main·下一编辑器单写者任务） |
-| M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | blocked（待 C3a/b） |
+| M6-C3b-relative-layout-render-diff | `game-scene-skeleton`+report | L3✓·C2✓·C3a✓ | **done `b51dce5`**（Creator 3.8.8 三分辨率 Preview·相对布局+render 差分复用·交叉审查 approve） |
+| M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | **ready**（C1/C2/C3a/C3b 已满足·下一编辑器单写者任务） |
 | M3-45-stats-records-screens | scene+新 cc 组件 | L7✓/L8✓/M3-40/41 | blocked（待 M3-40/41 + 编辑器档期） |
 | M3-46a-help-screen（拆自 M3-46） | `lobby.scene`+新组件 | M3-42✓ | blocked（编辑器档期·C3 后） |
 | M3-46b-pause-overlay（拆自 M3-46） | `game.scene`+新组件 | L12✓ | blocked（编辑器档期·C3 后） |
@@ -530,7 +530,7 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 > 按用户批准的「全量接收与执行顺序计划」执行：先第一波解锁器与独立纯任务，再第二波消费依赖，最后 M3-61→M6-G13→M6-I1。编辑器/美术/视觉 gate 未抢跑。
 - **已并 main**：第十一批剩余 VM（M3-40/41/43/44）、第十二批纯逻辑/文档（M4-30/31/32、M3-50/51/52/53/54/58、M6-L13、M6-G13/14、M6-D4）、第十三批纯逻辑（M2-12、M6-G15、M3-60/62、M4-40/41、M3-61）以及 **M6-I1 桶整合**。
 - **客观门**：最终 main `7c7b427` 上 `npm --prefix test test -- --run` **127 文件 / 623 用例全绿**；`npm --prefix test run typecheck` 通过；新增纯层/纯 UI 文件 `cc` 搜索零命中。
-- **仍保持 gate**：C3b 已解锁为下一编辑器单写者任务；M3-55/56/57/59/63/64、C4、M3-45/46 仍等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 `PLAYTEST.md` 骨架已并 main，后续随 C4/发布验收填实测记录。
+- **仍保持 gate**：C4 已解锁为下一编辑器单写者任务；M3-55/56/57/59/63/64、M3-45/46 仍等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 `PLAYTEST.md` 骨架已并 main，后续随 C4/发布验收填实测记录。
 - **本地注意**：~~工作区若干未跟踪新脚本 `.meta`~~ → ✅ **已闭合**：20 个 Creator 生成 `.meta`（ver 4.0.24·typescript importer·uuid 唯一·零逻辑改动）已统一提交（采纳建议#6 late .meta sync）。
 
 ### 🔍 架构复核 + 执行者 13 条建议落实（2026-06-29）
