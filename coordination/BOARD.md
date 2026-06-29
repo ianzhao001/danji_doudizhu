@@ -4,7 +4,7 @@
 
 ## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批进行中**：A 线纯逻辑 7（L7-L12+M3-42）+ G 4（G9-G12）+ D2/D3 ✅ 已并 main（103 文件/507 绿）；M3-40/41/43/44 解锁 ready；C2 in-review 待 Creator；R 待用户视觉终审；C3 已拆 C3a/C3b；新增桶整合 M6-I1（见下「第十一批」+「验收记录」） · **第十二批已派发**（18 任务·P AI 纵深 / V 视图 / L 文案 / G 护栏 / C 编辑器 / D 文档 / R 美术·spec 全部入 main，见下「第十二批」） · **第十三批已派发**（10 任务·AI 模块组合/平衡度量/回放编码/剩余视图·见下「第十三批」·纯逻辑尾部）
 
-main 现状：**103 测试文件 / 507 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 字面量联合）、`flow→data` 零 import、`index.ts` 桶待 M6-I1 统一补第十一批新模块。第九批 L1-L4 已全部 `merge --no-ff` 入 main；L5 selfplay 长回归（1..50）待验证（L4 settle 修改已入 main）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**C1-C4 编辑器串行待执行**（依赖 L1/L2/L3 已在 main，C1→C2→C3→C4 串行）。
+main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 字面量联合）、`flow→data` 零 import；第十一/十二/十三批纯逻辑尾部与 M6-I1 桶导出已并 main（最新 `7c7b427`）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**编辑器/美术线继续按 gate 串行**：C2 仍待 Creator 3.8.8 验证；ART-IMPORT/ART-05 仍待用户视觉终审；M6-D5 按计划延后到编辑器功能基本稳定后补。
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
@@ -399,10 +399,10 @@ main 现状：**103 测试文件 / 507 用例全绿、typecheck 净、纯层零 
 | M6-L10-bidding-advisor | `ai/bidding-advisor.ts`+test | bidding.isStrongHand | **done** |
 | M6-L11-trick-replay | `game/trick-replay.ts`+test | replay/events | **done** |
 | M6-L12-pause-menu | `ui/pause-menu.ts`+test | — | **done** |
-| M3-40-stats-detail-view | `ui/stats-detail-view.ts`+test | L7 | **ready**（L7 已 merge·解锁） |
-| M3-41-records-detail-view | `ui/records-detail-view.ts`+test | L8 | **ready**（L8 已 merge·解锁） |
-| M3-43-bidding-advice-view | `ui/bidding-advice-view.ts`+test | L10 | **ready**（L10 已 merge·解锁） |
-| M3-44-replay-view | `ui/replay-view.ts`+test | L11 | **ready**（L11 已 merge·解锁） |
+| M3-40-stats-detail-view | `ui/stats-detail-view.ts`+test | L7 | **done**（并 main·第一波） |
+| M3-41-records-detail-view | `ui/records-detail-view.ts`+test | L8 | **done**（并 main·第一波） |
+| M3-43-bidding-advice-view | `ui/bidding-advice-view.ts`+test | L10 | **done**（并 main·第一波） |
+| M3-44-replay-view | `ui/replay-view.ts`+test | L11 | **done**（并 main·第一波） |
 
 ### G 集成/硬化护栏（worktree **并行**·禁 cc·绿护栏·不改产品码）【核心】
 | ID | 文件域 | 状态 |
@@ -436,7 +436,7 @@ main 现状：**103 测试文件 / 507 用例全绿、typecheck 净、纯层零 
 |----|----|----|
 | M6-D2-qa-checklist-refresh | `docs/QA_CHECKLIST.md`+report | **done**（证据对齐已合并测试·G 线证据已刷新为已并） |
 | M6-D3-roadmap-update | `docs/ROADMAP.md`+report | **done** |
-| M6-I1-barrel-exports | `{data,ai,game,ui}/index.ts` 仅 re-export+test | **ready**（采纳建议#6·A 线已并·可执行统一补桶） |
+| M6-I1-barrel-exports | `{data,ai,game,ui}/index.ts` 仅 re-export+test | **done `7c7b427`**（新增公开模块已补桶·623 绿） |
 | M6-D1-release-docs | `docs/*`+BOARD | blocked（待所有轨 merge·架构收尾） |
 
 ### 📐 编辑器任务验收模板（采纳建议#4 · C2/C3a/C3b/C4/M3-45/46/ART-IMPORT 必填）
@@ -458,39 +458,39 @@ main 现状：**103 测试文件 / 507 用例全绿、typecheck 净、纯层零 
 ### P AI 纵深（worktree **并行**·禁 cc·纯 spec）【打磨】
 | ID | 文件域 | 依赖 | 状态 |
 |----|----|----|----|
-| M4-30-hand-strength | `ai/handStrength.ts`+test | rules | ready |
-| M4-31-card-memory | `ai/cardMemory.ts`+test | game events/rules | ready |
-| M4-32-endgame-finisher | `ai/endgame.ts`+test | rules 枚举 | ready |
+| M4-30-hand-strength | `ai/handStrength.ts`+test | rules | **done**（并 main·第一波） |
+| M4-31-card-memory | `ai/cardMemory.ts`+test | game events/rules | **done**（并 main·第一波） |
+| M4-32-endgame-finisher | `ai/endgame.ts`+test | rules 枚举 | **done**（并 main·第一波） |
 
 ### V 视图模型（worktree **并行**·禁 cc·纯 spec）【打磨】
 | ID | 文件域 | 依赖 | 状态 |
 |----|----|----|----|
-| M3-50-tutorial-steps | `ui/tutorial-steps.ts`+test | RULES/GAME_DESIGN | ready |
-| M3-52-turn-timer-view | `ui/turn-timer.ts`+test | — | ready |
-| M3-53-toast-queue | `ui/toast-queue.ts`+test | — | ready |
-| M3-58-difficulty-picker-view | `ui/difficulty-picker-view.ts`+test | difficultyConfig | ready |
-| M3-51-strength-meter-view | `ui/strength-meter-view.ts`+test | M4-30 | **blocked: 待 M4-30 merge** |
-| M3-54-card-memory-view | `ui/card-memory-view.ts`+test | M4-31 | **blocked: 待 M4-31 merge** |
+| M3-50-tutorial-steps | `ui/tutorial-steps.ts`+test | RULES/GAME_DESIGN | **done**（并 main·第一波） |
+| M3-52-turn-timer-view | `ui/turn-timer.ts`+test | — | **done**（并 main·第一波） |
+| M3-53-toast-queue | `ui/toast-queue.ts`+test | — | **done**（并 main·第一波） |
+| M3-58-difficulty-picker-view | `ui/difficulty-picker-view.ts`+test | difficultyConfig | **done**（并 main·第一波） |
+| M3-51-strength-meter-view | `ui/strength-meter-view.ts`+test | M4-30 | **done**（并 main·第二波） |
+| M3-54-card-memory-view | `ui/card-memory-view.ts`+test | M4-31 | **done**（并 main·第二波） |
 
 ### L 可维护性 / G 横切护栏（worktree **并行**·禁 cc）【L 打磨·G 核心】
 | ID | 文件域 | 状态 |
 |----|----|----|
-| M6-L13-string-table | `ui/strings.ts`+test（仅新增·不迁移组件） | ready |
-| M6-G13-view-model-immutability | `test/ui/view-model-immutability.test.ts`（绿护栏·不改产品码） | ready |
-| M6-G14-ai-hidden-state-isolation | `test/ai/ai-hidden-state-isolation.test.ts`（绿护栏·不改产品码） | ready |
+| M6-L13-string-table | `ui/strings.ts`+test（仅新增·不迁移组件） | **done**（并 main·第一波） |
+| M6-G13-view-model-immutability | `test/ui/view-model-immutability.test.ts`（绿护栏·不改产品码） | **done**（并 main·第三波） |
+| M6-G14-ai-hidden-state-isolation | `test/ai/ai-hidden-state-isolation.test.ts`（绿护栏·不改产品码） | **done**（并 main·第一波） |
 
 ### C 编辑器接线（**串行单写者** `task/M6-editor`·需 Creator·按验收模板）【打磨】
 | ID | 文件域 | 依赖 | 状态 |
 |----|----|----|----|
-| M3-59-difficulty-picker-ui | `lobby-scene` 升级难度控件 | M3-58 | blocked（待 M3-58 + 编辑器档期） |
-| M3-55-tutorial-screen | `lobby.scene`+新组件 | M3-50 | blocked（待 M3-50 + 档期） |
-| M3-56-hud-meters | `game-scene-skeleton`/新 HUD 组件 | M3-51/54（+M4-30/31） | blocked（待视图 + 档期） |
-| M3-57-toast-timer-wiring | `game-scene-skeleton`/新组件 | M3-52/53 | blocked（待视图 + 档期） |
+| M3-59-difficulty-picker-ui | `lobby-scene` 升级难度控件 | M3-58 | blocked（依赖已满足·待 C2/编辑器档期） |
+| M3-55-tutorial-screen | `lobby.scene`+新组件 | M3-50 | blocked（依赖已满足·待 C2/编辑器档期） |
+| M3-56-hud-meters | `game-scene-skeleton`/新 HUD 组件 | M3-51/54（+M4-30/31） | blocked（依赖已满足·待编辑器串行） |
+| M3-57-toast-timer-wiring | `game-scene-skeleton`/新组件 | M3-52/53 | blocked（依赖已满足·待编辑器串行） |
 
 ### D 文档 / R 美术【D 核心·R 打磨·gated】
 | ID | 文件域 | 状态 |
 |----|----|----|
-| M6-D4-arch-notes | `docs/ARCH_DECISIONS.md`+`docs/KNOWN_LIMITATIONS.md`（新）+report | ready |
+| M6-D4-arch-notes | `docs/ARCH_DECISIONS.md`+`docs/KNOWN_LIMITATIONS.md`（新）+report | **done**（并 main·第一波） |
 | ART-05-misc-assets | `asset-previews/…v2/misc/`（splash/app-icon/空状态/角标）+PROMPTS+report | blocked（待用户对 ART 风格整体认可） |
 
 > **文件域不相交核对**：P/V/L 各为新 `ai/`/`ui/` 文件 + 新 test（两两不碰）；G 各新 test；C 共享 keystone 串行；D 新增两份 docs；R 仅 `asset-previews/`。与第十一批未完成项（M3-40/41/43/44、M6-I1、C2-C4、M3-45/46、ART-IMPORT、D1）文件域亦不相交。
@@ -503,19 +503,26 @@ main 现状：**103 测试文件 / 507 用例全绿、typecheck 净、纯层零 
 
 | ID | 轨 | 文件域 | 依赖 | 状态 |
 |----|----|----|----|----|
-| M2-12-replay-codec | 离线 | `game/replay-codec.ts`+test | events/replay✓ | **ready** |
-| M6-G15-selfplay-balance | G 核心 | `test/selfplay/balance.test.ts`（绿护栏） | selfplay✓ | **ready** |
-| M3-60-ai-thinking-view | V 打磨 | `ui/ai-thinking-view.ts`+test | — | **ready** |
-| M3-62-last-action-view | V 打磨 | `ui/last-action-view.ts`+test | events/card-view✓ | **ready** |
+| M2-12-replay-codec | 离线 | `game/replay-codec.ts`+test | events/replay✓ | **done**（并 main·第一波） |
+| M6-G15-selfplay-balance | G 核心 | `test/selfplay/balance.test.ts`（绿护栏） | selfplay✓ | **done**（并 main·第一波） |
+| M3-60-ai-thinking-view | V 打磨 | `ui/ai-thinking-view.ts`+test | — | **done**（并 main·第一波） |
+| M3-62-last-action-view | V 打磨 | `ui/last-action-view.ts`+test | events/card-view✓ | **done**（并 main·第一波） |
 | M6-D5-playtest-script | D 核心 | `docs/PLAYTEST.md`+report | — | **ready** |
-| M4-40-action-insight | P 打磨 | `ai/insight.ts`+test（组合 M4-30/32+hintRank✓） | M4-30/32 | **blocked: 待 M4-30+M4-32 merge** |
-| M4-41-bid-confidence | P 打磨 | `ai/bid-confidence.ts`+test | M4-30 | **blocked: 待 M4-30 merge** |
-| M3-61-insight-view | V 打磨 | `ui/insight-view.ts`+test | M4-40 | **blocked: 待 M4-40 merge** |
-| M3-63-thinking-lastaction-ui | C 编辑器 | `game-scene-skeleton`/新组件 | M3-60/62 | blocked（编辑器串行） |
-| M3-64-insight-advisor-ui | C 编辑器 | `game-scene-skeleton`/新组件 | M3-61 | blocked（编辑器串行） |
+| M4-40-action-insight | P 打磨 | `ai/insight.ts`+test（组合 M4-30/32+hintRank✓） | M4-30/32 | **done**（并 main·第二波） |
+| M4-41-bid-confidence | P 打磨 | `ai/bid-confidence.ts`+test | M4-30 | **done**（并 main·第二波） |
+| M3-61-insight-view | V 打磨 | `ui/insight-view.ts`+test | M4-40 | **done**（并 main·第三波） |
+| M3-63-thinking-lastaction-ui | C 编辑器 | `game-scene-skeleton`/新组件 | M3-60/62 | blocked（依赖已满足·编辑器串行） |
+| M3-64-insight-advisor-ui | C 编辑器 | `game-scene-skeleton`/新组件 | M3-61 | blocked（依赖已满足·编辑器串行） |
 
 > **文件域不相交**：各为新 `ai/`/`ui/`/`game/` 文件 + 新 test + 新 docs，两两不碰，与批11/12 未完成项亦不相交。
 > **本批 ready（无依赖·可并行）**：M2-12、M6-G15、M3-60、M3-62、M6-D5 —— 5 个。其余链式（M4-30→M4-40→M3-61；M4-30→M4-41）按硬状态待 dep 入 main。
+
+### ✅ 第十二/十三批纯逻辑收口记录（2026-06-29 · 执行/架构）
+> 按用户批准的「全量接收与执行顺序计划」执行：先第一波解锁器与独立纯任务，再第二波消费依赖，最后 M3-61→M6-G13→M6-I1。编辑器/美术/视觉 gate 未抢跑。
+- **已并 main**：第十一批剩余 VM（M3-40/41/43/44）、第十二批纯逻辑/文档（M4-30/31/32、M3-50/51/52/53/54/58、M6-L13、M6-G13/14、M6-D4）、第十三批纯逻辑（M2-12、M6-G15、M3-60/62、M4-40/41、M3-61）以及 **M6-I1 桶整合**。
+- **客观门**：最终 main `7c7b427` 上 `npm --prefix test test -- --run` **127 文件 / 623 用例全绿**；`npm --prefix test run typecheck` 通过；新增纯层/纯 UI 文件 `cc` 搜索零命中。
+- **仍保持 gate**：C2 仍需 Creator 3.8.8 验证；M3-55/56/57/59/63/64、C3a/C3b/C4、M3-45/46 均等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 按计划延后到编辑器功能基本稳定后补 `PLAYTEST.md`。
+- **本地注意**：工作区出现若干未跟踪新脚本 `.meta`（Creator/本地生成形态），本轮未纳入纯逻辑提交；后续 Creator gate 可统一校验并决定是否提交。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
