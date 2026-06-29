@@ -3,6 +3,7 @@
 - 实现方标识：Codex
 - 分支：`task/M6-editor`
 - 状态：in-review（需编辑器复核 390×844 动效截图）
+- 同步状态：已将 `main` 合入 `task/M6-editor`（merge commit `23f7027`），当前差异仍仅限 C2 范围。
 
 ## 改了哪些文件
 - 更新 `assets/scripts/ui/components/game-scene-skeleton.ts`
@@ -13,6 +14,11 @@
 npm --prefix test test -- --testTimeout=60000
 Test Files  92 passed (92)
 Tests       469 passed (469)
+
+2026-06-30 同步 main 后复验：
+npm --prefix test test -- --run --testTimeout=60000
+Test Files  127 passed (127)
+Tests       623 passed (623)
 
 npm --prefix test run typecheck
 tsc --noEmit
@@ -28,7 +34,7 @@ git diff --check
 - 手牌发牌/手牌变化使用 `dealCardDelay(index,total)` 做逐张位移 + 透明度进入；选中上浮去掉原硬编码 `+4`，只使用 VM `slot.y`，选中变化用短 tween。
 - 结算面板使用 scale-in + opacity tween；所有渲染动效受 `settings.animation` 门控。
 - 当前命令行无法可靠产出 Cocos 390×844 动效截图；本机 Creator 3.8.8 可见，但 `CocosCreator --help` 返回内置 Node 帮助。请架构/编辑器复核时在 Creator 预览中补炸弹/火箭局部动效截图。
-- worktree 中已有未纳入本提交的本地 Creator 改动：`package.json` 格式/uuid、`settings/` 目录；本任务未暂存这些文件。
+- 原 worktree 中未纳入 C2 的本地 Creator 配置改动（`package.json` 格式/uuid、`settings/` 目录）已移入 stash：`stash@{0}` / `pre-c2-main-merge local Creator config noise`。同步 main 后工作树干净；C2 不提交 `package.json` / `settings/` / `profiles/` 噪声。
 
 ## 疑问（给架构）
 - 若后续要求出牌区节点持久写入 `game.scene`，请用 Cocos Creator 编辑器生成并保存 scene/meta；本次按 guardrail 未手写场景资产。
