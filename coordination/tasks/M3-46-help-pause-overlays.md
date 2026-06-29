@@ -1,6 +1,7 @@
 # M3-46 帮助屏 + 暂停叠加层（编辑器·绑 M3-42/L12 · 第十一批·打磨）
 
-- 状态：blocked（待 M3-42 help-content + M6-L12 pause-menu 入 main；编辑器串行）
+- 状态：**⚠️ 已拆分·勿直接认领**——按建议#5 拆为 **M3-46a-help-screen**（lobby 帮助屏·绑 M3-42）+ **M3-46b-pause-overlay**（game 暂停叠加层·绑 M6-L12），降低同时碰 `lobby.scene`+`game.scene`+状态流的审查复杂度。本文件留作背景参考。
+- 〔原状态〕blocked（待 M3-42 help-content + M6-L12 pause-menu 入 main；编辑器串行）
 - 派发模式：编辑器执行者（Cocos Creator 3.8.8）· 编辑器串行单写者
 - 文件域：`assets/scene/{lobby,game}.scene`（加帮助入口 + 游戏内暂停按钮/叠加层）+ `assets/scripts/ui/components/*`（新 cc 组件）+ `.meta`（编辑器生成）
 - 依赖：**M3-42 `helpSections()` + M6-L12 `PauseState` 状态机**（入 main）

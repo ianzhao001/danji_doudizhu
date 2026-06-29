@@ -317,16 +317,16 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 | M6-L2-animation-params | cue→tween 参数纯映射表 | `ui/animation-params.ts`+`index.ts`+test | **done `7d93e65`**（7/7 绿·桶冲突串行解） |
 | M6-L3-table-layout-resolutions | tableLayout 参数化+多分辨率 sweep | `ui/table-layout.ts`+`screen-view.ts`+test | **done `99d13b8`**（15/15 绿·兼容性铁律） |
 | M6-L4-round-runtime-exceptions | resume-to-settled/redead 超限/bidding reason | `flow/round-runtime.ts`+`game/bidding.ts`+test | **done `c08de19`**（5/5 绿·+1 行 settle 投影） |
-| M6-L5-selfplay-long | selfplay seeds 1..50 回归护栏 | `test/selfplay/selfplay-long.test.ts` | **ready**（第十批·L4 已 merge 解锁） |
-| M6-L6-cue-id-union | CueId string→字面量联合 + cue 一致性绿护栏 | `ui/event-cues.ts`+`test/ui/cue-id-consistency.test.ts` | **ready**（第十批·优化任务书·L1/L2 已 merge） |
+| M6-L5-selfplay-long | selfplay seeds 1..50 回归护栏 | `test/selfplay/selfplay-long.test.ts` | **done `20af2e9`**（第十批已并 main） |
+| M6-L6-cue-id-union | CueId string→字面量联合 + cue 一致性绿护栏 | `ui/event-cues.ts`+`test/ui/cue-id-consistency.test.ts` | **done `4c840ed`**（第十批已并 main） |
 
-#### B-2 CC 接线/编辑器/构建串行单写者组（`task/M6-editor` · C1→C2→C3→C4）
-
-| ID | 任务 | 文件域 | 状态 |
+#### B-2 CC 接线/编辑器/构建串行单写者组（`task/M6-editor`）
+> **⚠️ 历史存档（勿据此认领）**——C2-C4 的**当前**状态以「第十一批 › C 编辑器/UI」表 + 各批验收记录为准（采纳建议#1 统一状态源）：**C1 done · C2 in-review 待 Creator · C3 已拆 C3a/C3b · C4 待 C3a/b**。下表为批9 派发时快照，仅留档。
+| ID | 任务 | 文件域 | 状态（当前·见上） |
 |----|----|----|----|
-| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | **done `31b5668`**（用户 Creator 验证过） |
-| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | **ready**（C1 已入 main·消费 L2 已在 main） |
-| M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | `game.scene`+`lobby.scene`+`game-scene-skeleton`+report | blocked（待 C2+L3） |
+| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | **done `31b5668`** |
+| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | **in-review** 待 Creator（`08d0188`·实现完成·缺截图） |
+| M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | — | **已拆 → C3a + C3b**（见第十一批 C 表） |
 | M6-C4-build-verification | 构建验证+发布验收记录 | `cocos.config.json`+report | blocked（待 C1-C3） |
 | M6-D1-release-docs | 发布/QA 文档收尾（架构·非派发） | `docs/*`+`BOARD.md` | blocked（待所有轨） |
 
@@ -421,10 +421,12 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 | M6-C3b-relative-layout-render-diff | `game-scene-skeleton`+report | L3✓·C2·C3a | blocked（串行于 C3a） |
 | M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | blocked（待 C3a/b） |
 | M3-45-stats-records-screens | scene+新 cc 组件 | L7✓/L8✓/M3-40/41 | blocked（待 M3-40/41 + 编辑器档期） |
-| M3-46-help-pause-overlays | scene+新 cc 组件 | M3-42✓/L12✓ | blocked（待编辑器档期） |
+| M3-46a-help-screen（拆自 M3-46） | `lobby.scene`+新组件 | M3-42✓ | blocked（编辑器档期·C3 后） |
+| M3-46b-pause-overlay（拆自 M3-46） | `game.scene`+新组件 | L12✓ | blocked（编辑器档期·C3 后） |
 
 ### R 美术导入（编辑器·**gated 待用户视觉终审**·**串行**·照 M3-29 流程）【核心·依赖用户】
 > 采纳建议#5：三导入都改 `asset-keys.ts`，**非完全并行域**，须串行 02→03→04（或架构合并时统一解 key 冲突）。统一 key 命名表见下，避免各分支各自加 key 致合并冲突。
+> **审查#7**：每个导入 report 须记录 **① 用户视觉批准来源**（哪条消息/截图确认）② 导入清单 ③ key 映射 ④ `.meta` 由 Creator 生成——**不得仅凭技术规格通过**。
 | ID | 文件域 | key 前缀（建议） | 状态 |
 |----|----|----|----|
 | ART-IMPORT-02-avatars | `assets/resources/art/avatars/`+`asset-keys.ts`+.meta | `avatar.*`（avatarHero/avatarAiLeft/avatarAiRight/badgeLandlord/badgeFarmer/avatarFrame） | blocked（待用户认可 ART-02·串行 #1） |
@@ -439,8 +441,15 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 | M6-I1-barrel-exports | `{data,ai,game,ui}/index.ts` 仅 re-export+test | **done `7c7b427`**（新增公开模块已补桶·623 绿） |
 | M6-D1-release-docs | `docs/*`+BOARD | blocked（待所有轨 merge·架构收尾） |
 
-### 📐 编辑器任务验收模板（采纳建议#4 · C2/C3a/C3b/C4/M3-45/46/ART-IMPORT 必填）
+### 📐 编辑器任务验收模板（采纳建议#4 · C2/C3a/C3b/C4/M3-编辑器屏/ART-IMPORT 必填）
 > 编辑器任务 report 必须含：① **Creator 版本**（3.8.8）；② **预览分辨率**与截图路径（≥指定档）；③ **是否改 scene/meta**（列出文件，未改注明「运行时注入」）；④ **worktree 是否残留本地未提交** `package.json`/`settings/`/`profiles/`（Creator 易生成，**只提交任务文件域**，残留须 `git checkout`/不 add）；⑤ 编辑器 Console 是否零报错。审查者据此核对，不接受「仅代码报告」。
+
+### 🚦 编辑器线推进协议（采纳建议#3+#4 · 收紧发布 gate）
+> `task/M6-editor` 是共享 keystone（`game-scene-skeleton.ts`+scene）的串行单写者分支，后续多任务叠加，纪律如下：
+- **#2 C2 不直接并入 main**：保持 `in-review`，直到 Creator 3.8.8 复核 + 390×844 动效截图落盘 + Console 零报错 + 脏文件（`package.json`/`settings/`）处理方案明确。审查卡验收模板，缺截图=未闭环。
+- **#3 同步/清洁门（每个编辑器任务启动前）**：① `git merge main`（取回纯逻辑/桶导出最新）；② 清掉或显式排除 `package.json`/`settings/`/`profiles/` 本地噪声（`git checkout -- package.json` / 不 add）；③ 跑 `npm --prefix test test` 全绿 + Creator 编译零报错。**不在不干净分支上叠新任务。**
+- **#4 推进顺序（重排）**：**C2 验证/合并 → C3a（多分辨率 SafeArea 基线 + 截图）→ C3b（相对布局 + render 差分稳定）→ 之后才接 HUD(M3-56)/toast·timer(M3-57)/thinking·lastaction(M3-63)/advisor(M3-64)/教程(M3-55)/帮助·暂停(M3-46a/b)/难度面板(M3-59)/战绩历史屏(M3-45)**。理由：后续 UI 不应建立在旧硬编码坐标 + 全量重建 render 之上。
+- **#1 状态源唯一**：编辑器任务状态以「第十一/十二/十三批」C 表 + 验收记录为准；批9 B-2 表已标历史存档。
 
 ### ✅ 第十一批验收记录（A 线 7 + G 4 + D2/D3 已并 main · 2026-06-29）
 > 13 分支按建议#2 顺序逐一审 + `merge --no-ff`：先 A 基础（L7/L8/L9/M3-42/L10/L11/L12）→ G9-G12 → D3 → D2（G 并后证据复核）。审查纪律（建议）：逐分支 `git diff --stat` 核文件域、grep cc、确认未改 `index.ts` 桶/未篡改既有测试、读新源确认实现（非空跑）。
@@ -522,7 +531,14 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 - **已并 main**：第十一批剩余 VM（M3-40/41/43/44）、第十二批纯逻辑/文档（M4-30/31/32、M3-50/51/52/53/54/58、M6-L13、M6-G13/14、M6-D4）、第十三批纯逻辑（M2-12、M6-G15、M3-60/62、M4-40/41、M3-61）以及 **M6-I1 桶整合**。
 - **客观门**：最终 main `7c7b427` 上 `npm --prefix test test -- --run` **127 文件 / 623 用例全绿**；`npm --prefix test run typecheck` 通过；新增纯层/纯 UI 文件 `cc` 搜索零命中。
 - **仍保持 gate**：C2 仍需 Creator 3.8.8 验证；M3-55/56/57/59/63/64、C3a/C3b/C4、M3-45/46 均等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 按计划延后到编辑器功能基本稳定后补 `PLAYTEST.md`。
-- **本地注意**：工作区出现若干未跟踪新脚本 `.meta`（Creator/本地生成形态），本轮未纳入纯逻辑提交；后续 Creator gate 可统一校验并决定是否提交。
+- **本地注意**：~~工作区若干未跟踪新脚本 `.meta`~~ → ✅ **已闭合**：20 个 Creator 生成 `.meta`（ver 4.0.24·typescript importer·uuid 唯一·零逻辑改动）已统一提交（采纳建议#6 late .meta sync）。
+
+### 🔍 架构复核 + 执行者 13 条建议落实（2026-06-29）
+> 用户给规划者 7 条 + 审查者 8 条建议，方向：纯逻辑核心已收口，下一阶段把 **C2-C4 发布 gate 做硬**（编辑器单写者纪律 / Creator 证据 / scene·meta 清洁 / 截图手测真实性）。
+- **复核 main**：`3a44027` 实测 **127 文件 / 623 用例全绿**、typecheck 净、纯层零 cc；20 late `.meta` 已提交；工作树干净；仅 `task/M6-editor`(C2) 未合。
+- **规划者建议落实**：#1 批9 B-2 表标「历史存档」+ 修正 L5/L6→done、C2→in-review、C3→已拆（状态源唯一指向第十一批 C 表）；#2 **C2 保持 in-review 不并入**；#3+#4 新增「🚦 编辑器线推进协议」（启动前同步/清洁门 + 重排 C2→C3a→C3b→HUD/toast/thinking/advisor）；#5 **M3-46 拆 M3-46a（帮助屏）+ M3-46b（暂停层）**；#6 late `.meta` 已提交；#7 **M6-D1 spec 重写**为最终发布范围（依赖 C2-C4/编辑器屏/美术导入/D5/构建）。
+- **审查者建议落实**：#4 **M3-56 spec 改为必须喂全量 `GameEvent`（非 sliced recentEvents）+ ownHand 用当前手牌防双重扣减**；#7 ART 导入 report 须记用户视觉批准来源；#8 M6-D5 标「尽早做骨架」；#1/#2/#3 C2/`package.json`/C3b 行为审查点并入「编辑器线推进协议」+验收模板；#5 M3-57「计时仅提示不改 runtime」、#6 M3-64「advisor 默认低打扰」已在各 spec 锁定。
+- **未改**：纯逻辑 main（已绿）、C2 代码（待用户 Creator 验证）。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
