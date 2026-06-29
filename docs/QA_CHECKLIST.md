@@ -39,7 +39,7 @@
 - [x] 地主获得底牌后手牌为 20 张。← `test/game/core.test.ts`; `test/ui/hand-layout.test.ts`
 - [x] 无人叫地主时能重新发牌。← `test/game/bidding.test.ts`; `test/flow/round-runtime-exceptions.test.ts`
 - [x] 叫地主底倍为 1，每次抢 / 反抢倍数翻倍。← `test/game/bidding.test.ts`; `test/flow/policies-bid.test.ts`
-- [x] 叫抢倍数与炸弹 / 火箭 / 春天倍数连乘正确。← `test/game/settlement.test.ts`; `test/game/settlement-spring-boundaries.test.ts`; 第十一批 `task/M6-G10-multiplier-stacking` 补穷举护栏待合并
+- [x] 叫抢倍数与炸弹 / 火箭 / 春天倍数连乘正确。← `test/game/settlement.test.ts`; `test/game/settlement-spring-boundaries.test.ts`; `test/game/multiplier-stacking.test.ts`（第十一批·已并 main）
 - [x] 连续过牌后回到当前牌权玩家。← `test/game/core.test.ts`; `test/game/replay.test.ts`
 - [x] 任一玩家出完牌后立即进入结算。← `test/game/core.test.ts`; `test/flow/driver.test.ts`
 - [x] 春天和反春天结算正确。← `test/game/settlement.test.ts`; `test/game/settlement-spring-boundaries.test.ts`
@@ -54,12 +54,12 @@
 ## 序列化与断局
 
 - [x] `RoundState` 存档 → 读档状态一致。← `test/game/serialize.test.ts`; `test/game/serialize-deep.test.ts`; `test/data/save.test.ts`
-- [x] 读档后能合法继续当前局。← `test/game/resume.test.ts`; `test/data/session.test.ts`; `test/flow/round-runtime.test.ts`; 第十一批 `task/M6-G9-save-resume-e2e` 补端到端护栏待合并
+- [x] 读档后能合法继续当前局。← `test/game/resume.test.ts`; `test/data/session.test.ts`; `test/flow/round-runtime.test.ts`; `test/integration/save-resume-e2e.test.ts`（第十一批·已并 main）
 
 ## 自对弈与稳定性
 
 - [x] N 局 AI vs AI 无非法状态。← `test/selfplay/selfplay.test.ts`; `test/selfplay/selfplay-long.test.ts`; `test/ai/legality-matrix.test.ts`
-- [x] 自对弈无死循环、无无限等待。← `test/selfplay/selfplay.test.ts`; `test/selfplay/selfplay-long.test.ts`; `test/selfplay/difficulty.test.ts`; 第十一批 `task/M6-G12-ai-no-starve` 补难度矩阵待合并
+- [x] 自对弈无死循环、无无限等待。← `test/selfplay/selfplay.test.ts`; `test/selfplay/selfplay-long.test.ts`; `test/selfplay/difficulty.test.ts`; `test/selfplay/ai-no-starve.test.ts`（第十一批·已并 main）
 - [x] 相同种子可复现洗牌结果。← `test/rules/deal.test.ts`; `test/selfplay/selfplay.test.ts`
 
 ## AI 测试
