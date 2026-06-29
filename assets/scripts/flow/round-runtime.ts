@@ -38,6 +38,10 @@ const DEFAULT_BASE_SCORE = 1;
 const DEFAULT_THINKING_DELAY_MS = 0;
 const DEFAULT_START_SEAT: SeatIndex = 0;
 const DEFAULT_MAX_REDEALS = 10;
+const DEFAULT_MAX_TURNS = 300;
+const INTERNAL_ERROR_REASON = 'INTERNAL_ERROR';
+
+export type RuntimeTerminationReason = 'settled' | 'redealExhausted' | 'error';
 
 export interface RuntimeConfig {
   seed: number;
@@ -48,6 +52,8 @@ export interface RuntimeConfig {
   clock?: Clock;
   bidPolicy?: BidPolicy;
   playPolicy?: PlayPolicy;
+  maxTurns?: number;
+  maxRedeals?: number;
   persist?: (payload: { round: RoundState; heroSeat: SeatIndex; bidMultiplier: number; events: GameEvent[] }) => void;
   onSettled?: (finish: RoundFinishInput) => void;
 }
@@ -73,10 +79,17 @@ export interface RoundRuntime {
   submitPlayerAction(input: PlayerInput): Promise<SubmitResult>;
   onEvent(cb: (e: FlowEvent) => void): () => void;
   settlement(): Settlement | null;
+  terminationReason(): RuntimeTerminationReason | null;
   dispose(): void;
 }
 
 type RuntimePhase = ReturnType<RoundRuntime['phase']>;
+
+function readonlyBidding(state: BiddingState): BiddingState {
+  const clone = { ...state, grabQueue: state.grabQueue.slice() };
+  Object.freeze(clone.grabQueue);
+  return Object.freeze(clone) as BiddingState;
+}
 
 class RoundRuntimeImpl implements RoundRuntime {
   private readonly rng: Rng;
@@ -85,11 +98,12 @@ class RoundRuntimeImpl implements RoundRuntime {
   private readonly clock: Clock;
   private readonly bidPolicy: BidPolicy;
   private readonly playPolicy: PlayPolicy;
+  private readonly maxTurns: number;
+  private readonly maxRedeals: number;
   private readonly persist?: RuntimeConfig['persist'];
   private readonly onSettled?: RuntimeConfig['onSettled'];
   private readonly subscribers = new Set<(e: FlowEvent) => void>();
-  private readonly flowEvents: FlowEvent[] = [];
-  private readonly gameEvents: GameEvent[];
+  private readonly pendingReplayEvents: FlowEvent[] = [];
 
   private heroSeat: SeatIndex;
   private currentDeal: Deal | null = null;
@@ -99,8 +113,10 @@ class RoundRuntimeImpl implements RoundRuntime {
   private bidMultiplier: number;
   private currentSettlement: Settlement | null = null;
   private redeals = 0;
-  private advancing: Promise<void> | null = null;
+  private gameEvents: GameEvent[];
+  private currentTerminationReason: RuntimeTerminationReason | null = null;
   private settledNotified = false;
+  private replayDelivered = false;
 
   constructor(config: RuntimeConfig, resume?: ResumeSnapshot) {
     const policies = levelPolicies(config.levels);
@@ -110,6 +126,8 @@ class RoundRuntimeImpl implements RoundRuntime {
     this.clock = config.clock ?? realClock;
     this.bidPolicy = config.bidPolicy ?? policies.bidPolicy ?? defaultBidPolicy;
     this.playPolicy = config.playPolicy ?? policies.playPolicy ?? defaultPlayPolicy;
+    this.maxTurns = config.maxTurns ?? DEFAULT_MAX_TURNS;
+    this.maxRedeals = config.maxRedeals ?? DEFAULT_MAX_REDEALS;
     this.persist = config.persist;
     this.onSettled = config.onSettled;
     this.heroSeat = resume?.heroSeat ?? config.heroSeat;
@@ -136,7 +154,7 @@ class RoundRuntimeImpl implements RoundRuntime {
   }
 
   currentBidding(): BiddingState | null {
-    return this.currentPhase === 'bidding' ? this.bidding : null;
+    return this.currentPhase === 'bidding' && this.bidding ? readonlyBidding(this.bidding) : null;
   }
 
   isPlayerTurn(): boolean {
@@ -189,10 +207,15 @@ class RoundRuntimeImpl implements RoundRuntime {
         this.finishIfSettled(events);
       }
     } catch (error) {
-      return { ok: false, error: { reason: error instanceof IllegalActionError ? error.reason : String(error) } };
+      if (error instanceof IllegalActionError) return { ok: false, error: { reason: error.reason } };
+      this.terminateWithError(error);
+      return { ok: false, events, error: { reason: INTERNAL_ERROR_REASON } };
     }
 
     await this.advanceUntilPause(events);
+    if (this.currentTerminationReason === 'error') {
+      return { ok: false, events, error: { reason: INTERNAL_ERROR_REASON } };
+    }
     return {
       ok: true,
       snapshot: this.currentSnapshot() ?? undefined,
@@ -203,11 +226,20 @@ class RoundRuntimeImpl implements RoundRuntime {
 
   onEvent(cb: (e: FlowEvent) => void): () => void {
     this.subscribers.add(cb);
+    if (!this.replayDelivered && this.pendingReplayEvents.length > 0) {
+      this.replayDelivered = true;
+      const replay = this.pendingReplayEvents.splice(0);
+      for (const event of replay) this.deliver(cb, event);
+    }
     return () => void this.subscribers.delete(cb);
   }
 
   settlement(): Settlement | null {
     return this.currentSettlement;
+  }
+
+  terminationReason(): RuntimeTerminationReason | null {
+    return this.currentTerminationReason;
   }
 
   dispose(): void {
@@ -216,6 +248,7 @@ class RoundRuntimeImpl implements RoundRuntime {
   }
 
   private startDeal(): void {
+    this.gameEvents = [];
     this.currentDeal = createRoundDeal(this.rng);
     this.bidding = createBidding(DEFAULT_START_SEAT);
     this.currentPhase = 'bidding';
@@ -223,51 +256,63 @@ class RoundRuntimeImpl implements RoundRuntime {
   }
 
   private scheduleAdvance(): void {
-    this.advancing = this.advanceUntilPause().finally(() => {
-      this.advancing = null;
-    });
+    void this.advanceUntilPause().catch((error) => this.terminateWithError(error));
   }
 
   private async advanceUntilPause(bucket?: FlowEvent[]): Promise<void> {
-    while (this.currentPhase !== 'disposed') {
-      if (this.currentPhase === 'bidding') {
-        if (!this.bidding || !this.currentDeal) return;
-        if (this.bidding.phase === 'done') {
-          this.enterPlaying(bucket);
-          continue;
-        }
-        if (this.bidding.phase === 'redeal') {
-          this.redeal(bucket);
-          continue;
-        }
-        if (this.bidding.turn === this.heroSeat) return;
-
-        await this.sleepForAi();
-        if (this.isDisposed()) return;
-        const action = decideBidAction({ bidding: this.bidding, deal: this.currentDeal, bidPolicy: this.bidPolicy });
-        this.bidding = applyBiddingStep(this.bidding, action);
-        this.emit(biddingEvent(action, this.bidding), bucket);
-        continue;
-      }
-
-      if (this.currentPhase === 'playing') {
-        if (!this.state || this.state.phase === GamePhase.Settled) {
-          this.finishIfSettled(bucket);
+    try {
+      let steps = 0;
+      while (this.currentPhase !== 'disposed') {
+        if (steps >= this.maxTurns) {
+          this.terminateWithError(new Error('ROUND_RUNTIME_MAX_TURNS'));
           return;
         }
-        if (this.state.turn === this.heroSeat) return;
+        steps++;
 
-        await this.sleepForAi();
-        if (this.isDisposed()) return;
-        const action = decidePlayAction({ state: this.state, playPolicy: this.playPolicy, rng: this.rng });
-        const result = applyPlayStep(this.state, action);
-        this.state = result.state;
-        this.pushApplyResult(result, bucket);
-        this.finishIfSettled(bucket);
-        continue;
+        if (this.currentPhase === 'bidding') {
+          if (!this.bidding || !this.currentDeal) {
+            this.terminateWithError(new Error('BIDDING_STATE_MISSING'));
+            return;
+          }
+          if (this.bidding.phase === 'done') {
+            this.enterPlaying(bucket);
+            continue;
+          }
+          if (this.bidding.phase === 'redeal') {
+            this.redeal(bucket);
+            continue;
+          }
+          if (this.bidding.turn === this.heroSeat) return;
+
+          await this.sleepForAi();
+          if (this.isDisposed()) return;
+          const action = decideBidAction({ bidding: this.bidding, deal: this.currentDeal, bidPolicy: this.bidPolicy });
+          this.bidding = applyBiddingStep(this.bidding, action);
+          this.emit(biddingEvent(action, this.bidding), bucket);
+          continue;
+        }
+
+        if (this.currentPhase === 'playing') {
+          if (!this.state || this.state.phase === GamePhase.Settled) {
+            this.finishIfSettled(bucket);
+            return;
+          }
+          if (this.state.turn === this.heroSeat) return;
+
+          await this.sleepForAi();
+          if (this.isDisposed()) return;
+          const action = decidePlayAction({ state: this.state, playPolicy: this.playPolicy, rng: this.rng });
+          const result = applyPlayStep(this.state, action);
+          this.state = result.state;
+          this.pushApplyResult(result, bucket);
+          this.finishIfSettled(bucket);
+          continue;
+        }
+
+        return;
       }
-
-      return;
+    } catch (error) {
+      this.terminateWithError(error);
     }
   }
 
@@ -281,9 +326,24 @@ class RoundRuntimeImpl implements RoundRuntime {
 
   private emit(event: FlowEvent, bucket?: FlowEvent[]): void {
     if (this.currentPhase === 'disposed') return;
-    this.flowEvents.push(event);
     bucket?.push(event);
-    for (const subscriber of this.subscribers) subscriber(event);
+    if (
+      !this.replayDelivered &&
+      this.subscribers.size === 0 &&
+      this.pendingReplayEvents.length === 0 &&
+      event.type === 'deal'
+    ) {
+      this.pendingReplayEvents.push(event);
+    }
+    for (const subscriber of this.subscribers) this.deliver(subscriber, event);
+  }
+
+  private deliver(subscriber: (event: FlowEvent) => void, event: FlowEvent): void {
+    try {
+      subscriber(event);
+    } catch {
+      // Subscriber failures must not break runtime advancement or other subscribers.
+    }
   }
 
   private pushApplyResult(result: { events: GameEvent[] }, bucket?: FlowEvent[]): void {
@@ -294,13 +354,18 @@ class RoundRuntimeImpl implements RoundRuntime {
   }
 
   private enterPlaying(bucket?: FlowEvent[]): void {
-    if (!this.bidding || this.bidding.landlord === null || !this.currentDeal) return;
+    if (!this.bidding || this.bidding.landlord === null || !this.currentDeal) {
+      this.terminateWithError(new Error('BIDDING_DONE_WITHOUT_LANDLORD'));
+      return;
+    }
     this.bidMultiplier = this.bidding.multiplier;
     this.emit(
       { type: 'landlordDecided', landlord: this.bidding.landlord, bidMultiplier: this.bidding.multiplier },
       bucket,
     );
+    if (this.isDisposed()) return;
     this.state = createPlayingState(this.currentDeal, this.bidding.landlord);
+    if (this.isDisposed()) return;
     this.persist?.({
       round: this.state,
       heroSeat: this.heroSeat,
@@ -314,7 +379,9 @@ class RoundRuntimeImpl implements RoundRuntime {
   private redeal(bucket?: FlowEvent[]): void {
     this.redeals++;
     this.emit({ type: 'redeal', attempt: this.redeals }, bucket);
-    if (this.redeals > DEFAULT_MAX_REDEALS) {
+    if (this.isDisposed()) return;
+    if (this.redeals > this.maxRedeals) {
+      this.currentTerminationReason = 'redealExhausted';
       this.currentPhase = 'disposed';
       return;
     }
@@ -333,13 +400,21 @@ class RoundRuntimeImpl implements RoundRuntime {
       baseScore: this.baseScore,
     });
     this.currentPhase = 'settled';
+    this.currentTerminationReason = 'settled';
     this.settledNotified = true;
     this.emit({ type: 'settled', settlement: this.currentSettlement }, bucket);
+    if (this.isDisposed()) return;
     this.onSettled?.({
       landlord: this.state.landlord,
       winner: win.side,
       settlement: this.currentSettlement,
     });
+  }
+
+  private terminateWithError(_error: unknown): void {
+    if (this.currentTerminationReason === 'settled') return;
+    this.currentTerminationReason = 'error';
+    this.currentPhase = 'disposed';
   }
 }
 
