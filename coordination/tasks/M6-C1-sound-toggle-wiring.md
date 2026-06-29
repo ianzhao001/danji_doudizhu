@@ -1,6 +1,6 @@
 # M6-C1 音效开关写侧接线（消费 M6-L1 audio-gate）
 
-- 状态：blocked（待 M6-L1 入 main；同 `task/M6-editor` 串行 #1，编辑器单写者）
+- 状态：**ready**（依赖 M6-L1 audio-gate 已并入 main `97b0895`；同 `task/M6-editor` 串行 #1，编辑器单写者）
 - 派发模式：编辑器执行者（Cocos Creator 3.8.8·非 worktree·单写者保 scene 一致）
 - 执行分支：`task/M6-editor`（C1→C2→C3→C4 同分支串行）
 - **worktree 路径**：用 `git worktree add ../斗地主.worktrees/M6-editor task/M6-editor` 建新工作树；**不复用**历史残留 `../斗地主.worktrees/M3-editor-integration`（已清理）。
