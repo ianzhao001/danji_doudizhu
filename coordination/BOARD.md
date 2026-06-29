@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批已派发**（26 任务·A 纯逻辑增强 / G 集成硬化 / C 编辑器屏 / R 美术导入 / D 文档·spec 全部入 main，见下「第十一批」）
 
 main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 已收紧为字面量联合）、`flow→data` 零 import。第九批 L1-L4 已全部 `merge --no-ff` 入 main；L5 selfplay 长回归（1..50）待验证（L4 settle 修改已入 main）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**C1-C4 编辑器串行待执行**（依赖 L1/L2/L3 已在 main，C1→C2→C3→C4 串行）。
 
@@ -383,6 +383,60 @@ main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 c
 >   · **设计决策已落定**：为守「不手写 scene/meta」铁律，lobby 设置控件用**组件运行时注入**而非编排进 `lobby.scene`（用户验证认可此路径）；C1 实际未改 scene 资产，仅改两个 cc 组件 `.ts`。
 >   · **`task/M6-editor` 分支+worktree 保留**给 C2/C3/C4 串行续做；worktree 含 Creator 本地噪声（`package.json`/`settings/`，非 C1 deliverable，未入 main）。**C2 启动前须先把该 worktree 同步到 main**（取回 L5/L6 union CueId + C1 merge）。
 >   · 实现方设计决策：为守「不手写 scene/meta」铁律，lobby 设置控件改**组件运行时注入**而非编排进 `lobby.scene`（故 C1 实际未改 scene 资产）——用户已认可此路径（选「先验证再合并」而非「改回场景编排」）。
+
+## 第十一批（发布前打磨 + 单机品质增强 · 大批量派发 · 规划者派发 · 2026-06-29）
+
+> 用户指令「尽可能多派发·不低于历史 2 倍」。26 任务，**每个均锚定真实代码/缺口**（侦察核对：RecordEntry 字段、replay buildTrace/traceSummary、isStrongHand、hint API、settlement、round-runtime L4 修复均已读）。分 A 纯逻辑增强 / G 集成硬化护栏 / C 编辑器屏 / R 美术导入 / D 文档 五轨。**ROADMAP M6 本为最小打磨范围**——Track A/部分 C 标【打磨】（超最小范围、提升 v1 单机品质，**不**引入联网/账号/支付/广告/匹配，守首版范围铁律）；Track G/D + C2-C4 + R 标【核心】。spec 全部入 main（`coordination/tasks/<ID>.md`），各任务 import 直引、不改 `index.ts` 桶（架构合并时统一补桶）。
+
+### A 纯逻辑增强（worktree **并行**·禁 cc·纯 spec·新文件 import 直引）【打磨】
+| ID | 文件域 | 依赖 | 状态 |
+|----|----|----|----|
+| M6-L7-stats-digest | `data/statsDigest.ts`+test | records | ready |
+| M3-40-stats-detail-view | `ui/stats-detail-view.ts`+test | L7 | ready（L7 入 main 后） |
+| M6-L8-records-query | `data/recordsQuery.ts`+test | records | ready |
+| M3-41-records-detail-view | `ui/records-detail-view.ts`+test | L8 | ready（L8 后） |
+| M6-L9-hint-ranking | `ai/hintRank.ts`+test | hint/rules | ready |
+| M3-42-help-content | `ui/help-content.ts`+test | RULES.md | ready |
+| M6-L10-bidding-advisor | `ai/bidding-advisor.ts`+test | bidding.isStrongHand | ready |
+| M3-43-bidding-advice-view | `ui/bidding-advice-view.ts`+test | L10 | ready（L10 后） |
+| M6-L11-trick-replay | `game/trick-replay.ts`+test | replay/events | ready |
+| M3-44-replay-view | `ui/replay-view.ts`+test | L11 | ready（L11 后） |
+| M6-L12-pause-menu | `ui/pause-menu.ts`+test | — | ready |
+
+### G 集成/硬化护栏（worktree **并行**·禁 cc·绿护栏·不改产品码）【核心】
+| ID | 文件域 | 状态 |
+|----|----|----|
+| M6-G9-save-resume-e2e | `test/integration/save-resume-e2e.test.ts`（新目录） | ready |
+| M6-G10-multiplier-stacking | `test/game/multiplier-stacking.test.ts` | ready |
+| M6-G11-runtime-resume-phases | `test/flow/runtime-resume-phases.test.ts` | ready |
+| M6-G12-ai-no-starve | `test/selfplay/ai-no-starve.test.ts`（可复用 runner helper） | ready |
+
+### C 编辑器/UI（**串行单写者** `task/M6-editor`·需 Cocos Creator）【C2-C4 核心·M3-45/46 打磨】
+| ID | 文件域 | 依赖 | 状态 |
+|----|----|----|----|
+| M6-C2-animation-wiring | `game-scene-skeleton`+`game.scene` | C1✓·L2✓ | ready（启动前同步 main） |
+| M6-C3-mobile-regression | `game.scene`+`lobby.scene`+`game-scene-skeleton`+report | C2·L3✓ | blocked（待 C2） |
+| M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | blocked（待 C3） |
+| M3-45-stats-records-screens | scene+新 cc 组件 | L7/L8/M3-40/41 | blocked（待视图 + 编辑器档期） |
+| M3-46-help-pause-overlays | scene+新 cc 组件 | M3-42/L12 | blocked（待视图 + 编辑器档期） |
+
+### R 美术导入（编辑器·**gated 待用户视觉终审**·照 M3-29 流程）【核心·依赖用户】
+| ID | 文件域 | 状态 |
+|----|----|----|
+| ART-IMPORT-02-avatars | `assets/resources/art/avatars/`+`asset-keys.ts`+.meta | blocked（待用户认可 ART-02） |
+| ART-IMPORT-03-ui | `assets/resources/art/ui/`+`asset-keys.ts`+.meta | blocked（待用户认可 ART-03） |
+| ART-IMPORT-04-cards | `assets/resources/art/cards/`+`asset-keys.ts`+.meta | blocked（待用户认可 ART-04·card-template 命名对齐） |
+
+### D 文档（架构/文档执行者·改 docs）【核心】
+| ID | 文件域 | 状态 |
+|----|----|----|
+| M6-D1-release-docs | `docs/*`+BOARD | blocked（待所有轨 merge·架构收尾） |
+| M6-D2-qa-checklist-refresh | `docs/QA_CHECKLIST.md`+report | ready |
+| M6-D3-roadmap-update | `docs/ROADMAP.md`+report | ready |
+
+> **文件域不相交核对**：A 各为新 `data/`/`ai/`/`game/`/`ui/` 文件 + 新 test（两两不碰，可全并行）；G 各为新 test 文件（含新 `test/integration/`）；C 共享 scene/keystone 故串行单写者；R 各为不同 `assets/resources/` 子目录（共改 `asset-keys.ts` → 串行 merge 或架构合并时并行解）；D 各为不同 docs。A↔G↔D 与在跑的 C/R **不相交**。
+> **派发顺序建议**：第一波并行 A 的 6 个无依赖项（L7/L8/L9/L10/L11/L12/M3-42）+ G 全部 4 个 + D2/D3；第二波 A 的视图层（M3-40/41/43/44，待各自 L 入 main）；C 走编辑器串行（C2 先，启动前同步 main）；R 待用户视觉终审逐个解锁。
+> **桶导出**：所有新模块按 spec import 直引、不改 `index.ts`；架构在合并整合步统一补桶（沿用第六批先例）。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
