@@ -5,11 +5,13 @@
 
 export * from './stats';
 export * from './statsCodec';
+export * from './statsDigest';
 export * from './settings';
 export * from './settingsCodec';
 export * from './settingsStorage';
 export * from './save';
 export * from './saveStorage';
 export * from './records';
+export * from './recordsQuery';
 export * from './difficultyConfig';
 export * from './aggregate';
