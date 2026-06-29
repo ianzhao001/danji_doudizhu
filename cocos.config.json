@@ -2,6 +2,14 @@
     "scene": {
         "tick": false
     },
+    "builder": {
+        "common": {
+            "platform": "web-mobile",
+            "buildPath": "project://build",
+            "outputName": "web-mobile",
+            "mainBundleCompressionType": "merge_dep"
+        }
+    },
     "version": "1.0.0",
     "$schema": "./temp/cocos.config.schema.json"
 }
