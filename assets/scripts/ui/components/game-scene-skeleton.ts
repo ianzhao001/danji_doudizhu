@@ -36,6 +36,7 @@ import { decideCuePlayback } from '../audio-gate';
 import { dealCardDelay, playFlyFromTo, pulseParams } from '../animation-params';
 import { clearSelection, isSelected, toggle } from '../selection';
 import { deriveScreenVM } from '../screen-view';
+import type { Rect, TableRegions } from '../table-layout';
 import { toggleSetting, type ToggleKey } from '../settings-view';
 import { RESOURCE_PATHS, cardAssetPath, cueAudioPath } from '../asset-keys';
 
@@ -136,6 +137,7 @@ export class GameSceneSkeleton extends Component {
   private lastHandSignature = '';
   private lastPlayAreaSignature = '';
   private renderedSelectedCardKeys = new Set<string>();
+  private liveRenderNodes: Set<Node> | null = null;
 
   onLoad(): void {
     this.loadSprite(RESOURCE_PATHS.gameTableBg, this.background);
@@ -216,71 +218,100 @@ export class GameSceneSkeleton extends Component {
       this.selected = this.selected.filter((selected) => snapshot.viewerHand?.some((card) => sameCard(card, selected)));
     }
 
-    const width = this.canvasSize().width;
-    const handWidth = Math.max(1, width - 32);
+    const canvas = this.canvasSize();
     const vm = deriveScreenVM({
       snapshot,
       bidding,
       heroSeat: HERO_SEAT,
       selectedCards: this.selected,
       recentEvents: this.recentEvents,
-      layoutOpts: { containerWidth: handWidth, cardWidth: CARD_SIZE.width, liftOffset: HAND_LIFT },
+      layoutOpts: {
+        containerWidth: canvas.width,
+        containerHeight: canvas.height,
+        cardWidth: CARD_SIZE.width,
+        liftOffset: HAND_LIFT,
+      },
       settlement,
     });
 
-    this.clearNode(this.uiRoot);
-
-    this.renderTopBar(this.runtime.phase(), vm.topBar, snapshot?.viewerHand?.length ?? 0);
-    this.renderRuntimeSettings();
-    this.renderSeats(snapshot?.handCounts ?? [0, 0, 0], snapshot?.landlord ?? null);
-    this.renderPlayArea(snapshot?.top ?? null);
-    this.renderBidding(bidding ? vm.bidding : undefined);
-    this.renderHand(vm.hand, handWidth);
-    this.renderStatus(this.statusText || (this.runtime.isPlayerTurn() ? '轮到你' : '等待'));
-    this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint);
-    this.renderResult(vm.result);
+    this.beginRenderDiff();
+    this.renderTopBar(this.runtime.phase(), vm.topBar, snapshot?.viewerHand?.length ?? 0, vm.layout, canvas);
+    this.renderRuntimeSettings(vm.layout, canvas);
+    this.renderSeats(snapshot?.handCounts ?? [0, 0, 0], snapshot?.landlord ?? null, vm.layout, canvas);
+    this.renderPlayArea(snapshot?.top ?? null, vm.layout, canvas);
+    this.renderBidding(bidding ? vm.bidding : undefined, vm.layout, canvas);
+    this.renderHand(vm.hand, vm.layout, canvas);
+    this.renderStatus(this.statusText || (this.runtime.isPlayerTurn() ? '轮到你' : '等待'), vm.layout, canvas);
+    this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, vm.layout, canvas);
+    this.renderResult(vm.result, canvas);
+    this.endRenderDiff();
   }
 
-  private renderTopBar(phase: string, topBar: { multiplier: number; bombs: number; landlordSeat: number }, handCount: number): void {
-    this.addLabel(phase, 0, 382, 18, this.uiRoot!, 140, 30);
-    this.addLabel(`地主 ${topBar.landlordSeat + 1}`, -128, 350, 16, this.uiRoot!, 110, 30);
-    this.addLabel(`倍数 ×${topBar.multiplier}`, 0, 350, 16, this.uiRoot!, 110, 30);
-    this.addLabel(`手牌 ${handCount}`, 128, 350, 16, this.uiRoot!, 110, 30);
+  private renderTopBar(
+    phase: string,
+    topBar: { multiplier: number; bombs: number; landlordSeat: number },
+    handCount: number,
+    layout: TableRegions,
+    canvas: { width: number; height: number },
+  ): void {
+    const phasePos = this.rectPoint(layout.topBar, canvas, 0.5, 0.625);
+    const infoY = layout.topBar.y + layout.topBar.height + 8;
+    const landlordPos = this.screenPoint(canvas, canvas.width / 6, infoY);
+    const multiplierPos = this.screenPoint(canvas, canvas.width / 2, infoY);
+    const handPos = this.screenPoint(canvas, (canvas.width * 5) / 6, infoY);
+    this.addLabel(phase, phasePos.x, phasePos.y, 18, this.uiRoot!, 140, 30, 'top-phase');
+    this.addLabel(`地主 ${topBar.landlordSeat + 1}`, landlordPos.x, landlordPos.y, 16, this.uiRoot!, 110, 30, 'top-landlord');
+    this.addLabel(`倍数 ×${topBar.multiplier}`, multiplierPos.x, multiplierPos.y, 16, this.uiRoot!, 110, 30, 'top-multiplier');
+    this.addLabel(`手牌 ${handCount}`, handPos.x, handPos.y, 16, this.uiRoot!, 110, 30, 'top-hand-count');
   }
 
-  private renderRuntimeSettings(): void {
+  private renderRuntimeSettings(layout: TableRegions, canvas: { width: number; height: number }): void {
     const settings = this.reloadSettings();
-    const controls: { key: ToggleKey; label: string; on: boolean; x: number }[] = [
-      { key: 'sound', label: '音效', on: settings.sound, x: -108 },
-      { key: 'animation', label: '动效', on: settings.animation, x: 0 },
-      { key: 'vibration', label: '震动', on: settings.vibration, x: 108 },
+    const controls: { key: ToggleKey; label: string; on: boolean; fx: number }[] = [
+      { key: 'sound', label: '音效', on: settings.sound, fx: 0.22 },
+      { key: 'animation', label: '动效', on: settings.animation, fx: 0.5 },
+      { key: 'vibration', label: '震动', on: settings.vibration, fx: 0.78 },
     ];
+    const y = layout.opponentLeft.y + layout.opponentLeft.height * 0.35;
     for (const control of controls) {
+      const pos = this.screenPoint(canvas, canvas.width * control.fx, y);
       this.addButton(
         `${control.label}${control.on ? '开' : '关'}`,
-        control.x,
-        314,
+        pos.x,
+        pos.y,
         88,
         32,
         true,
         () => this.toggleRuntimeSetting(control.key),
+        this.uiRoot!,
+        `setting-${control.key}`,
       );
     }
   }
 
-  private renderSeats(handCounts: [number, number, number], landlord: number | null): void {
-    this.addLabel(`AI 左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, -132, 158, 16, this.uiRoot!, 108, 64);
-    this.addLabel(`AI 右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, 132, 158, 16, this.uiRoot!, 108, 64);
+  private renderSeats(
+    handCounts: [number, number, number],
+    landlord: number | null,
+    layout: TableRegions,
+    canvas: { width: number; height: number },
+  ): void {
+    const left = this.rectPoint(layout.playArea, canvas, 0.06, 0.24);
+    const right = this.rectPoint(layout.playArea, canvas, 0.94, 0.24);
+    this.addLabel(`AI 左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, left.x, left.y, 16, this.uiRoot!, 108, 64, 'seat-left');
+    this.addLabel(`AI 右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, right.x, right.y, 16, this.uiRoot!, 108, 64, 'seat-right');
   }
 
-  private renderPlayArea(top: TopPlay | null): void {
+  private renderPlayArea(top: TopPlay | null, layout: TableRegions, canvas: { width: number; height: number }): void {
     const area = this.ensureNode('play-area-runtime', this.uiRoot!);
     this.playAreaRoot = area;
-    area.setPosition(0, 62, 0);
-    this.addUiTransform(area, 250, 112);
+    const pos = this.rectPoint(layout.playArea, canvas, 0.5, 0.78);
+    const width = Math.min(250, Math.max(170, layout.playArea.width - 42));
+    const height = Math.min(112, Math.max(86, layout.playArea.height * 0.62));
+    area.setPosition(pos.x, pos.y, 0);
+    this.addUiTransform(area, width, height);
 
     const labelText = top ? `座位${top.seat + 1}` : '自由出牌';
-    const label = this.addLabel(`出牌区\n${labelText}`, 0, 34, 18, area, 170, 48);
+    const label = this.addLabel(`出牌区\n${labelText}`, 0, 34, 18, area, 170, 48, 'play-area-label');
     label.lineHeight = 28;
     if (!top) {
       this.lastPlayAreaSignature = '';
@@ -291,7 +322,7 @@ export class GameSceneSkeleton extends Component {
     const signature = `${top.seat}:${cardsSignature(cards)}`;
     const animate = this.settings.animation && signature !== this.lastPlayAreaSignature;
     this.lastPlayAreaSignature = signature;
-    const maxWidth = 224;
+    const maxWidth = Math.max(120, width - 26);
     const spacing = cards.length <= 1 ? 0 : Math.min(34, (maxWidth - CARD_SIZE.width) / (cards.length - 1));
     const startX = -((cards.length - 1) * spacing) / 2;
     cards.forEach((card, index) => {
@@ -300,27 +331,43 @@ export class GameSceneSkeleton extends Component {
     });
   }
 
-  private renderBidding(bidding: ReturnType<typeof deriveScreenVM>['bidding']): void {
+  private renderBidding(
+    bidding: ReturnType<typeof deriveScreenVM>['bidding'],
+    layout: TableRegions,
+    canvas: { width: number; height: number },
+  ): void {
     if (!bidding) return;
-    this.addLabel(bidding.prompt, 0, -132, 18);
+    const promptY = Math.max(layout.playArea.y + layout.playArea.height + 16, layout.actionButtons.y - 50);
+    const prompt = this.screenPoint(canvas, canvas.width / 2, promptY);
+    this.addLabel(bidding.prompt, prompt.x, prompt.y, 18, this.uiRoot!, 220, 72, 'bidding-prompt');
     bidding.buttons.forEach((button, index) => {
-      const spacing = 118;
-      const x = (index - (bidding.buttons.length - 1) / 2) * spacing;
-      this.addButton(button.label, x, -180, 112, 42, button.enabled, () => {
+      const spacing = Math.min(118, layout.actionButtons.width / Math.max(1, bidding.buttons.length));
+      const screenX = layout.actionButtons.x + layout.actionButtons.width / 2 + (index - (bidding.buttons.length - 1) / 2) * spacing;
+      const screenY = layout.actionButtons.y + Math.min(12, layout.actionButtons.height * 0.2);
+      const pos = this.screenPoint(canvas, screenX, screenY);
+      this.addButton(button.label, pos.x, pos.y, 112, 42, button.enabled, () => {
         if (!button.enabled) return;
         void this.submitBid(button.id);
-      });
+      }, this.uiRoot!, `bid-${button.id}`);
     });
   }
 
-  private renderHand(hand: ReturnType<typeof deriveScreenVM>['hand'], containerWidth: number): void {
-    this.addLabel('玩家手牌', 0, -286, 16, this.uiRoot!, 140, 30);
+  private renderHand(
+    hand: ReturnType<typeof deriveScreenVM>['hand'],
+    layout: TableRegions,
+    canvas: { width: number; height: number },
+  ): void {
+    const title = this.screenPoint(canvas, canvas.width / 2, layout.playerHand.y + Math.min(24, layout.playerHand.height * 0.15));
+    this.addLabel('玩家手牌', title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title');
     const handSignature = cardsSignature(hand.map((slot) => slot.card));
     const animateDeal = this.settings.animation && handSignature !== this.lastHandSignature;
     const nextSelectedKeys = new Set<string>();
+    const containerWidth = Math.max(1, layout.playerHand.width);
+    const handTopY = layout.playerHand.y + Math.min(74, layout.playerHand.height * 0.46);
     hand.forEach((slot, index) => {
-      const x = slot.x + CARD_SIZE.width / 2 - containerWidth / 2;
-      const y = -336 - slot.y;
+      const screenX = layout.playerHand.x + slot.x + CARD_SIZE.width / 2;
+      const screenY = handTopY + slot.y;
+      const { x, y } = this.screenPoint(canvas, screenX, screenY);
       this.addCard(slot.card, x, y, slot.selected, index, hand.length, animateDeal);
       if (slot.selected) nextSelectedKeys.add(cardKey(slot.card));
     });
@@ -328,30 +375,43 @@ export class GameSceneSkeleton extends Component {
     this.renderedSelectedCardKeys = nextSelectedKeys;
   }
 
-  private renderActions(play: boolean, pass: boolean, hint: boolean): void {
-    this.addButton('出牌', -112, -232, 84, 38, play, () => void this.submitPlay());
-    this.addButton('不要', 0, -232, 84, 38, pass, () => void this.submitPass());
-    this.addButton('提示', 112, -232, 84, 38, hint, () => this.applyHint());
+  private renderActions(
+    play: boolean,
+    pass: boolean,
+    hint: boolean,
+    layout: TableRegions,
+    canvas: { width: number; height: number },
+  ): void {
+    const y = layout.actionButtons.y + layout.actionButtons.height * 0.78;
+    const playPos = this.screenPoint(canvas, layout.actionButtons.x + layout.actionButtons.width * 0.1, y);
+    const passPos = this.screenPoint(canvas, layout.actionButtons.x + layout.actionButtons.width * 0.5, y);
+    const hintPos = this.screenPoint(canvas, layout.actionButtons.x + layout.actionButtons.width * 0.9, y);
+    this.addButton('出牌', playPos.x, playPos.y, 84, 38, play, () => void this.submitPlay(), this.uiRoot!, 'action-play');
+    this.addButton('不要', passPos.x, passPos.y, 84, 38, pass, () => void this.submitPass(), this.uiRoot!, 'action-pass');
+    this.addButton('提示', hintPos.x, hintPos.y, 84, 38, hint, () => this.applyHint(), this.uiRoot!, 'action-hint');
   }
 
-  private renderStatus(text: string): void {
-    this.addLabel(text, 0, -264, 18, this.uiRoot!, 180, 32);
+  private renderStatus(text: string, layout: TableRegions, canvas: { width: number; height: number }): void {
+    const pos = this.screenPoint(canvas, canvas.width / 2, layout.playerHand.y + 2);
+    this.addLabel(text, pos.x, pos.y, 18, this.uiRoot!, 180, 32, 'status-label');
   }
 
-  private renderResult(result: ReturnType<typeof deriveScreenVM>['result']): void {
+  private renderResult(result: ReturnType<typeof deriveScreenVM>['result'], canvas: { width: number; height: number }): void {
     if (!result) return;
     const panel = this.ensureNode('settlement-panel-runtime', this.uiRoot!);
-    panel.setPosition(0, 4, 0);
+    panel.setPosition(0, Math.round(canvas.height * 0.005), 0);
     panel.setScale(1, 1, 1);
-    this.addUiTransform(panel, 330, 420);
-    const sprite = panel.addComponent(Sprite);
+    const panelWidth = Math.min(330, Math.max(280, canvas.width - 60));
+    const panelHeight = Math.min(420, Math.max(360, canvas.height - 220));
+    this.addUiTransform(panel, panelWidth, panelHeight);
+    const sprite = panel.getComponent(Sprite) ?? panel.addComponent(Sprite);
     this.loadSprite(RESOURCE_PATHS.settlementBg, sprite);
-    this.addLabel(result.resultText, 0, 150, 34, panel);
-    this.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, 92, 20, panel);
-    this.addLabel(result.springText || '本局结算', 0, 50, 18, panel);
-    this.addLabel(result.scores.map((row) => `座位${row.seat + 1}${row.isLandlord ? '(地主)' : ''}: ${row.score}`).join('\n'), 0, -34, 18, panel);
-    this.addButton('再来一局', -74, -154, 116, 42, true, () => this.startGame(true), panel);
-    this.addButton('返回大厅', 74, -154, 116, 42, true, () => director.loadScene('lobby'), panel);
+    this.addLabel(result.resultText, 0, panelHeight * 0.36, 34, panel, 220, 72, 'result-title');
+    this.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.22, 20, panel, 240, 40, 'result-multiplier');
+    this.addLabel(result.springText || '本局结算', 0, panelHeight * 0.12, 18, panel, 240, 40, 'result-spring');
+    this.addLabel(result.scores.map((row) => `座位${row.seat + 1}${row.isLandlord ? '(地主)' : ''}: ${row.score}`).join('\n'), 0, -panelHeight * 0.08, 18, panel, 260, 120, 'result-scores');
+    this.addButton('再来一局', -74, -panelHeight * 0.37, 116, 42, true, () => this.startGame(true), panel, 'result-new');
+    this.addButton('返回大厅', 74, -panelHeight * 0.37, 116, 42, true, () => director.loadScene('lobby'), panel, 'result-lobby');
     if (this.settings.animation) this.animateScaleIn(panel, 0.92, 180);
   }
 
@@ -435,12 +495,13 @@ export class GameSceneSkeleton extends Component {
     const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
     opacity.opacity = 255;
     this.addUiTransform(node, CARD_SIZE.width, CARD_SIZE.height);
-    const sprite = node.addComponent(Sprite);
+    const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
     const view = cardView(card);
     this.loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite);
+    node.off(Node.EventType.TOUCH_END);
     if (interactive) node.on(Node.EventType.TOUCH_END, () => this.toggleCard(card), this);
 
-    const label = this.addLabel(`${view.rankLabel}${suitText(view.suitKey)}`, -12, 18, 10, node, 30, 18);
+    const label = this.addLabel(`${view.rankLabel}${suitText(view.suitKey)}`, -12, 18, 10, node, 30, 18, 'card-rank-label');
     label.color =
       view.suitKey === Suit.Heart || view.suitKey === Suit.Diamond
         ? new Color(205, 96, 124, 255)
@@ -489,11 +550,12 @@ export class GameSceneSkeleton extends Component {
     enabled: boolean,
     cb: () => void,
     parent: Node = this.uiRoot!,
+    name?: string,
   ): Label {
-    const node = this.ensureNode(`button-${text}-${x}-${y}`, parent);
+    const node = this.ensureNode(name ?? `button-${text}-${x}-${y}`, parent);
     node.setPosition(x, y, 0);
     this.addUiTransform(node, width, height);
-    const button = node.addComponent(Button);
+    const button = node.getComponent(Button) ?? node.addComponent(Button);
     button.target = this.drawButtonBackground(node, width, height, enabled);
     button.transition = Button.Transition.COLOR;
     button.interactable = enabled;
@@ -501,11 +563,12 @@ export class GameSceneSkeleton extends Component {
     button.pressedColor = new Color(255, 214, 226, 150);
     button.hoverColor = new Color(255, 255, 255, 100);
     button.disabledColor = new Color(255, 255, 255, 24);
+    node.off(Button.EventType.CLICK);
     node.on(Button.EventType.CLICK, cb, this);
 
     const labelNode = this.ensureNode('button-label', node);
     this.addUiTransform(labelNode, width, height);
-    const label = labelNode.addComponent(Label);
+    const label = labelNode.getComponent(Label) ?? labelNode.addComponent(Label);
     label.string = text;
     label.fontSize = 20;
     label.lineHeight = 24;
@@ -523,11 +586,12 @@ export class GameSceneSkeleton extends Component {
     parent: Node = this.uiRoot!,
     width = 220,
     height = 72,
+    name?: string,
   ): Label {
-    const node = this.ensureNode(`label-${text}-${x}-${y}`, parent);
+    const node = this.ensureNode(name ?? `label-${text}-${x}-${y}`, parent);
     node.setPosition(x, y, 0);
     this.addUiTransform(node, width, height);
-    const label = node.addComponent(Label);
+    const label = node.getComponent(Label) ?? node.addComponent(Label);
     label.string = text;
     label.fontSize = fontSize;
     label.lineHeight = fontSize + 5;
@@ -613,6 +677,7 @@ export class GameSceneSkeleton extends Component {
       existing.active = true;
       existing.layer = parent.layer;
       existing.setSiblingIndex(parent.children.length - 1);
+      this.liveRenderNodes?.add(existing);
       return existing;
     }
     const node = new Node(name);
@@ -620,13 +685,29 @@ export class GameSceneSkeleton extends Component {
     node.layer = parent.layer;
     node.active = true;
     node.setSiblingIndex(parent.children.length - 1);
+    this.liveRenderNodes?.add(node);
     return node;
   }
 
-  private clearNode(node: Node): void {
-    for (const child of node.children.slice()) {
-      child.removeFromParent();
-      child.destroy();
+  private beginRenderDiff(): void {
+    this.liveRenderNodes = new Set<Node>();
+  }
+
+  private endRenderDiff(): void {
+    if (this.uiRoot && this.liveRenderNodes) this.pruneInactiveChildren(this.uiRoot);
+    this.liveRenderNodes = null;
+  }
+
+  private pruneInactiveChildren(parent: Node): void {
+    const live = this.liveRenderNodes;
+    if (!live) return;
+    for (const child of parent.children.slice()) {
+      if (!live.has(child)) {
+        child.removeFromParent();
+        child.destroy();
+      } else {
+        this.pruneInactiveChildren(child);
+      }
     }
   }
 
@@ -640,7 +721,7 @@ export class GameSceneSkeleton extends Component {
   private drawButtonBackground(parent: Node, width: number, height: number, enabled: boolean): Node {
     const node = this.ensureNode('button-bg', parent);
     this.addUiTransform(node, width, height);
-    const graphics = node.addComponent(Graphics);
+    const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
     graphics.clear();
     graphics.fillColor = enabled ? new Color(255, 255, 255, 70) : new Color(255, 255, 255, 30);
     graphics.roundRect(-width / 2, -height / 2, width, height, 8);
@@ -659,6 +740,17 @@ export class GameSceneSkeleton extends Component {
     return {
       width: Math.max(1, size?.width ?? 390),
       height: Math.max(1, size?.height ?? 844),
+    };
+  }
+
+  private rectPoint(rect: Rect, canvas: { width: number; height: number }, fx: number, fy: number): { x: number; y: number } {
+    return this.screenPoint(canvas, rect.x + rect.width * fx, rect.y + rect.height * fy);
+  }
+
+  private screenPoint(canvas: { width: number; height: number }, screenX: number, screenY: number): { x: number; y: number } {
+    return {
+      x: Math.round(screenX - canvas.width / 2),
+      y: Math.round(canvas.height / 2 - screenY),
     };
   }
 
