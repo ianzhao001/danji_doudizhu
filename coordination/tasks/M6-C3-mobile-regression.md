@@ -1,6 +1,7 @@
 # M6-C3 移动端回归 + 渲染性能（消费 M6-L3 · 串行于 C2 之后）
 
-- 状态：blocked（待 M6-L3 + M6-C2 入 main；同 `task/M6-editor` 串行 #3，编辑器单写者）
+- 状态：**⚠️ 已拆分·勿直接认领**——按执行者建议#3 拆为 **M6-C3a（场景 SafeArea/ResolutionPolicy + 6 截图 + M3-36 闭合）** + **M6-C3b（渲染层相对布局 + render 差分）**，降低单任务审查/回归面。本文件保留为背景参考，实际派发用 C3a/C3b。
+- 〔原状态〕blocked（待 M6-L3 + M6-C2 入 main；同 `task/M6-editor` 串行 #3，编辑器单写者）
 - 派发模式：编辑器执行者（Cocos Creator 3.8.8·非 worktree·单写者）
 - 执行分支：`task/M6-editor`
 - **worktree 路径**：与 C1/C2 同一 `task/M6-editor` 工作树（`../斗地主.worktrees/M6-editor`），串行于 C2 之后；不复用历史残留目录。

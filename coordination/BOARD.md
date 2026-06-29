@@ -2,9 +2,9 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批已派发**（26 任务·A 纯逻辑增强 / G 集成硬化 / C 编辑器屏 / R 美术导入 / D 文档·spec 全部入 main，见下「第十一批」）
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批进行中**：A 线纯逻辑 7（L7-L12+M3-42）+ G 4（G9-G12）+ D2/D3 ✅ 已并 main（103 文件/507 绿）；M3-40/41/43/44 解锁 ready；C2 in-review 待 Creator；R 待用户视觉终审；C3 已拆 C3a/C3b；新增桶整合 M6-I1（见下「第十一批」+「验收记录」） · **第十二批已派发**（18 任务·P AI 纵深 / V 视图 / L 文案 / G 护栏 / C 编辑器 / D 文档 / R 美术·spec 全部入 main，见下「第十二批」） · **第十三批已派发**（10 任务·AI 模块组合/平衡度量/回放编码/剩余视图·见下「第十三批」·纯逻辑尾部）
 
-main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 已收紧为字面量联合）、`flow→data` 零 import。第九批 L1-L4 已全部 `merge --no-ff` 入 main；L5 selfplay 长回归（1..50）待验证（L4 settle 修改已入 main）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**C1-C4 编辑器串行待执行**（依赖 L1/L2/L3 已在 main，C1→C2→C3→C4 串行）。
+main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 字面量联合）、`flow→data` 零 import；第十一/十二/十三批纯逻辑尾部与 M6-I1 桶导出已并 main（最新 `7c7b427`）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**编辑器/美术线继续按 gate 串行**：C2 仍待 Creator 3.8.8 验证；ART-IMPORT/ART-05 仍待用户视觉终审；M6-D5 按计划延后到编辑器功能基本稳定后补。
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
@@ -317,16 +317,16 @@ main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 c
 | M6-L2-animation-params | cue→tween 参数纯映射表 | `ui/animation-params.ts`+`index.ts`+test | **done `7d93e65`**（7/7 绿·桶冲突串行解） |
 | M6-L3-table-layout-resolutions | tableLayout 参数化+多分辨率 sweep | `ui/table-layout.ts`+`screen-view.ts`+test | **done `99d13b8`**（15/15 绿·兼容性铁律） |
 | M6-L4-round-runtime-exceptions | resume-to-settled/redead 超限/bidding reason | `flow/round-runtime.ts`+`game/bidding.ts`+test | **done `c08de19`**（5/5 绿·+1 行 settle 投影） |
-| M6-L5-selfplay-long | selfplay seeds 1..50 回归护栏 | `test/selfplay/selfplay-long.test.ts` | **ready**（第十批·L4 已 merge 解锁） |
-| M6-L6-cue-id-union | CueId string→字面量联合 + cue 一致性绿护栏 | `ui/event-cues.ts`+`test/ui/cue-id-consistency.test.ts` | **ready**（第十批·优化任务书·L1/L2 已 merge） |
+| M6-L5-selfplay-long | selfplay seeds 1..50 回归护栏 | `test/selfplay/selfplay-long.test.ts` | **done `20af2e9`**（第十批已并 main） |
+| M6-L6-cue-id-union | CueId string→字面量联合 + cue 一致性绿护栏 | `ui/event-cues.ts`+`test/ui/cue-id-consistency.test.ts` | **done `4c840ed`**（第十批已并 main） |
 
-#### B-2 CC 接线/编辑器/构建串行单写者组（`task/M6-editor` · C1→C2→C3→C4）
-
-| ID | 任务 | 文件域 | 状态 |
+#### B-2 CC 接线/编辑器/构建串行单写者组（`task/M6-editor`）
+> **⚠️ 历史存档（勿据此认领）**——C2-C4 的**当前**状态以「第十一批 › C 编辑器/UI」表 + 各批验收记录为准（采纳建议#1 统一状态源）：**C1 done · C2 in-review 待 Creator · C3 已拆 C3a/C3b · C4 待 C3a/b**。下表为批9 派发时快照，仅留档。
+| ID | 任务 | 文件域 | 状态（当前·见上） |
 |----|----|----|----|
-| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | **done `31b5668`**（用户 Creator 验证过） |
-| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | **ready**（C1 已入 main·消费 L2 已在 main） |
-| M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | `game.scene`+`lobby.scene`+`game-scene-skeleton`+report | blocked（待 C2+L3） |
+| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | **done `31b5668`** |
+| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | **in-review** 待 Creator（`08d0188`·实现完成·缺截图） |
+| M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | — | **已拆 → C3a + C3b**（见第十一批 C 表） |
 | M6-C4-build-verification | 构建验证+发布验收记录 | `cocos.config.json`+report | blocked（待 C1-C3） |
 | M6-D1-release-docs | 发布/QA 文档收尾（架构·非派发） | `docs/*`+`BOARD.md` | blocked（待所有轨） |
 
@@ -389,54 +389,156 @@ main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 c
 > 用户指令「尽可能多派发·不低于历史 2 倍」。26 任务，**每个均锚定真实代码/缺口**（侦察核对：RecordEntry 字段、replay buildTrace/traceSummary、isStrongHand、hint API、settlement、round-runtime L4 修复均已读）。分 A 纯逻辑增强 / G 集成硬化护栏 / C 编辑器屏 / R 美术导入 / D 文档 五轨。**ROADMAP M6 本为最小打磨范围**——Track A/部分 C 标【打磨】（超最小范围、提升 v1 单机品质，**不**引入联网/账号/支付/广告/匹配，守首版范围铁律）；Track G/D + C2-C4 + R 标【核心】。spec 全部入 main（`coordination/tasks/<ID>.md`），各任务 import 直引、不改 `index.ts` 桶（架构合并时统一补桶）。
 
 ### A 纯逻辑增强（worktree **并行**·禁 cc·纯 spec·新文件 import 直引）【打磨】
+> 状态表达硬化（采纳建议#1）：依赖型任务用 `blocked: 待 Lx merge`，dep 入 main 后才翻 `ready`，避免实现方见 ready 提前起分支致重复 rebase/API 漂移。
 | ID | 文件域 | 依赖 | 状态 |
 |----|----|----|----|
-| M6-L7-stats-digest | `data/statsDigest.ts`+test | records | ready |
-| M3-40-stats-detail-view | `ui/stats-detail-view.ts`+test | L7 | ready（L7 入 main 后） |
-| M6-L8-records-query | `data/recordsQuery.ts`+test | records | ready |
-| M3-41-records-detail-view | `ui/records-detail-view.ts`+test | L8 | ready（L8 后） |
-| M6-L9-hint-ranking | `ai/hintRank.ts`+test | hint/rules | ready |
-| M3-42-help-content | `ui/help-content.ts`+test | RULES.md | ready |
-| M6-L10-bidding-advisor | `ai/bidding-advisor.ts`+test | bidding.isStrongHand | ready |
-| M3-43-bidding-advice-view | `ui/bidding-advice-view.ts`+test | L10 | ready（L10 后） |
-| M6-L11-trick-replay | `game/trick-replay.ts`+test | replay/events | ready |
-| M3-44-replay-view | `ui/replay-view.ts`+test | L11 | ready（L11 后） |
-| M6-L12-pause-menu | `ui/pause-menu.ts`+test | — | ready |
+| M6-L7-stats-digest | `data/statsDigest.ts`+test | records | **done `<批11>`** |
+| M6-L8-records-query | `data/recordsQuery.ts`+test | records | **done** |
+| M6-L9-hint-ranking | `ai/hintRank.ts`+test | hint/rules/_shared.compareMoves | **done** |
+| M3-42-help-content | `ui/help-content.ts`+test | RULES.md | **done** |
+| M6-L10-bidding-advisor | `ai/bidding-advisor.ts`+test | bidding.isStrongHand | **done** |
+| M6-L11-trick-replay | `game/trick-replay.ts`+test | replay/events | **done** |
+| M6-L12-pause-menu | `ui/pause-menu.ts`+test | — | **done** |
+| M3-40-stats-detail-view | `ui/stats-detail-view.ts`+test | L7 | **done**（并 main·第一波） |
+| M3-41-records-detail-view | `ui/records-detail-view.ts`+test | L8 | **done**（并 main·第一波） |
+| M3-43-bidding-advice-view | `ui/bidding-advice-view.ts`+test | L10 | **done**（并 main·第一波） |
+| M3-44-replay-view | `ui/replay-view.ts`+test | L11 | **done**（并 main·第一波） |
 
 ### G 集成/硬化护栏（worktree **并行**·禁 cc·绿护栏·不改产品码）【核心】
 | ID | 文件域 | 状态 |
 |----|----|----|
-| M6-G9-save-resume-e2e | `test/integration/save-resume-e2e.test.ts`（新目录） | ready |
-| M6-G10-multiplier-stacking | `test/game/multiplier-stacking.test.ts` | ready |
-| M6-G11-runtime-resume-phases | `test/flow/runtime-resume-phases.test.ts` | ready |
-| M6-G12-ai-no-starve | `test/selfplay/ai-no-starve.test.ts`（可复用 runner helper） | ready |
+| M6-G9-save-resume-e2e | `test/integration/save-resume-e2e.test.ts`（新目录） | **done**（端到端·零和·aggregate） |
+| M6-G10-multiplier-stacking | `test/game/multiplier-stacking.test.ts` | **done**（连乘穷举） |
+| M6-G11-runtime-resume-phases | `test/flow/runtime-resume-phases.test.ts` | **done**（锁 L4 resume-to-settled·正确未测 bidding resume） |
+| M6-G12-ai-no-starve | `test/selfplay/ai-no-starve.test.ts` | **done**（难度矩阵·必终止） |
 
 ### C 编辑器/UI（**串行单写者** `task/M6-editor`·需 Cocos Creator）【C2-C4 核心·M3-45/46 打磨】
+> C3 已拆（采纳建议#3）→ C3a + C3b，降单任务审查/回归面。
 | ID | 文件域 | 依赖 | 状态 |
 |----|----|----|----|
-| M6-C2-animation-wiring | `game-scene-skeleton`+`game.scene` | C1✓·L2✓ | ready（启动前同步 main） |
-| M6-C3-mobile-regression | `game.scene`+`lobby.scene`+`game-scene-skeleton`+report | C2·L3✓ | blocked（待 C2） |
-| M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | blocked（待 C3） |
-| M3-45-stats-records-screens | scene+新 cc 组件 | L7/L8/M3-40/41 | blocked（待视图 + 编辑器档期） |
-| M3-46-help-pause-overlays | scene+新 cc 组件 | M3-42/L12 | blocked（待视图 + 编辑器档期） |
+| M6-C2-animation-wiring | `game-scene-skeleton`+`game.scene` | C1✓·L2✓ | **in-review**（已实现 `08d0188`·待 Creator 验证·见验收记录） |
+| M6-C3a-safearea-screenshots | `*.scene`+`.meta`+M3-36 report+QA | C2 | blocked（待 C2 验过） |
+| M6-C3b-relative-layout-render-diff | `game-scene-skeleton`+report | L3✓·C2·C3a | blocked（串行于 C3a） |
+| M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | blocked（待 C3a/b） |
+| M3-45-stats-records-screens | scene+新 cc 组件 | L7✓/L8✓/M3-40/41 | blocked（待 M3-40/41 + 编辑器档期） |
+| M3-46a-help-screen（拆自 M3-46） | `lobby.scene`+新组件 | M3-42✓ | blocked（编辑器档期·C3 后） |
+| M3-46b-pause-overlay（拆自 M3-46） | `game.scene`+新组件 | L12✓ | blocked（编辑器档期·C3 后） |
 
-### R 美术导入（编辑器·**gated 待用户视觉终审**·照 M3-29 流程）【核心·依赖用户】
-| ID | 文件域 | 状态 |
-|----|----|----|
-| ART-IMPORT-02-avatars | `assets/resources/art/avatars/`+`asset-keys.ts`+.meta | blocked（待用户认可 ART-02） |
-| ART-IMPORT-03-ui | `assets/resources/art/ui/`+`asset-keys.ts`+.meta | blocked（待用户认可 ART-03） |
-| ART-IMPORT-04-cards | `assets/resources/art/cards/`+`asset-keys.ts`+.meta | blocked（待用户认可 ART-04·card-template 命名对齐） |
+### R 美术导入（编辑器·**gated 待用户视觉终审**·**串行**·照 M3-29 流程）【核心·依赖用户】
+> 采纳建议#5：三导入都改 `asset-keys.ts`，**非完全并行域**，须串行 02→03→04（或架构合并时统一解 key 冲突）。统一 key 命名表见下，避免各分支各自加 key 致合并冲突。
+> **审查#7**：每个导入 report 须记录 **① 用户视觉批准来源**（哪条消息/截图确认）② 导入清单 ③ key 映射 ④ `.meta` 由 Creator 生成——**不得仅凭技术规格通过**。
+| ID | 文件域 | key 前缀（建议） | 状态 |
+|----|----|----|----|
+| ART-IMPORT-02-avatars | `assets/resources/art/avatars/`+`asset-keys.ts`+.meta | `avatar.*`（avatarHero/avatarAiLeft/avatarAiRight/badgeLandlord/badgeFarmer/avatarFrame） | blocked（待用户认可 ART-02·串行 #1） |
+| ART-IMPORT-03-ui | `assets/resources/art/ui/`+`asset-keys.ts`+.meta | `ui.*`（btn*/icon*/badge*/panel*） | blocked（待用户认可 ART-03·串行 #2） |
+| ART-IMPORT-04-cards | `assets/resources/art/cards/`+`asset-keys.ts`+.meta | `card.*`（cardBack/jokerSmall/jokerBig/cardTemplate——**cardTemplate 对齐既有键**） | blocked（待用户认可 ART-04·串行 #3） |
 
 ### D 文档（架构/文档执行者·改 docs）【核心】
 | ID | 文件域 | 状态 |
 |----|----|----|
+| M6-D2-qa-checklist-refresh | `docs/QA_CHECKLIST.md`+report | **done**（证据对齐已合并测试·G 线证据已刷新为已并） |
+| M6-D3-roadmap-update | `docs/ROADMAP.md`+report | **done** |
+| M6-I1-barrel-exports | `{data,ai,game,ui}/index.ts` 仅 re-export+test | **done `7c7b427`**（新增公开模块已补桶·623 绿） |
 | M6-D1-release-docs | `docs/*`+BOARD | blocked（待所有轨 merge·架构收尾） |
-| M6-D2-qa-checklist-refresh | `docs/QA_CHECKLIST.md`+report | ready |
-| M6-D3-roadmap-update | `docs/ROADMAP.md`+report | ready |
 
-> **文件域不相交核对**：A 各为新 `data/`/`ai/`/`game/`/`ui/` 文件 + 新 test（两两不碰，可全并行）；G 各为新 test 文件（含新 `test/integration/`）；C 共享 scene/keystone 故串行单写者；R 各为不同 `assets/resources/` 子目录（共改 `asset-keys.ts` → 串行 merge 或架构合并时并行解）；D 各为不同 docs。A↔G↔D 与在跑的 C/R **不相交**。
-> **派发顺序建议**：第一波并行 A 的 6 个无依赖项（L7/L8/L9/L10/L11/L12/M3-42）+ G 全部 4 个 + D2/D3；第二波 A 的视图层（M3-40/41/43/44，待各自 L 入 main）；C 走编辑器串行（C2 先，启动前同步 main）；R 待用户视觉终审逐个解锁。
-> **桶导出**：所有新模块按 spec import 直引、不改 `index.ts`；架构在合并整合步统一补桶（沿用第六批先例）。
+### 📐 编辑器任务验收模板（采纳建议#4 · C2/C3a/C3b/C4/M3-编辑器屏/ART-IMPORT 必填）
+> 编辑器任务 report 必须含：① **Creator 版本**（3.8.8）；② **预览分辨率**与截图路径（≥指定档）；③ **是否改 scene/meta**（列出文件，未改注明「运行时注入」）；④ **worktree 是否残留本地未提交** `package.json`/`settings/`/`profiles/`（Creator 易生成，**只提交任务文件域**，残留须 `git checkout`/不 add）；⑤ 编辑器 Console 是否零报错。审查者据此核对，不接受「仅代码报告」。
+
+### 🚦 编辑器线推进协议（采纳建议#3+#4 · 收紧发布 gate）
+> `task/M6-editor` 是共享 keystone（`game-scene-skeleton.ts`+scene）的串行单写者分支，后续多任务叠加，纪律如下：
+- **#2 C2 不直接并入 main**：保持 `in-review`，直到 Creator 3.8.8 复核 + 390×844 动效截图落盘 + Console 零报错 + 脏文件（`package.json`/`settings/`）处理方案明确。审查卡验收模板，缺截图=未闭环。
+- **#3 同步/清洁门（每个编辑器任务启动前）**：① `git merge main`（取回纯逻辑/桶导出最新）；② 清掉或显式排除 `package.json`/`settings/`/`profiles/` 本地噪声（`git checkout -- package.json` / 不 add）；③ 跑 `npm --prefix test test` 全绿 + Creator 编译零报错。**不在不干净分支上叠新任务。**
+- **#4 推进顺序（重排）**：**C2 验证/合并 → C3a（多分辨率 SafeArea 基线 + 截图）→ C3b（相对布局 + render 差分稳定）→ 之后才接 HUD(M3-56)/toast·timer(M3-57)/thinking·lastaction(M3-63)/advisor(M3-64)/教程(M3-55)/帮助·暂停(M3-46a/b)/难度面板(M3-59)/战绩历史屏(M3-45)**。理由：后续 UI 不应建立在旧硬编码坐标 + 全量重建 render 之上。
+- **#1 状态源唯一**：编辑器任务状态以「第十一/十二/十三批」C 表 + 验收记录为准；批9 B-2 表已标历史存档。
+
+### ✅ 第十一批验收记录（A 线 7 + G 4 + D2/D3 已并 main · 2026-06-29）
+> 13 分支按建议#2 顺序逐一审 + `merge --no-ff`：先 A 基础（L7/L8/L9/M3-42/L10/L11/L12）→ G9-G12 → D3 → D2（G 并后证据复核）。审查纪律（建议）：逐分支 `git diff --stat` 核文件域、grep cc、确认未改 `index.ts` 桶/未篡改既有测试、读新源确认实现（非空跑）。
+- **客观门**：`npm --prefix test test` **103 文件 / 507 用例全绿**（+11 文件 / +38 用例）；`typecheck` 净；纯层 + 新 ui 纯岛（help-content/pause-menu）**零 cc**；`index.ts` 桶**未被任务改**（留 M6-I1 统一补）。
+- **逐项确认**：L7 streak/极值/分角色口径对齐 `recordRound`；L8 稳定排序 + limit 边界；L9 引用 `ai/levels/_shared.compareMoves` + `rules.isBombLike` **路径真实**（无 API 漂移）；L10 复用 `isStrongHand(,2)` 单一真相源；L11 按 reset/win 分墩；L12 状态机非法转移幂等；**G11 正确未测 bidding resume**（RoundState 仅 Playing/Settled，符合 spec 条件分支·采纳审查建议#3）且锁住 L4 resume-to-settled（multiplier 8 = bid4×anti-spring2、onSettled 恰一次）。
+- **D2 守纪**（采纳审查建议#4）：3 处引用 G 线的项以**已合并** settlement/resume/selfplay 测试为主证据打勾，G 分支当时标「待合并」未当已完成；G 并入后已刷新为「已并 main」。
+- **.meta**：Creator 为 A 线 7 个新脚本自动生成 `.meta`（typescript importer·唯一 uuid），架构提交（`2ca4ccf`）。
+- **worktree/分支**：13 个已 remove+delete；仅剩 `task/M6-editor`（C2）。
+- **M3-40/41/43/44 解锁**：依赖 L7/L8/L10/L11 已并 → 由 `blocked` 翻 `ready`（硬状态·采纳建议#1）。
+
+## 第十二批（AI 纵深 + UX 打磨 + 集成收尾 · 大批量派发 · 规划者派发 · 2026-06-29）
+
+> 用户三次要求「继续保持足够多数量」。纯逻辑核心已基本完备，本批 18 任务侧重 **AI 纵深**（强度评估/已出牌记忆/残局检测）+ **UX 打磨**（教程/强度条/计时/瞬时提示/已出牌 HUD/难度面板）+ **横切护栏 + 文档收尾**，并续上编辑器接线。**已砍掉无消费方的投机模块**（difficulty 调参/扩展 settings）。沿用「import 直引、不改 index.ts 桶（留 M6-I1 统一补）」「依赖型任务 `blocked: 待 X merge`，dep 并后才翻 ready」「编辑器任务按验收模板」。spec 全部入 main。范围声明：仍**不引入联网/账号/支付/广告/匹配**，turn-timer 仅提示不强制代打。
+
+### P AI 纵深（worktree **并行**·禁 cc·纯 spec）【打磨】
+| ID | 文件域 | 依赖 | 状态 |
+|----|----|----|----|
+| M4-30-hand-strength | `ai/handStrength.ts`+test | rules | **done**（并 main·第一波） |
+| M4-31-card-memory | `ai/cardMemory.ts`+test | game events/rules | **done**（并 main·第一波） |
+| M4-32-endgame-finisher | `ai/endgame.ts`+test | rules 枚举 | **done**（并 main·第一波） |
+
+### V 视图模型（worktree **并行**·禁 cc·纯 spec）【打磨】
+| ID | 文件域 | 依赖 | 状态 |
+|----|----|----|----|
+| M3-50-tutorial-steps | `ui/tutorial-steps.ts`+test | RULES/GAME_DESIGN | **done**（并 main·第一波） |
+| M3-52-turn-timer-view | `ui/turn-timer.ts`+test | — | **done**（并 main·第一波） |
+| M3-53-toast-queue | `ui/toast-queue.ts`+test | — | **done**（并 main·第一波） |
+| M3-58-difficulty-picker-view | `ui/difficulty-picker-view.ts`+test | difficultyConfig | **done**（并 main·第一波） |
+| M3-51-strength-meter-view | `ui/strength-meter-view.ts`+test | M4-30 | **done**（并 main·第二波） |
+| M3-54-card-memory-view | `ui/card-memory-view.ts`+test | M4-31 | **done**（并 main·第二波） |
+
+### L 可维护性 / G 横切护栏（worktree **并行**·禁 cc）【L 打磨·G 核心】
+| ID | 文件域 | 状态 |
+|----|----|----|
+| M6-L13-string-table | `ui/strings.ts`+test（仅新增·不迁移组件） | **done**（并 main·第一波） |
+| M6-G13-view-model-immutability | `test/ui/view-model-immutability.test.ts`（绿护栏·不改产品码） | **done**（并 main·第三波） |
+| M6-G14-ai-hidden-state-isolation | `test/ai/ai-hidden-state-isolation.test.ts`（绿护栏·不改产品码） | **done**（并 main·第一波） |
+
+### C 编辑器接线（**串行单写者** `task/M6-editor`·需 Creator·按验收模板）【打磨】
+| ID | 文件域 | 依赖 | 状态 |
+|----|----|----|----|
+| M3-59-difficulty-picker-ui | `lobby-scene` 升级难度控件 | M3-58 | blocked（依赖已满足·待 C2/编辑器档期） |
+| M3-55-tutorial-screen | `lobby.scene`+新组件 | M3-50 | blocked（依赖已满足·待 C2/编辑器档期） |
+| M3-56-hud-meters | `game-scene-skeleton`/新 HUD 组件 | M3-51/54（+M4-30/31） | blocked（依赖已满足·待编辑器串行） |
+| M3-57-toast-timer-wiring | `game-scene-skeleton`/新组件 | M3-52/53 | blocked（依赖已满足·待编辑器串行） |
+
+### D 文档 / R 美术【D 核心·R 打磨·gated】
+| ID | 文件域 | 状态 |
+|----|----|----|
+| M6-D4-arch-notes | `docs/ARCH_DECISIONS.md`+`docs/KNOWN_LIMITATIONS.md`（新）+report | **done**（并 main·第一波） |
+| ART-05-misc-assets | `asset-previews/…v2/misc/`（splash/app-icon/空状态/角标）+PROMPTS+report | blocked（待用户对 ART 风格整体认可） |
+
+> **文件域不相交核对**：P/V/L 各为新 `ai/`/`ui/` 文件 + 新 test（两两不碰）；G 各新 test；C 共享 keystone 串行；D 新增两份 docs；R 仅 `asset-previews/`。与第十一批未完成项（M3-40/41/43/44、M6-I1、C2-C4、M3-45/46、ART-IMPORT、D1）文件域亦不相交。
+> **第一波可并行（无依赖）**：M4-30/31/32、M3-50/52/53/58、M6-L13、M6-G13/14、M6-D4 —— 11 个；第二波 M3-51/54（待 M4-30/31）；C 线串行待视图 + Creator 档期；R 待用户。
+> **桶**：P/V/L 新模块按 import 直引、不改 `index.ts`；并入后随 **M6-I1** 一并补桶（M6-I1 范围相应扩到第十二批新模块）。
+
+## 第十三批（AI 模块组合 + 平衡度量 + 回放编码 + 剩余视图 · 规划者派发 · 2026-06-29）
+
+> 用户「A+B 一起」。这是纯逻辑的**真实尾部**：把第十二批的 AI 纯模块**组合成可用建议**、加**难度平衡客观护栏**、回放编解码、剩余 UX 视图。10 任务。**架构已向用户声明：纯逻辑核心到此基本见底，后续价值集中在编辑器/美术/构建/QA**（需 Creator/用户），不再靠堆纯 spec 推进。沿用全部既定规矩（硬状态/import 直引/编辑器验收模板/砍投机模块）。M6-I1 桶整合范围相应再扩到第十三批新模块。
+
+| ID | 轨 | 文件域 | 依赖 | 状态 |
+|----|----|----|----|----|
+| M2-12-replay-codec | 离线 | `game/replay-codec.ts`+test | events/replay✓ | **done**（并 main·第一波） |
+| M6-G15-selfplay-balance | G 核心 | `test/selfplay/balance.test.ts`（绿护栏） | selfplay✓ | **done**（并 main·第一波） |
+| M3-60-ai-thinking-view | V 打磨 | `ui/ai-thinking-view.ts`+test | — | **done**（并 main·第一波） |
+| M3-62-last-action-view | V 打磨 | `ui/last-action-view.ts`+test | events/card-view✓ | **done**（并 main·第一波） |
+| M6-D5-playtest-script | D 核心 | `docs/PLAYTEST.md`+report | — | **ready** |
+| M4-40-action-insight | P 打磨 | `ai/insight.ts`+test（组合 M4-30/32+hintRank✓） | M4-30/32 | **done**（并 main·第二波） |
+| M4-41-bid-confidence | P 打磨 | `ai/bid-confidence.ts`+test | M4-30 | **done**（并 main·第二波） |
+| M3-61-insight-view | V 打磨 | `ui/insight-view.ts`+test | M4-40 | **done**（并 main·第三波） |
+| M3-63-thinking-lastaction-ui | C 编辑器 | `game-scene-skeleton`/新组件 | M3-60/62 | blocked（依赖已满足·编辑器串行） |
+| M3-64-insight-advisor-ui | C 编辑器 | `game-scene-skeleton`/新组件 | M3-61 | blocked（依赖已满足·编辑器串行） |
+
+> **文件域不相交**：各为新 `ai/`/`ui/`/`game/` 文件 + 新 test + 新 docs，两两不碰，与批11/12 未完成项亦不相交。
+> **本批 ready（无依赖·可并行）**：M2-12、M6-G15、M3-60、M3-62、M6-D5 —— 5 个。其余链式（M4-30→M4-40→M3-61；M4-30→M4-41）按硬状态待 dep 入 main。
+
+### ✅ 第十二/十三批纯逻辑收口记录（2026-06-29 · 执行/架构）
+> 按用户批准的「全量接收与执行顺序计划」执行：先第一波解锁器与独立纯任务，再第二波消费依赖，最后 M3-61→M6-G13→M6-I1。编辑器/美术/视觉 gate 未抢跑。
+- **已并 main**：第十一批剩余 VM（M3-40/41/43/44）、第十二批纯逻辑/文档（M4-30/31/32、M3-50/51/52/53/54/58、M6-L13、M6-G13/14、M6-D4）、第十三批纯逻辑（M2-12、M6-G15、M3-60/62、M4-40/41、M3-61）以及 **M6-I1 桶整合**。
+- **客观门**：最终 main `7c7b427` 上 `npm --prefix test test -- --run` **127 文件 / 623 用例全绿**；`npm --prefix test run typecheck` 通过；新增纯层/纯 UI 文件 `cc` 搜索零命中。
+- **仍保持 gate**：C2 仍需 Creator 3.8.8 验证；M3-55/56/57/59/63/64、C3a/C3b/C4、M3-45/46 均等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 按计划延后到编辑器功能基本稳定后补 `PLAYTEST.md`。
+- **本地注意**：~~工作区若干未跟踪新脚本 `.meta`~~ → ✅ **已闭合**：20 个 Creator 生成 `.meta`（ver 4.0.24·typescript importer·uuid 唯一·零逻辑改动）已统一提交（采纳建议#6 late .meta sync）。
+
+### 🔍 架构复核 + 执行者 13 条建议落实（2026-06-29）
+> 用户给规划者 7 条 + 审查者 8 条建议，方向：纯逻辑核心已收口，下一阶段把 **C2-C4 发布 gate 做硬**（编辑器单写者纪律 / Creator 证据 / scene·meta 清洁 / 截图手测真实性）。
+- **复核 main**：`3a44027` 实测 **127 文件 / 623 用例全绿**、typecheck 净、纯层零 cc；20 late `.meta` 已提交；工作树干净；仅 `task/M6-editor`(C2) 未合。
+- **规划者建议落实**：#1 批9 B-2 表标「历史存档」+ 修正 L5/L6→done、C2→in-review、C3→已拆（状态源唯一指向第十一批 C 表）；#2 **C2 保持 in-review 不并入**；#3+#4 新增「🚦 编辑器线推进协议」（启动前同步/清洁门 + 重排 C2→C3a→C3b→HUD/toast/thinking/advisor）；#5 **M3-46 拆 M3-46a（帮助屏）+ M3-46b（暂停层）**；#6 late `.meta` 已提交；#7 **M6-D1 spec 重写**为最终发布范围（依赖 C2-C4/编辑器屏/美术导入/D5/构建）。
+- **审查者建议落实**：#4 **M3-56 spec 改为必须喂全量 `GameEvent`（非 sliced recentEvents）+ ownHand 用当前手牌防双重扣减**；#7 ART 导入 report 须记用户视觉批准来源；#8 M6-D5 标「尽早做骨架」；#1/#2/#3 C2/`package.json`/C3b 行为审查点并入「编辑器线推进协议」+验收模板；#5 M3-57「计时仅提示不改 runtime」、#6 M3-64「advisor 默认低打扰」已在各 spec 锁定。
+- **未改**：纯逻辑 main（已绿）、C2 代码（待用户 Creator 验证）。
 
 ## 后续（本批次之后）
 - **设计型待办进展**：① 落盘数值不变量已闭合：`serialize`(passesInARow/bombsPlayed) 由 T4、`records`(multiplier/bombs/heroScore/playedAt) 由 T5、`save.savedAt` 与 `bidMultiplier` 由 T1/M5-12c 折叠实现；② 整屏 VM 集成层 M3-01 已并 main。
