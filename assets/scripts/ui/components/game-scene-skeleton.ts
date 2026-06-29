@@ -11,6 +11,7 @@ import {
   Sprite,
   SpriteFrame,
   UITransform,
+  UIOpacity,
   Vec3,
   director,
   resources,
@@ -26,12 +27,13 @@ import { loadSettings, saveSettings } from '../../data/settingsStorage';
 import { startRoundRuntime, resumeRoundRuntime, type RoundRuntime } from '../../flow/round-runtime';
 import { realClock } from '../../flow/clock';
 import type { FlowEvent } from '../../flow/types';
-import type { ResumeSnapshot, RoundFinishInput, SeatIndex } from '../../game';
+import type { ResumeSnapshot, RoundFinishInput, SeatIndex, TopPlay } from '../../game';
 import { type Card, Suit } from '../../rules';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { cardView } from '../card-view';
 import { cueForFlowEvent, type CueId } from '../event-cues';
 import { decideCuePlayback } from '../audio-gate';
+import { dealCardDelay, playFlyFromTo, pulseParams } from '../animation-params';
 import { clearSelection, isSelected, toggle } from '../selection';
 import { deriveScreenVM } from '../screen-view';
 import { toggleSetting, type ToggleKey } from '../settings-view';
@@ -68,6 +70,14 @@ const SCAFFOLD_NODE_NAMES = [
 
 function sameCard(a: Card, b: Card): boolean {
   return a.rank === b.rank && a.suit === b.suit;
+}
+
+function cardKey(card: Card): string {
+  return `${card.rank}-${card.suit}`;
+}
+
+function cardsSignature(cards: Card[]): string {
+  return cards.map(cardKey).join('|');
 }
 
 function labelColor(enabled: boolean): Color {
@@ -116,12 +126,16 @@ export class GameSceneSkeleton extends Component {
   private unsubscribe: (() => void) | null = null;
   private audioSource: AudioSource | null = null;
   private uiRoot: Node | null = null;
+  private playAreaRoot: Node | null = null;
   private selected: Card[] = [];
   private recentEvents: FlowEvent[] = [];
   private settings: Settings = defaultSettings();
   private statusText = '';
   private submitting = false;
   private readonly spriteFrames = new Map<string, SpriteFrame>();
+  private lastHandSignature = '';
+  private lastPlayAreaSignature = '';
+  private renderedSelectedCardKeys = new Set<string>();
 
   onLoad(): void {
     this.loadSprite(RESOURCE_PATHS.gameTableBg, this.background);
@@ -146,6 +160,9 @@ export class GameSceneSkeleton extends Component {
     this.selected = clearSelection();
     this.recentEvents = [];
     this.statusText = '';
+    this.lastHandSignature = '';
+    this.lastPlayAreaSignature = '';
+    this.renderedSelectedCardKeys.clear();
 
     const storage = cocosStorage();
     this.settings = loadSettings(storage, SETTINGS_KEY);
@@ -183,8 +200,8 @@ export class GameSceneSkeleton extends Component {
     this.unsubscribe = this.runtime.onEvent((event) => {
       this.recentEvents.push(event);
       this.recentEvents = this.recentEvents.slice(-12);
-      this.playCue(event);
       this.render();
+      this.playCue(event);
     });
     this.render();
   }
@@ -216,7 +233,7 @@ export class GameSceneSkeleton extends Component {
     this.renderTopBar(this.runtime.phase(), vm.topBar, snapshot?.viewerHand?.length ?? 0);
     this.renderRuntimeSettings();
     this.renderSeats(snapshot?.handCounts ?? [0, 0, 0], snapshot?.landlord ?? null);
-    this.renderPlayArea(snapshot?.top ? String(snapshot.top.pattern.category) : '自由出牌');
+    this.renderPlayArea(snapshot?.top ?? null);
     this.renderBidding(bidding ? vm.bidding : undefined);
     this.renderHand(vm.hand, handWidth);
     this.renderStatus(this.statusText || (this.runtime.isPlayerTurn() ? '轮到你' : '等待'));
@@ -256,9 +273,31 @@ export class GameSceneSkeleton extends Component {
     this.addLabel(`AI 右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, 132, 158, 16, this.uiRoot!, 108, 64);
   }
 
-  private renderPlayArea(text: string): void {
-    const label = this.addLabel(`出牌区\n${text}`, 0, 62, 20, this.uiRoot!, 180, 64);
+  private renderPlayArea(top: TopPlay | null): void {
+    const area = this.ensureNode('play-area-runtime', this.uiRoot!);
+    this.playAreaRoot = area;
+    area.setPosition(0, 62, 0);
+    this.addUiTransform(area, 250, 112);
+
+    const labelText = top ? `座位${top.seat + 1}` : '自由出牌';
+    const label = this.addLabel(`出牌区\n${labelText}`, 0, 34, 18, area, 170, 48);
     label.lineHeight = 28;
+    if (!top) {
+      this.lastPlayAreaSignature = '';
+      return;
+    }
+
+    const cards = top.pattern.cards;
+    const signature = `${top.seat}:${cardsSignature(cards)}`;
+    const animate = this.settings.animation && signature !== this.lastPlayAreaSignature;
+    this.lastPlayAreaSignature = signature;
+    const maxWidth = 224;
+    const spacing = cards.length <= 1 ? 0 : Math.min(34, (maxWidth - CARD_SIZE.width) / (cards.length - 1));
+    const startX = -((cards.length - 1) * spacing) / 2;
+    cards.forEach((card, index) => {
+      const x = startX + index * spacing;
+      this.addDisplayCard(card, x, -22, area, `play-card-${index}`, animate);
+    });
   }
 
   private renderBidding(bidding: ReturnType<typeof deriveScreenVM>['bidding']): void {
@@ -276,11 +315,17 @@ export class GameSceneSkeleton extends Component {
 
   private renderHand(hand: ReturnType<typeof deriveScreenVM>['hand'], containerWidth: number): void {
     this.addLabel('玩家手牌', 0, -286, 16, this.uiRoot!, 140, 30);
-    for (const slot of hand) {
+    const handSignature = cardsSignature(hand.map((slot) => slot.card));
+    const animateDeal = this.settings.animation && handSignature !== this.lastHandSignature;
+    const nextSelectedKeys = new Set<string>();
+    hand.forEach((slot, index) => {
       const x = slot.x + CARD_SIZE.width / 2 - containerWidth / 2;
       const y = -336 - slot.y;
-      this.addCard(slot.card, x, y, slot.selected);
-    }
+      this.addCard(slot.card, x, y, slot.selected, index, hand.length, animateDeal);
+      if (slot.selected) nextSelectedKeys.add(cardKey(slot.card));
+    });
+    this.lastHandSignature = handSignature;
+    this.renderedSelectedCardKeys = nextSelectedKeys;
   }
 
   private renderActions(play: boolean, pass: boolean, hint: boolean): void {
@@ -297,6 +342,7 @@ export class GameSceneSkeleton extends Component {
     if (!result) return;
     const panel = this.ensureNode('settlement-panel-runtime', this.uiRoot!);
     panel.setPosition(0, 4, 0);
+    panel.setScale(1, 1, 1);
     this.addUiTransform(panel, 330, 420);
     const sprite = panel.addComponent(Sprite);
     this.loadSprite(RESOURCE_PATHS.settlementBg, sprite);
@@ -306,6 +352,7 @@ export class GameSceneSkeleton extends Component {
     this.addLabel(result.scores.map((row) => `座位${row.seat + 1}${row.isLandlord ? '(地主)' : ''}: ${row.score}`).join('\n'), 0, -34, 18, panel);
     this.addButton('再来一局', -74, -154, 116, 42, true, () => this.startGame(true), panel);
     this.addButton('返回大厅', 74, -154, 116, 42, true, () => director.loadScene('lobby'), panel);
+    if (this.settings.animation) this.animateScaleIn(panel, 0.92, 180);
   }
 
   private async submitBid(id: 'call' | 'grab' | 'pass'): Promise<void> {
@@ -353,20 +400,78 @@ export class GameSceneSkeleton extends Component {
     this.render();
   }
 
-  private addCard(card: Card, x: number, y: number, selected: boolean): void {
-    const node = this.ensureNode(`card-${card.rank}-${card.suit}-${x}`, this.uiRoot!);
-    node.setPosition(x, y + (selected ? 4 : 0), 0);
+  private addCard(
+    card: Card,
+    x: number,
+    y: number,
+    selected: boolean,
+    index: number,
+    total: number,
+    animateDeal: boolean,
+  ): void {
+    const node = this.addCardNode(card, x, y, this.uiRoot!, `card-${index}`, true);
+    const key = cardKey(card);
+    const wasSelected = this.renderedSelectedCardKeys.has(key);
+    if (this.settings.animation && animateDeal) {
+      this.animateCardDeal(node, x, y, index, total);
+    } else if (this.settings.animation && wasSelected !== selected) {
+      const fromY = selected ? y - HAND_LIFT : y + HAND_LIFT;
+      node.setPosition(x, fromY, 0);
+      tween(node).to(0.12, { position: new Vec3(x, y, 0) }).start();
+    } else {
+      node.setPosition(x, y, 0);
+    }
+  }
+
+  private addDisplayCard(card: Card, x: number, y: number, parent: Node, name: string, animate: boolean): void {
+    const node = this.addCardNode(card, x, y, parent, name, false);
+    if (this.settings.animation && animate) this.animateCardPlay(node, x, y);
+  }
+
+  private addCardNode(card: Card, x: number, y: number, parent: Node, name: string, interactive: boolean): Node {
+    const node = this.ensureNode(`${name}-${cardKey(card)}`, parent);
+    node.setPosition(x, y, 0);
+    node.setScale(1, 1, 1);
+    const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+    opacity.opacity = 255;
     this.addUiTransform(node, CARD_SIZE.width, CARD_SIZE.height);
     const sprite = node.addComponent(Sprite);
     const view = cardView(card);
     this.loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite);
-    node.on(Node.EventType.TOUCH_END, () => this.toggleCard(card), this);
+    if (interactive) node.on(Node.EventType.TOUCH_END, () => this.toggleCard(card), this);
 
     const label = this.addLabel(`${view.rankLabel}${suitText(view.suitKey)}`, -12, 18, 10, node, 30, 18);
     label.color =
       view.suitKey === Suit.Heart || view.suitKey === Suit.Diamond
         ? new Color(205, 96, 124, 255)
         : new Color(84, 74, 92, 255);
+    return node;
+  }
+
+  private animateCardDeal(node: Node, x: number, y: number, index: number, total: number): void {
+    const delay = dealCardDelay(index, total) / 1000;
+    const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+    opacity.opacity = 0;
+    node.setPosition(x, y - 42, 0);
+    tween(node).delay(delay).to(0.18, { position: new Vec3(x, y, 0) }).start();
+    tween(opacity).delay(delay).to(0.12, { opacity: 255 }).start();
+  }
+
+  private animateCardPlay(node: Node, x: number, y: number): void {
+    const fly = playFlyFromTo();
+    const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+    opacity.opacity = 0;
+    node.setPosition(x, y + fly.fromY, 0);
+    tween(node).to(fly.durationMs / 1000, { position: new Vec3(x, y + fly.toY, 0) }).start();
+    tween(opacity).to(Math.min(0.14, fly.durationMs / 1000), { opacity: 255 }).start();
+  }
+
+  private animateScaleIn(node: Node, fromScale: number, durationMs: number): void {
+    const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+    opacity.opacity = 0;
+    node.setScale(fromScale, fromScale, 1);
+    tween(node).to(durationMs / 1000, { scale: new Vec3(1, 1, 1) }).start();
+    tween(opacity).to(Math.min(0.16, durationMs / 1000), { opacity: 255 }).start();
   }
 
   private toggleCard(card: Card): void {
@@ -454,12 +559,23 @@ export class GameSceneSkeleton extends Component {
   }
 
   private playEffect(cue: CueId): void {
-    if (!this.uiRoot || (cue !== 'bomb' && cue !== 'rocket' && cue !== 'deal' && cue !== 'play')) return;
-    const scaleUp = cue === 'bomb' || cue === 'rocket' ? 1.12 : 1.04;
-    tween(this.uiRoot)
-      .to(0.1, { scale: new Vec3(scaleUp, scaleUp, 1) })
-      .to(0.16, { scale: new Vec3(1, 1, 1) })
+    if (!this.uiRoot) return;
+    const params = pulseParams(cue);
+    if (!params) return;
+    const target = cue === 'bomb' || cue === 'rocket' || cue === 'play' ? this.playAreaRoot ?? this.uiRoot : this.uiRoot;
+    tween(target)
+      .to(params.upMs / 1000, { scale: new Vec3(params.scaleUp, params.scaleUp, 1) })
+      .to(params.downMs / 1000, { scale: new Vec3(1, 1, 1) })
       .start();
+    if (cue === 'bomb' || cue === 'rocket') {
+      const origin = target.position.clone();
+      tween(target)
+        .by(0.04, { position: new Vec3(5, 0, 0) })
+        .by(0.08, { position: new Vec3(-10, 0, 0) })
+        .by(0.04, { position: new Vec3(5, 0, 0) })
+        .call(() => target.setPosition(origin))
+        .start();
+    }
   }
 
   private reloadSettings(): Settings {
