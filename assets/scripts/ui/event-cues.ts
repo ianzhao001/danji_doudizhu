@@ -23,11 +23,17 @@ export const CUE_IDS = [
 
 export type CueId = (typeof CUE_IDS)[number];
 
+type AssertExtends<A extends B, B> = A;
+export type EventCueExhaustiveness = [
+  AssertExtends<GameEvent['type'], CueId>,
+  AssertExtends<Exclude<FlowEvent['type'], 'round'>, CueId>,
+];
+
 export function cueForGameEvent(event: GameEvent): CueId {
   return event.type;
 }
 
-export function cueForFlowEvent(event: FlowEvent): CueId | null {
+export function cueForFlowEvent(event: FlowEvent): CueId {
   if (event.type === 'round') return cueForGameEvent(event.event);
   return event.type;
 }
