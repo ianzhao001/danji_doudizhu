@@ -17,3 +17,4 @@ export * from './records-view';
 export * from './settings-view';
 export * from './lobby-view';
 export * from './audio-gate';
+export * from './animation-params';
