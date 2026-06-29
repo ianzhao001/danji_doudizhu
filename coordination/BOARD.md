@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `claimed:<标识>` · `in-review` · `changes-requested` · `done`。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批：L5/L6 ✅ 已并 main，C1 ⏸ 待 Creator 验证（用户定「先验证再合并」），见下「第十批」**
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」
 
 main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 已收紧为字面量联合）、`flow→data` 零 import。第九批 L1-L4 已全部 `merge --no-ff` 入 main；L5 selfplay 长回归（1..50）待验证（L4 settle 修改已入 main）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**C1-C4 编辑器串行待执行**（依赖 L1/L2/L3 已在 main，C1→C2→C3→C4 串行）。
 
@@ -324,8 +324,8 @@ main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 c
 
 | ID | 任务 | 文件域 | 状态 |
 |----|----|----|----|
-| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`+`lobby.scene` | **ready**（L1 已入 main） |
-| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | blocked（待 C1） |
+| M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | **done `31b5668`**（用户 Creator 验证过） |
+| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | **ready**（C1 已入 main·消费 L2 已在 main） |
 | M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | `game.scene`+`lobby.scene`+`game-scene-skeleton`+report | blocked（待 C2+L3） |
 | M6-C4-build-verification | 构建验证+发布验收记录 | `cocos.config.json`+report | blocked（待 C1-C3） |
 | M6-D1-release-docs | 发布/QA 文档收尾（架构·非派发） | `docs/*`+`BOARD.md` | blocked（待所有轨） |
@@ -370,7 +370,7 @@ main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 c
 |----|----|----|----|----|
 | M6-L5-selfplay-long | **新任务书**·纯逻辑 worktree·纯 spec | `test/selfplay/selfplay-long.test.ts`（新）+report | `task/M6-L5-selfplay-long` | **done `20af2e9`**（2/2 绿·1..50·10.8s） |
 | M6-L6-cue-id-union | **优化任务书**·纯逻辑 worktree·纯 spec | `ui/event-cues.ts` + `test/ui/cue-id-consistency.test.ts`（新）+report | `task/M6-L6-cue-id-union` | **done `4c840ed`**（5/5 绿·CueId 联合·零 cc） |
-| M6-C1-sound-toggle-wiring | 编辑器串行·消费 L1 | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | `task/M6-editor`（C1→C2→C3→C4） | **in-review · 待 Creator 验证**（代码评审过·用户定「先验证再合并」） |
+| M6-C1-sound-toggle-wiring | 编辑器串行·消费 L1 | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | `task/M6-editor`（C1→C2→C3→C4） | **done `31b5668`**（用户 Creator 验证过·解锁 C2） |
 
 > **文件域不相交核对**：L5=`test/selfplay/`（新文件）；L6=`ui/event-cues.ts`+`test/ui/`（新文件），**不碰** L1/L2 刚并入的 `audio-gate.ts`/`animation-params.ts`（靠源头收紧 `CueId` 让其在 typecheck 期自动获益）；C1=`ui/components/*`+`assets/scene/`。两两不相交，L5/L6 可真并行（不同 worktree），C1 走编辑器单写者分支。
 > **派发模式**：L5/L6 用 PROTOCOL bootstrap（纯逻辑 worktree·`<ID>` 换分支名·纯 spec 自写测试）；C1 用编辑器 bootstrap（Cocos Creator·新建 `../斗地主.worktrees/M6-editor`）。
@@ -379,7 +379,9 @@ main 现状：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 c
 > **第十批验收记录（2026-06-29）**：
 > - **L5/L6 ✅ 已验收并并入 main**：各在 worktree 独立验证（L5 typecheck 净/464 绿·selfplay-long 1..50 通过 10.8s；L6 typecheck 净/467 绿·cue-id-consistency 5/5）后 `merge --no-ff`（`20af2e9`→`4c840ed`）。集成验证：**92 测试文件 / 469 用例全绿、typecheck 净、纯层零 cc**（含 `event-cues/audio-gate/animation-params`）、`CueId` 已为 `(typeof CUE_IDS)[number]` 联合、工作树净。worktree+分支已清理。
 >   · **L6 实现优于 spec**：除字面量联合，额外导出 `CUE_IDS` const 数组供遍历；护栏用 `satisfies readonly CueId[]` 加编译期校验，并锁 audio-gate/animation **引用真实**（deal/play/bomb/rocket→effect/pulse、bomb→vibrate、pass→inert）——彻底堵住「拼错→静默禁用」。
-> - **C1 ⏸ 待 Creator 验证（用户决定「先验证再合并」）**：代码评审通过（playCue 改调 `decideCuePlayback`·vibration 跨平台降级·settings 热重读·修 `defaultSettings`→`loadSettings` bug·热切换持久化），cc 用法对 3.8 地道且与 `game-scene-skeleton` 既有运行时建节点模式一致。**但 import cc，无头测试/typecheck 不覆盖**（实现方 worktree `tsc -p tsconfig.json` exit 2·缺 Creator cc 类型环境），**且无 390×844 截图**。`task/M6-editor` 分支+worktree **保留**，待用户在 Cocos Creator 3.8.8 打开确认编译通过 + 截图后，架构再 `merge --no-ff` 入 main 并解锁 C2。
+> - **C1 ✅ 已验收并并入 main `31b5668`（用户 Cocos Creator 验证）**：代码评审通过（playCue 改调 `decideCuePlayback`·vibration 跨平台降级·settings 热重读·修 `defaultSettings`→`loadSettings` bug·热切换持久化），cc 用法对 3.8 地道且与 `game-scene-skeleton` 既有运行时建节点模式一致。用户在 Cocos Creator 3.8.8 打开 `task/M6-editor` 验证：**编辑器状态栏零报错（编译通过）、lobby/game 场景 390×844 渲染正常、运行时 lobby 设置控件（音效/震动/动效 + 难度三档）显示并可切换持久化（动效 开→关 截图佐证）**。合并后客观门：92 文件 / 469 用例全绿、typecheck 净；cc 仅现于 `ui/components/{lobby-scene,game-scene-skeleton}.ts`+`runtime/cocos-storage.ts`（允许层），纯层 + ui 纯岛零 cc。与 L6 union CueId 兼容（`playEffect` 字面量比较均为 `CUE_IDS` 成员）。
+>   · **设计决策已落定**：为守「不手写 scene/meta」铁律，lobby 设置控件用**组件运行时注入**而非编排进 `lobby.scene`（用户验证认可此路径）；C1 实际未改 scene 资产，仅改两个 cc 组件 `.ts`。
+>   · **`task/M6-editor` 分支+worktree 保留**给 C2/C3/C4 串行续做；worktree 含 Creator 本地噪声（`package.json`/`settings/`，非 C1 deliverable，未入 main）。**C2 启动前须先把该 worktree 同步到 main**（取回 L5/L6 union CueId + C1 merge）。
 >   · 实现方设计决策：为守「不手写 scene/meta」铁律，lobby 设置控件改**组件运行时注入**而非编排进 `lobby.scene`（故 C1 实际未改 scene 资产）——用户已认可此路径（选「先验证再合并」而非「改回场景编排」）。
 
 ## 后续（本批次之后）

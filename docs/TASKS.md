@@ -1,6 +1,6 @@
 # 项目任务清单
 
-## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（.meta 编辑器已补全）· **第八批 ✅ 已验收并入 main**：A 交互层 M3-32~36 已并 main（`291b53b`，全链路可玩通一整局）+ B 文生图 ART-01 背景包已并 main（`a181d45`，`asset-previews/...v2/backgrounds/`，详见 coordination/BOARD.md）；ART-01 风格锚已被用户采纳· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待执行 · D1 文档收尾 + L5 后置验证待完成，详见 coordination/BOARD.md · **第九批已通过架构验证（462 绿/typecheck 净/纯层零 cc·保持合并）** · **第十批**：M6-L5（selfplay 1..50·`20af2e9`）+ M6-L6（CueId 收紧·`4c840ed`）✅ 已并 main（92 文件/469 绿）；M6-C1 ⏸ 待 Cocos Creator 验证编译+截图（用户定「先验证再合并」）
+## 当前阶段：M2 ✅ + M4 ✅ + 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并入 main（`fc821cc`，85 文件 / 437 绿、typecheck 净、纯层零 cc）**：M5-20 runtime 存储 + M5-21 round-runtime 门面 + M3-29/30/31 资源/大厅/游戏骨架 + M5-14-followup（.meta 编辑器已补全）· **第八批 ✅ 已验收并入 main**：A 交互层 M3-32~36 已并 main（`291b53b`，全链路可玩通一整局）+ B 文生图 ART-01 背景包已并 main（`a181d45`，`asset-previews/...v2/backgrounds/`，详见 coordination/BOARD.md）；ART-01 风格锚已被用户采纳· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待执行 · D1 文档收尾 + L5 后置验证待完成，详见 coordination/BOARD.md · **第九批已通过架构验证（462 绿/typecheck 净/纯层零 cc·保持合并）** · **第十批**：M6-L5（selfplay 1..50·`20af2e9`）+ M6-L6（CueId 收紧·`4c840ed`）✅ 已并 main（92 文件/469 绿）；M6-C1 ✅ 已并 main `31b5668`（用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁
 
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
@@ -115,8 +115,8 @@
 - [x] Cocos 存储适配器（sys.localStorage → StorageLike，runtime 桥接层）。〔M5-20 已并 main `d9033c3`：storage-adapter(禁cc·可测)/cocos-storage(cc 隔离)〕
 - [x] 交互式单局运行时门面（round-runtime：start/resume/玩家动作/AI 自动，对齐 deriveScreenVM）。〔M5-21 已并 main `0f31900`：重构 driver 抽 step helper·flow→data 零 import·dispose 中断〕
 - [x] statsCodec unknown-version 注释订正（容灾兜底非可逆迁移）。〔M5-14-followup 已并 main `b51032c`·纯文档 1 行·行为零改〕
-- [~] 音效开关写侧接线 + 热重载。〔M6-C1 代码评审过·**⏸ 待 Cocos Creator 验证编译+390×844 截图后合并**·`task/M6-editor` 分支+worktree 保留·消费 M6-L1〕
-- [~] 基础动画接线 + card/弹窗级动效。〔M6-C2 待执行·编辑器串行·消费 M6-L2·待 C1 完成〕
+- [x] 音效开关写侧接线 + 热重载。〔M6-C1 已并 main `31b5668`·用户 Creator 验证（编译零报错/390×844 渲染/开关切换持久化）·playCue 改调 decideCuePlayback·vibration 跨平台降级·settings 热重读·修 defaultSettings bug·lobby/game 运行时注入设置控件〕
+- [~] 基础动画接线 + card/弹窗级动效。〔M6-C2 **ready**·C1 已并 main 解锁·编辑器串行·消费 M6-L2（已在 main）·`task/M6-editor` 续做（启动前同步 main）〕
 - [ ] 发布验收记录。〔M6-D1 待所有轨 merge·架构收尾〕
 
 ## M6 发布前打磨
