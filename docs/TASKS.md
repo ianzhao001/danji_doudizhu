@@ -118,13 +118,13 @@
 - [x] 交互式单局运行时门面（round-runtime：start/resume/玩家动作/AI 自动，对齐 deriveScreenVM）。〔M5-21 已并 main `0f31900`：重构 driver 抽 step helper·flow→data 零 import·dispose 中断〕
 - [x] statsCodec unknown-version 注释订正（容灾兜底非可逆迁移）。〔M5-14-followup 已并 main `b51032c`·纯文档 1 行·行为零改〕
 - [x] 音效开关写侧接线 + 热重载。〔M6-C1 已并 main `31b5668`·用户 Creator 验证（编译零报错/390×844 渲染/开关切换持久化）·playCue 改调 decideCuePlayback·vibration 跨平台降级·settings 热重读·修 defaultSettings bug·lobby/game 运行时注入设置控件〕
-- [~] 基础动画接线 + card/弹窗级动效。〔M6-C2 **ready**·C1 已并 main 解锁·编辑器串行·消费 M6-L2（已在 main）·`task/M6-editor` 续做（启动前同步 main）〕
+- [x] 基础动画接线 + card/弹窗级动效。〔M6-C2 已并 main `17b96f3`·Creator 3.8.8 预览·390×844 bomb 局部动效截图·Console 零 Error〕
 - [ ] 发布验收记录。〔M6-D1 待所有轨 merge·架构收尾〕
 
 ## M6 发布前打磨
 
 - [x] 移动端适配纯逻辑件。〔M6-L3 已并 main `99d13b8`·tableLayout 参数化+多分辨率 sweep·15/15 绿〕
-- [~] 移动端适配回归 + 渲染性能。〔M6-C3 待执行·编辑器串行·消费 L3·待 C2 完成〕
+- [~] 移动端适配回归 + 渲染性能。〔M6-C3a ready（C2 已完成）→ C3b blocked（待 C3a）·编辑器串行·消费 L3〕
 - [~] 性能检查。〔M6-C3 内含·render 差分更新 + 去抖；M6-L5 selfplay 长回归 1..50·**已并 main `20af2e9`**·2/2 绿·10.8s〕
 - [x] CueId 类型收紧 + cue 一致性护栏。〔M6-L6 已并 main `4c840ed`·`CueId` string→11 字面量联合（CUE_IDS 派生）·绿护栏锁 audio-gate/animation 引用真实·5/5 绿·零 cc〕
 - [x] 异常流程检查。〔M6-L4 已并 main `c08de19`·resume-to-settled/redead 超限/bidding reason·5/5 绿〕

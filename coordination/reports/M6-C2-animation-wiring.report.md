@@ -2,8 +2,8 @@
 
 - 实现方标识：Codex
 - 分支：`task/M6-editor`
-- 状态：in-review（Creator 3.8.8 预览与 390×844 动效截图已补，待架构评审合并）
-- 同步状态：已将 `main` 合入 `task/M6-editor`（merge commit `23f7027`），当前差异仍限 C2 范围 + 本报告截图。
+- 状态：done（已并 main：`17b96f3`）
+- 同步状态：已将 `main` 合入 `task/M6-editor`（merge commit `23f7027`），最终并入范围为 C2 脚本 + 本报告 + 390×844 截图。
 
 ## 改了哪些文件
 - 更新 `assets/scripts/ui/components/game-scene-skeleton.ts`

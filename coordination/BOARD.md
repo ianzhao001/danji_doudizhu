@@ -321,11 +321,11 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 | M6-L6-cue-id-union | CueId string→字面量联合 + cue 一致性绿护栏 | `ui/event-cues.ts`+`test/ui/cue-id-consistency.test.ts` | **done `4c840ed`**（第十批已并 main） |
 
 #### B-2 CC 接线/编辑器/构建串行单写者组（`task/M6-editor`）
-> **⚠️ 历史存档（勿据此认领）**——C2-C4 的**当前**状态以「第十一批 › C 编辑器/UI」表 + 各批验收记录为准（采纳建议#1 统一状态源）：**C1 done · C2 in-review 待 Creator · C3 已拆 C3a/C3b · C4 待 C3a/b**。下表为批9 派发时快照，仅留档。
+> **⚠️ 历史存档（勿据此认领）**——C2-C4 的**当前**状态以「第十一批 › C 编辑器/UI」表 + 各批验收记录为准（采纳建议#1 统一状态源）：**C1 done · C2 done · C3 已拆 C3a/C3b · C4 待 C3a/b**。下表为批9 派发时快照，仅留档。
 | ID | 任务 | 文件域 | 状态（当前·见上） |
 |----|----|----|----|
 | M6-C1-sound-toggle-wiring | 音效开关写侧接线（消费 L1） | `game-scene-skeleton`+`lobby-scene`（运行时注入·未改 scene） | **done `31b5668`** |
-| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | **in-review** 待 Creator（`08d0188`·实现完成·缺截图） |
+| M6-C2-animation-wiring | 基础动画接线（消费 L2·串行于 C1） | `game-scene-skeleton`+`game.scene` | **done `17b96f3`**（Creator 3.8.8 + 390×844 bomb 局部动效截图） |
 | M6-C3-mobile-regression | 移动端回归+渲染性能（消费 L3·串行于 C2） | — | **已拆 → C3a + C3b**（见第十一批 C 表） |
 | M6-C4-build-verification | 构建验证+发布验收记录 | `cocos.config.json`+report | blocked（待 C1-C3） |
 | M6-D1-release-docs | 发布/QA 文档收尾（架构·非派发） | `docs/*`+`BOARD.md` | blocked（待所有轨） |
@@ -416,8 +416,8 @@ main 现状：**127 测试文件 / 623 用例全绿、typecheck 净、纯层零 
 > C3 已拆（采纳建议#3）→ C3a + C3b，降单任务审查/回归面。
 | ID | 文件域 | 依赖 | 状态 |
 |----|----|----|----|
-| M6-C2-animation-wiring | `game-scene-skeleton`+`game.scene` | C1✓·L2✓ | **in-review**（已实现 `08d0188`·待 Creator 验证·见验收记录） |
-| M6-C3a-safearea-screenshots | `*.scene`+`.meta`+M3-36 report+QA | C2 | blocked（待 C2 验过） |
+| M6-C2-animation-wiring | `game-scene-skeleton`+`game.scene` | C1✓·L2✓ | **done `17b96f3`**（Creator 3.8.8 预览·390×844 bomb 局部动效截图·Console 零 Error） |
+| M6-C3a-safearea-screenshots | `*.scene`+`.meta`+M3-36 report+QA | C2✓ | **ready**（C2 已并 main·下一编辑器单写者任务） |
 | M6-C3b-relative-layout-render-diff | `game-scene-skeleton`+report | L3✓·C2·C3a | blocked（串行于 C3a） |
 | M6-C4-build-verification | `cocos.config.json`+report | C1-C3 | blocked（待 C3a/b） |
 | M3-45-stats-records-screens | scene+新 cc 组件 | L7✓/L8✓/M3-40/41 | blocked（待 M3-40/41 + 编辑器档期） |
