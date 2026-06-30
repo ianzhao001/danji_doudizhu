@@ -22,6 +22,7 @@ import { AiLevel } from '../../ai';
 import { nextHint } from '../../ai/hint';
 import { evaluateHand } from '../../ai/handStrength';
 import { trackPlayed } from '../../ai/cardMemory';
+import { adviseAction } from '../../ai/insight';
 import { commitFinishedRound, persistRound, restoreRound, type SessionKeys } from '../../data/session';
 import { difficultyConfig } from '../../data/difficultyConfig';
 import { defaultSettings, type Settings } from '../../data/settings';
@@ -43,6 +44,7 @@ import { deriveStrengthMeter } from '../strength-meter-view';
 import { deriveTurnTimer } from '../turn-timer';
 import { emptyToasts, pushToast, tickToasts, type ToastQueue } from '../toast-queue';
 import { deriveAiThinking } from '../ai-thinking-view';
+import { deriveInsightView } from '../insight-view';
 import { deriveLastActions, type SeatLastAction } from '../last-action-view';
 import type { Rect, TableRegions } from '../table-layout';
 import { toggleSetting, type ToggleKey } from '../settings-view';
@@ -147,6 +149,7 @@ export class GameSceneSkeleton extends Component {
   private turnTimerElapsedMs = 0;
   private uiTickRenderMs = 0;
   private memoryExpanded = false;
+  private advisorEnabled = false;
   private settings: Settings = defaultSettings();
   private statusText = '';
   private submitting = false;
@@ -203,6 +206,7 @@ export class GameSceneSkeleton extends Component {
     this.turnTimerKey = null;
     this.turnTimerElapsedMs = 0;
     this.uiTickRenderMs = 0;
+    this.advisorEnabled = false;
     this.animatedToastIds.clear();
     this.statusText = '';
     this.lastHandSignature = '';
@@ -287,6 +291,7 @@ export class GameSceneSkeleton extends Component {
     this.renderSeatFeedback(vm.layout, canvas);
     this.renderPlayArea(snapshot?.top ?? null, vm.layout, canvas);
     this.renderHud(snapshot?.viewerHand ?? [], vm.layout, canvas);
+    this.renderAdvisor(snapshot, vm.layout, canvas);
     this.renderBidding(bidding ? vm.bidding : undefined, vm.layout, canvas);
     this.renderHand(vm.hand, vm.layout, canvas);
     this.renderStatus(this.statusText || (this.runtime.isPlayerTurn() ? '轮到你' : '等待'), vm.layout, canvas);
@@ -592,6 +597,48 @@ export class GameSceneSkeleton extends Component {
     label.color = timer.urgent ? new Color(255, 196, 196, 255) : new Color(238, 248, 255, 255);
   }
 
+  private renderAdvisor(
+    snapshot: ReturnType<RoundRuntime['currentSnapshot']> | undefined,
+    layout: TableRegions,
+    canvas: { width: number; height: number },
+  ): void {
+    if (!snapshot?.viewerHand || !this.runtime?.isPlayerTurn() || this.runtime.phase() !== 'playing') return;
+    const centerY = layout.playArea.y + layout.playArea.height + 56;
+    const togglePos = this.screenPoint(canvas, layout.actionButtons.x + 34, centerY);
+    this.addButton(
+      this.advisorEnabled ? '建议开' : '建议关',
+      togglePos.x,
+      togglePos.y,
+      70,
+      30,
+      true,
+      () => this.toggleAdvisor(),
+      this.uiRoot!,
+      'advisor-toggle',
+    );
+
+    if (!this.advisorEnabled) return;
+    const insight = deriveInsightView(adviseAction(snapshot.viewerHand, snapshot.top?.pattern ?? null));
+    if (!insight.text) return;
+
+    const width = Math.min(226, Math.max(188, canvas.width - 156));
+    const height = 30;
+    const panelX = Math.min(canvas.width - width / 2 - 24, layout.actionButtons.x + layout.actionButtons.width * 0.66);
+    const panelPos = this.screenPoint(canvas, panelX, centerY);
+    const root = this.ensureNode('advisor-panel', this.uiRoot!);
+    root.setPosition(panelPos.x, panelPos.y, 0);
+    this.addUiTransform(root, width, height);
+    const color = insight.isPass
+      ? new Color(43, 55, 75, 190)
+      : insight.emphasize
+        ? new Color(52, 86, 63, 192)
+        : new Color(37, 42, 58, 184);
+    this.drawHudPanel(root, width, height, color);
+
+    const label = this.addLabel(insight.text, 0, 1, 13, root, width - 18, height - 4, 'advisor-label');
+    label.color = insight.emphasize ? new Color(221, 255, 224, 255) : new Color(255, 248, 226, 255);
+  }
+
   private renderToasts(layout: TableRegions, canvas: { width: number; height: number }): void {
     if (this.toasts.items.length === 0) return;
     const pos = this.screenPoint(canvas, canvas.width / 2, Math.max(148, layout.playArea.y - 10));
@@ -673,6 +720,11 @@ export class GameSceneSkeleton extends Component {
     const move = nextHint(snapshot.viewerHand, snapshot.top?.pattern ?? null, this.selected.length > 0 ? this.selected : undefined);
     if (!move) return;
     this.selected = move.cards.slice();
+    this.render();
+  }
+
+  private toggleAdvisor(): void {
+    this.advisorEnabled = !this.advisorEnabled;
     this.render();
   }
 
