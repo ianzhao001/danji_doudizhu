@@ -4,6 +4,7 @@
 
 import type { Card } from '../rules';
 import type { BiddingState, GameSnapshot, SeatIndex, Settlement } from '../game';
+import type { FlowEvent } from '../flow/types';
 import { deriveActionButtons, type ActionButtonsState } from './action-buttons';
 import { deriveBiddingView, type BiddingView } from './bidding-view';
 import { layoutHandInteractive, type InteractiveSlot } from './hand-interaction';
@@ -28,6 +29,7 @@ export function deriveScreenVM(args: {
   bidding?: BiddingState;
   heroSeat: SeatIndex;
   selectedCards: Card[];
+  recentEvents: FlowEvent[];
   layoutOpts: { containerWidth: number; containerHeight?: number; cardWidth: number; liftOffset: number };
   settlement?: Settlement;
 }): ScreenVM {

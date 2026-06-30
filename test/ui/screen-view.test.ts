@@ -33,6 +33,7 @@ describe('screen view model', () => {
       snapshot: snap,
       heroSeat: 0,
       selectedCards,
+      recentEvents: [],
       layoutOpts,
     });
 
@@ -50,6 +51,7 @@ describe('screen view model', () => {
       bidding: createBidding(0),
       heroSeat: 0,
       selectedCards: [],
+      recentEvents: [],
       layoutOpts,
     });
 
@@ -64,6 +66,7 @@ describe('screen view model', () => {
       settlement: settlement(),
       heroSeat: 2,
       selectedCards: [],
+      recentEvents: [],
       layoutOpts,
     });
 
@@ -76,6 +79,7 @@ describe('screen view model', () => {
     const vm = deriveScreenVM({
       heroSeat: 0,
       selectedCards: [],
+      recentEvents: [],
       layoutOpts,
     });
 
@@ -92,6 +96,7 @@ describe('screen view model', () => {
       snapshot: snapshot(),
       heroSeat: 0,
       selectedCards: [],
+      recentEvents: [],
       layoutOpts,
     });
 
@@ -107,6 +112,7 @@ describe('screen view model', () => {
       snapshot: snapshot(),
       heroSeat: 0,
       selectedCards,
+      recentEvents: [],
       layoutOpts,
     });
 

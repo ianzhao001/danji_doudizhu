@@ -1,4 +1,4 @@
-# M3-68-screen-view-drop-cues 实现报告
+# M3-68-screen-view-drop-cues 返工报告
 
 - 实现方标识：Codex
 - 分支：`task/M3-68-screen-view-drop-cues`
@@ -7,45 +7,46 @@
 ## 改了哪些文件
 - `assets/scripts/ui/screen-view.ts`
   - 移除 `ScreenVM.cues`。
-  - 移除 `deriveScreenVM` 入参 `recentEvents`。
-  - 移除对 `FlowEvent`、`event-cues`、`cueForFlowEvent` 的依赖。
+  - 移除 `cueForFlowEvent` / `CueId` import 与 `recentEvents.map(...).filter(...)` 计算。
+  - 按订正 spec 的 A 方案保留 `deriveScreenVM` args 里的 `recentEvents: FlowEvent[]` 类型入口，函数体不解构、不使用。
 - `test/ui/screen-view.test.ts`
-  - 按新契约移除 `recentEvents` 入参和 `vm.cues` 断言。
-  - 保留布局、按钮、叫分、结算、空态、不可变性等既有断言。
+  - 移除 cues 相关断言。
+  - 所有 `deriveScreenVM` 调用补 `recentEvents: []`，锁住 caller/callee 参数形状。
 
 ## 测试与类型检查输出
 ```
-npm --prefix test test -- ui/screen-view.test.ts
-Test Files  1 passed (1)
-Tests       6 passed (6)
+git merge main
+Merge made by the 'ort' strategy.
+
+npm --prefix test test
+Test Files  131 passed (131)
+Tests       645 passed (645)
 
 npm --prefix test run typecheck
 tsc --noEmit
 
-npm --prefix test test
-Test Files  128 passed (128)
-Tests       632 passed (632)
-
 git diff --check
-<no output>
+通过，无输出
 
-rg -n "from ['\"]cc['\"]" assets/scripts/rules assets/scripts/game assets/scripts/ai assets/scripts/flow assets/scripts/data assets/scripts/ui/screen-view.ts
-<no matches>
+cc import 护栏
+rg -n "^\\s*import .*['\\\"]cc['\\\"]|from ['\\\"]cc['\\\"]" assets/scripts/ui/screen-view.ts test/ui/screen-view.test.ts
+无命中
 ```
 
 ## 与 spec 的偏差 / 关键决策
-- 无偏差。
-- `recentEvents` 在 `screen-view.ts` 内已无消费方，因此按任务书要求从 `deriveScreenVM` 签名中移除。
-- 未改 `event-cues.ts`，该模块仍保留给其他直接消费者。
+- 采用订正任务书推荐 A：保留 `recentEvents` 入参类型，caller `game-scene-skeleton.ts` 零改，因此无需 Creator 编译证据。
+- `recentEvents` 只作为兼容参数保留，不再参与 `ScreenVM` 派生；cue 播放仍由组件内独立 `playCue(event)` 路径处理。
+- 未触碰 `game-scene-skeleton.ts`，也未触碰 `event-cues.ts`。
+- 除 cues 相关断言外，screen-view 既有布局、按钮、叫分、结算、空态、不可变性覆盖保持。
 
 ## 疑问（给架构）
 - 无。
 
 ## 自检（对照验收项）
-- [x] `ScreenVM` 不再暴露 `cues`。
-- [x] `deriveScreenVM` 不再依赖 `FlowEvent` / `cueForFlowEvent`。
-- [x] `screen-view.test.ts` 不再断言 cue 映射。
-- [x] 全量测试绿。
-- [x] typecheck 无错。
-- [x] 仅改声明文件域。
-- [x] 未 import cc。
+- [x] `ScreenVM` 不再暴露 `cues`
+- [x] 去掉 `cueForFlowEvent` / `CueId` 依赖和 cues 映射
+- [x] 保留 `recentEvents: FlowEvent[]` 参数，caller/callee 一致
+- [x] caller `game-scene-skeleton.ts` 未改
+- [x] full suite 全绿
+- [x] typecheck 无错
+- [x] 未 import cc
