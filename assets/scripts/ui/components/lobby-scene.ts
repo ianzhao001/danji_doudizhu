@@ -3,6 +3,7 @@ import { AiLevel } from '../../ai';
 import { emptyRecords, emptyStats, loadSettings, saveSettings, type Settings } from '../../data';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { deriveLobbyView, deriveRecordsView, deriveSettingsView, deriveStatsView } from '../index';
+import { deriveDifficultyPicker } from '../difficulty-picker-view';
 import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
 import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
@@ -15,12 +16,6 @@ const TOGGLE_LABELS: Record<ToggleKey, string> = {
   sound: '音效',
   vibration: '震动',
   animation: '动效',
-};
-
-const DIFFICULTY_LABELS: Record<AiLevel, string> = {
-  [AiLevel.Simple]: '简单',
-  [AiLevel.Normal]: '普通',
-  [AiLevel.Hard]: '困难',
 };
 
 interface HelpRow {
@@ -101,12 +96,13 @@ export class LobbyScene extends Component {
     const statsView = deriveStatsView(stats);
     const settingsView = deriveSettingsView(settings);
     const recordRows = deriveRecordsView(records, 1);
+    const difficulty = deriveDifficultyPicker(settingsView.difficulty).options.find((option) => option.selected);
 
     this.setText(this.continueLabel, lobby.continueLabel);
     this.setText(this.roundsLabel, `局数 ${statsView.rounds}`);
     this.setText(this.winRateLabel, `胜率 ${statsView.winRatePct}%`);
     this.setText(this.netScoreLabel, `净分 ${statsView.netScoreLabel}`);
-    this.setText(this.difficultyLabel, `难度 ${DIFFICULTY_LABELS[settingsView.difficulty]}`);
+    this.setText(this.difficultyLabel, `难度 ${difficulty?.label ?? '普通'}`);
     this.setText(this.latestRecordLabel, recordRows[0]?.scoreLabel ?? '暂无战绩');
     this.renderRuntimeControls(settings);
   }
@@ -129,11 +125,13 @@ export class LobbyScene extends Component {
   private renderSettingsControls(settings: Settings): void {
     if (!this.controlsRoot) return;
     const settingsView = deriveSettingsView(settings);
+    this.renderDifficultyPanel(settingsView.difficulty);
+
     settingsView.toggles.forEach((toggle, index) => {
       this.addButton(
         `${TOGGLE_LABELS[toggle.key]} ${toggle.on ? '开' : '关'}`,
         -112 + index * 112,
-        -304,
+        -244,
         96,
         36,
         true,
@@ -141,32 +139,82 @@ export class LobbyScene extends Component {
         this.controlsRoot!,
       );
     });
+  }
 
-    const levels = [AiLevel.Simple, AiLevel.Normal, AiLevel.Hard] as const;
-    levels.forEach((level, index) => {
-      const selected = settingsView.difficulty === level;
+  private renderDifficultyPanel(current: AiLevel): void {
+    if (!this.controlsRoot) return;
+    const panelWidth = 336;
+    const panelHeight = 210;
+    const panel = this.ensureNode('difficulty-picker-panel', this.controlsRoot);
+    panel.setPosition(0, -296, 0);
+    this.addUiTransform(panel, panelWidth, panelHeight);
+    this.drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 214));
+
+    const picker = deriveDifficultyPicker(current);
+    picker.options.forEach((option, index) => {
+      const y = 6 - index * 38;
       this.addButton(
-        `${selected ? '当前' : ''}${DIFFICULTY_LABELS[level]}`,
-        -112 + index * 112,
-        -354,
-        96,
-        36,
+        '',
+        0,
+        y,
+        panelWidth - 18,
+        32,
         true,
-        () => this.persist(setDifficulty(loadSettings(cocosStorage(), SETTINGS_KEY), level)),
-        this.controlsRoot!,
-        selected,
+        () => this.persist(setDifficulty(loadSettings(cocosStorage(), SETTINGS_KEY), option.level)),
+        panel,
+        option.selected,
       );
+      const title = this.addLabel(
+        option.label,
+        -124,
+        y,
+        15,
+        panel,
+        54,
+        24,
+        `difficulty-label-${option.level}`,
+        option.selected ? new Color(255, 236, 197, 255) : new Color(255, 255, 255, 238),
+      );
+      title.lineHeight = 18;
+      const lines = wrapText(option.description, 13).slice(0, 2);
+      const single = lines.length === 1;
+      lines.forEach((line, lineIndex) => {
+        this.addLabel(
+          line,
+          -6,
+          y + (single ? 0 : 6 - lineIndex * 14),
+          12,
+          panel,
+          194,
+          16,
+          `difficulty-desc-${option.level}-${lineIndex}`,
+          new Color(255, 255, 255, 215),
+        );
+      });
+      if (option.selected) {
+        this.addLabel(
+          '当前',
+          130,
+          y,
+          12,
+          panel,
+          42,
+          20,
+          `difficulty-current-${option.level}`,
+          new Color(255, 236, 197, 255),
+        );
+      }
     });
   }
 
   private renderLobbyEntries(): void {
     if (!this.controlsRoot) return;
-    this.addButton('教程', -116, -248, 92, 34, true, () => {
+    this.addButton('教程', -116, -218, 92, 34, true, () => {
       this.screen = 'tutorial';
       this.tutorialIndex = 0;
       this.render();
     }, this.controlsRoot);
-    this.addButton('帮助', 116, -248, 92, 34, true, () => {
+    this.addButton('帮助', 116, -218, 92, 34, true, () => {
       this.screen = 'help';
       this.helpScrollIndex = 0;
       this.render();
