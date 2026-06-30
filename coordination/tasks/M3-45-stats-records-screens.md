@@ -1,6 +1,6 @@
 # M3-45 战绩/历史明细屏（编辑器·绑 L7/L8 · 第十一批·打磨）
 
-- 状态：blocked（待 M6-L7/L8 + M3-40/41 视图模型入 main；编辑器串行）
+- 状态：**done `a817c98`**（M6-editor 收口；运行时注入，未改 scene/meta）
 - 派发模式：编辑器执行者（Cocos Creator 3.8.8）· `task/M6-editor` 串行（C2/C3/C4 之后或单独编辑器分支，由架构按 .scene 单写者排期）
 - 文件域：`assets/scene/lobby.scene`（加战绩/历史入口与子面板，或新 `assets/scene/stats.scene`）+ `assets/scripts/ui/components/*`（新 cc 组件）+ 对应 `.meta`（编辑器生成）
 - 依赖：**M6-L7 `digestRecords` + M3-40 `deriveStatsDetailView` + M6-L8 `queryRecords` + M3-41 `deriveRecordsDetailView`**（全部入 main）

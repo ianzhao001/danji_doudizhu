@@ -1,6 +1,6 @@
 # M3-55 新手教程屏（编辑器·绑 M3-50 · 第十二批·打磨）
 
-- 状态：blocked（待 M3-50 tutorial-steps 入 main；编辑器串行）
+- 状态：**done `a817c98`**（M6-editor 收口；运行时注入，未改 scene/meta）
 - 派发模式：编辑器执行者（Cocos Creator 3.8.8·单写者）· 编辑器串行分支
 - 文件域：`assets/scene/lobby.scene`（加教程入口）+ `assets/scripts/ui/components/*`（新 cc 组件）+ `.meta`、report
 - 依赖：**M3-50**（`tutorialSteps()`）
