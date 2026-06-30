@@ -1,8 +1,27 @@
 import { _decorator, Button, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UITransform, resources } from 'cc';
 import { AiLevel } from '../../ai';
-import { emptyRecords, emptyStats, loadSettings, saveSettings, type Settings } from '../../data';
+import {
+  deserializeStats,
+  digestRecords,
+  emptyRecords,
+  emptyStats,
+  loadSettings,
+  migrateRecords,
+  saveSettings,
+  type RecordOutcome,
+  type RecordRole,
+  type RecordsState,
+  type Settings,
+} from '../../data';
 import { cocosStorage } from '../../runtime/cocos-storage';
-import { deriveLobbyView, deriveRecordsView, deriveSettingsView, deriveStatsView } from '../index';
+import {
+  deriveLobbyView,
+  deriveRecordsDetailView,
+  deriveRecordsView,
+  deriveSettingsView,
+  deriveStatsDetailView,
+  deriveStatsView,
+} from '../index';
 import { deriveDifficultyPicker } from '../difficulty-picker-view';
 import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
@@ -11,6 +30,8 @@ import { RESOURCE_PATHS } from '../asset-keys';
 
 const { ccclass, property } = _decorator;
 const SETTINGS_KEY = 'doudizhu.settings';
+const STATS_KEY = 'doudizhu.stats';
+const RECORDS_KEY = 'doudizhu.records';
 
 const TOGGLE_LABELS: Record<ToggleKey, string> = {
   sound: '音效',
@@ -22,6 +43,8 @@ interface HelpRow {
   text: string;
   kind: 'title' | 'body' | 'spacer';
 }
+
+type LobbyScreen = 'home' | 'tutorial' | 'help' | 'stats' | 'records';
 
 function highlightLabel(step: TutorialStep): string {
   switch (step.highlight) {
@@ -78,9 +101,14 @@ export class LobbyScene extends Component {
   latestRecordLabel: Label | null = null;
 
   private controlsRoot: Node | null = null;
-  private screen: 'home' | 'tutorial' | 'help' = 'home';
+  private screen: LobbyScreen = 'home';
   private tutorialIndex = 0;
   private helpScrollIndex = 0;
+  private recordQuery: { outcome: RecordOutcome; role: RecordRole; order: 'newest' | 'oldest' } = {
+    outcome: 'all',
+    role: 'all',
+    order: 'newest',
+  };
 
   onLoad(): void {
     this.loadSprite(RESOURCE_PATHS.lobbyBg, this.background);
@@ -90,8 +118,8 @@ export class LobbyScene extends Component {
 
   private render(): void {
     const settings = loadSettings(cocosStorage(), SETTINGS_KEY);
-    const stats = emptyStats();
-    const records = emptyRecords();
+    const stats = this.loadStats();
+    const records = this.loadRecords();
     const lobby = deriveLobbyView({ savedSlot: null, stats });
     const statsView = deriveStatsView(stats);
     const settingsView = deriveSettingsView(settings);
@@ -116,6 +144,14 @@ export class LobbyScene extends Component {
     }
     if (this.screen === 'help') {
       this.renderHelpScreen();
+      return;
+    }
+    if (this.screen === 'stats') {
+      this.renderStatsScreen();
+      return;
+    }
+    if (this.screen === 'records') {
+      this.renderRecordsScreen();
       return;
     }
     this.renderSettingsControls(settings);
@@ -209,14 +245,22 @@ export class LobbyScene extends Component {
 
   private renderLobbyEntries(): void {
     if (!this.controlsRoot) return;
-    this.addButton('教程', -116, -218, 92, 34, true, () => {
+    this.addButton('教程', -126, -218, 72, 34, true, () => {
       this.screen = 'tutorial';
       this.tutorialIndex = 0;
       this.render();
     }, this.controlsRoot);
-    this.addButton('帮助', 116, -218, 92, 34, true, () => {
+    this.addButton('帮助', -42, -218, 72, 34, true, () => {
       this.screen = 'help';
       this.helpScrollIndex = 0;
+      this.render();
+    }, this.controlsRoot);
+    this.addButton('战绩', 42, -218, 72, 34, true, () => {
+      this.screen = 'stats';
+      this.render();
+    }, this.controlsRoot);
+    this.addButton('历史', 126, -218, 72, 34, true, () => {
+      this.screen = 'records';
       this.render();
     }, this.controlsRoot);
   }
@@ -307,6 +351,143 @@ export class LobbyScene extends Component {
     }, panel);
   }
 
+  private renderStatsScreen(): void {
+    if (!this.controlsRoot) return;
+    const view = deriveStatsDetailView(digestRecords(this.loadRecords()));
+    const panel = this.ensureNode('stats-panel', this.controlsRoot);
+    panel.setPosition(0, -96, 0);
+    this.addUiTransform(panel, 330, 500);
+    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 232));
+    this.addLabel('战绩', 0, 210, 22, panel, 220, 34, 'stats-heading');
+    if (view.empty) {
+      this.addLabel('暂无完成对局', 0, 174, 13, panel, 150, 24, 'stats-empty', new Color(255, 255, 255, 190));
+    }
+
+    view.rows.forEach((row, index) => {
+      const y = 160 - index * 26;
+      this.addLabel(row.label, -78, y, 13, panel, 126, 22, `stats-label-${index}`, new Color(255, 255, 255, 216));
+      this.addLabel(row.value, 82, y, 14, panel, 130, 22, `stats-value-${index}`, new Color(255, 246, 213, 250));
+    });
+
+    this.addButton('历史', -72, -214, 96, 36, true, () => {
+      this.screen = 'records';
+      this.render();
+    }, panel);
+    this.addButton('返回', 72, -214, 96, 36, true, () => {
+      this.screen = 'home';
+      this.render();
+    }, panel);
+  }
+
+  private renderRecordsScreen(): void {
+    if (!this.controlsRoot) return;
+    const records = this.loadRecords();
+    const query = { ...this.recordQuery, limit: 5 };
+    const view = deriveRecordsDetailView(records, query);
+    const panel = this.ensureNode('records-panel', this.controlsRoot);
+    panel.setPosition(0, -96, 0);
+    this.addUiTransform(panel, 330, 500);
+    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 232));
+    this.addLabel('历史', 0, 210, 22, panel, 220, 34, 'records-heading');
+
+    this.renderFilterGroup(
+      panel,
+      156,
+      [
+        { label: '全部', value: 'all' },
+        { label: '胜', value: 'win' },
+        { label: '负', value: 'loss' },
+      ],
+      this.recordQuery.outcome,
+      (value) => {
+        this.recordQuery = { ...this.recordQuery, outcome: value };
+        this.render();
+      },
+    );
+    this.renderFilterGroup(
+      panel,
+      118,
+      [
+        { label: '全部', value: 'all' },
+        { label: '地主', value: 'landlord' },
+        { label: '农民', value: 'farmer' },
+      ],
+      this.recordQuery.role,
+      (value) => {
+        this.recordQuery = { ...this.recordQuery, role: value };
+        this.render();
+      },
+    );
+    this.renderFilterGroup(
+      panel,
+      80,
+      [
+        { label: '最新', value: 'newest' },
+        { label: '最早', value: 'oldest' },
+      ],
+      this.recordQuery.order,
+      (value) => {
+        this.recordQuery = { ...this.recordQuery, order: value };
+        this.render();
+      },
+    );
+
+    this.addLabel(view.filterLabel, 0, 48, 13, panel, 240, 22, 'records-filter-label', new Color(255, 255, 255, 205));
+    if (view.empty) {
+      this.addLabel('暂无匹配历史', 0, 4, 16, panel, 180, 30, 'records-empty', new Color(255, 255, 255, 205));
+    } else {
+      view.rows.forEach((row, index) => {
+        const y = 12 - index * 30;
+        const tags = row.tags.length > 0 ? ` ${row.tags.join(' ')}` : '';
+        this.addLabel(
+          `${row.outcomeLabel} ${row.roleLabel} ${row.scoreLabel} ${row.multiplierLabel}${tags}`,
+          0,
+          y,
+          13,
+          panel,
+          280,
+          22,
+          `records-row-${index}`,
+          row.outcomeLabel === '胜' ? new Color(228, 255, 219, 245) : new Color(255, 225, 225, 245),
+        );
+      });
+    }
+
+    this.addButton('战绩', -72, -214, 96, 36, true, () => {
+      this.screen = 'stats';
+      this.render();
+    }, panel);
+    this.addButton('返回', 72, -214, 96, 36, true, () => {
+      this.screen = 'home';
+      this.render();
+    }, panel);
+  }
+
+  private renderFilterGroup<T extends string>(
+    panel: Node,
+    y: number,
+    options: { label: string; value: T }[],
+    current: T,
+    select: (value: T) => void,
+  ): void {
+    const spacing = options.length === 2 ? 86 : 76;
+    const startX = -((options.length - 1) * spacing) / 2;
+    options.forEach((option, index) => {
+      const selected = option.value === current;
+      this.addButton(
+        option.label,
+        startX + index * spacing,
+        y,
+        options.length === 2 ? 78 : 66,
+        30,
+        true,
+        () => select(option.value),
+        panel,
+        selected,
+      ).fontSize = 14;
+    });
+  }
+
   private helpRows(): HelpRow[] {
     const rows: HelpRow[] = [];
     helpSections().forEach((section, sectionIndex) => {
@@ -326,6 +507,22 @@ export class LobbyScene extends Component {
       console.warn('saveSettings failed', error);
     }
     this.render();
+  }
+
+  private loadStats(): ReturnType<typeof emptyStats> {
+    const raw = cocosStorage().getItem(STATS_KEY);
+    return raw === null ? emptyStats() : deserializeStats(raw);
+  }
+
+  private loadRecords(): RecordsState {
+    const raw = cocosStorage().getItem(RECORDS_KEY);
+    if (raw === null) return emptyRecords();
+    try {
+      return migrateRecords(JSON.parse(raw));
+    } catch (error) {
+      console.warn('loadRecords failed', error);
+      return emptyRecords();
+    }
   }
 
   private setText(label: Label | null, text: string): void {
