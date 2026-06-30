@@ -49,6 +49,37 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 > **优先级**：#4（每帧 I/O·性能）与 #1（错误可诊断性）最高，分落 M3-67 / M6-G18；#5 一行修锁次之。
 > **派发**：M6-G18 与 M3-68 即可认领（纯逻辑·PROTOCOL bootstrap）；M3-67 待 M6-editor 第二批入 main 后翻 ready，接在 M3-65/M3-66 之后的编辑器串行队列。
 
+## 第十六批（第四轮全量审查转化 · 18 项逐条裁决 · 2026-07-01）
+
+> 第四轮三方审查（读 84 文件/7086 行·未改码）提 18 项。架构**逐条核实代码后裁决**：采纳并立任务 4 项 · 已在第十五批覆盖 2 项 · 采纳但暂不立任务（记录理由）4 项 · 驳回（核实为非问题）6 项 · 另 #16 装饰性可顺手收。
+
+### 采纳并派发（4 任务·均纯逻辑·worktree）
+| ID | 文件域 | 分支 | 状态 | 覆盖 |
+|----|----|----|----|----|
+| M6-G19-typeguard-consolidation | 新 `rules/guards.ts`+`game/seat.ts` + 多消费方改 import | `task/M6-G19-typeguard-consolidation` | **ready** | #3 重复守卫去重（isRecord×6/isSeat×4/nextSeat×2/cardKey×3/isGameEvent×2） |
+| M6-G20-core-structural-sharing | `game/core.ts` | `task/M6-G20-core-structural-sharing` | **ready** | #7 不可变结构共享（去 pass/未变座位冗余手牌拷贝） |
+| M6-G21-ai-heuristic-hardening | `ai/cardMemory.ts`+`ai/handStrength.ts` | `task/M6-G21-ai-heuristic-hardening` | **ready** | #8 cardMemory 不可变·#11 straightLength 去隐式顺序依赖·#12 评分权重具名 |
+| M4-42-hard-ai-depth | `ai/levels/hard.ts` | `task/M4-42-hard-ai-depth` | **todo（产品 gated）** | #9 Hard 中盘纵深（消费 M4-30/31/32·selfplay 胜率验收） |
+
+> **串行约束**：G19 与 G20 均触 `game/core.ts`，**不并行**（report 注明顺序）。G21 与 M4-42 均 ai/ 但文件域不交（G21=cardMemory/handStrength，M4-42=levels/hard）可并行。G19/G20/G21 为发布前清理类，M4-42 显著更大、按产品优先级单独排期。
+
+### 已在第十五批覆盖（不重复立项）
+- **#5**（game-scene 每帧设置 I/O）= **M3-67** 已含。
+- **#18**（`terminateWithError` 错误吞没）= **M6-G18** 已含。
+
+### 采纳但暂不立任务（记录理由·留后续）
+- **#1 上帝组件 `game-scene-skeleton.ts`(1278 行) / #10 `round-runtime.ts`(427 行) 拆分**：有效债务，但**发布前做高风险大重构不当**——组件/runtime 均可用且经多轮审查+截图+CDP 净；单组件运行时注入是项目刻意决策、round-runtime 刚被 G16 硬化。**登记为已知债务**，留发布后重构里程碑（建议补进 M6-D4 已知限制）。
+- **#4 `legalFollows` 全量枚举无剪枝**：真实但**过早优化**——selfplay 1..50 仅 ~10.8s 无实测瓶颈；keystone rules 层改动须逐一证明等价；与项目既有立场一致（G16 已以「过早优化」否决 legalInputs 缓存）。**留待 profiling 触发**再做等价守护版定向生成。
+- **#6 `save.ts` 双重序列化**：真实瑕疵（round 字段被转义两次 + 兼容分支），但**低价值**——单存档槽体积膨胀可忽略；属受测数据 codec 的**格式变更**，发布前性价比低（修法本身向后兼容、安全）。**留后续数据层清理**。
+
+### 驳回（核实为非问题·附依据）
+- **#2 submitPlay 双 `render()`**：**不存在**。`game-scene-skeleton.ts:795-807` 全方法仅一处 render；所引片段与代码不符。
+- **#13 春天判定基于出牌次数**：**逻辑正确**。地主必首家领出 → `landlordPlays===1` 恰表「仅领出一手后被农民清牌」= 标准反春天，非 bug；仅可加一行说明注释。
+- **#14 selection 过滤无 dirty 检测**：**非问题**。过滤在 `render()` 开头、`renderHand` 前同一调用内完成，无跨帧不一致（评审亦承认全量重绘下不出问题）。
+- **#15 `validatePlay` 双遍历**：微优化，合并会耦合 ownership 与 recognize，收益微乎；否决。
+- **#16 `vibrate()` 双重断言**：装饰性；`?.()` 可选调用本就安全，可在 M3-67 顺手收紧，不值独立任务。
+- **#17 冻结 `RoundState`**：给核心热路径加 deep-freeze 开销，换 G13/G14 护栏+约定已提供的防护；发布前否决。
+
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
 - **客观门全绿**：`npm --prefix test test` **90 文件 / 462 全绿**；`typecheck` exit 0；纯层（`rules/game/ai/flow/data`）+ `ui/{audio-gate,animation-params,table-layout,screen-view,event-cues}` grep **零 `from 'cc'`**；`flow→data` 零 import；工作树净；新文件 `.meta` 齐全（audio-gate/animation-params）；ART 仅在 `asset-previews/`，**未污染 `assets/`**。
