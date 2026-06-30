@@ -4,6 +4,7 @@ import { emptyRecords, emptyStats, loadSettings, saveSettings, type Settings } f
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { deriveLobbyView, deriveRecordsView, deriveSettingsView, deriveStatsView } from '../index';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
+import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
 import { RESOURCE_PATHS } from '../asset-keys';
 
 const { ccclass, property } = _decorator;
@@ -20,6 +21,37 @@ const DIFFICULTY_LABELS: Record<AiLevel, string> = {
   [AiLevel.Normal]: '普通',
   [AiLevel.Hard]: '困难',
 };
+
+function highlightLabel(step: TutorialStep): string {
+  switch (step.highlight) {
+    case 'playerHand':
+      return '玩家手牌';
+    case 'biddingPanel':
+      return '叫抢区域';
+    case 'playArea':
+      return '出牌区';
+    case 'actionButtons':
+      return '操作按钮';
+    case 'scorePanel':
+      return '结算面板';
+    default:
+      return '当前步骤';
+  }
+}
+
+function wrapText(text: string, charsPerLine: number): string[] {
+  const lines: string[] = [];
+  let line = '';
+  for (const char of Array.from(text)) {
+    line += char;
+    if (line.length >= charsPerLine) {
+      lines.push(line.trimEnd());
+      line = '';
+    }
+  }
+  if (line) lines.push(line.trimEnd());
+  return lines;
+}
 
 @ccclass('LobbyScene')
 export class LobbyScene extends Component {
@@ -45,6 +77,8 @@ export class LobbyScene extends Component {
   latestRecordLabel: Label | null = null;
 
   private controlsRoot: Node | null = null;
+  private screen: 'home' | 'tutorial' = 'home';
+  private tutorialIndex = 0;
 
   onLoad(): void {
     this.loadSprite(RESOURCE_PATHS.lobbyBg, this.background);
@@ -67,13 +101,22 @@ export class LobbyScene extends Component {
     this.setText(this.netScoreLabel, `净分 ${statsView.netScoreLabel}`);
     this.setText(this.difficultyLabel, `难度 ${DIFFICULTY_LABELS[settingsView.difficulty]}`);
     this.setText(this.latestRecordLabel, recordRows[0]?.scoreLabel ?? '暂无战绩');
+    this.renderRuntimeControls(settings);
+  }
+
+  private renderRuntimeControls(settings: Settings): void {
+    if (!this.controlsRoot) return;
+    this.clearNode(this.controlsRoot);
+    if (this.screen === 'tutorial') {
+      this.renderTutorialScreen();
+      return;
+    }
     this.renderSettingsControls(settings);
+    this.renderLobbyEntries();
   }
 
   private renderSettingsControls(settings: Settings): void {
     if (!this.controlsRoot) return;
-    this.clearNode(this.controlsRoot);
-
     const settingsView = deriveSettingsView(settings);
     settingsView.toggles.forEach((toggle, index) => {
       this.addButton(
@@ -105,6 +148,56 @@ export class LobbyScene extends Component {
     });
   }
 
+  private renderLobbyEntries(): void {
+    if (!this.controlsRoot) return;
+    this.addButton('教程', -116, -248, 92, 34, true, () => {
+      this.screen = 'tutorial';
+      this.tutorialIndex = 0;
+      this.render();
+    }, this.controlsRoot);
+  }
+
+  private renderTutorialScreen(): void {
+    if (!this.controlsRoot) return;
+    const steps = tutorialSteps();
+    const currentIndex = Math.max(0, Math.min(this.tutorialIndex, steps.length - 1));
+    const current = steps[currentIndex];
+    if (!current) {
+      this.screen = 'home';
+      this.render();
+      return;
+    }
+
+    const panel = this.ensureNode('tutorial-panel', this.controlsRoot);
+    panel.setPosition(0, -120, 0);
+    this.addUiTransform(panel, 318, 360);
+    this.drawPanel(panel, 318, 360, new Color(42, 44, 58, 222));
+    this.addLabel('新手教程', 0, 138, 22, panel, 240, 34, 'tutorial-heading');
+    this.addLabel(`${currentIndex + 1}/${steps.length}`, 118, 138, 13, panel, 54, 24, 'tutorial-progress');
+    this.addLabel(current.title, 0, 92, 24, panel, 250, 42, 'tutorial-title');
+    wrapText(current.body, 16).forEach((line, index) => {
+      this.addLabel(line, 0, 38 - index * 24, 16, panel, 252, 24, `tutorial-body-${index}`);
+    });
+    if (current.highlight) this.addLabel(`重点：${highlightLabel(current)}`, 0, -42, 14, panel, 220, 28, 'tutorial-highlight');
+
+    this.addButton('上一步', -96, -132, 78, 36, this.tutorialIndex > 0, () => {
+      this.tutorialIndex = Math.max(0, this.tutorialIndex - 1);
+      this.render();
+    }, panel);
+    this.addButton(this.tutorialIndex >= steps.length - 1 ? '完成' : '下一步', 0, -132, 78, 36, true, () => {
+      if (this.tutorialIndex >= steps.length - 1) {
+        this.screen = 'home';
+      } else {
+        this.tutorialIndex = nextStep(steps, this.tutorialIndex);
+      }
+      this.render();
+    }, panel);
+    this.addButton('跳过', 96, -132, 78, 36, true, () => {
+      this.screen = 'home';
+      this.render();
+    }, panel);
+  }
+
   private persist(next: Settings): void {
     try {
       saveSettings(cocosStorage(), SETTINGS_KEY, next);
@@ -116,6 +209,29 @@ export class LobbyScene extends Component {
 
   private setText(label: Label | null, text: string): void {
     if (label) label.string = text;
+  }
+
+  private addLabel(
+    text: string,
+    x: number,
+    y: number,
+    fontSize: number,
+    parent: Node,
+    width: number,
+    height: number,
+    name: string,
+  ): Label {
+    const node = this.ensureNode(name, parent);
+    node.setPosition(x, y, 0);
+    this.addUiTransform(node, width, height);
+    const label = node.getComponent(Label) ?? node.addComponent(Label);
+    label.string = text;
+    label.fontSize = fontSize;
+    label.lineHeight = fontSize + 6;
+    label.horizontalAlign = Label.HorizontalAlign.CENTER;
+    label.verticalAlign = Label.VerticalAlign.CENTER;
+    label.color = new Color(255, 255, 255, 255);
+    return label;
   }
 
   private addButton(
@@ -190,6 +306,14 @@ export class LobbyScene extends Component {
     graphics.roundRect(-width / 2, -height / 2, width, height, 8);
     graphics.fill();
     return node;
+  }
+
+  private drawPanel(parent: Node, width: number, height: number, fill: Color): void {
+    const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = fill;
+    graphics.roundRect(-width / 2, -height / 2, width, height, 8);
+    graphics.fill();
   }
 
   private addUiTransform(node: Node, width: number, height: number): UITransform {
