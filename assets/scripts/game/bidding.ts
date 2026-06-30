@@ -5,6 +5,7 @@
  */
 
 import { SeatIndex, IllegalActionError } from './types';
+import { nextSeat } from './seat';
 
 export type BidActionType = 'call' | 'grab' | 'pass';
 export interface BidAction {
@@ -24,10 +25,6 @@ export interface BiddingState {
   callingPasses: number; // calling 阶段累计 pass 数
   grabQueue: SeatIndex[]; // grabbing 阶段「待行动座位」队列
   grabbed: boolean; // 本 grabbing 轮是否已发生过 grab
-}
-
-function nextSeat(seat: SeatIndex): SeatIndex {
-  return ((seat + 1) % 3) as SeatIndex;
 }
 
 function grabQueueFor(caller: SeatIndex): SeatIndex[] {

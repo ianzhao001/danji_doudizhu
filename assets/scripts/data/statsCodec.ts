@@ -4,6 +4,7 @@
  */
 
 import { type MatchStats, emptyStats } from './stats';
+import { isRecord } from '../rules/guards';
 
 export const STATS_VERSION = 1;
 
@@ -15,10 +16,6 @@ const STAT_FIELDS = [
   'farmerWins',
   'netScore',
 ] as const;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
 
 function numberOrDefault(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;

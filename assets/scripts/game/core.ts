@@ -5,6 +5,7 @@
  */
 
 import { Card, Category, Deal, validatePlay } from '../rules';
+import { cardKey } from '../rules/guards';
 import {
   RoundState,
   RoundAction,
@@ -17,14 +18,7 @@ import {
   GameEvent,
   PlayerSeat,
 } from './types';
-
-function nextSeat(seat: SeatIndex): SeatIndex {
-  return ((seat + 1) % 3) as SeatIndex;
-}
-
-function cardKey(card: Card): string {
-  return `${card.rank}:${card.suit}`;
-}
+import { nextSeat } from './seat';
 
 function findSeat(state: RoundState, seat: SeatIndex): PlayerSeat {
   const player = state.seats.find((s) => s.index === seat);
@@ -64,7 +58,7 @@ function removeCards(hand: Card[], cards: Card[]): Card[] {
 
 function replaceSeatHand(state: RoundState, seat: SeatIndex, hand: Card[]): PlayerSeat[] {
   return state.seats.map((player) =>
-    player.index === seat ? { ...player, hand } : { ...player, hand: player.hand.slice() },
+    player.index === seat ? { ...player, hand } : player,
   );
 }
 
@@ -108,7 +102,6 @@ export function apply(state: RoundState, action: RoundAction): ApplyResult {
       return {
         state: {
           ...state,
-          seats: state.seats.map((player) => ({ ...player, hand: player.hand.slice() })),
           turn: leader,
           top: null,
           passesInARow: 0,
@@ -120,7 +113,6 @@ export function apply(state: RoundState, action: RoundAction): ApplyResult {
     return {
       state: {
         ...state,
-        seats: state.seats.map((player) => ({ ...player, hand: player.hand.slice() })),
         turn: nextSeat(action.seat),
         passesInARow: nextPasses,
       },

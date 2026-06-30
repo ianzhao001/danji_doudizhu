@@ -70,4 +70,40 @@ describe('evaluateHand', () => {
     expect(first.score).toBeLessThanOrEqual(100);
     expect(second).toEqual(first);
   });
+
+  it('keeps straight length stable when the hand also contains 2 and jokers', () => {
+    const hand = [
+      c(Rank.R3),
+      c(Rank.R4),
+      c(Rank.R5),
+      c(Rank.A),
+      c(Rank.R2),
+      c(Rank.SmallJoker),
+      c(Rank.BigJoker),
+    ];
+
+    expect(evaluateHand(hand).longestStraight).toBe(3);
+  });
+
+  it('preserves the named weight formula output for a representative strong hand', () => {
+    const hand = [
+      c(Rank.SmallJoker),
+      c(Rank.BigJoker),
+      c(Rank.R2),
+      ...four(Rank.Q),
+      c(Rank.R3),
+      c(Rank.R4),
+      c(Rank.R5),
+      c(Rank.R6),
+      c(Rank.R7),
+    ];
+
+    expect(evaluateHand(hand)).toEqual({
+      score: 78,
+      bombs: 1,
+      rockets: 1,
+      highCards: 3,
+      longestStraight: 5,
+    });
+  });
 });
