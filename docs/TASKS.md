@@ -4,6 +4,8 @@
 
 > 2026-07-01 收口更新：M6-editor 后续编辑器 UI 已审查通过并入 main `a817c98`（M3-57 toast/timer、M3-63 AI thinking/last action、M3-64 advisor、M3-55 tutorial、M3-46a help、M3-46b pause overlay、M3-59 difficulty picker、M3-45 stats/records；均为运行时注入，未改 scene/meta/root 配置；390×844 截图 + CDP errors `[]`）。最终验证 **128 测试文件 / 632 用例全绿、typecheck 净**。剩余本地 gate：ART-IMPORT-02/03/04 与 ART-05 待用户视觉终审，M6-D1 发布/QA 文档收尾待最终发布 gate。
 
+> 2026-07-01 第十五批派发（M6-editor 两轮审查转化·5 任务·均非阻塞）：第二批编辑器 UI（M3-45/46a/46b/55/57/59/63/64）+ 第三轮 round-runtime/运行时审查**均通过**，发现转出 5 个文件域互不相交的打磨/硬化任务——纯逻辑 **M6-G18**（round-runtime 诊断可见性 + replay 盲区）·**M3-68**（screen-view 去 dead `cues`）已 **ready** 可即认领；编辑器串行 **M3-65**（lobby home 重排 + 子屏不透出）·**M3-66**（HUD 叠压消除 + 暂停冻结计时）·**M3-67**（去每帧存储 I/O + 修 submitting 死锁 + 音频并发）**blocked** 待本批入 main。详见 coordination/BOARD.md「第十五批」。
+
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
 状态说明：
@@ -130,4 +132,5 @@
 - [x] 异常流程检查。〔M6-L4 已并 main `c08de19`·resume-to-settled/redead 超限/bidding reason·5/5 绿〕
 - [x] 构建验证。〔M6-C4 已并 main `4c314b9`·Creator 3.8.8 web-mobile build success·390×844 运行烟测·交叉审查 approve〕
 - [x] 发布硬化（三方审查转化·第十四批）。〔M6-G16 已并 main `d9cc851`·`round-runtime.ts` 生命周期/错误边界/死状态（RR-1..10）·RR-1 settled replay 登记后续契约取舍；M6-G17 已并 main `422411c`·`event-cues.ts` cue 编译期穷尽断言 + 签名诚实化（EC-1/EC-3，驳回 EC-2）·最终 128/632 绿·typecheck 净〕
+- [ ] 发布硬化（第三轮审查转化·第十五批·续 G16）。〔M6-G18 `round-runtime.ts` 诊断可见性（存错误 + `terminationDetail()` 访问器）+ replay 漏 resume-settled + 单投递 replay·纯 spec·ready·**不碰 `flow/types.ts`**·守 M3-56 不变量〕
 - [ ] 发布验收记录。〔M6-D1 待所有轨 merge·架构收尾〕

@@ -35,6 +35,20 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 > **未纳入**：`update(dt)` 周期 render × 出牌飞行 tween（审查期 CDP 无错 + 交互正常，仅登记观察，不立任务）。
 > **解锁/派发**：本批 M6-editor 合并 main 后两任务由 blocked 翻 ready；编辑器任务交付按「📐 编辑器任务验收模板」附 390×844 截图与 Console 证据。
 
+### 第十五批·第二波（第三轮审查转化 · round-runtime 诊断 + 运行时卫生 · 2026-07-01）
+
+> 第三轮审查（G16/G17 已并 main 后，未改码）对 `flow/round-runtime.ts`（3 项）+ `ui/components/game-scene-skeleton.ts`（4 项）+ `ui/screen-view.ts`（1 项）的发现，架构**逐条核实代码后全部采纳**（8/8），转 3 个文件域互不相交的任务。`event-cues.ts` 经审查**无新缺陷**（G17 编译期穷尽断言到位）。
+
+| ID | 类型 | 文件域 | 分支 | 状态 | 覆盖发现 |
+|----|----|----|----|----|----|
+| M6-G18-round-runtime-diagnostics | 发布硬化(改产品码·纯 spec) | `flow/round-runtime.ts` + 新 `test/flow/round-runtime-diagnostics.test.ts` | `task/M6-G18-round-runtime-diagnostics` | **ready**（无依赖·可即认领·与编辑器线并行） | #1 错误吞没(M)·#2 replay 漏 settled(L)·#3 单投递 replay(L) |
+| M3-67-game-scene-runtime-hygiene | 编辑器(运行时卫生) | `ui/components/game-scene-skeleton.ts` | `task/M6-editor` | blocked（待本批入 main） | #4 每帧存储 I/O(M)·#5 submitting 死锁(M)·#7 音频并发(L)·#8 按钮重注册(L·可选) |
+| M3-68-screen-view-drop-cues | 纯岛清理(纯 spec) | `ui/screen-view.ts` + `test/ui/screen-view.test.ts` | `task/M3-68-screen-view-drop-cues` | **ready**（无依赖·可即认领） | #6 dead `vm.cues`(L) |
+
+> **架构裁决要点（落进 spec）**：① **#1** 倾向「存错误 + `terminationDetail(): unknown` 访问器」（`RoundRuntime` 接口 additive 非破坏，**不碰 `flow/types.ts`**，续 G16 纪律），`console.warn` 仅可选且勿刷 selfplay；② **#2** 放宽 replay 入队覆盖构造期同步 emit（`'deal'`+`'settled'`），**严守 M3-56 不变量**（非 round 事件不串入 `fullGameEvents`、fresh 仍恰一次 deal）；③ **#3** 多订阅者 replay 语义二选一（per-subscriber 补发 / 显式注释单投递），属 by-design 澄清；④ **#4/#5/#7** 编辑器运行时卫生，纯去 I/O + 一行修锁 + `playOneShot`，**不改布局/交互**；⑤ **#8** 列为**可选 stretch**——仅在确证不产生 stale 按钮时做，否则保持现状（LOW 价值 vs 热路径回归风险）。
+> **优先级**：#4（每帧 I/O·性能）与 #1（错误可诊断性）最高，分落 M3-67 / M6-G18；#5 一行修锁次之。
+> **派发**：M6-G18 与 M3-68 即可认领（纯逻辑·PROTOCOL bootstrap）；M3-67 待 M6-editor 第二批入 main 后翻 ready，接在 M3-65/M3-66 之后的编辑器串行队列。
+
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
 - **客观门全绿**：`npm --prefix test test` **90 文件 / 462 全绿**；`typecheck` exit 0；纯层（`rules/game/ai/flow/data`）+ `ui/{audio-gate,animation-params,table-layout,screen-view,event-cues}` grep **零 `from 'cc'`**；`flow→data` 零 import；工作树净；新文件 `.meta` 齐全（audio-gate/animation-params）；ART 仅在 `asset-previews/`，**未污染 `assets/`**。
