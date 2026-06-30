@@ -346,7 +346,7 @@ class RoundRuntimeImpl implements RoundRuntime {
   }
 
   private isReplayableStartupEvent(event: FlowEvent): boolean {
-    return event.type === 'deal' || event.type === 'settled';
+    return event.type === 'deal';
   }
 
   private deliver(subscriber: (event: FlowEvent) => void, event: FlowEvent): void {

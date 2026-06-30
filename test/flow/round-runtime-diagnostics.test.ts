@@ -115,7 +115,7 @@ describe('round-runtime diagnostics hardening', () => {
     expect(runtime.terminationDetail()).toBe(boom);
   });
 
-  it('replays resume-settled events to the first subscriber', async () => {
+  it('does not replay resume-settled events to onEvent subscribers', async () => {
     const winEvent: GameEvent = { type: 'win', seat: 0, side: Side.Landlord };
     const runtime = resumeRoundRuntime(
       {
@@ -133,7 +133,7 @@ describe('round-runtime diagnostics hardening', () => {
 
     expect(runtime.phase()).toBe('settled');
     expect(runtime.settlement()).not.toBeNull();
-    expect(seen).toEqual(['settled']);
+    expect(seen).toEqual([]);
   });
 
   it('replays the opening deal once per subscriber before realtime events start', async () => {
