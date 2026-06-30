@@ -4,10 +4,8 @@
 
 import type { Card } from '../rules';
 import type { BiddingState, GameSnapshot, SeatIndex, Settlement } from '../game';
-import type { FlowEvent } from '../flow';
 import { deriveActionButtons, type ActionButtonsState } from './action-buttons';
 import { deriveBiddingView, type BiddingView } from './bidding-view';
-import { cueForFlowEvent, type CueId } from './event-cues';
 import { layoutHandInteractive, type InteractiveSlot } from './hand-interaction';
 import { deriveResultView, type ResultView } from './result-view';
 import { tableLayout, type TableRegions } from './table-layout';
@@ -18,7 +16,6 @@ export interface ScreenVM {
   actions: ActionButtonsState;
   bidding?: BiddingView;
   result?: ResultView;
-  cues: CueId[];
   topBar: { multiplier: number; bombs: number; landlordSeat: SeatIndex };
 }
 
@@ -31,11 +28,10 @@ export function deriveScreenVM(args: {
   bidding?: BiddingState;
   heroSeat: SeatIndex;
   selectedCards: Card[];
-  recentEvents: FlowEvent[];
   layoutOpts: { containerWidth: number; containerHeight?: number; cardWidth: number; liftOffset: number };
   settlement?: Settlement;
 }): ScreenVM {
-  const { snapshot, bidding, heroSeat, selectedCards, recentEvents, layoutOpts, settlement } = args;
+  const { snapshot, bidding, heroSeat, selectedCards, layoutOpts, settlement } = args;
   const hand = snapshot
     ? layoutHandInteractive({
         hand: snapshot.viewerHand ?? [],
@@ -43,9 +39,6 @@ export function deriveScreenVM(args: {
         ...layoutOpts,
       })
     : [];
-  const cues = recentEvents
-    .map(cueForFlowEvent)
-    .filter((cue): cue is CueId => cue !== null);
 
   return {
     layout:
@@ -56,7 +49,6 @@ export function deriveScreenVM(args: {
     actions: snapshot ? deriveActionButtons({ snapshot, selectedCards, viewerSeat: heroSeat }) : emptyActions(),
     bidding: bidding ? deriveBiddingView(bidding, heroSeat) : undefined,
     result: settlement ? deriveResultView({ settlement, landlord: snapshot?.landlord ?? 0, heroSeat }) : undefined,
-    cues,
     topBar: {
       multiplier: settlement?.multiplier ?? 1,
       bombs: settlement?.bombs ?? 0,

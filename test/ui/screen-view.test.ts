@@ -26,17 +26,13 @@ function settlement(overrides: Partial<Settlement> = {}): Settlement {
 }
 
 describe('screen view model', () => {
-  it('derives playing screen pieces from snapshot and recent events', () => {
+  it('derives playing screen pieces from snapshot', () => {
     const snap = snapshot();
     const selectedCards = cards('K');
     const vm = deriveScreenVM({
       snapshot: snap,
       heroSeat: 0,
       selectedCards,
-      recentEvents: [
-        { type: 'round', event: { type: 'pass', seat: 1 } },
-        { type: 'round', event: { type: 'play', seat: 0, pattern: top('5').pattern } },
-      ],
       layoutOpts,
     });
 
@@ -44,7 +40,6 @@ describe('screen view model', () => {
     expect(vm.hand.length).toBe(3);
     expect(vm.actions.play).toBe(true);
     expect(vm.actions.pass).toBe(true);
-    expect(vm.cues).toEqual(['pass', 'play']);
     expect(vm.bidding).toBeUndefined();
     expect(vm.result).toBeUndefined();
     expect(vm.topBar.landlordSeat).toBe(2);
@@ -55,7 +50,6 @@ describe('screen view model', () => {
       bidding: createBidding(0),
       heroSeat: 0,
       selectedCards: [],
-      recentEvents: [],
       layoutOpts,
     });
 
@@ -70,7 +64,6 @@ describe('screen view model', () => {
       settlement: settlement(),
       heroSeat: 2,
       selectedCards: [],
-      recentEvents: [],
       layoutOpts,
     });
 
@@ -83,7 +76,6 @@ describe('screen view model', () => {
     const vm = deriveScreenVM({
       heroSeat: 0,
       selectedCards: [],
-      recentEvents: [],
       layoutOpts,
     });
 
@@ -91,7 +83,6 @@ describe('screen view model', () => {
     expect(vm.actions).toEqual({ play: false, pass: false, hint: false });
     expect(vm.bidding).toBeUndefined();
     expect(vm.result).toBeUndefined();
-    expect(vm.cues).toEqual([]);
     expect(vm.topBar).toEqual({ multiplier: 1, bombs: 0, landlordSeat: 0 });
     expect(vm.layout.topBar).toBeDefined();
   });
@@ -101,7 +92,6 @@ describe('screen view model', () => {
       snapshot: snapshot(),
       heroSeat: 0,
       selectedCards: [],
-      recentEvents: [],
       layoutOpts,
     });
 
@@ -109,21 +99,17 @@ describe('screen view model', () => {
     expect(vm.topBar.bombs).toBe(0);
   });
 
-  it('does not mutate selectedCards or recentEvents', () => {
+  it('does not mutate selectedCards', () => {
     const selectedCards = cards('K');
-    const recentEvents = [{ type: 'round' as const, event: { type: 'pass' as const, seat: 1 as const } }];
     const selectedBefore = selectedCards.map((card) => ({ ...card }));
-    const eventsBefore = structuredClone(recentEvents);
 
     deriveScreenVM({
       snapshot: snapshot(),
       heroSeat: 0,
       selectedCards,
-      recentEvents,
       layoutOpts,
     });
 
     expect(selectedCards).toEqual(selectedBefore);
-    expect(recentEvents).toEqual(eventsBefore);
   });
 });
