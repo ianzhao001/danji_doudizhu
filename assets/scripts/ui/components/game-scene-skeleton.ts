@@ -42,6 +42,8 @@ import { deriveScreenVM } from '../screen-view';
 import { deriveStrengthMeter } from '../strength-meter-view';
 import { deriveTurnTimer } from '../turn-timer';
 import { emptyToasts, pushToast, tickToasts, type ToastQueue } from '../toast-queue';
+import { deriveAiThinking } from '../ai-thinking-view';
+import { deriveLastActions, type SeatLastAction } from '../last-action-view';
 import type { Rect, TableRegions } from '../table-layout';
 import { toggleSetting, type ToggleKey } from '../settings-view';
 import { RESOURCE_PATHS, cardAssetPath, cueAudioPath } from '../asset-keys';
@@ -179,8 +181,9 @@ export class GameSceneSkeleton extends Component {
 
     let shouldRender = this.tickToastState();
     const timerActive = this.syncTurnTimerKey();
+    const thinkingAnimating = this.settings.animation && this.isAiThinkingActive();
     if (timerActive) this.turnTimerElapsedMs = Math.min(TURN_TIMER_MS, this.turnTimerElapsedMs + deltaMs);
-    if (timerActive && this.uiTickRenderMs >= UI_TICK_RENDER_MS) {
+    if ((timerActive || thinkingAnimating) && this.uiTickRenderMs >= UI_TICK_RENDER_MS) {
       this.uiTickRenderMs = 0;
       shouldRender = true;
     }
@@ -281,6 +284,7 @@ export class GameSceneSkeleton extends Component {
     this.renderTopBar(this.runtime.phase(), vm.topBar, snapshot?.viewerHand?.length ?? 0, vm.layout, canvas);
     this.renderRuntimeSettings(vm.layout, canvas);
     this.renderSeats(snapshot?.handCounts ?? [0, 0, 0], snapshot?.landlord ?? null, vm.layout, canvas);
+    this.renderSeatFeedback(vm.layout, canvas);
     this.renderPlayArea(snapshot?.top ?? null, vm.layout, canvas);
     this.renderHud(snapshot?.viewerHand ?? [], vm.layout, canvas);
     this.renderBidding(bidding ? vm.bidding : undefined, vm.layout, canvas);
@@ -345,6 +349,47 @@ export class GameSceneSkeleton extends Component {
     const right = this.rectPoint(layout.playArea, canvas, 0.94, 0.24);
     this.addLabel(`AI 左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, left.x, left.y, 16, this.uiRoot!, 108, 64, 'seat-left');
     this.addLabel(`AI 右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, right.x, right.y, 16, this.uiRoot!, 108, 64, 'seat-right');
+  }
+
+  private renderSeatFeedback(layout: TableRegions, canvas: { width: number; height: number }): void {
+    this.renderLastActions(layout, canvas);
+    this.renderAiThinking(layout, canvas);
+  }
+
+  private renderLastActions(layout: TableRegions, canvas: { width: number; height: number }): void {
+    const recentRoundEvents = this.recentEvents.flatMap((event) => (event.type === 'round' ? [event.event] : []));
+    const rows = deriveLastActions(recentRoundEvents);
+    rows.forEach((row) => {
+      const pos = this.lastActionPosition(row.seat, layout, canvas);
+      const label = this.addLabel(row.text, pos.x, pos.y, 12, this.uiRoot!, pos.width, 24, `last-action-${row.seat}`);
+      label.color = row.text === '—' ? new Color(255, 255, 255, 120) : new Color(255, 244, 209, 230);
+    });
+  }
+
+  private renderAiThinking(layout: TableRegions, canvas: { width: number; height: number }): void {
+    const thinking = this.aiThinkingView();
+    if (!thinking?.active || thinking.seat === null) {
+      this.clearAiThinkingNodes();
+      return;
+    }
+    const pos = this.aiThinkingPosition(thinking.seat, layout, canvas);
+    const root = this.ensureNode(`ai-thinking-${thinking.seat}`, this.uiRoot!);
+    root.setPosition(pos.x, pos.y, 0);
+    this.addUiTransform(root, pos.width, 28);
+    this.drawHudPanel(root, pos.width, 28, new Color(37, 42, 58, 176));
+
+    const dots = this.settings.animation ? '.'.repeat(thinking.dots) : '';
+    const label = this.addLabel(`${thinking.label}${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
+    label.color = new Color(221, 242, 255, 255);
+  }
+
+  private clearAiThinkingNodes(): void {
+    for (const seat of [0, 1, 2]) {
+      const node = this.uiRoot?.getChildByName(`ai-thinking-${seat}`);
+      if (!node) continue;
+      node.removeFromParent();
+      node.destroy();
+    }
   }
 
   private renderPlayArea(top: TopPlay | null, layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -815,6 +860,51 @@ export class GameSceneSkeleton extends Component {
       return ['playing', snapshot.turn, top, snapshot.handCounts.join(',')].join(':');
     }
     return null;
+  }
+
+  private isAiThinkingActive(): boolean {
+    return this.aiThinkingView()?.active ?? false;
+  }
+
+  private aiThinkingView(): ReturnType<typeof deriveAiThinking> | null {
+    if (!this.runtime) return null;
+    const phase = this.runtime.phase();
+    if (phase === 'bidding') {
+      const bidding = this.runtime.currentBidding();
+      if (!bidding) return null;
+      return deriveAiThinking(bidding.turn, HERO_SEAT, 'bidding', this.settings.animation ? this.toastClockMs : 0);
+    }
+    if (phase === 'playing') {
+      const snapshot = this.runtime.currentSnapshot();
+      if (!snapshot) return null;
+      return deriveAiThinking(snapshot.turn, HERO_SEAT, 'playing', this.settings.animation ? this.toastClockMs : 0);
+    }
+    if (phase === 'settled') return deriveAiThinking(HERO_SEAT, HERO_SEAT, 'settled', 0);
+    return null;
+  }
+
+  private lastActionPosition(
+    seat: SeatLastAction['seat'],
+    layout: TableRegions,
+    canvas: { width: number; height: number },
+  ): { x: number; y: number; width: number } {
+    if (seat === HERO_SEAT) {
+      const pos = this.screenPoint(canvas, canvas.width / 2, layout.playArea.y + layout.playArea.height + 24);
+      return { ...pos, width: 136 };
+    }
+    const rect = seat === 1 ? layout.opponentLeft : layout.opponentRight;
+    const pos = this.screenPoint(canvas, rect.x + rect.width / 2, rect.y + rect.height + 22);
+    return { ...pos, width: 112 };
+  }
+
+  private aiThinkingPosition(
+    seat: SeatIndex,
+    layout: TableRegions,
+    canvas: { width: number; height: number },
+  ): { x: number; y: number; width: number } {
+    const rect = seat === 1 ? layout.opponentLeft : layout.opponentRight;
+    const pos = this.screenPoint(canvas, rect.x + rect.width / 2, rect.y + rect.height + 52);
+    return { ...pos, width: 126 };
   }
 
   private syncTurnTimerKey(): boolean {
