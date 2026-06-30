@@ -41,9 +41,9 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 
 | ID | 类型 | 文件域 | 分支 | 状态 | 覆盖发现 |
 |----|----|----|----|----|----|
-| M6-G18-round-runtime-diagnostics | 发布硬化(改产品码·纯 spec) | `flow/round-runtime.ts` + 新 `test/flow/round-runtime-diagnostics.test.ts` | `task/M6-G18-round-runtime-diagnostics` | **ready**（无依赖·可即认领·与编辑器线并行） | #1 错误吞没(M)·#2 replay 漏 settled(L)·#3 单投递 replay(L) |
-| M3-67-game-scene-runtime-hygiene | 编辑器(运行时卫生) | `ui/components/game-scene-skeleton.ts` | `task/M6-editor` | **ready**（依赖 M3-56/57/63/64/46b 已在 main·编辑器串行接 M3-65/66 之后） | #4 每帧存储 I/O(M)·#5 submitting 死锁(M)·#7 音频并发(L)·#8 按钮重注册(L·可选) |
-| M3-68-screen-view-drop-cues | 纯岛清理(纯 spec) | `ui/screen-view.ts` + `test/ui/screen-view.test.ts` | `task/M3-68-screen-view-drop-cues` | **ready**（无依赖·可即认领） | #6 dead `vm.cues`(L) |
+| M6-G18-round-runtime-diagnostics | 发布硬化(改产品码·纯 spec) | `flow/round-runtime.ts` + 新 `test/flow/round-runtime-diagnostics.test.ts` | `task/M6-G18-round-runtime-diagnostics` | **changes-requested**（契约裁决：**settled 不入 replay**·见下「第十六批审查记录」） | #1 错误吞没(M)·**#2 撤销**·#3 单投递 replay(L) |
+| M3-67-game-scene-runtime-hygiene | 编辑器(运行时卫生) | `ui/components/game-scene-skeleton.ts` | `task/M6-editor` | **done `08b333e`**（审查通过·去每帧 I/O + 修 submitting + playOneShot·Creator 390×844·console []） | #4 每帧存储 I/O(M)·#5 submitting 死锁(M)·#7 音频并发(L)·#8 未做(可选) |
+| M3-68-screen-view-drop-cues | 纯岛清理(纯 spec) | `ui/screen-view.ts` + `test/ui/screen-view.test.ts` | `task/M3-68-screen-view-drop-cues` | **changes-requested**（caller 不匹配·spec 缺陷·见下「第十六批审查记录」） | #6 dead `vm.cues`(L) |
 
 > **架构裁决要点（落进 spec）**：① **#1** 倾向「存错误 + `terminationDetail(): unknown` 访问器」（`RoundRuntime` 接口 additive 非破坏，**不碰 `flow/types.ts`**，续 G16 纪律），`console.warn` 仅可选且勿刷 selfplay；② **#2** 放宽 replay 入队覆盖构造期同步 emit（`'deal'`+`'settled'`），**严守 M3-56 不变量**（非 round 事件不串入 `fullGameEvents`、fresh 仍恰一次 deal）；③ **#3** 多订阅者 replay 语义二选一（per-subscriber 补发 / 显式注释单投递），属 by-design 澄清；④ **#4/#5/#7** 编辑器运行时卫生，纯去 I/O + 一行修锁 + `playOneShot`，**不改布局/交互**；⑤ **#8** 列为**可选 stretch**——仅在确证不产生 stale 按钮时做，否则保持现状（LOW 价值 vs 热路径回归风险）。
 > **优先级**：#4（每帧 I/O·性能）与 #1（错误可诊断性）最高，分落 M3-67 / M6-G18；#5 一行修锁次之。
@@ -56,9 +56,9 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 ### 采纳并派发（4 任务·均纯逻辑·worktree）
 | ID | 文件域 | 分支 | 状态 | 覆盖 |
 |----|----|----|----|----|
-| M6-G19-typeguard-consolidation | 新 `rules/guards.ts`+`game/seat.ts` + 多消费方改 import | `task/M6-G19-typeguard-consolidation` | **ready** | #3 重复守卫去重（isRecord×6/isSeat×4/nextSeat×2/cardKey×3/isGameEvent×2） |
-| M6-G20-core-structural-sharing | `game/core.ts` | `task/M6-G20-core-structural-sharing` | **ready** | #7 不可变结构共享（去 pass/未变座位冗余手牌拷贝） |
-| M6-G21-ai-heuristic-hardening | `ai/cardMemory.ts`+`ai/handStrength.ts` | `task/M6-G21-ai-heuristic-hardening` | **ready** | #8 cardMemory 不可变·#11 straightLength 去隐式顺序依赖·#12 评分权重具名 |
+| M6-G19-typeguard-consolidation | 新 `rules/guards.ts`+`game/seat.ts` + 多消费方改 import | `task/M6-G19-typeguard-consolidation` | **done `80c71a0`**（+`.meta` `c2e37fd`·偏差：isGameEvent 统一为 strict·见记录） | #3 重复守卫去重（isRecord×6/isSeat×4/nextSeat×2/cardKey×3/isGameEvent×2） |
+| M6-G20-core-structural-sharing | `game/core.ts` | `task/M6-G20-core-structural-sharing` | **done `e9bf6d7`**（审查通过·语义逐字不变·635 绿） | #7 不可变结构共享（去 pass/未变座位冗余手牌拷贝） |
+| M6-G21-ai-heuristic-hardening | `ai/cardMemory.ts`+`ai/handStrength.ts` | `task/M6-G21-ai-heuristic-hardening` | **done `b0bbd41`**（审查通过·三项行为保持） | #8 cardMemory 不可变·#11 straightLength 去隐式顺序依赖·#12 评分权重具名 |
 | M4-42-hard-ai-depth | `ai/levels/hard.ts` | `task/M4-42-hard-ai-depth` | **todo（产品 gated）** | #9 Hard 中盘纵深（消费 M4-30/31/32·selfplay 胜率验收） |
 
 > **串行约束**：G19 与 G20 均触 `game/core.ts`，**不并行**（report 注明顺序）。G21 与 M4-42 均 ai/ 但文件域不交（G21=cardMemory/handStrength，M4-42=levels/hard）可并行。G19/G20/G21 为发布前清理类，M4-42 显著更大、按产品优先级单独排期。
@@ -79,6 +79,26 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 - **#15 `validatePlay` 双遍历**：微优化，合并会耦合 ownership 与 recognize，收益微乎；否决。
 - **#16 `vibrate()` 双重断言**：装饰性；`?.()` 可选调用本就安全，可在 M3-67 顺手收紧，不值独立任务。
 - **#17 冻结 `RoundState`**：给核心热路径加 deep-freeze 开销，换 G13/G14 护栏+约定已提供的防护；发布前否决。
+
+### 🔍 第十六批审查记录（架构验收 6 实现分支 · 2026-07-01）
+
+> 独立复核（重读 diff + 验语义 + 重跑 full suite，不采信报告）。**4 合 / 1 改 / 1 裁决**。合并后 main：**131 files / 645 tests 绿·typecheck 净·纯层零 cc**。
+
+**✅ 已合并（merge --no-ff）**
+- **M3-67 `08b333e`**：去 render/playCue 每帧 `reloadSettings`（改读 `this.settings`）+ `startGame` 重置 `submitting` + cue 改 `playOneShot`。行为保持·Creator 390×844·console []。
+- **M6-G20 `e9bf6d7`**：core.ts 结构共享（pass 不拷手牌·`replaceSeatHand` 仅替换出牌座位·未变座位保持引用）。事件/状态语义逐字不变。
+- **M6-G19 `80c71a0`**（+ Creator `.meta` `c2e37fd`）：守卫去重，层级正确（`rules/guards.ts`→rules、`game/seat.ts`→game+guards）、index.ts 桶未动、hintRank 的 `cardKey(Move)` 保留、game-scene 内部 `cardKey` 由 `-` 改 `:` 分隔（纯运行时签名·一致即可·无碍）。**偏差（接受并登记）**：去重 surfaced 既有分歧——`isGameEvent` 旧在 save.ts 用 loose `isRecord(pattern)`、replay-codec 用 strict `isPattern`；无法在单一函数同时保两种语义，执行方统一为 **strict `isHandPattern`**，收紧 save 校验。合法存档（serializeSave 出的 pattern 必为合法 HandPattern）与 642 测试均不受影响，属安全改进，非「逐字等价」——架构采纳。
+- **M6-G21 `b0bbd41`**：trackPlayed 返回 `Object.freeze`（值不变）+ straightLength 显式 reset（输出不变·去枚举顺序隐式依赖）+ evaluateHand 权重具名（公式不变）。
+
+**🔁 changes-requested：M3-68-screen-view-drop-cues（spec 缺陷·我方）**
+- 执行方按 spec 移除了 `deriveScreenVM` 的 `recentEvents` 入参，但**调用方 `game-scene-skeleton.ts:284` 仍传 `recentEvents:`**——caller/callee 不匹配（任一 full typecheck 该组件即 TS2353 excess-property）。测试 green 是**假阴性**：test tsconfig 在 `test/` 下 `include:["**/*.ts"]`，仅编译 `test/**` + 被测试 import 的文件；**无测试 import game-scene-skeleton**（cc 组件），故不在 test tsc 程序内、错误未暴露。
+- **根因是 M3-68 任务书写错**（误写「调用方无需改」——把 `cues` 输出与 `recentEvents` 输入混为一谈）。已订正 spec。
+- **修法（择一·已写进 spec）**：**A.** 保留 `recentEvents` 入参类型（仅删 `cues` 字段 + map/filter + `cueForFlowEvent`/`CueId` import），caller 零改、自洽于纯岛；**B.** 删入参 + 同步删 `game-scene-skeleton.ts` 调用处 `recentEvents:` 一行（touch cc 组件·需 Creator 复核）。建议 A。
+
+**⚖️ 契约裁决：M6-G18 的「resume-settled 是否进 replay」→ 裁定 NO**
+- 冲突：M6-G18 实现把 `'settled'` 也纳入 `isReplayableStartupEvent` → resume-settled 首订阅者收到 `settled`；但既有 `test/flow/runtime-resume-phases.test.ts:143` 断言同场景 `events=[]`。
+- **裁决：settled 不进 replay，既有测试正确，撤销 G18 finding #2。** 理由：① replay 机制目的是让晚挂载的首订阅者补回构造期 `'deal'` 以驱动初始渲染；② resume 一个**已结束**的局重放 `settled` 事件 = 重新触发胜负 cue（音效/动画），**重开已完成对局时再播一次胜利动画是错的**；③ 结算面板本就由 `settlement()` 访问器 + `onSettled` 提供，不依赖事件流；④ 现行 save 仅在 enterPlaying 落盘（永不 settled），resume-settled 实际不可达，所谓「盲区」非真缺陷。
+- **要求执行方**：把 `isReplayableStartupEvent` 改回 **仅 `'deal'`**；**保留** #1 `terminationDetail()`（已正确实现）与 #3 `replayClosed` 机制（与既有测试兼容）。改后 full suite 应转绿。spec 已更新。
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**

@@ -10,6 +10,8 @@
 
 > 2026-07-01 第十六批派发（第四轮全量审查转化·18 项逐条裁决）：采纳并立任务 4（纯逻辑·均 ready/todo）——**M6-G19**（跨层类型守卫去重）·**M6-G20**（core.ts 不可变结构共享去冗余拷贝）·**M6-G21**（cardMemory 不可变 + straightLength 鲁棒 + 评分权重具名）·**M4-42**（困难 AI 中盘纵深·产品 gated）；2 项已在第十五批覆盖（#5→M3-67、#18→M6-G18）；4 项采纳但暂不立任务（#1/#10 上帝组件/runtime 拆分=发布后重构、#4 legalFollows 剪枝=过早优化、#6 save 双序列化=低价值格式变更）；6 项驳回（#2 双 render 不存在、#13 春天判定正确、#14/#15/#16/#17 非问题/微优化）。详见 coordination/BOARD.md「第十六批」。
 
+> 2026-07-01 第十六批审查（6 实现分支·独立复核）：**4 合 / 1 改 / 1 裁决**，合并后 main **131 files / 645 tests 绿·typecheck 净·纯层零 cc**。已并：**M3-67 `08b333e`**（运行时卫生）·**M6-G20 `e9bf6d7`**·**M6-G19 `80c71a0`**（+`.meta` `c2e37fd`）·**M6-G21 `b0bbd41`**。**M3-68 打回**（caller `game-scene-skeleton:284` 仍传已删的 `recentEvents`→Cocos TS2353；test 绿是假阴性因该 cc 组件不在 test tsc 程序内；根因 M3-68 任务书写错·已订正）。**M6-G18 契约裁定**：resume-settled 的 `settled` **不**入 replay（重开已结束局重播胜负 cue 是错的·结算走 settlement()/onSettled·该路径实际不可达）→ 撤销 #2、保留 #1/#3·spec 已更新。详见 coordination/BOARD.md「第十六批审查记录」。
+
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
 状态说明：
@@ -137,9 +139,9 @@
 - [x] 异常流程检查。〔M6-L4 已并 main `c08de19`·resume-to-settled/redead 超限/bidding reason·5/5 绿〕
 - [x] 构建验证。〔M6-C4 已并 main `4c314b9`·Creator 3.8.8 web-mobile build success·390×844 运行烟测·交叉审查 approve〕
 - [x] 发布硬化（三方审查转化·第十四批）。〔M6-G16 已并 main `d9cc851`·`round-runtime.ts` 生命周期/错误边界/死状态（RR-1..10）·RR-1 settled replay 登记后续契约取舍；M6-G17 已并 main `422411c`·`event-cues.ts` cue 编译期穷尽断言 + 签名诚实化（EC-1/EC-3，驳回 EC-2）·最终 128/632 绿·typecheck 净〕
-- [ ] 发布硬化（第三轮审查转化·第十五批·续 G16）。〔M6-G18 `round-runtime.ts` 诊断可见性（存错误 + `terminationDetail()` 访问器）+ replay 漏 resume-settled + 单投递 replay·纯 spec·ready·**不碰 `flow/types.ts`**·守 M3-56 不变量〕
-- [ ] DRY 收口（第四轮审查转化·第十六批）。〔M6-G19 跨层类型守卫去重（isRecord×6/isSeat×4/nextSeat×2/cardKey×3/isGameEvent×2 → `rules/guards.ts`+`game/seat.ts`）·纯 spec·ready·守层级·与 G20 串行〕
-- [ ] 核心热路径硬化（第四轮审查转化·第十六批）。〔M6-G20 `core.ts` 不可变结构共享（只克隆变化座位·pass 不拷手牌）·纯 spec·ready·行为零改·full suite 安全网〕
-- [ ] AI 启发式一致性硬化（第四轮审查转化·第十六批）。〔M6-G21 cardMemory 返回不可变 + straightLength 去隐式枚举顺序依赖 + evaluateHand 权重具名·纯 spec·ready·三项均行为保持〕
+- [ ] 发布硬化（第三轮审查·**changes-requested**）。〔M6-G18 #1 `terminationDetail()` 已正确实现；**契约裁定 #2 撤销**（settled 不入 replay·既有 resume-phases 测试正确）→ 执行方把 `isReplayableStartupEvent` 改回仅 `'deal'`、保留 #1/#3·改后 full suite 转绿〕
+- [x] DRY 收口（第四轮审查转化·第十六批）。〔M6-G19 已并 main `80c71a0`（+`.meta` `c2e37fd`）·跨层守卫去重·层级/桶/hintRank 正确·偏差：isGameEvent 统一为 strict（收紧 save 校验·安全）·131 files/642 绿〕
+- [x] 核心热路径硬化（第四轮审查转化·第十六批）。〔M6-G20 已并 main `e9bf6d7`·`core.ts` 结构共享·事件/状态语义逐字不变·635 绿〕
+- [x] AI 启发式一致性硬化（第四轮审查转化·第十六批）。〔M6-G21 已并 main `b0bbd41`·cardMemory 冻结 + straightLength 显式 reset + 权重具名·三项行为保持〕
 - [ ] 发布验收记录。〔M6-D1 待所有轨 merge·架构收尾〕
 - [ ] 已知债务登记（第四轮审查·暂不重构）。〔#1 上帝组件 `game-scene-skeleton.ts`/#10 `round-runtime.ts` 拆分 = 发布后重构里程碑；#4 `legalFollows` 剪枝 = profiling 触发再做；#6 `save.ts` 双序列化 = 后续数据层清理·建议并入 M6-D4 已知限制〕
