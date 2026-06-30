@@ -64,7 +64,7 @@ function removeCards(hand: Card[], cards: Card[]): Card[] {
 
 function replaceSeatHand(state: RoundState, seat: SeatIndex, hand: Card[]): PlayerSeat[] {
   return state.seats.map((player) =>
-    player.index === seat ? { ...player, hand } : { ...player, hand: player.hand.slice() },
+    player.index === seat ? { ...player, hand } : player,
   );
 }
 
@@ -108,7 +108,6 @@ export function apply(state: RoundState, action: RoundAction): ApplyResult {
       return {
         state: {
           ...state,
-          seats: state.seats.map((player) => ({ ...player, hand: player.hand.slice() })),
           turn: leader,
           top: null,
           passesInARow: 0,
@@ -120,7 +119,6 @@ export function apply(state: RoundState, action: RoundAction): ApplyResult {
     return {
       state: {
         ...state,
-        seats: state.seats.map((player) => ({ ...player, hand: player.hand.slice() })),
         turn: nextSeat(action.seat),
         passesInARow: nextPasses,
       },
