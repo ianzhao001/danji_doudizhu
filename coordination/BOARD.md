@@ -22,6 +22,19 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 > - **未纳入的次要项**：单类拆分（拒绝·避免 churn 已验收 keystone）、`legalInputs` 缓存（过早优化）、逐步持久化粒度（产品决策·待确认）、submit seat 校验（低·G16 内可顺手）。
 > **派发**：用 PROTOCOL bootstrap（`<ID>` 换上表分支名）。两任务无依赖，可同时认领。
 
+## 第十五批（编辑器 UI 打磨 · M6-editor 第二批审查转化 · 2026-07-01）
+
+> M6-editor 第二批（M3-45/46a/46b/55/57/59/63/64 + 截图归一化）审查**通过**（128 文件/632 绿·typecheck 净·`diff --check` 净·护栏 grep 无命中·8 屏 390×844 截图齐·CDP errors `[]`）。审查 4 项**非阻塞**观感/密度发现转成 2 个编辑器串行收口任务，按文件域拆分、互不相交。
+
+| ID | 文件域 | 依赖（入 main 后解锁） | 分支 | 状态 |
+|----|----|----|----|----|
+| M3-65-lobby-home-density | `ui/components/lobby-scene.ts` + `.meta`/report | M3-45/M3-55/M3-59/M3-46a | `task/M6-editor` | blocked |
+| M3-66-game-hud-polish | `ui/components/game-scene-skeleton.ts` + `.meta`/report | M3-56/M3-57/M3-64/M3-46b | `task/M6-editor` | blocked |
+
+> **审查裁决要点（落进 spec）**：① 4 项均非阻塞观感/密度，**不拦本批合并**；② 按文件域拆 2 任务（lobby / game-scene 各一），编辑器单写者串行做；③ **M3-65** ＝ home 难度面板/toggle/四入口三排重排不交叠 + 常驻 `难度` label 不被面板裁切 + 子屏（战绩/历史/教程/帮助）不透出 home 数据；④ **M3-66** ＝ advisor×展开剩牌消叠压 + 暂停态冻结 turn-timer（仍守「超时仅视觉、绝不自动出牌/过牌」契约）。
+> **未纳入**：`update(dt)` 周期 render × 出牌飞行 tween（审查期 CDP 无错 + 交互正常，仅登记观察，不立任务）。
+> **解锁/派发**：本批 M6-editor 合并 main 后两任务由 blocked 翻 ready；编辑器任务交付按「📐 编辑器任务验收模板」附 390×844 截图与 Console 证据。
+
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
 - **客观门全绿**：`npm --prefix test test` **90 文件 / 462 全绿**；`typecheck` exit 0；纯层（`rules/game/ai/flow/data`）+ `ui/{audio-gate,animation-params,table-layout,screen-view,event-cues}` grep **零 `from 'cc'`**；`flow→data` 零 import；工作树净；新文件 `.meta` 齐全（audio-gate/animation-params）；ART 仅在 `asset-previews/`，**未污染 `assets/`**。
