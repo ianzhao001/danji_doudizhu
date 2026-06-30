@@ -6,6 +6,7 @@ import {
   enumerateMoves,
   legalFollows,
 } from '../rules';
+import { cardKey } from '../rules/guards';
 import { compareMoves } from './levels/_shared';
 
 export interface HintResult {
@@ -17,10 +18,6 @@ function compareHintMoves(a: Move, b: Move): number {
   const bBombLike = isBombLike(b.pattern.category);
   if (aBombLike !== bBombLike) return aBombLike ? 1 : -1;
   return compareMoves(a, b);
-}
-
-function cardKey(card: Card): string {
-  return `${card.rank}:${card.suit}`;
 }
 
 function cardsKey(cards: Card[]): string {

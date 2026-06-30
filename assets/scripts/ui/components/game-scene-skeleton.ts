@@ -33,6 +33,7 @@ import { realClock } from '../../flow/clock';
 import type { FlowEvent } from '../../flow/types';
 import type { GameEvent, ResumeSnapshot, RoundFinishInput, SeatIndex, TopPlay } from '../../game';
 import { type Card, Suit } from '../../rules';
+import { cardKey } from '../../rules/guards';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { cardView } from '../card-view';
 import { deriveCardMemoryView } from '../card-memory-view';
@@ -85,10 +86,6 @@ const SCAFFOLD_NODE_NAMES = [
 
 function sameCard(a: Card, b: Card): boolean {
   return a.rank === b.rank && a.suit === b.suit;
-}
-
-function cardKey(card: Card): string {
-  return `${card.rank}-${card.suit}`;
 }
 
 function cardsSignature(cards: Card[]): string {

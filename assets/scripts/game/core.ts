@@ -5,6 +5,7 @@
  */
 
 import { Card, Category, Deal, validatePlay } from '../rules';
+import { cardKey } from '../rules/guards';
 import {
   RoundState,
   RoundAction,
@@ -17,14 +18,7 @@ import {
   GameEvent,
   PlayerSeat,
 } from './types';
-
-function nextSeat(seat: SeatIndex): SeatIndex {
-  return ((seat + 1) % 3) as SeatIndex;
-}
-
-function cardKey(card: Card): string {
-  return `${card.rank}:${card.suit}`;
-}
+import { nextSeat } from './seat';
 
 function findSeat(state: RoundState, seat: SeatIndex): PlayerSeat {
   const player = state.seats.find((s) => s.index === seat);

@@ -5,6 +5,7 @@
  */
 
 import { AiLevel } from '../ai';
+import { isRecord } from '../rules/guards';
 
 export interface Settings {
   version: number;
@@ -26,10 +27,6 @@ export function defaultSettings(): Settings {
     vibration: true,
     animation: true,
   };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function isAiLevel(value: unknown): value is AiLevel {

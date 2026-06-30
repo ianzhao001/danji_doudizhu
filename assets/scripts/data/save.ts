@@ -4,8 +4,10 @@
  * 复用 game 层已校验的 serializeRound/deserializeRound 做内层 round 编解码。
  */
 
-import { Side, type GameEvent, type ResumePayload, type RoundState, type SeatIndex } from '../game/types';
+import type { GameEvent, ResumePayload, RoundState, SeatIndex } from '../game/types';
 import { deserializeRound, serializeRound } from '../game/serialize';
+import { isGameEvent, isSeat } from '../game/seat';
+import { isRecord } from '../rules/guards';
 
 export interface SaveSlot {
   version: number;
@@ -22,10 +24,6 @@ function corrupted(reason: string): never {
   throw new Error(`corrupted save slot: ${reason}`);
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
 export function serializeSave(slot: SaveSlot): string {
   const wire: Record<string, unknown> = {
     version: SAVE_VERSION,
@@ -38,28 +36,6 @@ export function serializeSave(slot: SaveSlot): string {
   }
   if (slot.events !== undefined) wire.events = slot.events;
   return JSON.stringify(wire);
-}
-
-function isSeat(value: unknown): value is SeatIndex {
-  return value === 0 || value === 1 || value === 2;
-}
-
-function isGameEvent(value: unknown): value is GameEvent {
-  if (!isRecord(value) || typeof value.type !== 'string') return false;
-  switch (value.type) {
-    case 'play':
-      return isSeat(value.seat) && isRecord(value.pattern);
-    case 'pass':
-    case 'bomb':
-    case 'rocket':
-      return isSeat(value.seat);
-    case 'reset':
-      return isSeat(value.leader);
-    case 'win':
-      return isSeat(value.seat) && (value.side === Side.Landlord || value.side === Side.Farmer);
-    default:
-      return false;
-  }
 }
 
 function parseEvents(value: unknown): GameEvent[] | undefined {
