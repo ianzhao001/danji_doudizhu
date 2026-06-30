@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/M6-editor`
-- 状态：in-review（代码、自动化验证、Creator 3.8.8 Preview / 390x844 交互复核完成）
+- 状态：merged（审查通过；已并 main `87f3f56`）
 - 同步状态：已在任务开始前将 `main` fast-forward 合入 `task/M6-editor`，当前基线为 `46fc70e`。
 
 ## 改了哪些文件
@@ -65,8 +65,9 @@ git diff --check
 
 ## 疑问（给架构 / 审查者）
 
-- 请重点审 UI 位置是否需要进一步下沉或拆为独立组件；当前实现控制在单文件内，便于接续 M3-57/M3-63/M3-64。
-- 请审查者重点复核 Creator Console 中的 `Channel closed` 是否为编辑器预览通道历史噪声；运行时 CDP 与清空后可见 Console 未观察到本任务 Error。
+- 审查结论：通过，可合并。
+- 审查者确认 UI 位置可接受，当前实现控制在单文件内，便于接续 M3-57/M3-63/M3-64。
+- 审查者将 Creator Console 中的 `Channel closed` 判为编辑器预览通道历史噪声；运行时 CDP 与清空后可见 Console 未观察到本任务 Error。
 
 ## 自检（对照验收项）
 

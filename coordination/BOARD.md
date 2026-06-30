@@ -509,7 +509,7 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 |----|----|----|----|
 | M3-59-difficulty-picker-ui | `lobby-scene` 升级难度控件 | M3-58 | blocked（依赖已满足·待 C2/编辑器档期） |
 | M3-55-tutorial-screen | `lobby.scene`+新组件 | M3-50 | blocked（依赖已满足·待 C2/编辑器档期） |
-| M3-56-hud-meters | `game-scene-skeleton`/新 HUD 组件 | M3-51/54（+M4-30/31） | blocked（依赖已满足·待编辑器串行） |
+| M3-56-hud-meters | `game-scene-skeleton`/新 HUD 组件 | M3-51/54（+M4-30/31） | **done `87f3f56`**（Creator 3.8.8·390×844 HUD/展开/出牌递减已验） |
 | M3-57-toast-timer-wiring | `game-scene-skeleton`/新组件 | M3-52/53 | blocked（依赖已满足·待编辑器串行） |
 
 ### D 文档 / R 美术【D 核心·R 打磨·gated】
@@ -546,7 +546,7 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 > 按用户批准的「全量接收与执行顺序计划」执行：先第一波解锁器与独立纯任务，再第二波消费依赖，最后 M3-61→M6-G13→M6-I1。编辑器/美术/视觉 gate 未抢跑。
 - **已并 main**：第十一批剩余 VM（M3-40/41/43/44）、第十二批纯逻辑/文档（M4-30/31/32、M3-50/51/52/53/54/58、M6-L13、M6-G13/14、M6-D4）、第十三批纯逻辑（M2-12、M6-G15、M3-60/62、M4-40/41、M3-61）以及 **M6-I1 桶整合**。
 - **客观门**：最终 main `7c7b427` 上 `npm --prefix test test -- --run` **127 文件 / 623 用例全绿**；`npm --prefix test run typecheck` 通过；新增纯层/纯 UI 文件 `cc` 搜索零命中。
-- **仍保持 gate**：C4 已并 main，M3-55/56/57/59/63/64、M3-45/46 继续等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 `PLAYTEST.md` 骨架已并 main，后续随发布验收填实测记录。
+- **仍保持 gate**：C4 与 M3-56 已并 main，M3-55/57/59/63/64、M3-45/46 继续等待编辑器串行；ART-IMPORT-02/03/04 与 ART-05 等用户视觉终审；M6-D5 `PLAYTEST.md` 骨架已并 main，后续随发布验收填实测记录。
 - **本地注意**：~~工作区若干未跟踪新脚本 `.meta`~~ → ✅ **已闭合**：20 个 Creator 生成 `.meta`（ver 4.0.24·typescript importer·uuid 唯一·零逻辑改动）已统一提交（采纳建议#6 late .meta sync）。
 
 ### 🔍 架构复核 + 执行者 13 条建议落实（2026-06-29）

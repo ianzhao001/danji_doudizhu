@@ -1,6 +1,6 @@
 # M3-56 对局 HUD：强度条 + 已出牌（编辑器·绑 M3-51/54 · 第十二批·打磨）
 
-- 状态：blocked（待 M3-51 + M3-54 + M4-30 + M4-31 入 main；编辑器串行）
+- 状态：done（已并 main `87f3f56`；Creator 3.8.8 / 390×844 复核通过）
 - 派发模式：编辑器执行者（Cocos Creator 3.8.8·单写者）· 编辑器串行分支
 - 文件域：`assets/scripts/ui/components/game-scene-skeleton.ts`（或新 HUD 组件）+ `.meta`、report
 - 依赖：**M3-51 strength-meter-view + M3-54 card-memory-view**（及其 AI 依赖 M4-30/31）
