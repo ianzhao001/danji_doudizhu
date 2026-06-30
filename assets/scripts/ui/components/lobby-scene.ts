@@ -132,6 +132,7 @@ export class LobbyScene extends Component {
     this.setText(this.netScoreLabel, `净分 ${statsView.netScoreLabel}`);
     this.setText(this.difficultyLabel, `难度 ${difficulty?.label ?? '普通'}`);
     this.setText(this.latestRecordLabel, recordRows[0]?.scoreLabel ?? '暂无战绩');
+    this.setHomeLabelsVisible(this.screen === 'home');
     this.renderRuntimeControls(settings);
   }
 
@@ -167,7 +168,7 @@ export class LobbyScene extends Component {
       this.addButton(
         `${TOGGLE_LABELS[toggle.key]} ${toggle.on ? '开' : '关'}`,
         -112 + index * 112,
-        -244,
+        -210,
         96,
         36,
         true,
@@ -180,15 +181,15 @@ export class LobbyScene extends Component {
   private renderDifficultyPanel(current: AiLevel): void {
     if (!this.controlsRoot) return;
     const panelWidth = 336;
-    const panelHeight = 210;
+    const panelHeight = 154;
     const panel = this.ensureNode('difficulty-picker-panel', this.controlsRoot);
-    panel.setPosition(0, -296, 0);
+    panel.setPosition(0, -320, 0);
     this.addUiTransform(panel, panelWidth, panelHeight);
-    this.drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 214));
+    this.drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 232));
 
     const picker = deriveDifficultyPicker(current);
     picker.options.forEach((option, index) => {
-      const y = 6 - index * 38;
+      const y = 39 - index * 39;
       this.addButton(
         '',
         0,
@@ -245,21 +246,21 @@ export class LobbyScene extends Component {
 
   private renderLobbyEntries(): void {
     if (!this.controlsRoot) return;
-    this.addButton('教程', -126, -218, 72, 34, true, () => {
+    this.addButton('教程', -126, -164, 72, 34, true, () => {
       this.screen = 'tutorial';
       this.tutorialIndex = 0;
       this.render();
     }, this.controlsRoot);
-    this.addButton('帮助', -42, -218, 72, 34, true, () => {
+    this.addButton('帮助', -42, -164, 72, 34, true, () => {
       this.screen = 'help';
       this.helpScrollIndex = 0;
       this.render();
     }, this.controlsRoot);
-    this.addButton('战绩', 42, -218, 72, 34, true, () => {
+    this.addButton('战绩', 42, -164, 72, 34, true, () => {
       this.screen = 'stats';
       this.render();
     }, this.controlsRoot);
-    this.addButton('历史', 126, -218, 72, 34, true, () => {
+    this.addButton('历史', 126, -164, 72, 34, true, () => {
       this.screen = 'records';
       this.render();
     }, this.controlsRoot);
@@ -279,7 +280,7 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('tutorial-panel', this.controlsRoot);
     panel.setPosition(0, -120, 0);
     this.addUiTransform(panel, 318, 360);
-    this.drawPanel(panel, 318, 360, new Color(42, 44, 58, 222));
+    this.drawPanel(panel, 318, 360, new Color(42, 44, 58, 255));
     this.addLabel('新手教程', 0, 138, 22, panel, 240, 34, 'tutorial-heading');
     this.addLabel(`${currentIndex + 1}/${steps.length}`, 118, 138, 13, panel, 54, 24, 'tutorial-progress');
     this.addLabel(current.title, 0, 92, 24, panel, 250, 42, 'tutorial-title');
@@ -317,7 +318,7 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('help-panel', this.controlsRoot);
     panel.setPosition(0, -96, 0);
     this.addUiTransform(panel, 330, 500);
-    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 228));
+    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
     this.addLabel('帮助', 0, 210, 22, panel, 220, 34, 'help-heading');
     this.addLabel(`${start + 1}-${Math.min(rows.length, start + visibleRows)}/${rows.length}`, 112, 210, 12, panel, 72, 22, 'help-progress', new Color(255, 255, 255, 210));
 
@@ -357,7 +358,7 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('stats-panel', this.controlsRoot);
     panel.setPosition(0, -96, 0);
     this.addUiTransform(panel, 330, 500);
-    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 232));
+    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
     this.addLabel('战绩', 0, 210, 22, panel, 220, 34, 'stats-heading');
     if (view.empty) {
       this.addLabel('暂无完成对局', 0, 174, 13, panel, 150, 24, 'stats-empty', new Color(255, 255, 255, 190));
@@ -387,7 +388,7 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('records-panel', this.controlsRoot);
     panel.setPosition(0, -96, 0);
     this.addUiTransform(panel, 330, 500);
-    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 232));
+    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
     this.addLabel('历史', 0, 210, 22, panel, 220, 34, 'records-heading');
 
     this.renderFilterGroup(
@@ -527,6 +528,19 @@ export class LobbyScene extends Component {
 
   private setText(label: Label | null, text: string): void {
     if (label) label.string = text;
+  }
+
+  private setHomeLabelsVisible(visible: boolean): void {
+    this.setLabelVisible(this.continueLabel, visible);
+    this.setLabelVisible(this.roundsLabel, visible);
+    this.setLabelVisible(this.winRateLabel, visible);
+    this.setLabelVisible(this.netScoreLabel, visible);
+    this.setLabelVisible(this.latestRecordLabel, false);
+    this.setLabelVisible(this.difficultyLabel, false);
+  }
+
+  private setLabelVisible(label: Label | null, visible: boolean): void {
+    if (label) label.node.active = visible;
   }
 
   private addLabel(

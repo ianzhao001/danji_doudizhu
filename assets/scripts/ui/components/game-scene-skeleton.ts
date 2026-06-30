@@ -188,9 +188,10 @@ export class GameSceneSkeleton extends Component {
 
     let shouldRender = this.tickToastState();
     const timerActive = this.syncTurnTimerKey();
+    const timerFrozen = this.isTurnTimerFrozen();
     const thinkingAnimating = this.settings.animation && this.isAiThinkingActive();
-    if (timerActive) this.turnTimerElapsedMs = Math.min(TURN_TIMER_MS, this.turnTimerElapsedMs + deltaMs);
-    if ((timerActive || thinkingAnimating) && this.uiTickRenderMs >= UI_TICK_RENDER_MS) {
+    if (timerActive && !timerFrozen) this.turnTimerElapsedMs = Math.min(TURN_TIMER_MS, this.turnTimerElapsedMs + deltaMs);
+    if (((timerActive && !timerFrozen) || thinkingAnimating) && this.uiTickRenderMs >= UI_TICK_RENDER_MS) {
       this.uiTickRenderMs = 0;
       shouldRender = true;
     }
@@ -613,7 +614,7 @@ export class GameSceneSkeleton extends Component {
     canvas: { width: number; height: number },
   ): void {
     if (!snapshot?.viewerHand || !this.runtime?.isPlayerTurn() || this.runtime.phase() !== 'playing') return;
-    const centerY = layout.playArea.y + layout.playArea.height + 56;
+    const centerY = this.advisorCenterY(layout);
     const togglePos = this.screenPoint(canvas, layout.actionButtons.x + 34, centerY);
     this.addButton(
       this.advisorEnabled ? '建议开' : '建议关',
@@ -647,6 +648,11 @@ export class GameSceneSkeleton extends Component {
 
     const label = this.addLabel(insight.text, 0, 1, 13, root, width - 18, height - 4, 'advisor-label');
     label.color = insight.emphasize ? new Color(221, 255, 224, 255) : new Color(255, 248, 226, 255);
+  }
+
+  private advisorCenterY(layout: TableRegions): number {
+    const defaultY = layout.playArea.y + layout.playArea.height + 56;
+    return this.memoryExpanded && this.advisorEnabled ? layout.playArea.y + layout.playArea.height + 24 : defaultY;
   }
 
   private renderToasts(layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -1069,6 +1075,10 @@ export class GameSceneSkeleton extends Component {
       this.uiTickRenderMs = 0;
     }
     return true;
+  }
+
+  private isTurnTimerFrozen(): boolean {
+    return this.pauseState.stage !== 'closed';
   }
 
   private prepareToastAnimation(node: Node, id: number): void {
