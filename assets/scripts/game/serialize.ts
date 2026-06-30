@@ -5,6 +5,8 @@
  */
 
 import { Category, Rank, Suit, recognize } from '../rules';
+import { hasOwn, isRecord } from '../rules/guards';
+import { isSeat } from './seat';
 import { GamePhase, Side, type RoundState } from './types';
 
 const CURRENT_VERSION = 1;
@@ -26,20 +28,8 @@ const CATEGORIES = new Set(Object.values(Category).filter((value): value is Cate
 const RANKS = new Set(Object.values(Rank).filter((value): value is Rank => typeof value === 'number'));
 const SUITS = new Set(Object.values(Suit));
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function hasOwn(value: Record<string, unknown>, key: string): boolean {
-  return Object.prototype.hasOwnProperty.call(value, key);
-}
-
 function fail(reason: string): never {
   throw new Error(`corrupted round state: ${reason}`);
-}
-
-function isSeat(value: unknown): value is 0 | 1 | 2 {
-  return value === 0 || value === 1 || value === 2;
 }
 
 function assertNonNegativeNumber(value: unknown, field: string): void {

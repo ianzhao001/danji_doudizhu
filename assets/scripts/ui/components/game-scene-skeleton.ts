@@ -33,6 +33,7 @@ import { realClock } from '../../flow/clock';
 import type { FlowEvent } from '../../flow/types';
 import type { GameEvent, ResumeSnapshot, RoundFinishInput, SeatIndex, TopPlay } from '../../game';
 import { type Card, Suit } from '../../rules';
+import { cardKey } from '../../rules/guards';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { cardView } from '../card-view';
 import { deriveCardMemoryView } from '../card-memory-view';
@@ -85,10 +86,6 @@ const SCAFFOLD_NODE_NAMES = [
 
 function sameCard(a: Card, b: Card): boolean {
   return a.rank === b.rank && a.suit === b.suit;
-}
-
-function cardKey(card: Card): string {
-  return `${card.rank}-${card.suit}`;
 }
 
 function cardsSignature(cards: Card[]): string {
@@ -214,6 +211,7 @@ export class GameSceneSkeleton extends Component {
     this.advisorEnabled = false;
     this.pauseState = initialPause;
     this.renderedPauseStage = 'closed';
+    this.submitting = false;
     this.animatedToastIds.clear();
     this.statusText = '';
     this.lastHandSignature = '';
@@ -332,7 +330,7 @@ export class GameSceneSkeleton extends Component {
   }
 
   private renderRuntimeSettings(layout: TableRegions, canvas: { width: number; height: number }): void {
-    const settings = this.reloadSettings();
+    const settings = this.settings;
     const controls: { key: ToggleKey; label: string; on: boolean; fx: number }[] = [
       { key: 'sound', label: '音效', on: settings.sound, fx: 0.22 },
       { key: 'animation', label: '动效', on: settings.animation, fx: 0.5 },
@@ -1103,16 +1101,15 @@ export class GameSceneSkeleton extends Component {
   private playCue(event: FlowEvent): void {
     const cue = cueForFlowEvent(event);
     if (!cue) return;
-    const settings = this.reloadSettings();
+    const settings = this.settings;
     const decision = decideCuePlayback(settings, cue);
     const path = cueAudioPath(cue);
     if (decision.effect) this.playEffect(cue);
     if (decision.vibrate) this.vibrate();
     if (!decision.sound || !path || !this.audioSource) return;
     resources.load(path, AudioClip, (error, clip) => {
-      if (!error && clip && this.audioSource) {
-        this.audioSource.clip = clip;
-        this.audioSource.play();
+      if (!error && clip && this.audioSource && decideCuePlayback(this.settings, cue).sound) {
+        this.audioSource.playOneShot(clip);
       }
     });
   }
@@ -1137,13 +1134,8 @@ export class GameSceneSkeleton extends Component {
     }
   }
 
-  private reloadSettings(): Settings {
-    this.settings = loadSettings(cocosStorage(), SETTINGS_KEY);
-    return this.settings;
-  }
-
   private toggleRuntimeSetting(key: ToggleKey): void {
-    const next = toggleSetting(this.reloadSettings(), key);
+    const next = toggleSetting(this.settings, key);
     try {
       saveSettings(cocosStorage(), SETTINGS_KEY, next);
       this.settings = next;

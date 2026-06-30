@@ -89,4 +89,16 @@ describe('trackPlayed', () => {
     expect(first.playedCount).toBe(4);
     expect(second).toEqual(first);
   });
+
+  it('returns frozen memory objects', () => {
+    const memory = trackPlayed([], [c(Rank.R3)]);
+    const remaining = memory.remainingByRank as Record<number, number>;
+
+    expect(Object.isFrozen(memory)).toBe(true);
+    expect(Object.isFrozen(memory.remainingByRank)).toBe(true);
+    expect(() => {
+      remaining[Rank.R3] = 4;
+    }).toThrow(TypeError);
+    expect(memory.remainingByRank[Rank.R3]).toBe(3);
+  });
 });

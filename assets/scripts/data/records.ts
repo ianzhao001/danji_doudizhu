@@ -4,6 +4,8 @@
  */
 
 import { Side, type SeatIndex, type Spring } from '../game';
+import { isSeat } from '../game/seat';
+import { isRecord } from '../rules/guards';
 
 export interface RecordEntry {
   heroSeat: SeatIndex;
@@ -24,16 +26,7 @@ export interface RecordsState {
 export const RECORDS_VERSION = 1;
 export const MAX_RECORDS = 50;
 
-const SEATS = [0, 1, 2] as const;
 const SPRINGS: Spring[] = ['none', 'spring', 'anti-spring'];
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function isSeat(value: unknown): value is SeatIndex {
-  return SEATS.includes(value as SeatIndex);
-}
 
 function positiveIntOrDefault(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 1 ? value : fallback;
