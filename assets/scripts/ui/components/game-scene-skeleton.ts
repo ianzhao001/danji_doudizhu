@@ -40,6 +40,8 @@ import { dealCardDelay, playFlyFromTo, pulseParams } from '../animation-params';
 import { clearSelection, isSelected, toggle } from '../selection';
 import { deriveScreenVM } from '../screen-view';
 import { deriveStrengthMeter } from '../strength-meter-view';
+import { deriveTurnTimer } from '../turn-timer';
+import { emptyToasts, pushToast, tickToasts, type ToastQueue } from '../toast-queue';
 import type { Rect, TableRegions } from '../table-layout';
 import { toggleSetting, type ToggleKey } from '../settings-view';
 import { RESOURCE_PATHS, cardAssetPath, cueAudioPath } from '../asset-keys';
@@ -56,6 +58,8 @@ const SESSION_KEYS: SessionKeys = {
 
 const CARD_SIZE = { width: 46, height: 64 };
 const HAND_LIFT = 18;
+const TURN_TIMER_MS = 15_000;
+const UI_TICK_RENDER_MS = 180;
 const SCAFFOLD_NODE_NAMES = [
   'phase-label',
   'landlord-label',
@@ -135,6 +139,11 @@ export class GameSceneSkeleton extends Component {
   private selected: Card[] = [];
   private recentEvents: FlowEvent[] = [];
   private fullGameEvents: GameEvent[] = [];
+  private toasts: ToastQueue = emptyToasts;
+  private toastClockMs = 0;
+  private turnTimerKey: string | null = null;
+  private turnTimerElapsedMs = 0;
+  private uiTickRenderMs = 0;
   private memoryExpanded = false;
   private settings: Settings = defaultSettings();
   private statusText = '';
@@ -143,6 +152,7 @@ export class GameSceneSkeleton extends Component {
   private lastHandSignature = '';
   private lastPlayAreaSignature = '';
   private renderedSelectedCardKeys = new Set<string>();
+  private animatedToastIds = new Set<number>();
   private liveRenderNodes: Set<Node> | null = null;
 
   onLoad(): void {
@@ -161,6 +171,23 @@ export class GameSceneSkeleton extends Component {
     this.runtime = null;
   }
 
+  update(dt: number): void {
+    if (!this.runtime || !this.uiRoot) return;
+    const deltaMs = Math.max(0, dt * 1000);
+    this.toastClockMs += deltaMs;
+    this.uiTickRenderMs += deltaMs;
+
+    let shouldRender = this.tickToastState();
+    const timerActive = this.syncTurnTimerKey();
+    if (timerActive) this.turnTimerElapsedMs = Math.min(TURN_TIMER_MS, this.turnTimerElapsedMs + deltaMs);
+    if (timerActive && this.uiTickRenderMs >= UI_TICK_RENDER_MS) {
+      this.uiTickRenderMs = 0;
+      shouldRender = true;
+    }
+
+    if (shouldRender) this.render();
+  }
+
   private startGame(forceNew: boolean): void {
     this.unsubscribe?.();
     this.runtime?.dispose();
@@ -168,6 +195,12 @@ export class GameSceneSkeleton extends Component {
     this.selected = clearSelection();
     this.recentEvents = [];
     this.fullGameEvents = [];
+    this.toasts = emptyToasts;
+    this.toastClockMs = 0;
+    this.turnTimerKey = null;
+    this.turnTimerElapsedMs = 0;
+    this.uiTickRenderMs = 0;
+    this.animatedToastIds.clear();
     this.statusText = '';
     this.lastHandSignature = '';
     this.lastPlayAreaSignature = '';
@@ -211,6 +244,7 @@ export class GameSceneSkeleton extends Component {
       if (event.type === 'round') this.fullGameEvents.push(event.event);
       this.recentEvents.push(event);
       this.recentEvents = this.recentEvents.slice(-12);
+      this.pushEventToast(event);
       this.render();
       this.playCue(event);
     });
@@ -252,7 +286,9 @@ export class GameSceneSkeleton extends Component {
     this.renderBidding(bidding ? vm.bidding : undefined, vm.layout, canvas);
     this.renderHand(vm.hand, vm.layout, canvas);
     this.renderStatus(this.statusText || (this.runtime.isPlayerTurn() ? '轮到你' : '等待'), vm.layout, canvas);
+    this.renderTurnTimer(vm.layout, canvas);
     this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, vm.layout, canvas);
+    this.renderToasts(vm.layout, canvas);
     this.renderResult(vm.result, canvas);
     this.endRenderDiff();
   }
@@ -482,6 +518,55 @@ export class GameSceneSkeleton extends Component {
     this.addLabel(text, pos.x, pos.y, 18, this.uiRoot!, 180, 32, 'status-label');
   }
 
+  private renderTurnTimer(layout: TableRegions, canvas: { width: number; height: number }): void {
+    if (!this.syncTurnTimerKey()) return;
+    const timer = deriveTurnTimer(TURN_TIMER_MS - this.turnTimerElapsedMs, TURN_TIMER_MS);
+    const width = Math.min(188, Math.max(150, layout.actionButtons.width - 88));
+    const height = 22;
+    const pos = this.screenPoint(canvas, canvas.width / 2, layout.actionButtons.y + 13);
+    const root = this.ensureNode('turn-timer-runtime', this.uiRoot!);
+    root.setPosition(pos.x, pos.y, 0);
+    this.addUiTransform(root, width, height);
+    this.drawHudPanel(root, width, height, new Color(34, 39, 52, 166));
+
+    const barWidth = width - 68;
+    const barHeight = 5;
+    const bar = this.ensureNode('turn-timer-bar', root);
+    bar.setPosition(-14, -3, 0);
+    this.addUiTransform(bar, barWidth, barHeight);
+    const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = new Color(255, 255, 255, 42);
+    graphics.roundRect(-barWidth / 2, -barHeight / 2, barWidth, barHeight, 3);
+    graphics.fill();
+    graphics.fillColor = timer.urgent ? new Color(255, 114, 114, 235) : new Color(134, 206, 255, 230);
+    graphics.roundRect(-barWidth / 2, -barHeight / 2, Math.round((barWidth * timer.pct) / 100), barHeight, 3);
+    graphics.fill();
+
+    const label = this.addLabel(`计时 ${timer.label}`, width / 2 - 35, 1, 12, root, 60, 20, 'turn-timer-label');
+    label.color = timer.urgent ? new Color(255, 196, 196, 255) : new Color(238, 248, 255, 255);
+  }
+
+  private renderToasts(layout: TableRegions, canvas: { width: number; height: number }): void {
+    if (this.toasts.items.length === 0) return;
+    const pos = this.screenPoint(canvas, canvas.width / 2, Math.max(148, layout.playArea.y - 10));
+    const root = this.ensureNode('toast-layer-runtime', this.uiRoot!);
+    root.setPosition(pos.x, pos.y, 0);
+    this.addUiTransform(root, Math.min(260, canvas.width - 64), 112);
+
+    this.toasts.items.forEach((toast, index) => {
+      const width = Math.min(238, Math.max(174, canvas.width - 112));
+      const height = 30;
+      const node = this.ensureNode(`toast-${toast.id}`, root);
+      node.setPosition(0, -index * 34, 0);
+      this.addUiTransform(node, width, height);
+      this.drawHudPanel(node, width, height, new Color(30, 32, 44, 190));
+      const label = this.addLabel(toast.text, 0, 0, 15, node, width - 22, height, 'toast-label');
+      label.color = new Color(255, 248, 225, 255);
+      this.prepareToastAnimation(node, toast.id);
+    });
+  }
+
   private renderResult(result: ReturnType<typeof deriveScreenVM>['result'], canvas: { width: number; height: number }): void {
     if (!result) return;
     const panel = this.ensureNode('settlement-panel-runtime', this.uiRoot!);
@@ -689,6 +774,81 @@ export class GameSceneSkeleton extends Component {
 
   private showStatus(text: string): void {
     this.statusText = text;
+  }
+
+  private tickToastState(): boolean {
+    const before = this.toasts.items.map((toast) => toast.id).join('|');
+    this.toasts = tickToasts(this.toasts, this.toastClockMs);
+    const activeIds = new Set(this.toasts.items.map((toast) => toast.id));
+    this.animatedToastIds = new Set([...this.animatedToastIds].filter((id) => activeIds.has(id)));
+    return before !== this.toasts.items.map((toast) => toast.id).join('|');
+  }
+
+  private pushEventToast(event: FlowEvent): void {
+    const text = this.eventToastText(event);
+    if (!text) return;
+    this.toasts = pushToast(this.toasts, text, this.toastClockMs);
+  }
+
+  private eventToastText(event: FlowEvent): string | null {
+    if (event.type === 'round') {
+      const round = event.event;
+      if (round.type === 'bomb') return `座位${round.seat + 1} 炸弹！`;
+      if (round.type === 'rocket') return `座位${round.seat + 1} 火箭！`;
+      if (round.type === 'pass') return `座位${round.seat + 1} 不要`;
+      return null;
+    }
+    if (event.type === 'settled') {
+      if (event.settlement.spring === 'spring') return '春天！';
+      if (event.settlement.spring === 'anti-spring') return '反春天！';
+    }
+    return null;
+  }
+
+  private currentPlayerTurnKey(): string | null {
+    if (!this.runtime?.isPlayerTurn()) return null;
+    const phase = this.runtime.phase();
+    if (phase === 'playing') {
+      const snapshot = this.runtime.currentSnapshot();
+      if (!snapshot) return null;
+      const top = snapshot.top ? `${snapshot.top.seat}:${cardsSignature(snapshot.top.pattern.cards)}` : 'lead';
+      return ['playing', snapshot.turn, top, snapshot.handCounts.join(',')].join(':');
+    }
+    return null;
+  }
+
+  private syncTurnTimerKey(): boolean {
+    const key = this.currentPlayerTurnKey();
+    if (!key) {
+      this.turnTimerKey = null;
+      this.turnTimerElapsedMs = 0;
+      return false;
+    }
+    if (key !== this.turnTimerKey) {
+      this.turnTimerKey = key;
+      this.turnTimerElapsedMs = 0;
+      this.uiTickRenderMs = 0;
+    }
+    return true;
+  }
+
+  private prepareToastAnimation(node: Node, id: number): void {
+    const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+    if (!this.settings.animation) {
+      opacity.opacity = 255;
+      node.setScale(1, 1, 1);
+      return;
+    }
+    if (this.animatedToastIds.has(id)) {
+      opacity.opacity = 255;
+      node.setScale(1, 1, 1);
+      return;
+    }
+    this.animatedToastIds.add(id);
+    opacity.opacity = 0;
+    node.setScale(0.96, 0.96, 1);
+    tween(opacity).to(0.14, { opacity: 255 }).start();
+    tween(node).to(0.14, { scale: new Vec3(1, 1, 1) }).start();
   }
 
   private playCue(event: FlowEvent): void {
