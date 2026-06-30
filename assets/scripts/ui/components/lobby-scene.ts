@@ -3,6 +3,7 @@ import { AiLevel } from '../../ai';
 import { emptyRecords, emptyStats, loadSettings, saveSettings, type Settings } from '../../data';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { deriveLobbyView, deriveRecordsView, deriveSettingsView, deriveStatsView } from '../index';
+import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
 import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
 import { RESOURCE_PATHS } from '../asset-keys';
@@ -21,6 +22,11 @@ const DIFFICULTY_LABELS: Record<AiLevel, string> = {
   [AiLevel.Normal]: '普通',
   [AiLevel.Hard]: '困难',
 };
+
+interface HelpRow {
+  text: string;
+  kind: 'title' | 'body' | 'spacer';
+}
 
 function highlightLabel(step: TutorialStep): string {
   switch (step.highlight) {
@@ -77,8 +83,9 @@ export class LobbyScene extends Component {
   latestRecordLabel: Label | null = null;
 
   private controlsRoot: Node | null = null;
-  private screen: 'home' | 'tutorial' = 'home';
+  private screen: 'home' | 'tutorial' | 'help' = 'home';
   private tutorialIndex = 0;
+  private helpScrollIndex = 0;
 
   onLoad(): void {
     this.loadSprite(RESOURCE_PATHS.lobbyBg, this.background);
@@ -109,6 +116,10 @@ export class LobbyScene extends Component {
     this.clearNode(this.controlsRoot);
     if (this.screen === 'tutorial') {
       this.renderTutorialScreen();
+      return;
+    }
+    if (this.screen === 'help') {
+      this.renderHelpScreen();
       return;
     }
     this.renderSettingsControls(settings);
@@ -155,6 +166,11 @@ export class LobbyScene extends Component {
       this.tutorialIndex = 0;
       this.render();
     }, this.controlsRoot);
+    this.addButton('帮助', 116, -248, 92, 34, true, () => {
+      this.screen = 'help';
+      this.helpScrollIndex = 0;
+      this.render();
+    }, this.controlsRoot);
   }
 
   private renderTutorialScreen(): void {
@@ -198,6 +214,63 @@ export class LobbyScene extends Component {
     }, panel);
   }
 
+  private renderHelpScreen(): void {
+    if (!this.controlsRoot) return;
+    const rows = this.helpRows();
+    const visibleRows = 12;
+    const maxStart = Math.max(0, rows.length - visibleRows);
+    const start = Math.max(0, Math.min(this.helpScrollIndex, maxStart));
+    const visible = rows.slice(start, start + visibleRows);
+
+    const panel = this.ensureNode('help-panel', this.controlsRoot);
+    panel.setPosition(0, -96, 0);
+    this.addUiTransform(panel, 330, 500);
+    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 228));
+    this.addLabel('帮助', 0, 210, 22, panel, 220, 34, 'help-heading');
+    this.addLabel(`${start + 1}-${Math.min(rows.length, start + visibleRows)}/${rows.length}`, 112, 210, 12, panel, 72, 22, 'help-progress', new Color(255, 255, 255, 210));
+
+    visible.forEach((row, index) => {
+      const y = 166 - index * 24;
+      if (row.kind === 'spacer') return;
+      this.addLabel(
+        row.text,
+        0,
+        y,
+        row.kind === 'title' ? 17 : 13,
+        panel,
+        282,
+        24,
+        `help-row-${index}`,
+        row.kind === 'title' ? new Color(255, 236, 197, 255) : new Color(255, 255, 255, 238),
+      );
+    });
+
+    this.addButton('上滚', -98, -214, 78, 36, start > 0, () => {
+      this.helpScrollIndex = Math.max(0, start - 5);
+      this.render();
+    }, panel);
+    this.addButton('下滚', 0, -214, 78, 36, start < maxStart, () => {
+      this.helpScrollIndex = Math.min(maxStart, start + 5);
+      this.render();
+    }, panel);
+    this.addButton('返回', 98, -214, 78, 36, true, () => {
+      this.screen = 'home';
+      this.render();
+    }, panel);
+  }
+
+  private helpRows(): HelpRow[] {
+    const rows: HelpRow[] = [];
+    helpSections().forEach((section, sectionIndex) => {
+      if (sectionIndex > 0) rows.push({ text: '', kind: 'spacer' });
+      rows.push({ text: section.title, kind: 'title' });
+      section.lines.forEach((line) => {
+        wrapText(line, 20).forEach((text) => rows.push({ text: text.trim(), kind: 'body' }));
+      });
+    });
+    return rows;
+  }
+
   private persist(next: Settings): void {
     try {
       saveSettings(cocosStorage(), SETTINGS_KEY, next);
@@ -220,6 +293,7 @@ export class LobbyScene extends Component {
     width: number,
     height: number,
     name: string,
+    color = new Color(255, 255, 255, 255),
   ): Label {
     const node = this.ensureNode(name, parent);
     node.setPosition(x, y, 0);
@@ -230,7 +304,7 @@ export class LobbyScene extends Component {
     label.lineHeight = fontSize + 6;
     label.horizontalAlign = Label.HorizontalAlign.CENTER;
     label.verticalAlign = Label.VerticalAlign.CENTER;
-    label.color = new Color(255, 255, 255, 255);
+    label.color = color;
     return label;
   }
 
