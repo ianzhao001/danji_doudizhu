@@ -2,8 +2,8 @@ import { createDeck, type Card, Rank } from '../rules';
 import type { GameEvent } from '../game';
 
 export interface CardMemory {
-  remainingByRank: Record<number, number>;
-  playedCount: number;
+  readonly remainingByRank: Readonly<Record<number, number>>;
+  readonly playedCount: number;
 }
 
 const RANKS: Rank[] = [
@@ -54,5 +54,5 @@ export function trackPlayed(events: GameEvent[], ownHand: Card[] = []): CardMemo
     }
   }
 
-  return { remainingByRank, playedCount };
+  return Object.freeze({ remainingByRank: Object.freeze(remainingByRank), playedCount });
 }

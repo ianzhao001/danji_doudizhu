@@ -26,6 +26,17 @@ const ALL_RANKS: Rank[] = [
   Rank.BigJoker,
 ];
 
+// Strength score terms: rare made hands, high-card control, straight potential, groups, and hand volume.
+const STRENGTH_WEIGHTS = {
+  rocket: 24,
+  bomb: 18,
+  highCard: 5,
+  straightExtraRank: 4,
+  pair: 2,
+  trip: 3,
+  handSizeCap: 20,
+} as const;
+
 function clampScore(score: number): number {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
@@ -42,10 +53,12 @@ function straightLength(counts: Map<Rank, number>): number {
   let best = 0;
   let current = 0;
   for (const rank of ALL_RANKS) {
-    if (isSequenceable(rank) && (counts.get(rank) ?? 0) > 0) {
+    if (!isSequenceable(rank)) {
+      current = 0;
+    } else if ((counts.get(rank) ?? 0) > 0) {
       current += 1;
       best = Math.max(best, current);
-    } else if (isSequenceable(rank)) {
+    } else {
       current = 0;
     }
   }
@@ -67,13 +80,13 @@ export function evaluateHand(cards: Card[]): HandStrength {
   const trips = ALL_RANKS.filter((rank) => (counts.get(rank) ?? 0) >= 3).length;
 
   const score = clampScore(
-    rockets * 24 +
-      bombs * 18 +
-      highCards * 5 +
-      Math.max(0, longestStraight - 4) * 4 +
-      pairs * 2 +
-      trips * 3 +
-      Math.min(cards.length, 20),
+    rockets * STRENGTH_WEIGHTS.rocket +
+      bombs * STRENGTH_WEIGHTS.bomb +
+      highCards * STRENGTH_WEIGHTS.highCard +
+      Math.max(0, longestStraight - 4) * STRENGTH_WEIGHTS.straightExtraRank +
+      pairs * STRENGTH_WEIGHTS.pair +
+      trips * STRENGTH_WEIGHTS.trip +
+      Math.min(cards.length, STRENGTH_WEIGHTS.handSizeCap),
   );
 
   return { score, bombs, rockets, highCards, longestStraight };
