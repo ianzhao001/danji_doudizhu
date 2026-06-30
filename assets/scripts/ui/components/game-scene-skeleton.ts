@@ -20,6 +20,8 @@ import {
 } from 'cc';
 import { AiLevel } from '../../ai';
 import { nextHint } from '../../ai/hint';
+import { evaluateHand } from '../../ai/handStrength';
+import { trackPlayed } from '../../ai/cardMemory';
 import { commitFinishedRound, persistRound, restoreRound, type SessionKeys } from '../../data/session';
 import { difficultyConfig } from '../../data/difficultyConfig';
 import { defaultSettings, type Settings } from '../../data/settings';
@@ -27,15 +29,17 @@ import { loadSettings, saveSettings } from '../../data/settingsStorage';
 import { startRoundRuntime, resumeRoundRuntime, type RoundRuntime } from '../../flow/round-runtime';
 import { realClock } from '../../flow/clock';
 import type { FlowEvent } from '../../flow/types';
-import type { ResumeSnapshot, RoundFinishInput, SeatIndex, TopPlay } from '../../game';
+import type { GameEvent, ResumeSnapshot, RoundFinishInput, SeatIndex, TopPlay } from '../../game';
 import { type Card, Suit } from '../../rules';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { cardView } from '../card-view';
+import { deriveCardMemoryView } from '../card-memory-view';
 import { cueForFlowEvent, type CueId } from '../event-cues';
 import { decideCuePlayback } from '../audio-gate';
 import { dealCardDelay, playFlyFromTo, pulseParams } from '../animation-params';
 import { clearSelection, isSelected, toggle } from '../selection';
 import { deriveScreenVM } from '../screen-view';
+import { deriveStrengthMeter } from '../strength-meter-view';
 import type { Rect, TableRegions } from '../table-layout';
 import { toggleSetting, type ToggleKey } from '../settings-view';
 import { RESOURCE_PATHS, cardAssetPath, cueAudioPath } from '../asset-keys';
@@ -130,6 +134,8 @@ export class GameSceneSkeleton extends Component {
   private playAreaRoot: Node | null = null;
   private selected: Card[] = [];
   private recentEvents: FlowEvent[] = [];
+  private fullGameEvents: GameEvent[] = [];
+  private memoryExpanded = false;
   private settings: Settings = defaultSettings();
   private statusText = '';
   private submitting = false;
@@ -161,6 +167,7 @@ export class GameSceneSkeleton extends Component {
     this.unsubscribe = null;
     this.selected = clearSelection();
     this.recentEvents = [];
+    this.fullGameEvents = [];
     this.statusText = '';
     this.lastHandSignature = '';
     this.lastPlayAreaSignature = '';
@@ -198,8 +205,10 @@ export class GameSceneSkeleton extends Component {
       storage.removeItem(SESSION_KEYS.save);
     }
 
+    this.fullGameEvents = resume?.events.slice() ?? [];
     this.runtime = resume ? resumeRoundRuntime(resume, config) : startRoundRuntime(config);
     this.unsubscribe = this.runtime.onEvent((event) => {
+      if (event.type === 'round') this.fullGameEvents.push(event.event);
       this.recentEvents.push(event);
       this.recentEvents = this.recentEvents.slice(-12);
       this.render();
@@ -239,6 +248,7 @@ export class GameSceneSkeleton extends Component {
     this.renderRuntimeSettings(vm.layout, canvas);
     this.renderSeats(snapshot?.handCounts ?? [0, 0, 0], snapshot?.landlord ?? null, vm.layout, canvas);
     this.renderPlayArea(snapshot?.top ?? null, vm.layout, canvas);
+    this.renderHud(snapshot?.viewerHand ?? [], vm.layout, canvas);
     this.renderBidding(bidding ? vm.bidding : undefined, vm.layout, canvas);
     this.renderHand(vm.hand, vm.layout, canvas);
     this.renderStatus(this.statusText || (this.runtime.isPlayerTurn() ? '轮到你' : '等待'), vm.layout, canvas);
@@ -329,6 +339,82 @@ export class GameSceneSkeleton extends Component {
       const x = startX + index * spacing;
       this.addDisplayCard(card, x, -22, area, `play-card-${index}`, animate);
     });
+  }
+
+  private renderHud(hand: Card[], layout: TableRegions, canvas: { width: number; height: number }): void {
+    if (hand.length === 0) return;
+    this.renderStrengthMeter(hand, layout, canvas);
+    this.renderCardMemory(hand, layout, canvas);
+  }
+
+  private renderStrengthMeter(hand: Card[], layout: TableRegions, canvas: { width: number; height: number }): void {
+    const strength = deriveStrengthMeter(evaluateHand(hand));
+    const centerY = layout.actionButtons.y - 30;
+    const pos = this.screenPoint(canvas, canvas.width / 2, centerY);
+    const width = Math.min(260, Math.max(210, canvas.width - 96));
+    const height = 34;
+    const root = this.ensureNode('hud-strength-meter', this.uiRoot!);
+    root.setPosition(pos.x, pos.y, 0);
+    this.addUiTransform(root, width, height);
+    this.drawHudPanel(root, width, height, new Color(48, 40, 58, 178));
+
+    const barWidth = width - 104;
+    const barHeight = 8;
+    const barX = 30;
+    const bar = this.ensureNode('hud-strength-bar', root);
+    bar.setPosition(barX, -7, 0);
+    this.addUiTransform(bar, barWidth, barHeight);
+    const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = new Color(255, 255, 255, 42);
+    graphics.roundRect(-barWidth / 2, -barHeight / 2, barWidth, barHeight, 4);
+    graphics.fill();
+    graphics.fillColor = this.strengthColor(strength.tone);
+    const filled = Math.round((barWidth * strength.pct) / 100);
+    graphics.roundRect(-barWidth / 2, -barHeight / 2, filled, barHeight, 4);
+    graphics.fill();
+
+    this.addLabel('手牌强度', -width / 2 + 46, 5, 13, root, 86, 22, 'hud-strength-title');
+    this.addLabel(`${strength.label} ${strength.pct}%`, width / 2 - 56, 5, 13, root, 104, 22, 'hud-strength-value');
+  }
+
+  private renderCardMemory(hand: Card[], layout: TableRegions, canvas: { width: number; height: number }): void {
+    const memory = deriveCardMemoryView(trackPlayed(this.fullGameEvents, hand));
+    const rows = this.memoryExpanded ? memory.rows : memory.rows.slice(0, 6);
+    const panelWidth = Math.min(334, Math.max(286, canvas.width - 44));
+    const panelHeight = this.memoryExpanded ? 112 : 58;
+    const centerY = layout.actionButtons.y - (this.memoryExpanded ? 98 : 76);
+    const pos = this.screenPoint(canvas, canvas.width / 2, centerY);
+    const root = this.ensureNode('hud-card-memory', this.uiRoot!);
+    root.setPosition(pos.x, pos.y, 0);
+    this.addUiTransform(root, panelWidth, panelHeight);
+    this.drawHudPanel(root, panelWidth, panelHeight, new Color(42, 54, 62, 168));
+
+    this.addLabel('剩牌', -panelWidth / 2 + 24, panelHeight / 2 - 18, 13, root, 42, 24, 'hud-memory-title');
+    const toggleLabel = this.memoryExpanded ? '收起' : '展开';
+    const toggle = this.addButton(toggleLabel, -panelWidth / 2 + 76, panelHeight / 2 - 18, 56, 28, true, () => {
+      this.memoryExpanded = !this.memoryExpanded;
+      this.render();
+    }, root, 'hud-memory-toggle');
+    toggle.fontSize = 14;
+    toggle.lineHeight = 18;
+
+    const cols = this.memoryExpanded ? 5 : 6;
+    const cellWidth = Math.floor((panelWidth - 28) / cols);
+    rows.forEach((row, index) => {
+      const col = index % cols;
+      const line = Math.floor(index / cols);
+      const x = -panelWidth / 2 + 16 + cellWidth / 2 + col * cellWidth;
+      const y = panelHeight / 2 - 52 - line * 24;
+      const text = `${row.rankLabel}${row.remaining}`;
+      const item = this.addLabel(text, x, y, 12, root, cellWidth, 22, `hud-memory-${index}`);
+      item.color = row.exhausted ? new Color(255, 255, 255, 112) : new Color(255, 250, 228, 255);
+    });
+
+    if (!this.memoryExpanded) {
+      const more = memory.rows.length - rows.length;
+      this.addLabel(`+${more}`, panelWidth / 2 - 22, -11, 12, root, 34, 22, 'hud-memory-more');
+    }
   }
 
   private renderBidding(
@@ -727,6 +813,20 @@ export class GameSceneSkeleton extends Component {
     graphics.roundRect(-width / 2, -height / 2, width, height, 8);
     graphics.fill();
     return node;
+  }
+
+  private drawHudPanel(parent: Node, width: number, height: number, fill: Color): void {
+    const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = fill;
+    graphics.roundRect(-width / 2, -height / 2, width, height, 8);
+    graphics.fill();
+  }
+
+  private strengthColor(tone: 'weak' | 'mid' | 'strong'): Color {
+    if (tone === 'strong') return new Color(124, 218, 150, 230);
+    if (tone === 'mid') return new Color(255, 210, 112, 230);
+    return new Color(255, 134, 134, 230);
   }
 
   private addUiTransform(node: Node, width: number, height: number): UITransform {
