@@ -28,8 +28,8 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 
 | ID | 文件域 | 依赖（入 main 后解锁） | 分支 | 状态 |
 |----|----|----|----|----|
-| M3-65-lobby-home-density | `ui/components/lobby-scene.ts` + `.meta`/report | M3-45/M3-55/M3-59/M3-46a | `task/M6-editor` | blocked |
-| M3-66-game-hud-polish | `ui/components/game-scene-skeleton.ts` + `.meta`/report | M3-56/M3-57/M3-64/M3-46b | `task/M6-editor` | blocked |
+| M3-65-lobby-home-density | `ui/components/lobby-scene.ts` + `.meta`/report | M3-45/M3-55/M3-59/M3-46a | `task/M6-editor` | **done `7b9a111`**（审查通过·home 三排重排不交叠 + 隐藏冗余 label + 子屏不透出·CDP errors []） |
+| M3-66-game-hud-polish | `ui/components/game-scene-skeleton.ts` + `.meta`/report | M3-56/M3-57/M3-64/M3-46b | `task/M6-editor` | **done `7b9a111`**（审查通过·advisor×展开剩牌消叠压 + 暂停冻结 turn-timer，CDP `3151ms→3151ms` 实证冻结） |
 
 > **审查裁决要点（落进 spec）**：① 4 项均非阻塞观感/密度，**不拦本批合并**；② 按文件域拆 2 任务（lobby / game-scene 各一），编辑器单写者串行做；③ **M3-65** ＝ home 难度面板/toggle/四入口三排重排不交叠 + 常驻 `难度` label 不被面板裁切 + 子屏（战绩/历史/教程/帮助）不透出 home 数据；④ **M3-66** ＝ advisor×展开剩牌消叠压 + 暂停态冻结 turn-timer（仍守「超时仅视觉、绝不自动出牌/过牌」契约）。
 > **未纳入**：`update(dt)` 周期 render × 出牌飞行 tween（审查期 CDP 无错 + 交互正常，仅登记观察，不立任务）。
@@ -42,7 +42,7 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 | ID | 类型 | 文件域 | 分支 | 状态 | 覆盖发现 |
 |----|----|----|----|----|----|
 | M6-G18-round-runtime-diagnostics | 发布硬化(改产品码·纯 spec) | `flow/round-runtime.ts` + 新 `test/flow/round-runtime-diagnostics.test.ts` | `task/M6-G18-round-runtime-diagnostics` | **ready**（无依赖·可即认领·与编辑器线并行） | #1 错误吞没(M)·#2 replay 漏 settled(L)·#3 单投递 replay(L) |
-| M3-67-game-scene-runtime-hygiene | 编辑器(运行时卫生) | `ui/components/game-scene-skeleton.ts` | `task/M6-editor` | blocked（待本批入 main） | #4 每帧存储 I/O(M)·#5 submitting 死锁(M)·#7 音频并发(L)·#8 按钮重注册(L·可选) |
+| M3-67-game-scene-runtime-hygiene | 编辑器(运行时卫生) | `ui/components/game-scene-skeleton.ts` | `task/M6-editor` | **ready**（依赖 M3-56/57/63/64/46b 已在 main·编辑器串行接 M3-65/66 之后） | #4 每帧存储 I/O(M)·#5 submitting 死锁(M)·#7 音频并发(L)·#8 按钮重注册(L·可选) |
 | M3-68-screen-view-drop-cues | 纯岛清理(纯 spec) | `ui/screen-view.ts` + `test/ui/screen-view.test.ts` | `task/M3-68-screen-view-drop-cues` | **ready**（无依赖·可即认领） | #6 dead `vm.cues`(L) |
 
 > **架构裁决要点（落进 spec）**：① **#1** 倾向「存错误 + `terminationDetail(): unknown` 访问器」（`RoundRuntime` 接口 additive 非破坏，**不碰 `flow/types.ts`**，续 G16 纪律），`console.warn` 仅可选且勿刷 selfplay；② **#2** 放宽 replay 入队覆盖构造期同步 emit（`'deal'`+`'settled'`），**严守 M3-56 不变量**（非 round 事件不串入 `fullGameEvents`、fresh 仍恰一次 deal）；③ **#3** 多订阅者 replay 语义二选一（per-subscriber 补发 / 显式注释单投递），属 by-design 澄清；④ **#4/#5/#7** 编辑器运行时卫生，纯去 I/O + 一行修锁 + `playOneShot`，**不改布局/交互**；⑤ **#8** 列为**可选 stretch**——仅在确证不产生 stale 按钮时做，否则保持现状（LOW 价值 vs 热路径回归风险）。
