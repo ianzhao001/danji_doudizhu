@@ -2,6 +2,7 @@ import {
   _decorator,
   AudioClip,
   AudioSource,
+  BlockInputEvents,
   Button,
   Color,
   Component,
@@ -46,6 +47,7 @@ import { emptyToasts, pushToast, tickToasts, type ToastQueue } from '../toast-qu
 import { deriveAiThinking } from '../ai-thinking-view';
 import { deriveInsightView } from '../insight-view';
 import { deriveLastActions, type SeatLastAction } from '../last-action-view';
+import { askQuit, cancelQuit, closeMenu, initialPause, openMenu, type PauseState } from '../pause-menu';
 import type { Rect, TableRegions } from '../table-layout';
 import { toggleSetting, type ToggleKey } from '../settings-view';
 import { RESOURCE_PATHS, cardAssetPath, cueAudioPath } from '../asset-keys';
@@ -150,6 +152,8 @@ export class GameSceneSkeleton extends Component {
   private uiTickRenderMs = 0;
   private memoryExpanded = false;
   private advisorEnabled = false;
+  private pauseState: PauseState = initialPause;
+  private renderedPauseStage: PauseState['stage'] = 'closed';
   private settings: Settings = defaultSettings();
   private statusText = '';
   private submitting = false;
@@ -207,6 +211,8 @@ export class GameSceneSkeleton extends Component {
     this.turnTimerElapsedMs = 0;
     this.uiTickRenderMs = 0;
     this.advisorEnabled = false;
+    this.pauseState = initialPause;
+    this.renderedPauseStage = 'closed';
     this.animatedToastIds.clear();
     this.statusText = '';
     this.lastHandSignature = '';
@@ -299,6 +305,10 @@ export class GameSceneSkeleton extends Component {
     this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, vm.layout, canvas);
     this.renderToasts(vm.layout, canvas);
     this.renderResult(vm.result, canvas);
+    if (!vm.result) {
+      this.renderPauseControl(vm.layout, canvas);
+      this.renderPauseOverlay(canvas);
+    }
     this.endRenderDiff();
   }
 
@@ -676,6 +686,93 @@ export class GameSceneSkeleton extends Component {
     this.addButton('再来一局', -74, -panelHeight * 0.37, 116, 42, true, () => this.startGame(true), panel, 'result-new');
     this.addButton('返回大厅', 74, -panelHeight * 0.37, 116, 42, true, () => director.loadScene('lobby'), panel, 'result-lobby');
     if (this.settings.animation) this.animateScaleIn(panel, 0.92, 180);
+  }
+
+  private renderPauseControl(layout: TableRegions, canvas: { width: number; height: number }): void {
+    const screenY = Math.max(28, layout.topBar.y + layout.topBar.height * 0.52);
+    const pos = this.screenPoint(canvas, canvas.width - 42, screenY);
+    const label = this.addButton(
+      '暂停',
+      pos.x,
+      pos.y,
+      64,
+      30,
+      true,
+      () => this.openPauseMenu(),
+      this.uiRoot!,
+      'pause-open-button',
+    );
+    label.fontSize = 16;
+    label.lineHeight = 20;
+  }
+
+  private renderPauseOverlay(canvas: { width: number; height: number }): void {
+    if (this.pauseState.stage === 'closed') {
+      this.renderedPauseStage = 'closed';
+      return;
+    }
+
+    const root = this.ensureNode('pause-overlay-runtime', this.uiRoot!);
+    root.setPosition(0, 0, 0);
+    this.addUiTransform(root, canvas.width, canvas.height);
+    this.drawDimOverlay(root, canvas.width, canvas.height);
+    if (!root.getComponent(BlockInputEvents)) root.addComponent(BlockInputEvents);
+
+    const panelWidth = Math.min(320, Math.max(286, canvas.width - 56));
+    const panelHeight = this.pauseState.stage === 'confirm-quit' ? 232 : 270;
+    const panel = this.ensureNode('pause-panel', root);
+    panel.setPosition(0, 12, 0);
+    panel.setScale(1, 1, 1);
+    this.addUiTransform(panel, panelWidth, panelHeight);
+    this.drawHudPanel(panel, panelWidth, panelHeight, new Color(34, 38, 52, 236));
+
+    const shouldAnimate = this.settings.animation && this.renderedPauseStage !== this.pauseState.stage;
+    if (this.pauseState.stage === 'menu') this.renderPauseMenu(panel, panelWidth, panelHeight);
+    else this.renderPauseConfirm(panel, panelWidth, panelHeight);
+    if (shouldAnimate) this.animateScaleIn(panel, 0.96, 130);
+    this.renderedPauseStage = this.pauseState.stage;
+  }
+
+  private renderPauseMenu(panel: Node, panelWidth: number, panelHeight: number): void {
+    this.addLabel('暂停', 0, panelHeight / 2 - 46, 26, panel, panelWidth - 48, 48, 'pause-title');
+    const hint = this.addLabel('本局进度已保留', 0, panelHeight / 2 - 82, 14, panel, panelWidth - 58, 30, 'pause-hint');
+    hint.color = new Color(225, 235, 255, 215);
+    this.addButton('继续', 0, 28, 176, 42, true, () => this.closePauseMenu(), panel, 'pause-continue');
+    this.addButton('重开', 0, -30, 176, 42, true, () => this.restartFromPause(), panel, 'pause-restart');
+    this.addButton('退出', 0, -88, 176, 42, true, () => this.askPauseQuit(), panel, 'pause-quit');
+  }
+
+  private renderPauseConfirm(panel: Node, panelWidth: number, panelHeight: number): void {
+    this.addLabel('退出对局？', 0, panelHeight / 2 - 48, 24, panel, panelWidth - 48, 48, 'pause-confirm-title');
+    const hint = this.addLabel('确认后返回大厅', 0, 14, 16, panel, panelWidth - 58, 36, 'pause-confirm-hint');
+    hint.color = new Color(225, 235, 255, 218);
+    this.addButton('确认', -58, -64, 100, 42, true, () => director.loadScene('lobby'), panel, 'pause-confirm');
+    this.addButton('取消', 58, -64, 100, 42, true, () => this.cancelPauseQuit(), panel, 'pause-cancel');
+  }
+
+  private openPauseMenu(): void {
+    this.pauseState = openMenu(this.pauseState);
+    this.render();
+  }
+
+  private closePauseMenu(): void {
+    this.pauseState = closeMenu(this.pauseState);
+    this.render();
+  }
+
+  private askPauseQuit(): void {
+    this.pauseState = askQuit(this.pauseState);
+    this.render();
+  }
+
+  private cancelPauseQuit(): void {
+    this.pauseState = cancelQuit(this.pauseState);
+    this.render();
+  }
+
+  private restartFromPause(): void {
+    this.pauseState = closeMenu(this.pauseState);
+    this.startGame(true);
   }
 
   private async submitBid(id: 'call' | 'grab' | 'pass'): Promise<void> {
@@ -1122,6 +1219,14 @@ export class GameSceneSkeleton extends Component {
     graphics.clear();
     graphics.fillColor = fill;
     graphics.roundRect(-width / 2, -height / 2, width, height, 8);
+    graphics.fill();
+  }
+
+  private drawDimOverlay(parent: Node, width: number, height: number): void {
+    const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = new Color(0, 0, 0, 132);
+    graphics.rect(-width / 2, -height / 2, width, height);
     graphics.fill();
   }
 
