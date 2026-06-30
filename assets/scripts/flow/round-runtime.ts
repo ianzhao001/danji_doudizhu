@@ -80,6 +80,7 @@ export interface RoundRuntime {
   onEvent(cb: (e: FlowEvent) => void): () => void;
   settlement(): Settlement | null;
   terminationReason(): RuntimeTerminationReason | null;
+  terminationDetail(): unknown;
   dispose(): void;
 }
 
@@ -115,8 +116,9 @@ class RoundRuntimeImpl implements RoundRuntime {
   private redeals = 0;
   private gameEvents: GameEvent[];
   private currentTerminationReason: RuntimeTerminationReason | null = null;
+  private currentTerminationDetail: unknown;
   private settledNotified = false;
-  private replayDelivered = false;
+  private replayClosed = false;
 
   constructor(config: RuntimeConfig, resume?: ResumeSnapshot) {
     const policies = levelPolicies(config.levels);
@@ -226,11 +228,7 @@ class RoundRuntimeImpl implements RoundRuntime {
 
   onEvent(cb: (e: FlowEvent) => void): () => void {
     this.subscribers.add(cb);
-    if (!this.replayDelivered && this.pendingReplayEvents.length > 0) {
-      this.replayDelivered = true;
-      const replay = this.pendingReplayEvents.splice(0);
-      for (const event of replay) this.deliver(cb, event);
-    }
+    if (!this.replayClosed) for (const event of this.pendingReplayEvents) this.deliver(cb, event);
     return () => void this.subscribers.delete(cb);
   }
 
@@ -240,6 +238,10 @@ class RoundRuntimeImpl implements RoundRuntime {
 
   terminationReason(): RuntimeTerminationReason | null {
     return this.currentTerminationReason;
+  }
+
+  terminationDetail(): unknown {
+    return this.currentTerminationDetail;
   }
 
   dispose(): void {
@@ -328,14 +330,23 @@ class RoundRuntimeImpl implements RoundRuntime {
     if (this.currentPhase === 'disposed') return;
     bucket?.push(event);
     if (
-      !this.replayDelivered &&
+      !this.replayClosed &&
       this.subscribers.size === 0 &&
       this.pendingReplayEvents.length === 0 &&
-      event.type === 'deal'
+      this.isReplayableStartupEvent(event)
     ) {
       this.pendingReplayEvents.push(event);
     }
+    const closeReplayAfterDelivery = this.subscribers.size > 0 && this.pendingReplayEvents.length > 0;
     for (const subscriber of this.subscribers) this.deliver(subscriber, event);
+    if (closeReplayAfterDelivery) {
+      this.replayClosed = true;
+      this.pendingReplayEvents.length = 0;
+    }
+  }
+
+  private isReplayableStartupEvent(event: FlowEvent): boolean {
+    return event.type === 'deal';
   }
 
   private deliver(subscriber: (event: FlowEvent) => void, event: FlowEvent): void {
@@ -411,9 +422,10 @@ class RoundRuntimeImpl implements RoundRuntime {
     });
   }
 
-  private terminateWithError(_error: unknown): void {
+  private terminateWithError(error: unknown): void {
     if (this.currentTerminationReason === 'settled') return;
     this.currentTerminationReason = 'error';
+    this.currentTerminationDetail = error;
     this.currentPhase = 'disposed';
   }
 }
