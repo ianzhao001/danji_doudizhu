@@ -41,9 +41,9 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 
 | ID | 类型 | 文件域 | 分支 | 状态 | 覆盖发现 |
 |----|----|----|----|----|----|
-| M6-G18-round-runtime-diagnostics | 发布硬化(改产品码·纯 spec) | `flow/round-runtime.ts` + 新 `test/flow/round-runtime-diagnostics.test.ts` | `task/M6-G18-round-runtime-diagnostics` | **changes-requested**（契约裁决：**settled 不入 replay**·见下「第十六批审查记录」） | #1 错误吞没(M)·**#2 撤销**·#3 单投递 replay(L) |
+| M6-G18-round-runtime-diagnostics | 发布硬化(改产品码·纯 spec) | `flow/round-runtime.ts` + 新 `test/flow/round-runtime-diagnostics.test.ts` | `task/M6-G18-round-runtime-diagnostics` | **done `1e5fa96`**（返工复审通过·裁定落实+新测试锁契约·648 绿） | #1 terminationDetail·**#2 撤销**·#3 per-subscriber deal replay |
 | M3-67-game-scene-runtime-hygiene | 编辑器(运行时卫生) | `ui/components/game-scene-skeleton.ts` | `task/M6-editor` | **done `08b333e`**（审查通过·去每帧 I/O + 修 submitting + playOneShot·Creator 390×844·console []） | #4 每帧存储 I/O(M)·#5 submitting 死锁(M)·#7 音频并发(L)·#8 未做(可选) |
-| M3-68-screen-view-drop-cues | 纯岛清理(纯 spec) | `ui/screen-view.ts` + `test/ui/screen-view.test.ts` | `task/M3-68-screen-view-drop-cues` | **changes-requested**（caller 不匹配·spec 缺陷·见下「第十六批审查记录」） | #6 dead `vm.cues`(L) |
+| M3-68-screen-view-drop-cues | 纯岛清理(纯 spec) | `ui/screen-view.ts` + `test/ui/screen-view.test.ts` | `task/M3-68-screen-view-drop-cues` | **done `ffdb66d`**（返工复审通过·方案 A 保留入参·caller 零改·645 绿） | #6 dead `vm.cues`(L) |
 
 > **架构裁决要点（落进 spec）**：① **#1** 倾向「存错误 + `terminationDetail(): unknown` 访问器」（`RoundRuntime` 接口 additive 非破坏，**不碰 `flow/types.ts`**，续 G16 纪律），`console.warn` 仅可选且勿刷 selfplay；② **#2** 放宽 replay 入队覆盖构造期同步 emit（`'deal'`+`'settled'`），**严守 M3-56 不变量**（非 round 事件不串入 `fullGameEvents`、fresh 仍恰一次 deal）；③ **#3** 多订阅者 replay 语义二选一（per-subscriber 补发 / 显式注释单投递），属 by-design 澄清；④ **#4/#5/#7** 编辑器运行时卫生，纯去 I/O + 一行修锁 + `playOneShot`，**不改布局/交互**；⑤ **#8** 列为**可选 stretch**——仅在确证不产生 stale 按钮时做，否则保持现状（LOW 价值 vs 热路径回归风险）。
 > **优先级**：#4（每帧 I/O·性能）与 #1（错误可诊断性）最高，分落 M3-67 / M6-G18；#5 一行修锁次之。
@@ -99,6 +99,11 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 - 冲突：M6-G18 实现把 `'settled'` 也纳入 `isReplayableStartupEvent` → resume-settled 首订阅者收到 `settled`；但既有 `test/flow/runtime-resume-phases.test.ts:143` 断言同场景 `events=[]`。
 - **裁决：settled 不进 replay，既有测试正确，撤销 G18 finding #2。** 理由：① replay 机制目的是让晚挂载的首订阅者补回构造期 `'deal'` 以驱动初始渲染；② resume 一个**已结束**的局重放 `settled` 事件 = 重新触发胜负 cue（音效/动画），**重开已完成对局时再播一次胜利动画是错的**；③ 结算面板本就由 `settlement()` 访问器 + `onSettled` 提供，不依赖事件流；④ 现行 save 仅在 enterPlaying 落盘（永不 settled），resume-settled 实际不可达，所谓「盲区」非真缺陷。
 - **要求执行方**：把 `isReplayableStartupEvent` 改回 **仅 `'deal'`**；**保留** #1 `terminationDetail()`（已正确实现）与 #3 `replayClosed` 机制（与既有测试兼容）。改后 full suite 应转绿。spec 已更新。
+
+**✅ 返工复审（2026-07-01·两分支均通过并入 main）**
+- **M6-G18 `1e5fa96`**：`isReplayableStartupEvent` 已改回仅 `'deal'`；resume-settled 维持 `events=[]`（既有 resume-phases 测试未改且过）；保留 `terminationDetail()` + per-subscriber deal replay；未碰 `flow/types.ts`。新增 `round-runtime-diagnostics.test.ts` **锁定契约**（`不重放 settled`/`每订阅者补 deal 一次`/`terminationDetail 返回原始 error`）——未来若再把 settled 塞回 replay 会被此测试拦下。独立复跑 648 绿·typecheck 净。
+- **M3-68 `ffdb66d`**：采方案 A——`deriveScreenVM` 保留 `recentEvents: FlowEvent[]` 入参类型（不再使用），caller `game-scene-skeleton.ts` 经 diff 确认**零改**、无 TS2353；仅删 `cues` 字段/映射/`cueForFlowEvent`·`CueId` import；测试去 cues 断言、其余覆盖不减。独立复跑 645 绿·typecheck 净。
+- **合并后 main = `ffdb66d`：132 files / 648 tests 绿·typecheck 净·纯层零 cc。第十六批仅剩 M4-42（产品 gated）未动。**
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**

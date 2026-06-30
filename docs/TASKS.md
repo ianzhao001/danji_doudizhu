@@ -12,6 +12,8 @@
 
 > 2026-07-01 第十六批审查（6 实现分支·独立复核）：**4 合 / 1 改 / 1 裁决**，合并后 main **131 files / 645 tests 绿·typecheck 净·纯层零 cc**。已并：**M3-67 `08b333e`**（运行时卫生）·**M6-G20 `e9bf6d7`**·**M6-G19 `80c71a0`**（+`.meta` `c2e37fd`）·**M6-G21 `b0bbd41`**。**M3-68 打回**（caller `game-scene-skeleton:284` 仍传已删的 `recentEvents`→Cocos TS2353；test 绿是假阴性因该 cc 组件不在 test tsc 程序内；根因 M3-68 任务书写错·已订正）。**M6-G18 契约裁定**：resume-settled 的 `settled` **不**入 replay（重开已结束局重播胜负 cue 是错的·结算走 settlement()/onSettled·该路径实际不可达）→ 撤销 #2、保留 #1/#3·spec 已更新。详见 coordination/BOARD.md「第十六批审查记录」。
 
+> 2026-07-01 第十六批返工复审：两 changes-requested 分支返工后**均复审通过并入 main**——**M6-G18 `1e5fa96`**（裁定落实仅 `'deal'` replay·resume-settled 维持 events=[]·新测试锁契约）·**M3-68 `ffdb66d`**（方案 A 保留入参·caller 零改·无 TS2353）。合并后 main = `ffdb66d`：**132 files / 648 tests 绿·typecheck 净·纯层零 cc**。**第十六批 7 任务 6 done，仅剩 M4-42（产品 gated）**。
+
 > M2 起按用户决定启用 git + 多 AI worktree 协作；协议见 coordination/PROTOCOL.md。
 
 状态说明：
@@ -139,7 +141,7 @@
 - [x] 异常流程检查。〔M6-L4 已并 main `c08de19`·resume-to-settled/redead 超限/bidding reason·5/5 绿〕
 - [x] 构建验证。〔M6-C4 已并 main `4c314b9`·Creator 3.8.8 web-mobile build success·390×844 运行烟测·交叉审查 approve〕
 - [x] 发布硬化（三方审查转化·第十四批）。〔M6-G16 已并 main `d9cc851`·`round-runtime.ts` 生命周期/错误边界/死状态（RR-1..10）·RR-1 settled replay 登记后续契约取舍；M6-G17 已并 main `422411c`·`event-cues.ts` cue 编译期穷尽断言 + 签名诚实化（EC-1/EC-3，驳回 EC-2）·最终 128/632 绿·typecheck 净〕
-- [ ] 发布硬化（第三轮审查·**changes-requested**）。〔M6-G18 #1 `terminationDetail()` 已正确实现；**契约裁定 #2 撤销**（settled 不入 replay·既有 resume-phases 测试正确）→ 执行方把 `isReplayableStartupEvent` 改回仅 `'deal'`、保留 #1/#3·改后 full suite 转绿〕
+- [x] 发布硬化（第三轮审查转化·第十六批）。〔M6-G18 已并 main `1e5fa96`·返工复审通过·terminationDetail() + 仅 `'deal'` replay（裁定 settled 不入）+ per-subscriber·新测试锁契约·648 绿〕
 - [x] DRY 收口（第四轮审查转化·第十六批）。〔M6-G19 已并 main `80c71a0`（+`.meta` `c2e37fd`）·跨层守卫去重·层级/桶/hintRank 正确·偏差：isGameEvent 统一为 strict（收紧 save 校验·安全）·131 files/642 绿〕
 - [x] 核心热路径硬化（第四轮审查转化·第十六批）。〔M6-G20 已并 main `e9bf6d7`·`core.ts` 结构共享·事件/状态语义逐字不变·635 绿〕
 - [x] AI 启发式一致性硬化（第四轮审查转化·第十六批）。〔M6-G21 已并 main `b0bbd41`·cardMemory 冻结 + straightLength 显式 reset + 权重具名·三项行为保持〕
