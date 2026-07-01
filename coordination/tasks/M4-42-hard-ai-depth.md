@@ -1,6 +1,6 @@
 # M4-42 困难 AI 中盘策略纵深（消费 M4-30/31/32·审查转化·产品 gated）
 
-- 状态：todo（**产品 gated**·非紧急·按产品优先级排期；规模大于清理类任务）
+- 状态：ready（**产品已解 gate·2026-07-01**·排期为独立 AI 纵深批·PROTOCOL bootstrap 派发；规模大于清理类任务）
 - 派发模式：**纯 spec**（改产品码 + 自写 vitest/selfplay 验证）
 - 文件域（**只允许改这些**）：
   - `assets/scripts/ai/levels/hard.ts`（+ 可能的私有 helper，**不改** `_shared`/Normal 共用路径的签名）

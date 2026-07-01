@@ -59,7 +59,7 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 | M6-G19-typeguard-consolidation | 新 `rules/guards.ts`+`game/seat.ts` + 多消费方改 import | `task/M6-G19-typeguard-consolidation` | **done `80c71a0`**（+`.meta` `c2e37fd`·偏差：isGameEvent 统一为 strict·见记录） | #3 重复守卫去重（isRecord×6/isSeat×4/nextSeat×2/cardKey×3/isGameEvent×2） |
 | M6-G20-core-structural-sharing | `game/core.ts` | `task/M6-G20-core-structural-sharing` | **done `e9bf6d7`**（审查通过·语义逐字不变·635 绿） | #7 不可变结构共享（去 pass/未变座位冗余手牌拷贝） |
 | M6-G21-ai-heuristic-hardening | `ai/cardMemory.ts`+`ai/handStrength.ts` | `task/M6-G21-ai-heuristic-hardening` | **done `b0bbd41`**（审查通过·三项行为保持） | #8 cardMemory 不可变·#11 straightLength 去隐式顺序依赖·#12 评分权重具名 |
-| M4-42-hard-ai-depth | `ai/levels/hard.ts` | `task/M4-42-hard-ai-depth` | **todo（产品 gated）** | #9 Hard 中盘纵深（消费 M4-30/31/32·selfplay 胜率验收） |
+| M4-42-hard-ai-depth | `ai/levels/hard.ts` | `task/M4-42-hard-ai-depth` | **ready**（产品 2026-07-01 解 gate·分支已建于 `0960a4a`·PROTOCOL bootstrap 派发） | #9 Hard 中盘纵深（消费 M4-30/31/32·selfplay 胜率验收） |
 
 > **串行约束**：G19 与 G20 均触 `game/core.ts`，**不并行**（report 注明顺序）。G21 与 M4-42 均 ai/ 但文件域不交（G21=cardMemory/handStrength，M4-42=levels/hard）可并行。G19/G20/G21 为发布前清理类，M4-42 显著更大、按产品优先级单独排期。
 
@@ -104,6 +104,7 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 - **M6-G18 `1e5fa96`**：`isReplayableStartupEvent` 已改回仅 `'deal'`；resume-settled 维持 `events=[]`（既有 resume-phases 测试未改且过）；保留 `terminationDetail()` + per-subscriber deal replay；未碰 `flow/types.ts`。新增 `round-runtime-diagnostics.test.ts` **锁定契约**（`不重放 settled`/`每订阅者补 deal 一次`/`terminationDetail 返回原始 error`）——未来若再把 settled 塞回 replay 会被此测试拦下。独立复跑 648 绿·typecheck 净。
 - **M3-68 `ffdb66d`**：采方案 A——`deriveScreenVM` 保留 `recentEvents: FlowEvent[]` 入参类型（不再使用），caller `game-scene-skeleton.ts` 经 diff 确认**零改**、无 TS2353；仅删 `cues` 字段/映射/`cueForFlowEvent`·`CueId` import；测试去 cues 断言、其余覆盖不减。独立复跑 645 绿·typecheck 净。
 - **合并后 main = `ffdb66d`：132 files / 648 tests 绿·typecheck 净·纯层零 cc。第十六批仅剩 M4-42（产品 gated）未动。**
+- **2026-07-01 产品解 gate → M4-42 翻 ready 并派发**（与发布收尾文档「两条并行」）：分支 `task/M4-42-hard-ai-depth` 建于 `0960a4a`（纯 spec·无种子测试·实现方自写 selfplay 验证）；同批架构落发布收尾——第十六批 deferred refactors（#1/#10 拆分 · #4 legalFollows 剪枝 · #6 save 双序列化）已补登 `docs/KNOWN_LIMITATIONS.md`，M6-D1 收口剩余 gate 收敛为 {ART-IMPORT 用户视觉终审, M4-42 落地} 两项。
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
