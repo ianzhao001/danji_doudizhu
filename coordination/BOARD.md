@@ -706,3 +706,27 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
   - ✅ `ui/index.ts` 由 M3-01 创建，已导出 9 个 UI 岛、`screen-view`，以及第六批 `stats/records/settings/lobby-view`。
   - ✅ `data/index.ts` 已随 M5-11 导出 `aggregate`，并保留 `difficultyConfig`。
   - ✅ `game/index.ts` 已随 M5-10 导出 `resume`。
+
+---
+
+## v1.1 交互体验打磨批（横屏化 + 按钮化 + 资源规范 + Bug 清扫 · 2026-07-02）
+
+> 规划书：`/Users/admin/.claude/plans/beta-1-bug-2-label-3-4-btn-5-ai-curious-muffin.md`（v5 终审通过·7 份执行者审查逐条收口）。目标：竖屏→横屏、点击区按钮化、资源命名/绑定 + 可见文案打磨、Bug 清扫；核心是交互体验，不做大功能。派发按 Wave 0→1→2→3。
+> **协议修订（用户指定）**：审查通过后由**执行者合并 main**（脚本化 `claim/merge/release` 单 lane），经 **T-DOC 落 main 后启用**；T-DOC 未入 main 前一切按旧协议、执行者不自行合并。
+
+| ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
+|----|----|----|----|----|----|
+| T-DOC | 0 | 协议/脚本/模板 | `PROTOCOL.md`,`BOARD.md`,`agentctl.sh`,`templates/*` | — | **ready**（旧协议·架构合并） |
+| V-0 | 0 | baseline 记录 | `reports/V-0-baseline.md` | — | **ready**（规划者/用户直接落盘·不 gate Wave 1） |
+| E-0 | 1 | 编辑器配置(用户) | `project.json`,`*.scene`(Creator 生成) | T-DOC | blocked→ready(待 T-DOC) |
+| T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC | blocked→ready(待 T-DOC) |
+| T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC | blocked→ready(待 T-DOC) |
+| T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC | blocked→ready(待 T-DOC) |
+| T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 | 审计 |
+| P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0,T-A1,T-0,T-C0 | blocked |
+| P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0,T-0,T-C0 | blocked |
+| P-Text | 2 | 契约(规划者交付) | 文案清单 + `ui/strings.ts`(架构维护) | — | 规划者产出中 |
+| V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
+
+> **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
+> **派发**：Wave 0 两任务已出 spec（`tasks/T-DOC.md`、`tasks/V-0.md`）。T-DOC 用 PROTOCOL bootstrap 派发、架构合并；V-0 由规划者/用户执行。T-DOC 入 main 后 Wave 1 四任务翻 ready 并行。
