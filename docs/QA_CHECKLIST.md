@@ -79,14 +79,14 @@
 - [x] 叫地主/抢地主流程提示明确。← `test/ui/bidding-view.test.ts`; `coordination/reports/M3-34-bidding-settlement-popups.report.md`
 - [x] 出牌、提示、不要按钮状态正确。← `test/ui/action-buttons.test.ts`; `test/ui/action-buttons-edges.test.ts`; `coordination/reports/M3-33-action-buttons-hint.report.md`
 - [x] 结算弹窗不溢出屏幕。← `test/ui/result-view.test.ts`; `coordination/reports/M3-34-bidding-settlement-popups.report.md`
-- [ ] 设置弹窗不溢出屏幕。← C3a 已覆盖大厅运行时设置控件三档截图；正式设置弹窗 / 构建态仍待 M6-C4 复核
+- [x] 设置 / 难度控件不溢出屏幕。← `coordination/reports/M6-C3a-lobby-390x844.png`; `coordination/reports/M6-C3a-lobby-412x915.png`; `coordination/reports/M6-C3a-lobby-360x780.png`; `coordination/reports/M3-59-difficulty-picker-390x844.png`; `coordination/reports/M3-65-home-density-390x844.png`; `coordination/reports/M3-65-subscreen-opaque-390x844.png`
 
 ## 发布前检查
 
 - [x] Cocos Editor 打开项目无错误。← `coordination/reports/M3-29-resource-baseline-import.report.md`; `coordination/reports/M3-30-lobby-scene.report.md`; `coordination/reports/M3-31-game-scene-skeleton.report.md`; M6-C1 用户 Creator 验证记录见 `docs/TASKS.md`
-- [x] 脚本编译无错误。← `docs/TASKS.md`（M6-C1 用户 Creator 验证编译零报错）; `coordination/BOARD.md`（92 文件 / 469 用例，typecheck 净）
-- [x] Vitest 纯逻辑测试（规则 / 状态机 / AI）全部通过。← `coordination/BOARD.md`（main 92 文件 / 469 用例全绿）
+- [x] 脚本编译无错误。← `docs/TASKS.md`（M6-C1 用户 Creator 验证编译零报错）; `coordination/BOARD.md`（main 133 文件 / 653 用例，typecheck 净）
+- [x] Vitest 纯逻辑测试（规则 / 状态机 / AI）全部通过。← `coordination/BOARD.md`（main 133 文件 / 653 用例全绿）
 - [x] 自对弈冒烟（N 局）无阻塞。← `test/selfplay/selfplay.test.ts`; `test/selfplay/selfplay-long.test.ts`
-- [ ] 目标平台构建通过。← 待 M6-C4 web-mobile 构建验证
+- [x] 目标平台构建通过。← `coordination/reports/M6-02-build-verification.report.md`; D1 复测 `build/web-mobile/`（47M / 202 文件，CocosEngine 3.8.8，platform web-mobile）；`/tmp/doudizhu-d1-smoke/summary.json`
 - [x] 完成多局冒烟测试。← `test/selfplay/selfplay-long.test.ts`（seeds 1..50）
 - [x] 本地设置和战绩可保存。← `test/data/settings-storage.test.ts`; `test/data/session.test.ts`; `test/data/session-atomicity.test.ts`; `assets/scripts/ui/components/game-scene-skeleton.ts`

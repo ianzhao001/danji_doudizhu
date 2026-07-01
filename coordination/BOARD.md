@@ -4,7 +4,7 @@
 
 ## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批进行中**：A 线纯逻辑 7（L7-L12+M3-42）+ G 4（G9-G12）+ D2/D3 ✅ 已并 main（103 文件/507 绿）；M3-40/41/43/44 已并 main；C2/C3a/C3b 已并 main（C3b `b51dce5`），C4 ready；R 待用户视觉终审；新增桶整合 M6-I1 已并 main（见下「第十一批」+「验收记录」） · **第十二批已派发**（18 任务·P AI 纵深 / V 视图 / L 文案 / G 护栏 / C 编辑器 / D 文档 / R 美术·spec 全部入 main，见下「第十二批」） · **第十三批已派发**（10 任务·AI 模块组合/平衡度量/回放编码/剩余视图·M6-D5 已并 main·见下「第十三批」·纯逻辑尾部） · **第十四批 ✅ 已验收并并入 main**（G16 `d9cc851` round-runtime 生命周期/错误边界 + G17 `422411c` cue 编译期穷尽断言，128 文件 / 632 绿·typecheck 净）
 
-main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 cc**（仅 `ui/components/*`+`runtime/cocos-storage.ts`；`CueId` 字面量联合）、`flow→data` 零 import；第十一/十二/十三批纯逻辑尾部与 M6-I1 桶导出已并 main（`7c7b427`），编辑器 C2/C3a/C3b/C4、M3-56 HUD、M3-57/M3-63/M3-64/M3-55/M3-46a/M3-46b/M3-59/M3-45 与 D5 冒烟脚本已并 main（M6-editor 收口 `a817c98`，审查通过；截图均 390×844；CDP errors `[]`）。**第九批美术 ART-02/03/04 已并 main**（`6eb8995`，58 文件·`asset-previews/` 预览包·未导入 `assets/`·视觉终审归用户）。**剩余 gate**：ART-IMPORT-02/03/04 与 ART-05 仍待用户视觉终审；M6-D1 发布/QA 文档收尾待最终发布 gate。**第十四批 G16/G17 已并 main**（见下「第十四批」）。
+main 现状：**首版可发布**。代码 HEAD `d9c03f7` 已含 M4-42 `641b6a8` 与 ART-IMPORT `4334e81`；M6-D1 文档收口由本次 release-docs 提交落盘。当前验证口径：**133 测试文件 / 653 用例全绿、typecheck 净、纯层零 cc**；Cocos Creator 3.8.8 `web-mobile` 构建在当前 main 复测生成 `build/web-mobile/`（47M / 202 文件）；D1 三档 Web Mobile 烟测截图已落 `/tmp/doudizhu-d1-smoke/`。已知限制已归档到 `docs/KNOWN_LIMITATIONS.md`，均为发布后债务，不阻塞 v1。
 
 ## 第十四批（三方审查转化 · 发布硬化 · 架构派发 · 2026-06-30）
 
@@ -119,6 +119,29 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 > **决策**：用户选「先修后合」。分支/worktree 保留待重导后重新提交；架构复验每个 meta `userData.type=="sprite-frame"` + 含 sprite-frame 子资产 + UUID 仍唯一 + 653 绿后再 `merge --no-ff`。M6-D1 sign-off 在此前不得声称美术可用。
 >
 > **✅ 返工复审通过并入 main `4334e81`（2026-07-01）**：返工 `37d7d24` 用 Creator asset-db（save-asset-meta + reimport）把 22 个 sprite 转 `type:sprite-frame`（真实 `@f9941` 子资产·trim 几何真实·与既有 card-template 结构逐字同型·loader 可用）；delta **严格仅 22 `.png.meta` + 1 report**（无 PNG/asset-keys/测试/纯层改动）；app-icon/splash 仍 texture；**50 meta / 50 唯一 base UUID·零跨文件碰撞·sub-uuid 均自 base 派生**；无手写痕迹/临时扩展残留。复跑 **133 files / 653 tests 绿·typecheck 净·diff --check 净·无 cc**。worktree/分支已清理。**ART-IMPORT-02/03/04/05 全部 done。发布收口最后一个 gate 关闭 → M6-D1 可执行。**
+
+### ✅ M6-D1 发布验收记录（架构收口 · 2026-07-01）
+
+> 结论：**通过，首版可发布**。M6-D1 按“不虚标”规则先复核支持证据，再收口 `docs/ROADMAP.md`、`docs/TASKS.md`、`docs/QA_CHECKLIST.md` 与本 BOARD。
+
+最终落地主线：
+- M4-42 困难 AI 纵深：`641b6a8`
+- ART-IMPORT-02/03/04/05：`4334e81`
+- M6-D1 发布文档收口：本次 release-docs 提交
+
+构建与运行证据：
+- C4 历史构建记录：`coordination/reports/M6-02-build-verification.report.md`（Creator 3.8.8，platform `web-mobile`，build success，390×844 运行截图）。
+- D1 当前 main 复测：`env -u ELECTRON_RUN_AS_NODE ... CocosCreator --project /Users/admin/Documents/Cocos/斗地主 --build "platform=web-mobile;buildPath=project://build;outputName=web-mobile;debug=false;md5Cache=false;sourceMaps=false;mainBundleCompressionType=merge_dep"`。
+- 当前构建产物：`build/web-mobile/`（ignored，不入库；47M / 202 文件）。
+- 当前构建配置：`build/web-mobile/src/settings.json` → `CocosEngine: 3.8.8`、`engine.platform: web-mobile`、`engine.debug: false`、`launch.launchScene: db://assets/scene/game.scene`、`screen.designResolution: 390×844`。
+- D1 Web Mobile 烟测截图：`/tmp/doudizhu-d1-smoke/web-mobile-game-390x844.png`、`/tmp/doudizhu-d1-smoke/web-mobile-game-412x915.png`、`/tmp/doudizhu-d1-smoke/web-mobile-game-360x780.png`。
+- D1 CDP 摘要：`/tmp/doudizhu-d1-smoke/summary.json`；三档页面标题 `Cocos Creator | 斗地主`，canvas client 尺寸分别为 390×844 / 412×915 / 360×780。390 档仅有静态服务 favicon 404（非项目脚本错误）；412/360 档 errorEvents `[]`；均仅有 WebAudio autoplay warning。
+- C3a 多分辨率截图：`coordination/reports/M6-C3a-{game,lobby}-{390x844,412x915,360x780}.png`。
+- M6-D5 手动冒烟脚本：`docs/PLAYTEST.md`；本次 D1 执行构建态三档 smoke 作为发布验收附件，自动化多局与规则/状态机/AI 稳定性由 653 测试覆盖。
+
+已知限制与发布后债务：
+- `docs/KNOWN_LIMITATIONS.md` 已登记：`game-scene-skeleton.ts` / `round-runtime.ts` 发布后拆分、`legalFollows` profiling 触发后再剪枝、`save.ts` 双序列化后续数据层清理、Hard AI 记牌消费偏浅等。
+- 本批不引入联网、账号、支付、广告或匹配；首版范围仍为完整离线单机斗地主。
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
