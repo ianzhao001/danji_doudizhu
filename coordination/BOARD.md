@@ -716,12 +716,12 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 
 | ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
 |----|----|----|----|----|----|
-| T-DOC | 0 | 协议/脚本/模板 | `PROTOCOL.md`,`BOARD.md`,`agentctl.sh`,`templates/*` | — | **in-review**（旧协议·架构合并） |
+| T-DOC | 0 | 协议/脚本/模板 | `PROTOCOL.md`,`BOARD.md`,`agentctl.sh`,`templates/*` | — | **done `4b5188d`**（旧协议·架构合并·133/654 绿·typecheck 净·bash -n 通过） |
 | V-0 | 0 | baseline 记录 | `reports/V-0-baseline.md` | — | **ready**（规划者/用户直接落盘·不 gate Wave 1） |
-| E-0 | 1 | 编辑器配置(用户) | `project.json`,`*.scene`(Creator 生成) | T-DOC | blocked→ready(待 T-DOC) |
-| T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC | blocked→ready(待 T-DOC) |
-| T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC | blocked→ready(待 T-DOC) |
-| T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC | blocked→ready(待 T-DOC) |
+| E-0 | 1 | 编辑器配置(用户) | `project.json`,`*.scene`(Creator 生成) | T-DOC ✅ | **ready** |
+| T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC ✅ | **ready**（待架构种失败测试） |
+| T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | **ready** |
+| T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **ready** |
 | T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 | 审计 |
 | P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0,T-A1,T-0,T-C0 | blocked |
 | P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0,T-0,T-C0 | blocked |
@@ -729,4 +729,4 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
-> **派发**：Wave 0 两任务已出 spec（`tasks/T-DOC.md`、`tasks/V-0.md`）。T-DOC 用 PROTOCOL bootstrap 派发、架构合并；V-0 由规划者/用户执行。T-DOC 入 main 后 Wave 1 四任务翻 ready 并行。
+> **派发**：Wave 0 T-DOC ✅ 已并 main（`4b5188d`·新 `claim/merge/release` 流程已启用）。**Wave 1（E-0/T-A1/T-0/T-C0）已翻 ready，可并行派发**——后续任务按新协议：架构给 `approved` 后执行者 `claim→merge→release` 自合。T-A1 spec 待架构种失败测试后置 ready 可认领。V-0 由规划者/用户执行。
