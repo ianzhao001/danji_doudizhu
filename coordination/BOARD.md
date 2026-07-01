@@ -4,7 +4,7 @@
 
 ## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批进行中**：A 线纯逻辑 7（L7-L12+M3-42）+ G 4（G9-G12）+ D2/D3 ✅ 已并 main（103 文件/507 绿）；M3-40/41/43/44 已并 main；C2/C3a/C3b 已并 main（C3b `b51dce5`），C4 ready；R 待用户视觉终审；新增桶整合 M6-I1 已并 main（见下「第十一批」+「验收记录」） · **第十二批已派发**（18 任务·P AI 纵深 / V 视图 / L 文案 / G 护栏 / C 编辑器 / D 文档 / R 美术·spec 全部入 main，见下「第十二批」） · **第十三批已派发**（10 任务·AI 模块组合/平衡度量/回放编码/剩余视图·M6-D5 已并 main·见下「第十三批」·纯逻辑尾部） · **第十四批 ✅ 已验收并并入 main**（G16 `d9cc851` round-runtime 生命周期/错误边界 + G17 `422411c` cue 编译期穷尽断言，128 文件 / 632 绿·typecheck 净）
 
-main 现状：**代码/测试/文档就绪；发布打包待一处启动场景重构建复验**（见下「M6-D1 复审」）。代码 HEAD `d9c03f7` 已含 M4-42 `641b6a8` 与 ART-IMPORT `4334e81`；M6-D1 文档收口由 release-docs 提交 `ef0f93b` 落盘（架构复审通过·文件域/证据/口径均核实）。当前验证口径：**133 测试文件 / 653 用例全绿、typecheck 净、纯层零 cc**；Cocos Creator 3.8.8 `web-mobile` 构建在当前 main 复测生成 `build/web-mobile/`（47M / 202 文件）；D1 三档 Web Mobile 烟测截图已落 `/tmp/doudizhu-d1-smoke/`（游戏画布渲染正常·errorEvents 仅 390 档 favicon 404）。已知限制已归档到 `docs/KNOWN_LIMITATIONS.md`，均为发布后债务，不阻塞 v1。**唯一发布打包 gate**：release 构建 `launchScene=game.scene` 与设计「先进大厅」不符（GAME_DESIGN 核心循环步骤 1），用户裁定改 `lobby.scene` 后重构建 + 补大厅构建态烟测再打包。
+main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可发布**。当前 main 已含 M4-42 `641b6a8`、ART-IMPORT `4334e81`、M6-D1 文档收口 `ef0f93b` 与 M6-D1 发布打包返工；当前验证口径：**133 测试文件 / 653 用例全绿、typecheck 净、纯层零 cc**。Cocos Creator 3.8.8 `web-mobile` 构建在当前 main 复测生成 `build/web-mobile/`（47M / 202 文件），`launch.launchScene` 已改为 `db://assets/scene/lobby.scene`；D1 三档 Web Mobile 大厅烟测截图已落 `/tmp/doudizhu-d1-lobby-launch-smoke/`，390 档覆盖 lobby → game → pause quit → lobby 链路，三档 `errorEvents: []`。已知限制已归档到 `docs/KNOWN_LIMITATIONS.md`，均为发布后债务，不阻塞 v1。
 
 ## 第十四批（三方审查转化 · 发布硬化 · 架构派发 · 2026-06-30）
 
@@ -131,11 +131,12 @@ main 现状：**代码/测试/文档就绪；发布打包待一处启动场景�
 
 构建与运行证据：
 - C4 历史构建记录：`coordination/reports/M6-02-build-verification.report.md`（Creator 3.8.8，platform `web-mobile`，build success，390×844 运行截图）。
-- D1 当前 main 复测：`env -u ELECTRON_RUN_AS_NODE ... CocosCreator --project /Users/admin/Documents/Cocos/斗地主 --build "platform=web-mobile;buildPath=project://build;outputName=web-mobile;debug=false;md5Cache=false;sourceMaps=false;mainBundleCompressionType=merge_dep"`。
+- D1 当前 main 复测：`env -u ELECTRON_RUN_AS_NODE ... CocosCreator --project /Users/admin/Documents/Cocos/斗地主 --build "platform=web-mobile;buildPath=project://build;outputName=web-mobile;debug=false;md5Cache=false;sourceMaps=false;mainBundleCompressionType=merge_dep;startScene=dc62324b-10d4-4870-9518-1a34ce682067"`。
 - 当前构建产物：`build/web-mobile/`（ignored，不入库；47M / 202 文件）。
-- 当前构建配置：`build/web-mobile/src/settings.json` → `CocosEngine: 3.8.8`、`engine.platform: web-mobile`、`engine.debug: false`、`launch.launchScene: db://assets/scene/game.scene`、`screen.designResolution: 390×844`。
-- D1 Web Mobile 烟测截图：`/tmp/doudizhu-d1-smoke/web-mobile-game-390x844.png`、`/tmp/doudizhu-d1-smoke/web-mobile-game-412x915.png`、`/tmp/doudizhu-d1-smoke/web-mobile-game-360x780.png`。
-- D1 CDP 摘要：`/tmp/doudizhu-d1-smoke/summary.json`；三档页面标题 `Cocos Creator | 斗地主`，canvas client 尺寸分别为 390×844 / 412×915 / 360×780。390 档仅有静态服务 favicon 404（非项目脚本错误）；412/360 档 errorEvents `[]`；均仅有 WebAudio autoplay warning。
+- 当前构建配置：`build/web-mobile/src/settings.json` → `CocosEngine: 3.8.8`、`engine.platform: web-mobile`、`engine.debug: false`、`launch.launchScene: db://assets/scene/lobby.scene`、`screen.designResolution: 390×844`。
+- D1 Web Mobile 大厅烟测截图：`/tmp/doudizhu-d1-lobby-launch-smoke/lobby-390x844.png`、`/tmp/doudizhu-d1-lobby-launch-smoke/lobby-412x915.png`、`/tmp/doudizhu-d1-lobby-launch-smoke/lobby-360x780.png`；链路截图：`lobby-390x844-after-new-game.png`、`lobby-390x844-pause.png`、`lobby-390x844-pause-confirm.png`、`lobby-390x844-back-lobby.png`。
+- D1 CDP 摘要：`/tmp/doudizhu-d1-lobby-launch-smoke/summary.json`；三档页面标题 `Cocos Creator | 斗地主`，canvas client 尺寸分别为 390×844 / 412×915 / 360×780，均启动到 `sceneName: "lobby"` 且 `errorEvents: []`；390 档实测已有静态 `新对局` 入口可进 `game.scene`，并可经暂停退出确认回到大厅。
+- D1 发布打包返工报告：`coordination/reports/M6-D1-lobby-launch-rebuild.report.md`。
 - C3a 多分辨率截图：`coordination/reports/M6-C3a-{game,lobby}-{390x844,412x915,360x780}.png`。
 - M6-D5 手动冒烟脚本：`docs/PLAYTEST.md`；本次 D1 执行构建态三档 smoke 作为发布验收附件，自动化多局与规则/状态机/AI 稳定性由 653 测试覆盖。
 
@@ -146,12 +147,14 @@ main 现状：**代码/测试/文档就绪；发布打包待一处启动场景�
 #### ⚠️ M6-D1 复审（架构独立复核 · 2026-07-01 · 结论：文档 APPROVE / **发布打包 CHANGES REQUESTED**）
 > 复核 `ef0f93b`：**文件域**严格 4 文档（BOARD/ROADMAP/TASKS/QA_CHECKLIST）·**不虚标**逐条核实——所有勾选项引用的证据文件真实存在（M6-C3a×3 / M3-59 / M3-65×2 截图、`M6-02-build-verification.report.md`、133/653 口径），QA_CHECKLIST 未越界声称「大厅启动/导航」；构建产物真实（47M/202·gitignore 未入库）·settings.json 口径属实·390×844 构建态渲染经**目视确认为完整游戏画面**（非黑屏·pixel sample 全黑是取样点落在暗背景所致）·三档 errorEvents 仅 390 favicon 404。**测试 133/653 绿·typecheck 净·diff --check 净·纯层零 cc**。→ M6-D1 **文档收口本身合格**。
 >
-> **🔴 发布打包 gate（唯一未闭合）**：release 构建 `launch.launchScene = db://assets/scene/game.scene`，开机直进出牌局、**跳过大厅**；而 `docs/GAME_DESIGN.md:17` 核心循环步骤 1 = 「进入大厅」，lobby 承载难度选择/设置/战绩/历史/续局，是 v1 一等入口。且三档构建态烟测**均为 game.scene**，大厅**从未在构建态验证**。故**不能确认可打包/归档 v1**。
+> **🔴 当时发布打包 gate（复审发现）**：release 构建 `launch.launchScene = db://assets/scene/game.scene`，开机直进出牌局、**跳过大厅**；而 `docs/GAME_DESIGN.md:17` 核心循环步骤 1 = 「进入大厅」，lobby 承载难度选择/设置/战绩/历史/续局，是 v1 一等入口。且三档构建态烟测**均为 game.scene**，大厅**从未在构建态验证**。故当时**不能确认可打包/归档 v1**。
 > **用户裁定（2026-07-01）**：改启动场景为 `lobby.scene` 后重构建 + 补大厅构建态烟测，再打包。
 > **重构建 spec（交 Creator 环境执行）**：
 > - 起始场景 UUID：`lobby.scene`=`dc62324b-10d4-4870-9518-1a34ce682067`（现 `game.scene`=`76483838-c412-4de3-83ff-2ab3f683a1cd`）。编辑器 Build 面板「起始场景」设为 lobby（或 CLI build 传 `startScene=dc62324b-...`）后 web-mobile 重构建。
 > - 复验：新 `build/web-mobile/src/settings.json` → `launch.launchScene` = lobby.scene；大厅构建态三档（390×844/412×915/360×780）烟测截图渲染正常 + errorEvents `[]`（favicon 404 可忽略）；随后再走 lobby→game→结算→lobby 一次链路烟测更佳。
 > - 复验通过后架构解除本 gate、把 ROADMAP/BOARD 口径回填「首版可发布」并归档 v1。
+>
+> **✅ 返工关闭（2026-07-01）**：已用 Creator 3.8.8 CLI 传 `startScene=dc62324b-10d4-4870-9518-1a34ce682067` 重构建 `web-mobile`；`settings.json` 已为 `db://assets/scene/lobby.scene`；三档大厅烟测 `390×844/412×915/360×780` 全部 `sceneName="lobby"` 且 `errorEvents: []`；390 档链路 `lobby → 新对局 → game → 暂停 → 退出确认 → lobby` 通过。执行方同时补 runtime-only 触摸接线，让既有 `开始新局/新对局` Label 可进入 `game.scene`，未改 scene/meta/root 配置。验证：133 files / 653 tests 绿、typecheck 净、diff check 净、纯层零 cc。证据见 `coordination/reports/M6-D1-lobby-launch-rebuild.report.md` 与 `/tmp/doudizhu-d1-lobby-launch-smoke/summary.json`。**发布打包 gate 关闭，v1 可归档。**
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**

@@ -113,6 +113,7 @@ export class LobbyScene extends Component {
   onLoad(): void {
     this.loadSprite(RESOURCE_PATHS.lobbyBg, this.background);
     this.controlsRoot = this.ensureNode('settings-controls-runtime', this.node);
+    this.wirePrimaryNavigation();
     this.render();
   }
 
@@ -157,6 +158,25 @@ export class LobbyScene extends Component {
     }
     this.renderSettingsControls(settings);
     this.renderLobbyEntries();
+  }
+
+  private openGameScene(): void {
+    const runtime = globalThis as typeof globalThis & {
+      cc?: { director?: { loadScene(sceneName: string): void } };
+    };
+    runtime.cc?.director?.loadScene('game');
+  }
+
+  private wirePrimaryNavigation(): void {
+    this.wireGameSceneLabel(this.continueLabel?.node ?? null);
+    const startLabel = this.node.children.find((child) => child.name.startsWith('start-label')) ?? null;
+    this.wireGameSceneLabel(startLabel);
+  }
+
+  private wireGameSceneLabel(node: Node | null): void {
+    if (!node) return;
+    node.off(Node.EventType.TOUCH_END, this.openGameScene, this);
+    node.on(Node.EventType.TOUCH_END, this.openGameScene, this);
   }
 
   private renderSettingsControls(settings: Settings): void {

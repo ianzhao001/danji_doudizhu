@@ -87,6 +87,7 @@
 - [x] 脚本编译无错误。← `docs/TASKS.md`（M6-C1 用户 Creator 验证编译零报错）; `coordination/BOARD.md`（main 133 文件 / 653 用例，typecheck 净）
 - [x] Vitest 纯逻辑测试（规则 / 状态机 / AI）全部通过。← `coordination/BOARD.md`（main 133 文件 / 653 用例全绿）
 - [x] 自对弈冒烟（N 局）无阻塞。← `test/selfplay/selfplay.test.ts`; `test/selfplay/selfplay-long.test.ts`
-- [x] 目标平台构建通过。← `coordination/reports/M6-02-build-verification.report.md`; D1 复测 `build/web-mobile/`（47M / 202 文件，CocosEngine 3.8.8，platform web-mobile）；`/tmp/doudizhu-d1-smoke/summary.json`
+- [x] 目标平台构建通过。← `coordination/reports/M6-02-build-verification.report.md`; `coordination/reports/M6-D1-lobby-launch-rebuild.report.md`; D1 复测 `build/web-mobile/`（47M / 202 文件，CocosEngine 3.8.8，platform web-mobile，`launchScene=lobby.scene`）；`/tmp/doudizhu-d1-lobby-launch-smoke/summary.json`
+- [x] 发布构建首屏进入大厅，且可从大厅进入对局并返回大厅。← `/tmp/doudizhu-d1-lobby-launch-smoke/summary.json`（390×844 / 412×915 / 360×780 均 `sceneName="lobby"` 且 `errorEvents=[]`；390×844 验证 `lobby → game → pause quit → lobby`）
 - [x] 完成多局冒烟测试。← `test/selfplay/selfplay-long.test.ts`（seeds 1..50）
 - [x] 本地设置和战绩可保存。← `test/data/settings-storage.test.ts`; `test/data/session.test.ts`; `test/data/session-atomicity.test.ts`; `assets/scripts/ui/components/game-scene-skeleton.ts`
