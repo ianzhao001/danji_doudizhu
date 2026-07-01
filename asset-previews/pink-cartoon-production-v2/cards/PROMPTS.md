@@ -11,7 +11,7 @@ Output is intentionally kept under `asset-previews/` and is not imported into Co
 
 Built-in `image_gen` source:
 
-`/Users/admin/.codex/generated_images/019f0f3b-9397-79f1-8a79-ce7df2dda61d/ig_0c8b4f812e91051f016a41614bcadc819a87653e60c0a2b1e4.png`
+`/Users/admin/.codex/generated_images/019f1729-473e-7943-9830-d3ba7270eb12/ig_0e1a7236cec6a23e016a44b9838dc08190bf36fa049b49e833.png`
 
 Prompt:
 
@@ -24,6 +24,7 @@ Style/medium: polished 2D mobile game asset, cute puffy sticker-like cartoon, so
 Composition/framing: single full card-back centered, 2.5:3.5 ratio, border visible, tile-like inner pattern, no text.
 Color palette: warm cream, strawberry pink, coral pink, soft blue, lavender, small pastel yellow accents.
 Constraints: no text, no letters, no numbers, no card rank symbols, no readable suit marks, no logo, no watermark, no casino mood, no betting mood, no coins, no chips, no cash, no ingots.
+Avoid black corners, black outlines, heavy dark border, dark background, shadows outside the card, or any hard black pixels. Use soft pink/coral/cream outlines only.
 ```
 
 Post-processing:
@@ -31,6 +32,7 @@ Post-processing:
 - Copied source into `cards/source/card-back-source.png`.
 - Center cover-cropped and resized to `400x560`.
 - Saved final as opaque `cards/card-back.png`.
+- Reworked after visual pre-review to remove the old heavy black corners/outline; edge validation showed `dark_edge=0`.
 
 ## Jokers
 
@@ -52,4 +54,3 @@ Post-processing:
 - Cream card face, pink fine border, blank corner-label zones, and blank center area.
 - No point values, letters, numbers, rank marks, or suit marks.
 - `cards/source/card-template-source.png` is the same sprite over a flat `#00ff00` background.
-
