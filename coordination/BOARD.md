@@ -107,6 +107,17 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 - **2026-07-01 产品解 gate → M4-42 翻 ready 并派发**（与发布收尾文档「两条并行」）：分支 `task/M4-42-hard-ai-depth` 建于 `0960a4a`（纯 spec·无种子测试·实现方自写 selfplay 验证）；同批架构落发布收尾——第十六批 deferred refactors（#1/#10 拆分 · #4 legalFollows 剪枝 · #6 save 双序列化）已补登 `docs/KNOWN_LIMITATIONS.md`，M6-D1 收口剩余 gate 收敛为 {ART-IMPORT 用户视觉终审, M4-42 落地} 两项。
 - **2026-07-01 M4-42 审查通过并入 main `641b6a8`**（独立复核·非采信报告）：文件域仅 `ai/levels/hard.ts` + 新 `test/ai/hard-depth.test.ts` + report·未改 `_shared`/Normal 签名·无 cc；合法性（finishing 走 legalFollows/recognize·lead 走 enumerateMoves·余 conservativeAction）、确定性（不用 rng·排序带 compareMoves tiebreak）、无隐藏态（`trackPlayed([],hand)` 公开推断·守 G14）均核实。复跑 main **133 files / 652 tests 绿·typecheck 净·纯层零 cc·diff --check 净**。Selfplay Hard 地主 7/12 均分 0.83 vs Normal 基线 3/12 均分 -1.83，G15/M4-08 护栏未弱化。**第十六批 7 任务全 done。** 非阻塞观察已登记：cardMemory 消费偏浅（快照无出牌历史→`trackPlayed` 恒空 played）留待快照带 play history 后深化（见 `docs/KNOWN_LIMITATIONS.md`）。**发布收口唯一剩余外部 gate = ART-IMPORT 用户视觉终审。**
 
+### ART-IMPORT 审查（`task/art-final-review-assets` · 提交 `9773c03` · 2026-07-01 · **changes-requested·先修后合**）
+> 用户视觉终审通过（`/tmp/doudizhu-art-final-review-final/index.html` →「视觉通过，继续导入」）。架构独立复审 6/7 项过：card-back 返工去黑角/黑边且**预览↔导入字节一致**（md5 `176fd809…`）；位置正确 `art/{avatars,ui,cards,misc}/`；meta 为 Creator 3.8.8 生成、**116/116 UUID 唯一无重复**；`asset-keys.ts` 纯增键（既有 cardBack/cardTemplate/joker/cardAssetPath 未动）；reports 证据齐；worktree 复跑 **133 files / 653 tests 绿·typecheck 净·diff --check 净·无 cc**。
+>
+> **🔴 唯一阻塞（导入类型不符 loader 契约）**：runtime 经 `resources.load(path, SpriteFrame)` 加载美术（`lobby-scene.ts:660`、`game-scene-skeleton.ts:1273`），既有被加载资源（backgrounds/cardTemplate）均 `type:sprite-frame`。但本批 **22 个场景 sprite 被导入为 `type:texture`（无 `@f9941` sprite-frame 子资产）→ 无法作 SpriteFrame 加载**。当前无组件消费它们（故 653 绿/截图净·非活跃崩溃），但接线即失效。
+> **需重导为 sprite-frame（Creator Inspector: Type texture→sprite-frame·重生 meta·勿手写）**：
+> - avatars(3)：`avatar-frame`、`farmer-role-badge`、`landlord-role-badge`
+> - ui(16)：`btn-{primary,secondary,disabled}`、`icon-{play,pass,hint,bid,back,settings}`、`badge-{multiplier,turn,countdown-ring}`、`emphasis-{bomb,rocket,spring}`、`panel-popup`
+> - misc(3)：`badge-win`、`badge-lose`、`empty-records`
+> - **可留 texture(2)**：`misc/app-icon`、`misc/splash`（build/平台设置·非 resources.load(SpriteFrame) 目标）
+> **决策**：用户选「先修后合」。分支/worktree 保留待重导后重新提交；架构复验每个 meta `userData.type=="sprite-frame"` + 含 sprite-frame 子资产 + UUID 仍唯一 + 653 绿后再 `merge --no-ff`。M6-D1 sign-off 在此前不得声称美术可用。
+
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**
 - **客观门全绿**：`npm --prefix test test` **90 文件 / 462 全绿**；`typecheck` exit 0；纯层（`rules/game/ai/flow/data`）+ `ui/{audio-gate,animation-params,table-layout,screen-view,event-cues}` grep **零 `from 'cc'`**；`flow→data` 零 import；工作树净；新文件 `.meta` 齐全（audio-gate/animation-params）；ART 仅在 `asset-previews/`，**未污染 `assets/`**。
