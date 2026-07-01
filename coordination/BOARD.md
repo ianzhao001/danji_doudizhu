@@ -722,11 +722,12 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC ✅ | **done `2e66085`** |
 | T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | **done `dceff17`** |
 | T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **done `8e386e8`** |
-| T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 | 审计 |
-| P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0,T-A1,T-0,T-C0 | blocked |
-| P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0,T-0,T-C0 | blocked |
+| T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 ✅ | **done（审计闭合）**：`screen-view.ts:48-49` 纯透传 `tableLayout(w,h)`，T-A1 修好即自动生效，无需改 |
+| P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0✅,T-A1✅,T-0✅,T-C0✅ | **ready**（含 P-Text copy rider·分阶段送审） |
+| P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0✅,T-0✅,T-C0✅ | **ready**（6 子屏全覆盖·入口真按钮·分阶段送审） |
 | P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付**：清单落盘，Wave 2 并入 P-G 消费 |
 | V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
-> **派发**：Wave 0 T-DOC ✅ 已并 main（`4b5188d`·新 `claim/merge/release` 流程已启用）。**Wave 1（E-0/T-A1/T-0/T-C0）已翻 ready，可并行派发**——后续任务按新协议：架构给 `approved` 后执行者 `claim→merge→release` 自合。T-A1 spec 待架构种失败测试后置 ready 可认领。V-0 由规划者/用户执行。
+> **派发**：Wave 0 T-DOC ✅ 已并 main（`4b5188d`）。**Wave 1 ✅ 全部落 main**：E-0 `6e6ea7a` / T-A1 `2e66085` / T-C0 `8e386e8` / T-0 `dceff17`；T-A2 审计闭合。main `38628a0`·134/659 绿·typecheck 净。
+> **Wave 2 已派发（2026-07-02）**：**P-G ‖ P-L** 两条单写者流水线并行，文件域不相交（game-scene / lobby），依赖全 done。spec：`tasks/P-G.md`（消费 P-Text）、`tasks/P-L.md`。分支 `task/P-G`、`task/P-L` 已建。按新协议：分阶段送审 → 架构 `approved` → 执行者 `claim/merge/release`（共用单 lane，排队）。**V（Wave 3）待 P-G+P-L 入 main。**
