@@ -14,6 +14,7 @@ import {
   UIOpacity,
   Vec3,
   director,
+  resources,
   sys,
   tween,
 } from 'cc';
@@ -70,6 +71,9 @@ const SESSION_KEYS: SessionKeys = {
 const CARD_SIZE = { width: 52, height: 74 };
 const CARD_SUIT_ICON_SIZE = 22;
 const HAND_LIFT = 18;
+const LANDSCAPE_CANVAS = { width: 844, height: 390 };
+const CARD_PRESS_SCALE = 0.96;
+const CARD_PRESS_OPACITY = 214;
 const TURN_TIMER_MS = 15_000;
 const UI_TICK_RENDER_MS = 180;
 const SCAFFOLD_NODE_NAMES = [
@@ -110,6 +114,17 @@ function suitText(suit: Suit | 'joker'): string {
     default:
       return '★';
   }
+}
+
+function seatName(seat: number): string {
+  if (seat === 0) return '你';
+  if (seat === 1) return '左家';
+  if (seat === 2) return '右家';
+  return `座位${seat + 1}`;
+}
+
+function seatNameWithRole(seat: number, isLandlord: boolean): string {
+  return `${seatName(seat)}${isLandlord ? '（地主）' : ''}`;
 }
 
 @ccclass('GameSceneSkeleton')
@@ -163,7 +178,7 @@ export class GameSceneSkeleton extends Component {
   private liveRenderNodes: Set<Node> | null = null;
 
   onLoad(): void {
-    loadSprite(RESOURCE_PATHS.gameTableBg, this.background, this.spriteFrames);
+    if (this.background) this.background.node.active = false;
     if (this.cardTemplate) this.cardTemplate.node.active = false;
     this.hideSceneScaffold();
     this.audioSource = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
@@ -275,6 +290,7 @@ export class GameSceneSkeleton extends Component {
     }
 
     const canvas = this.canvasSize();
+    this.renderPlaceholderBackground(canvas);
     const vm = deriveScreenVM({
       snapshot,
       bidding,
@@ -325,7 +341,7 @@ export class GameSceneSkeleton extends Component {
     const multiplierPos = this.screenPoint(canvas, canvas.width / 2, infoY);
     const handPos = this.screenPoint(canvas, (canvas.width * 5) / 6, infoY);
     this.addLabel(phase, phasePos.x, phasePos.y, 18, this.uiRoot!, 140, 30, 'top-phase');
-    this.addLabel(`地主 ${topBar.landlordSeat + 1}`, landlordPos.x, landlordPos.y, 16, this.uiRoot!, 110, 30, 'top-landlord');
+    this.addLabel(`地主：${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 16, this.uiRoot!, 120, 30, 'top-landlord');
     this.addLabel(`倍数 ×${topBar.multiplier}`, multiplierPos.x, multiplierPos.y, 16, this.uiRoot!, 110, 30, 'top-multiplier');
     this.addLabel(`手牌 ${handCount}`, handPos.x, handPos.y, 16, this.uiRoot!, 110, 30, 'top-hand-count');
   }
@@ -360,10 +376,10 @@ export class GameSceneSkeleton extends Component {
     layout: TableRegions,
     canvas: { width: number; height: number },
   ): void {
-    const left = this.rectPoint(layout.playArea, canvas, 0.06, 0.24);
-    const right = this.rectPoint(layout.playArea, canvas, 0.94, 0.24);
-    this.addLabel(`AI 左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, left.x, left.y, 16, this.uiRoot!, 108, 64, 'seat-left');
-    this.addLabel(`AI 右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, right.x, right.y, 16, this.uiRoot!, 108, 64, 'seat-right');
+    const left = this.rectPoint(layout.opponentLeft, canvas, 0.5, 0.5);
+    const right = this.rectPoint(layout.opponentRight, canvas, 0.5, 0.5);
+    this.addLabel(`左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, left.x, left.y, 16, this.uiRoot!, 108, 64, 'seat-left');
+    this.addLabel(`右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, right.x, right.y, 16, this.uiRoot!, 108, 64, 'seat-right');
   }
 
   private renderSeatFeedback(layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -394,7 +410,7 @@ export class GameSceneSkeleton extends Component {
     drawPanel(root, pos.width, 28, new Color(37, 42, 58, 176));
 
     const dots = this.settings.animation ? '.'.repeat(thinking.dots) : '';
-    const label = this.addLabel(`${thinking.label}${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
+    const label = this.addLabel(`${seatName(thinking.seat)}思考中${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
     label.color = new Color(221, 242, 255, 255);
   }
 
@@ -416,9 +432,9 @@ export class GameSceneSkeleton extends Component {
     area.setPosition(pos.x, pos.y, 0);
     addUiTransform(area, width, height);
 
-    const labelText = top ? `座位${top.seat + 1}` : '自由出牌';
-    const label = this.addLabel(`出牌区\n${labelText}`, 0, 34, 18, area, 170, 48, 'play-area-label');
-    label.lineHeight = 28;
+    const labelText = top ? `${seatName(top.seat)}·已出牌` : '自由出牌';
+    const label = this.addLabel(labelText, 0, 34, 18, area, 170, 34, 'play-area-label');
+    label.lineHeight = 24;
     if (!top) {
       this.lastPlayAreaSignature = '';
       return;
@@ -477,10 +493,20 @@ export class GameSceneSkeleton extends Component {
   private renderCardMemory(hand: Card[], layout: TableRegions, canvas: { width: number; height: number }): void {
     const memory = deriveCardMemoryView(trackPlayed(this.fullGameEvents, hand));
     const rows = this.memoryExpanded ? memory.rows : memory.rows.slice(0, 6);
-    const panelWidth = Math.min(334, Math.max(286, canvas.width - 44));
-    const panelHeight = this.memoryExpanded ? 112 : 58;
-    const centerY = layout.actionButtons.y - (this.memoryExpanded ? 98 : 76);
-    const pos = this.screenPoint(canvas, canvas.width / 2, centerY);
+    const landscape = this.isLandscape(canvas);
+    const panelWidth = landscape
+      ? (this.memoryExpanded ? 220 : 196)
+      : Math.min(334, Math.max(286, canvas.width - 44));
+    const panelHeight = landscape
+      ? (this.memoryExpanded ? 104 : 72)
+      : (this.memoryExpanded ? 112 : 58);
+    const centerX = landscape
+      ? Math.max(panelWidth / 2 + 12, layout.playArea.x - panelWidth / 2 - 14)
+      : canvas.width / 2;
+    const centerY = landscape
+      ? layout.playArea.y + layout.playArea.height * 0.55
+      : layout.actionButtons.y - (this.memoryExpanded ? 98 : 76);
+    const pos = this.screenPoint(canvas, centerX, centerY);
     const root = this.ensureNode('hud-card-memory', this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
     addUiTransform(root, panelWidth, panelHeight);
@@ -501,7 +527,7 @@ export class GameSceneSkeleton extends Component {
       const col = index % cols;
       const line = Math.floor(index / cols);
       const x = -panelWidth / 2 + 16 + cellWidth / 2 + col * cellWidth;
-      const y = panelHeight / 2 - 52 - line * 24;
+      const y = panelHeight / 2 - (landscape ? 44 : 52) - line * (landscape ? 19 : 24);
       const text = `${row.rankLabel}${row.remaining}`;
       const item = this.addLabel(text, x, y, 12, root, cellWidth, 22, `hud-memory-${index}`);
       item.color = row.exhausted ? new Color(255, 255, 255, 112) : new Color(255, 250, 228, 255);
@@ -509,7 +535,7 @@ export class GameSceneSkeleton extends Component {
 
     if (!this.memoryExpanded) {
       const more = memory.rows.length - rows.length;
-      this.addLabel(`+${more}`, panelWidth / 2 - 22, -11, 12, root, 34, 22, 'hud-memory-more');
+      this.addLabel(`+${more}`, panelWidth / 2 - 22, landscape ? -20 : -11, 12, root, 34, 22, 'hud-memory-more');
     }
   }
 
@@ -680,15 +706,20 @@ export class GameSceneSkeleton extends Component {
     const panel = this.ensureNode('settlement-panel-runtime', this.uiRoot!);
     panel.setPosition(0, Math.round(canvas.height * 0.005), 0);
     panel.setScale(1, 1, 1);
-    const panelWidth = Math.min(330, Math.max(280, canvas.width - 60));
-    const panelHeight = Math.min(420, Math.max(360, canvas.height - 220));
+    const landscape = this.isLandscape(canvas);
+    const panelWidth = landscape
+      ? Math.min(360, Math.max(300, canvas.width * 0.42))
+      : Math.min(330, Math.max(280, canvas.width - 60));
+    const panelHeight = landscape
+      ? Math.min(318, Math.max(278, canvas.height - 54))
+      : Math.min(420, Math.max(360, canvas.height - 220));
     addUiTransform(panel, panelWidth, panelHeight);
     const sprite = panel.getComponent(Sprite) ?? panel.addComponent(Sprite);
     loadSprite(RESOURCE_PATHS.settlementBg, sprite, this.spriteFrames);
     this.addLabel(result.resultText, 0, panelHeight * 0.36, 34, panel, 220, 72, 'result-title');
     this.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.22, 20, panel, 240, 40, 'result-multiplier');
     this.addLabel(result.springText || '本局结算', 0, panelHeight * 0.12, 18, panel, 240, 40, 'result-spring');
-    this.addLabel(result.scores.map((row) => `座位${row.seat + 1}${row.isLandlord ? '(地主)' : ''}: ${row.score}`).join('\n'), 0, -panelHeight * 0.08, 18, panel, 260, 120, 'result-scores');
+    this.addLabel(result.scores.map((row) => `${seatNameWithRole(row.seat, row.isLandlord)}: ${row.score}`).join('\n'), 0, -panelHeight * 0.08, 18, panel, 280, 112, 'result-scores');
     this.addButton('再来一局', -74, -panelHeight * 0.37, 116, 42, true, () => this.startGame(true), panel, 'result-new');
     this.addButton('返回大厅', 74, -panelHeight * 0.37, 116, 42, true, () => director.loadScene('lobby'), panel, 'result-lobby');
     if (this.settings.animation) this.animateScaleIn(panel, 0.92, 180);
@@ -882,8 +913,17 @@ export class GameSceneSkeleton extends Component {
     const sprite = bgNode.getComponent(Sprite) ?? bgNode.addComponent(Sprite);
     this.configureCardSprite(sprite);
     loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite, this.spriteFrames);
+    node.off(Node.EventType.TOUCH_START);
     node.off(Node.EventType.TOUCH_END);
-    if (interactive) node.on(Node.EventType.TOUCH_END, () => this.toggleCard(card), this);
+    node.off(Node.EventType.TOUCH_CANCEL);
+    if (interactive) {
+      node.on(Node.EventType.TOUCH_START, () => this.setCardPressed(node, true), this);
+      node.on(Node.EventType.TOUCH_END, () => {
+        this.setCardPressed(node, false);
+        this.toggleCard(card);
+      }, this);
+      node.on(Node.EventType.TOUCH_CANCEL, () => this.setCardPressed(node, false), this);
+    }
 
     const faceColor = this.cardFaceColor(view.suitKey);
     const cornerLabel = this.addLabel(
@@ -1042,9 +1082,9 @@ export class GameSceneSkeleton extends Component {
   private eventToastText(event: FlowEvent): string | null {
     if (event.type === 'round') {
       const round = event.event;
-      if (round.type === 'bomb') return `座位${round.seat + 1} 炸弹！`;
-      if (round.type === 'rocket') return `座位${round.seat + 1} 火箭！`;
-      if (round.type === 'pass') return `座位${round.seat + 1} 不要`;
+      if (round.type === 'bomb') return `${seatName(round.seat)} 炸弹！`;
+      if (round.type === 'rocket') return `${seatName(round.seat)} 火箭！`;
+      if (round.type === 'pass') return `${seatName(round.seat)} 不要`;
       return null;
     }
     if (event.type === 'settled') {
@@ -1256,6 +1296,36 @@ export class GameSceneSkeleton extends Component {
     }
   }
 
+  private renderPlaceholderBackground(canvas: { width: number; height: number }): void {
+    if (this.background) this.background.node.active = false;
+    const node = this.ensureNode('game-placeholder-background', this.node);
+    node.setSiblingIndex(0);
+    node.setPosition(0, 0, 0);
+    addUiTransform(node, canvas.width, canvas.height);
+    const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = new Color(28, 82, 74, 255);
+    graphics.rect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+    graphics.fill();
+    graphics.fillColor = new Color(34, 112, 90, 190);
+    graphics.roundRect(-canvas.width * 0.32, -canvas.height * 0.24, canvas.width * 0.64, canvas.height * 0.48, 18);
+    graphics.fill();
+    graphics.fillColor = new Color(255, 255, 255, 18);
+    graphics.roundRect(-canvas.width * 0.44, canvas.height * 0.28, canvas.width * 0.88, 14, 7);
+    graphics.fill();
+  }
+
+  private setCardPressed(node: Node, pressed: boolean): void {
+    const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+    opacity.opacity = pressed ? CARD_PRESS_OPACITY : 255;
+    const scale = pressed ? CARD_PRESS_SCALE : 1;
+    node.setScale(scale, scale, 1);
+  }
+
+  private isLandscape(canvas: { width: number; height: number }): boolean {
+    return canvas.width >= canvas.height;
+  }
+
   private drawDimOverlay(parent: Node, width: number, height: number): void {
     const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
     graphics.clear();
@@ -1273,8 +1343,8 @@ export class GameSceneSkeleton extends Component {
   private canvasSize(): { width: number; height: number } {
     const size = this.node.getComponent(UITransform)?.contentSize;
     return {
-      width: Math.max(1, size?.width ?? 390),
-      height: Math.max(1, size?.height ?? 844),
+      width: Math.max(1, size?.width ?? LANDSCAPE_CANVAS.width),
+      height: Math.max(1, size?.height ?? LANDSCAPE_CANVAS.height),
     };
   }
 
