@@ -720,7 +720,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | V-0 | 0 | baseline 记录 | `reports/V-0-baseline.md` | — | **ready**（规划者/用户直接落盘·不 gate Wave 1） |
 | E-0 | 1 | 设计分辨率(执行者·worktree) | `settings/v2/packages/project.json`（**不碰 .scene**·cc.Canvas 运行时自适配） | T-DOC ✅ | **done `6e6ea7a`** |
 | T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC ✅ | **done `2e66085`** |
-| T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | merge-claimed:T-0 |
+| T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | **done `dceff17`** |
 | T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **done `8e386e8`** |
 | T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 | 审计 |
 | P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0,T-A1,T-0,T-C0 | blocked |
