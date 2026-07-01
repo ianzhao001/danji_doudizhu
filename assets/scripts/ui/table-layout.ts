@@ -4,6 +4,7 @@
  */
 
 export const PORTRAIT = { width: 390, height: 844 };
+export const LANDSCAPE = { width: 844, height: 390 };
 
 export const LAYOUT_METRICS = {
   topBar: { x: 0, y: 0, width: PORTRAIT.width, height: 64 },
@@ -42,6 +43,10 @@ export function tableLayout(containerWidth?: number, containerHeight?: number): 
 
   const width = Math.max(1, Math.round(containerWidth));
   const height = Math.max(1, Math.round(containerHeight));
+  if (width >= height) {
+    return landscapeLayout(width, height);
+  }
+
   const topBarHeight = Math.min(64, Math.max(48, Math.round(height * 0.08)));
   const opponentWidth = Math.min(150, Math.max(96, Math.round(width * 0.34)));
   const opponentHeight = Math.min(80, Math.max(64, Math.round(height * 0.09)));
@@ -54,6 +59,31 @@ export function tableLayout(containerWidth?: number, containerHeight?: number): 
   const actionWidth = Math.min(280, Math.max(220, width - 80));
   const playerHandY = height - playerHandHeight;
   const actionY = playerHandY - 16 - actionHeight;
+
+  return {
+    topBar: { x: 0, y: 0, width, height: topBarHeight },
+    opponentLeft: { x: 0, y: opponentY, width: opponentWidth, height: opponentHeight },
+    opponentRight: { x: width - opponentWidth, y: opponentY, width: opponentWidth, height: opponentHeight },
+    playArea: { x: Math.round((width - playAreaWidth) / 2), y: playAreaY, width: playAreaWidth, height: playAreaHeight },
+    actionButtons: { x: Math.round((width - actionWidth) / 2), y: actionY, width: actionWidth, height: actionHeight },
+    playerHand: { x: 0, y: playerHandY, width, height: playerHandHeight },
+  };
+}
+
+function landscapeLayout(width: number, height: number): TableRegions {
+  const topBarHeight = Math.min(48, Math.max(38, Math.round(height * 0.112)));
+  const verticalGap = Math.min(12, Math.max(8, Math.round(height * 0.026)));
+  const opponentWidth = Math.min(154, Math.max(120, Math.round(width * 0.18)));
+  const opponentHeight = Math.min(58, Math.max(48, Math.round(height * 0.135)));
+  const opponentY = topBarHeight + verticalGap;
+  const playAreaWidth = Math.min(320, Math.max(250, Math.round(width * 0.36)));
+  const playAreaHeight = Math.min(104, Math.max(84, Math.round(height * 0.236)));
+  const playAreaY = opponentY + opponentHeight + verticalGap;
+  const playerHandHeight = Math.min(96, Math.max(82, Math.round(height * 0.236)));
+  const playerHandY = height - playerHandHeight;
+  const actionHeight = Math.min(46, Math.max(40, Math.round(height * 0.11)));
+  const actionWidth = Math.min(300, Math.max(230, Math.round(width * 0.34)));
+  const actionY = playerHandY - verticalGap - actionHeight;
 
   return {
     topBar: { x: 0, y: 0, width, height: topBarHeight },
