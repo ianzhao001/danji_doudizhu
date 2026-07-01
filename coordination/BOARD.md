@@ -719,7 +719,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-DOC | 0 | 协议/脚本/模板 | `PROTOCOL.md`,`BOARD.md`,`agentctl.sh`,`templates/*` | — | **done `4b5188d`**（旧协议·架构合并·133/654 绿·typecheck 净·bash -n 通过） |
 | V-0 | 0 | baseline 记录 | `reports/V-0-baseline.md` | — | **ready**（规划者/用户直接落盘·不 gate Wave 1） |
 | E-0 | 1 | 设计分辨率(执行者·worktree) | `settings/v2/packages/project.json`（**不碰 .scene**·cc.Canvas 运行时自适配） | T-DOC ✅ | **done `6e6ea7a`** |
-| T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC ✅ | **approved** @ `3b8a798`（架构核对：portrait 契约不破·landscape 分支正确·134/659 绿·typecheck 净·失败测试未改）→ 执行者 `claim/merge/release` |
+| T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC ✅ | merge-claimed:T-A1 |
 | T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | **in-review** @ `8ccc921`（代码审查通过·typecheck+654 绿+forbidden grep 净；**待用户 Creator 冒烟**：lobby+game 渲染/按钮可点/Console 净后转 approved。新 `ui-helpers.ts` 需 Creator 生成 `.meta`（late sync）） |
 | T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **approved** @ `94f8b2f`（架构核对：58 键逐条审计完整·SpriteFrame 统一走 spriteFrameResourcePath·音频/字体/appIcon/splash 例外成立·「asset-keys.ts 不改」决策合理·仅新增 2 份 report 无代码风险）→ 执行者 `claim/merge/release` |
 | T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 | 审计 |
