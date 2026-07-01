@@ -47,7 +47,7 @@ export function enumerateMoves(hand: Card[]): Move[] {
     if (a) a.push(c);
     else byRank.set(c.rank, [c]);
   }
-  const ranks = [...byRank.keys()].sort((a, b) => a - b);
+  const ranks = Array.from(byRank.keys()).sort((a, b) => a - b);
   const countOf = (r: Rank): number => byRank.get(r)?.length ?? 0;
   const take = (r: Rank, k: number): Card[] => (byRank.get(r) ?? []).slice(0, k);
 

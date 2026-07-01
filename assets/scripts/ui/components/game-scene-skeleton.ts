@@ -51,7 +51,7 @@ import { deriveLastActions, type SeatLastAction } from '../last-action-view';
 import { askQuit, cancelQuit, closeMenu, initialPause, openMenu, type PauseState } from '../pause-menu';
 import type { Rect, TableRegions } from '../table-layout';
 import { toggleSetting, type ToggleKey } from '../settings-view';
-import { RESOURCE_PATHS, cardAssetPath, cueAudioPath } from '../asset-keys';
+import { RESOURCE_PATHS, cardAssetPath, cueAudioPath, suitAssetPath } from '../asset-keys';
 
 const { ccclass, property } = _decorator;
 
@@ -63,7 +63,8 @@ const SESSION_KEYS: SessionKeys = {
   records: 'doudizhu.records',
 };
 
-const CARD_SIZE = { width: 46, height: 64 };
+const CARD_SIZE = { width: 52, height: 74 };
+const CARD_SUIT_ICON_SIZE = 22;
 const HAND_LIFT = 18;
 const TURN_TIMER_MS = 15_000;
 const UI_TICK_RENDER_MS = 180;
@@ -538,13 +539,14 @@ export class GameSceneSkeleton extends Component {
     layout: TableRegions,
     canvas: { width: number; height: number },
   ): void {
-    const title = this.screenPoint(canvas, canvas.width / 2, layout.playerHand.y + Math.min(24, layout.playerHand.height * 0.15));
-    this.addLabel('玩家手牌', title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title');
+    if (hand.length === 0) {
+      const title = this.screenPoint(canvas, canvas.width / 2, layout.playerHand.y + Math.min(24, layout.playerHand.height * 0.15));
+      this.addLabel('玩家手牌', title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title');
+    }
     const handSignature = cardsSignature(hand.map((slot) => slot.card));
     const animateDeal = this.settings.animation && handSignature !== this.lastHandSignature;
     const nextSelectedKeys = new Set<string>();
-    const containerWidth = Math.max(1, layout.playerHand.width);
-    const handTopY = layout.playerHand.y + Math.min(74, layout.playerHand.height * 0.46);
+    const handTopY = layout.playerHand.y + Math.min(52, layout.playerHand.height * 0.33);
     hand.forEach((slot, index) => {
       const screenX = layout.playerHand.x + slot.x + CARD_SIZE.width / 2;
       const screenY = handTopY + slot.y;
@@ -864,18 +866,76 @@ export class GameSceneSkeleton extends Component {
     const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
     opacity.opacity = 255;
     this.addUiTransform(node, CARD_SIZE.width, CARD_SIZE.height);
-    const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
+    const parentSprite = node.getComponent(Sprite);
+    if (parentSprite) parentSprite.destroy();
     const view = cardView(card);
+    const fillNode = this.ensureNode('card-fill', node);
+    fillNode.setPosition(0, 0, 0);
+    fillNode.setSiblingIndex(0);
+    this.addUiTransform(fillNode, CARD_SIZE.width, CARD_SIZE.height);
+    this.drawCardBase(fillNode, CARD_SIZE.width, CARD_SIZE.height);
+
+    const bgNode = this.ensureNode('card-bg', node);
+    bgNode.setPosition(0, 0, 0);
+    bgNode.setSiblingIndex(1);
+    this.addUiTransform(bgNode, CARD_SIZE.width, CARD_SIZE.height);
+    const sprite = bgNode.getComponent(Sprite) ?? bgNode.addComponent(Sprite);
+    this.configureCardSprite(sprite);
     this.loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite);
     node.off(Node.EventType.TOUCH_END);
     if (interactive) node.on(Node.EventType.TOUCH_END, () => this.toggleCard(card), this);
 
-    const label = this.addLabel(`${view.rankLabel}${suitText(view.suitKey)}`, -12, 18, 10, node, 30, 18, 'card-rank-label');
-    label.color =
-      view.suitKey === Suit.Heart || view.suitKey === Suit.Diamond
-        ? new Color(205, 96, 124, 255)
-        : new Color(84, 74, 92, 255);
+    const faceColor = this.cardFaceColor(view.suitKey);
+    const cornerLabel = this.addLabel(
+      `${view.rankLabel}${suitText(view.suitKey)}`,
+      -14,
+      24,
+      view.suitKey === 'joker' ? 9 : 11,
+      node,
+      34,
+      18,
+      'card-rank-label',
+    );
+    cornerLabel.lineHeight = view.suitKey === 'joker' ? 12 : 14;
+    cornerLabel.color = faceColor;
+
+    if (view.suitKey !== 'joker') {
+      const rankLabel = this.addLabel(view.rankLabel, 0, 7, 18, node, CARD_SIZE.width - 12, 24, 'card-face-rank');
+      rankLabel.lineHeight = 21;
+      rankLabel.color = faceColor;
+      const suitPath = suitAssetPath(view.suitKey);
+      if (suitPath) {
+        const suitNode = this.ensureNode('card-suit-icon', node);
+        suitNode.setPosition(0, -17, 0);
+        this.addUiTransform(suitNode, CARD_SUIT_ICON_SIZE, CARD_SUIT_ICON_SIZE);
+        const suitSprite = suitNode.getComponent(Sprite) ?? suitNode.addComponent(Sprite);
+        this.configureCardSprite(suitSprite);
+        this.loadSprite(suitPath, suitSprite);
+      }
+    }
     return node;
+  }
+
+  private cardFaceColor(suit: Suit | 'joker'): Color {
+    return suit === Suit.Heart || suit === Suit.Diamond
+      ? new Color(204, 65, 92, 255)
+      : new Color(54, 55, 66, 255);
+  }
+
+  private configureCardSprite(sprite: Sprite): void {
+    sprite.type = Sprite.Type.SIMPLE;
+    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+  }
+
+  private drawCardBase(parent: Node, width: number, height: number): void {
+    const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = new Color(255, 252, 245, 248);
+    graphics.strokeColor = new Color(248, 143, 173, 230);
+    graphics.lineWidth = 1.5;
+    graphics.roundRect(-width / 2, -height / 2, width, height, 7);
+    graphics.fill();
+    graphics.stroke();
   }
 
   private animateCardDeal(node: Node, x: number, y: number, index: number, total: number): void {
@@ -978,7 +1038,7 @@ export class GameSceneSkeleton extends Component {
     const before = this.toasts.items.map((toast) => toast.id).join('|');
     this.toasts = tickToasts(this.toasts, this.toastClockMs);
     const activeIds = new Set(this.toasts.items.map((toast) => toast.id));
-    this.animatedToastIds = new Set([...this.animatedToastIds].filter((id) => activeIds.has(id)));
+    this.animatedToastIds = new Set(Array.from(this.animatedToastIds).filter((id) => activeIds.has(id)));
     return before !== this.toasts.items.map((toast) => toast.id).join('|');
   }
 

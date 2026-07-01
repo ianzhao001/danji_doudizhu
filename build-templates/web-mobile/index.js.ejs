@@ -1,0 +1,152 @@
+import { Application } from '<%= applicationJS %>';
+
+const canvas = document.getElementById('GameCanvas');
+const $p = canvas.parentElement;
+const bcr = $p.getBoundingClientRect();
+canvas.width = bcr.width;
+canvas.height = bcr.height;
+
+function topLevelImport (url) {
+    return System.import(url);
+}
+
+function loadBundle (engine, name) {
+    return new Promise((resolve, reject) => {
+        engine.assetManager.loadBundle(name, (err, bundle) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(bundle);
+        });
+    });
+}
+
+function containsSceneMarker (value) {
+    const stack = [value];
+    const seen = new WeakSet();
+    while (stack.length > 0) {
+        const next = stack.pop();
+        if (next === 'cc.Scene') {
+            return true;
+        }
+        if (!next || typeof next !== 'object') {
+            continue;
+        }
+        if (seen.has(next)) {
+            continue;
+        }
+        seen.add(next);
+        if (Array.isArray(next)) {
+            for (const item of next) {
+                stack.push(item);
+            }
+        } else {
+            for (const key of Object.keys(next)) {
+                stack.push(next[key]);
+            }
+        }
+    }
+    return false;
+}
+
+function pruneMissingComponentSlots (value) {
+    const stack = [value];
+    const seen = new WeakSet();
+    while (stack.length > 0) {
+        const next = stack.pop();
+        if (!next || typeof next !== 'object') {
+            continue;
+        }
+        if (seen.has(next)) {
+            continue;
+        }
+        seen.add(next);
+        if (Array.isArray(next)) {
+            const looksLikeComponentList = next.some((item) => item === null) && next.some((item) => Array.isArray(item));
+            if (looksLikeComponentList) {
+                for (let index = next.length - 1; index >= 0; index--) {
+                    if (next[index] === null) {
+                        next.splice(index, 1);
+                    }
+                }
+            }
+            for (const item of next) {
+                stack.push(item);
+            }
+        } else {
+            for (const key of Object.keys(next)) {
+                stack.push(next[key]);
+            }
+        }
+    }
+}
+
+function installSceneJsonSanitizer (engine) {
+    const downloader = engine.assetManager && engine.assetManager.downloader;
+    const original = downloader && downloader._downloaders && downloader._downloaders['.json'];
+    if (!downloader || !original || original.__doudizhuSceneSanitizer) {
+        return;
+    }
+    const wrapped = function (url, options, onComplete) {
+        return original.call(this, url, options, (err, data) => {
+            if (!err && containsSceneMarker(data)) {
+                pruneMissingComponentSlots(data);
+            }
+            onComplete(err, data);
+        });
+    };
+    wrapped.__doudizhuSceneSanitizer = true;
+    downloader.register('.json', wrapped);
+}
+
+function installSceneComponentFallback (engine, LobbyScene, GameSceneSkeleton) {
+    const attach = () => {
+        const scene = engine.director.getScene();
+        const canvas = scene && scene.getChildByName('Canvas');
+        if (!scene || !canvas) return;
+        if (scene.name === 'lobby' && LobbyScene && !canvas.getComponent(LobbyScene)) {
+            canvas.addComponent(LobbyScene);
+        }
+        if (scene.name === 'game' && GameSceneSkeleton && !canvas.getComponent(GameSceneSkeleton)) {
+            canvas.addComponent(GameSceneSkeleton);
+        }
+    };
+    const eventName = engine.Director && engine.Director.EVENT_AFTER_SCENE_LAUNCH;
+    if (eventName) {
+        engine.director.on(eventName, attach);
+    }
+    setTimeout(attach, 0);
+}
+
+const application = new Application();
+let ccEngine;
+
+topLevelImport('cc')
+.then((engine) => {
+    ccEngine = engine;
+    application.init(engine);
+    return engine.game.init({
+        debugMode: engine.DebugMode.ERROR,
+        settingsPath: application.settingsPath,
+        overrideSettings: {
+            profiling: {
+                showFPS: application.showFPS,
+            },
+        },
+    });
+}).then(() => {
+    return loadBundle(ccEngine, 'main');
+}).then(() => {
+    installSceneJsonSanitizer(ccEngine);
+    return Promise.all([
+        topLevelImport('chunks:///_virtual/lobby-scene.ts'),
+        topLevelImport('chunks:///_virtual/game-scene-skeleton.ts'),
+    ]);
+}).then(([lobbyModule, gameModule]) => {
+    installSceneComponentFallback(ccEngine, lobbyModule.LobbyScene, gameModule.GameSceneSkeleton);
+}).then(() => {
+    return ccEngine.game.run();
+}).catch((err) => {
+    console.error(err);
+});

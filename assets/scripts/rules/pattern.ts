@@ -54,7 +54,7 @@ export function recognize(cards: Card[]): HandPattern | null {
 
   const counts = new Map<Rank, number>();
   for (const c of cards) counts.set(c.rank, (counts.get(c.rank) ?? 0) + 1);
-  const ranks = [...counts.keys()].sort((a, b) => a - b);
+  const ranks = Array.from(counts.keys()).sort((a, b) => a - b);
   const byCount = (k: number): Rank[] => ranks.filter((r) => counts.get(r) === k);
   const singles = byCount(1);
   const pairs = byCount(2);
