@@ -1,4 +1,4 @@
-import { _decorator, Button, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UITransform, resources } from 'cc';
+import { _decorator, Color, Component, Label, Node, Sprite } from 'cc';
 import { AiLevel } from '../../ai';
 import {
   deserializeStats,
@@ -26,7 +26,8 @@ import { deriveDifficultyPicker } from '../difficulty-picker-view';
 import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
 import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
-import { RESOURCE_PATHS, spriteFrameResourcePath, type ResourcePath } from '../asset-keys';
+import { RESOURCE_PATHS } from '../asset-keys';
+import { addButton as addUiButton, addLabel as addUiLabel, addUiTransform, drawPanel, loadSprite } from './ui-helpers';
 
 const { ccclass, property } = _decorator;
 const SETTINGS_KEY = 'doudizhu.settings';
@@ -111,7 +112,7 @@ export class LobbyScene extends Component {
   };
 
   onLoad(): void {
-    this.loadSprite(RESOURCE_PATHS.lobbyBg, this.background);
+    loadSprite(RESOURCE_PATHS.lobbyBg, this.background);
     this.controlsRoot = this.ensureNode('settings-controls-runtime', this.node);
     this.wirePrimaryNavigation();
     this.render();
@@ -204,8 +205,8 @@ export class LobbyScene extends Component {
     const panelHeight = 154;
     const panel = this.ensureNode('difficulty-picker-panel', this.controlsRoot);
     panel.setPosition(0, -320, 0);
-    this.addUiTransform(panel, panelWidth, panelHeight);
-    this.drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 232));
+    addUiTransform(panel, panelWidth, panelHeight);
+    drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 232));
 
     const picker = deriveDifficultyPicker(current);
     picker.options.forEach((option, index) => {
@@ -299,8 +300,8 @@ export class LobbyScene extends Component {
 
     const panel = this.ensureNode('tutorial-panel', this.controlsRoot);
     panel.setPosition(0, -120, 0);
-    this.addUiTransform(panel, 318, 360);
-    this.drawPanel(panel, 318, 360, new Color(42, 44, 58, 255));
+    addUiTransform(panel, 318, 360);
+    drawPanel(panel, 318, 360, new Color(42, 44, 58, 255));
     this.addLabel('新手教程', 0, 138, 22, panel, 240, 34, 'tutorial-heading');
     this.addLabel(`${currentIndex + 1}/${steps.length}`, 118, 138, 13, panel, 54, 24, 'tutorial-progress');
     this.addLabel(current.title, 0, 92, 24, panel, 250, 42, 'tutorial-title');
@@ -337,8 +338,8 @@ export class LobbyScene extends Component {
 
     const panel = this.ensureNode('help-panel', this.controlsRoot);
     panel.setPosition(0, -96, 0);
-    this.addUiTransform(panel, 330, 500);
-    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
+    addUiTransform(panel, 330, 500);
+    drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
     this.addLabel('帮助', 0, 210, 22, panel, 220, 34, 'help-heading');
     this.addLabel(`${start + 1}-${Math.min(rows.length, start + visibleRows)}/${rows.length}`, 112, 210, 12, panel, 72, 22, 'help-progress', new Color(255, 255, 255, 210));
 
@@ -377,8 +378,8 @@ export class LobbyScene extends Component {
     const view = deriveStatsDetailView(digestRecords(this.loadRecords()));
     const panel = this.ensureNode('stats-panel', this.controlsRoot);
     panel.setPosition(0, -96, 0);
-    this.addUiTransform(panel, 330, 500);
-    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
+    addUiTransform(panel, 330, 500);
+    drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
     this.addLabel('战绩', 0, 210, 22, panel, 220, 34, 'stats-heading');
     if (view.empty) {
       this.addLabel('暂无完成对局', 0, 174, 13, panel, 150, 24, 'stats-empty', new Color(255, 255, 255, 190));
@@ -407,8 +408,8 @@ export class LobbyScene extends Component {
     const view = deriveRecordsDetailView(records, query);
     const panel = this.ensureNode('records-panel', this.controlsRoot);
     panel.setPosition(0, -96, 0);
-    this.addUiTransform(panel, 330, 500);
-    this.drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
+    addUiTransform(panel, 330, 500);
+    drawPanel(panel, 330, 500, new Color(36, 42, 58, 255));
     this.addLabel('历史', 0, 210, 22, panel, 220, 34, 'records-heading');
 
     this.renderFilterGroup(
@@ -574,17 +575,18 @@ export class LobbyScene extends Component {
     name: string,
     color = new Color(255, 255, 255, 255),
   ): Label {
-    const node = this.ensureNode(name, parent);
-    node.setPosition(x, y, 0);
-    this.addUiTransform(node, width, height);
-    const label = node.getComponent(Label) ?? node.addComponent(Label);
-    label.string = text;
-    label.fontSize = fontSize;
-    label.lineHeight = fontSize + 6;
-    label.horizontalAlign = Label.HorizontalAlign.CENTER;
-    label.verticalAlign = Label.VerticalAlign.CENTER;
-    label.color = color;
-    return label;
+    return addUiLabel(this.ensureNode.bind(this), {
+      text,
+      x,
+      y,
+      fontSize,
+      parent,
+      width,
+      height,
+      name,
+      color,
+      lineHeightOffset: 6,
+    });
   }
 
   private addButton(
@@ -598,29 +600,21 @@ export class LobbyScene extends Component {
     parent: Node,
     selected = false,
   ): Label {
-    const node = this.ensureNode(`button-${text}-${x}-${y}`, parent);
-    node.setPosition(x, y, 0);
-    this.addUiTransform(node, width, height);
-    const button = node.addComponent(Button);
-    button.target = this.drawButtonBackground(node, width, height, enabled, selected);
-    button.transition = Button.Transition.COLOR;
-    button.interactable = enabled;
-    button.normalColor = selected ? new Color(255, 224, 232, 150) : new Color(255, 255, 255, 70);
-    button.pressedColor = new Color(255, 214, 226, 170);
-    button.hoverColor = new Color(255, 255, 255, 100);
-    button.disabledColor = new Color(255, 255, 255, 24);
-    node.on(Button.EventType.CLICK, cb, this);
-
-    const labelNode = this.ensureNode('button-label', node);
-    this.addUiTransform(labelNode, width, height);
-    const label = labelNode.addComponent(Label);
-    label.string = text;
-    label.fontSize = 16;
-    label.lineHeight = 20;
-    label.horizontalAlign = Label.HorizontalAlign.CENTER;
-    label.verticalAlign = Label.VerticalAlign.CENTER;
-    label.color = enabled ? new Color(255, 255, 255, 255) : new Color(255, 255, 255, 120);
-    return label;
+    return addUiButton(this.ensureNode.bind(this), {
+      text,
+      x,
+      y,
+      width,
+      height,
+      enabled,
+      cb,
+      parent,
+      name: `button-${text}-${x}-${y}`,
+      selected,
+      fontSize: 16,
+      lineHeight: 20,
+      owner: this,
+    });
   }
 
   private ensureNode(name: string, parent: Node): Node {
@@ -646,39 +640,4 @@ export class LobbyScene extends Component {
     }
   }
 
-  private drawButtonBackground(parent: Node, width: number, height: number, enabled: boolean, selected: boolean): Node {
-    const node = this.ensureNode('button-bg', parent);
-    this.addUiTransform(node, width, height);
-    const graphics = node.addComponent(Graphics);
-    graphics.clear();
-    graphics.fillColor = selected
-      ? new Color(255, 224, 232, 150)
-      : enabled
-        ? new Color(255, 255, 255, 70)
-        : new Color(255, 255, 255, 30);
-    graphics.roundRect(-width / 2, -height / 2, width, height, 8);
-    graphics.fill();
-    return node;
-  }
-
-  private drawPanel(parent: Node, width: number, height: number, fill: Color): void {
-    const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
-    graphics.clear();
-    graphics.fillColor = fill;
-    graphics.roundRect(-width / 2, -height / 2, width, height, 8);
-    graphics.fill();
-  }
-
-  private addUiTransform(node: Node, width: number, height: number): UITransform {
-    const transform = node.getComponent(UITransform) ?? node.addComponent(UITransform);
-    transform.setContentSize(width, height);
-    return transform;
-  }
-
-  private loadSprite(path: ResourcePath, sprite: Sprite | null): void {
-    if (!sprite) return;
-    resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
-      if (!error && frame) sprite.spriteFrame = frame;
-    });
-  }
 }

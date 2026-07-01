@@ -3,7 +3,6 @@ import {
   AudioClip,
   AudioSource,
   BlockInputEvents,
-  Button,
   Color,
   Component,
   Graphics,
@@ -15,7 +14,6 @@ import {
   UIOpacity,
   Vec3,
   director,
-  resources,
   sys,
   tween,
 } from 'cc';
@@ -55,10 +53,9 @@ import {
   RESOURCE_PATHS,
   cardAssetPath,
   cueAudioPath,
-  spriteFrameResourcePath,
   suitAssetPath,
-  type ResourcePath,
 } from '../asset-keys';
+import { addButton as addUiButton, addLabel as addUiLabel, addUiTransform, drawPanel, loadSprite } from './ui-helpers';
 
 const { ccclass, property } = _decorator;
 
@@ -98,10 +95,6 @@ function sameCard(a: Card, b: Card): boolean {
 
 function cardsSignature(cards: Card[]): string {
   return cards.map(cardKey).join('|');
-}
-
-function labelColor(enabled: boolean): Color {
-  return enabled ? new Color(255, 255, 255, 255) : new Color(255, 255, 255, 120);
 }
 
 function suitText(suit: Suit | 'joker'): string {
@@ -170,7 +163,7 @@ export class GameSceneSkeleton extends Component {
   private liveRenderNodes: Set<Node> | null = null;
 
   onLoad(): void {
-    this.loadSprite(RESOURCE_PATHS.gameTableBg, this.background);
+    loadSprite(RESOURCE_PATHS.gameTableBg, this.background, this.spriteFrames);
     if (this.cardTemplate) this.cardTemplate.node.active = false;
     this.hideSceneScaffold();
     this.audioSource = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
@@ -397,8 +390,8 @@ export class GameSceneSkeleton extends Component {
     const pos = this.aiThinkingPosition(thinking.seat, layout, canvas);
     const root = this.ensureNode(`ai-thinking-${thinking.seat}`, this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
-    this.addUiTransform(root, pos.width, 28);
-    this.drawHudPanel(root, pos.width, 28, new Color(37, 42, 58, 176));
+    addUiTransform(root, pos.width, 28);
+    drawPanel(root, pos.width, 28, new Color(37, 42, 58, 176));
 
     const dots = this.settings.animation ? '.'.repeat(thinking.dots) : '';
     const label = this.addLabel(`${thinking.label}${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
@@ -421,7 +414,7 @@ export class GameSceneSkeleton extends Component {
     const width = Math.min(250, Math.max(170, layout.playArea.width - 42));
     const height = Math.min(112, Math.max(86, layout.playArea.height * 0.62));
     area.setPosition(pos.x, pos.y, 0);
-    this.addUiTransform(area, width, height);
+    addUiTransform(area, width, height);
 
     const labelText = top ? `座位${top.seat + 1}` : '自由出牌';
     const label = this.addLabel(`出牌区\n${labelText}`, 0, 34, 18, area, 170, 48, 'play-area-label');
@@ -458,15 +451,15 @@ export class GameSceneSkeleton extends Component {
     const height = 34;
     const root = this.ensureNode('hud-strength-meter', this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
-    this.addUiTransform(root, width, height);
-    this.drawHudPanel(root, width, height, new Color(48, 40, 58, 178));
+    addUiTransform(root, width, height);
+    drawPanel(root, width, height, new Color(48, 40, 58, 178));
 
     const barWidth = width - 104;
     const barHeight = 8;
     const barX = 30;
     const bar = this.ensureNode('hud-strength-bar', root);
     bar.setPosition(barX, -7, 0);
-    this.addUiTransform(bar, barWidth, barHeight);
+    addUiTransform(bar, barWidth, barHeight);
     const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
     graphics.clear();
     graphics.fillColor = new Color(255, 255, 255, 42);
@@ -490,8 +483,8 @@ export class GameSceneSkeleton extends Component {
     const pos = this.screenPoint(canvas, canvas.width / 2, centerY);
     const root = this.ensureNode('hud-card-memory', this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
-    this.addUiTransform(root, panelWidth, panelHeight);
-    this.drawHudPanel(root, panelWidth, panelHeight, new Color(42, 54, 62, 168));
+    addUiTransform(root, panelWidth, panelHeight);
+    drawPanel(root, panelWidth, panelHeight, new Color(42, 54, 62, 168));
 
     this.addLabel('剩牌', -panelWidth / 2 + 24, panelHeight / 2 - 18, 13, root, 42, 24, 'hud-memory-title');
     const toggleLabel = this.memoryExpanded ? '收起' : '展开';
@@ -594,14 +587,14 @@ export class GameSceneSkeleton extends Component {
     const pos = this.screenPoint(canvas, canvas.width / 2, layout.actionButtons.y + 13);
     const root = this.ensureNode('turn-timer-runtime', this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
-    this.addUiTransform(root, width, height);
-    this.drawHudPanel(root, width, height, new Color(34, 39, 52, 166));
+    addUiTransform(root, width, height);
+    drawPanel(root, width, height, new Color(34, 39, 52, 166));
 
     const barWidth = width - 68;
     const barHeight = 5;
     const bar = this.ensureNode('turn-timer-bar', root);
     bar.setPosition(-14, -3, 0);
-    this.addUiTransform(bar, barWidth, barHeight);
+    addUiTransform(bar, barWidth, barHeight);
     const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
     graphics.clear();
     graphics.fillColor = new Color(255, 255, 255, 42);
@@ -645,13 +638,13 @@ export class GameSceneSkeleton extends Component {
     const panelPos = this.screenPoint(canvas, panelX, centerY);
     const root = this.ensureNode('advisor-panel', this.uiRoot!);
     root.setPosition(panelPos.x, panelPos.y, 0);
-    this.addUiTransform(root, width, height);
+    addUiTransform(root, width, height);
     const color = insight.isPass
       ? new Color(43, 55, 75, 190)
       : insight.emphasize
         ? new Color(52, 86, 63, 192)
         : new Color(37, 42, 58, 184);
-    this.drawHudPanel(root, width, height, color);
+    drawPanel(root, width, height, color);
 
     const label = this.addLabel(insight.text, 0, 1, 13, root, width - 18, height - 4, 'advisor-label');
     label.color = insight.emphasize ? new Color(221, 255, 224, 255) : new Color(255, 248, 226, 255);
@@ -667,15 +660,15 @@ export class GameSceneSkeleton extends Component {
     const pos = this.screenPoint(canvas, canvas.width / 2, Math.max(148, layout.playArea.y - 10));
     const root = this.ensureNode('toast-layer-runtime', this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
-    this.addUiTransform(root, Math.min(260, canvas.width - 64), 112);
+    addUiTransform(root, Math.min(260, canvas.width - 64), 112);
 
     this.toasts.items.forEach((toast, index) => {
       const width = Math.min(238, Math.max(174, canvas.width - 112));
       const height = 30;
       const node = this.ensureNode(`toast-${toast.id}`, root);
       node.setPosition(0, -index * 34, 0);
-      this.addUiTransform(node, width, height);
-      this.drawHudPanel(node, width, height, new Color(30, 32, 44, 190));
+      addUiTransform(node, width, height);
+      drawPanel(node, width, height, new Color(30, 32, 44, 190));
       const label = this.addLabel(toast.text, 0, 0, 15, node, width - 22, height, 'toast-label');
       label.color = new Color(255, 248, 225, 255);
       this.prepareToastAnimation(node, toast.id);
@@ -689,9 +682,9 @@ export class GameSceneSkeleton extends Component {
     panel.setScale(1, 1, 1);
     const panelWidth = Math.min(330, Math.max(280, canvas.width - 60));
     const panelHeight = Math.min(420, Math.max(360, canvas.height - 220));
-    this.addUiTransform(panel, panelWidth, panelHeight);
+    addUiTransform(panel, panelWidth, panelHeight);
     const sprite = panel.getComponent(Sprite) ?? panel.addComponent(Sprite);
-    this.loadSprite(RESOURCE_PATHS.settlementBg, sprite);
+    loadSprite(RESOURCE_PATHS.settlementBg, sprite, this.spriteFrames);
     this.addLabel(result.resultText, 0, panelHeight * 0.36, 34, panel, 220, 72, 'result-title');
     this.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.22, 20, panel, 240, 40, 'result-multiplier');
     this.addLabel(result.springText || '本局结算', 0, panelHeight * 0.12, 18, panel, 240, 40, 'result-spring');
@@ -727,7 +720,7 @@ export class GameSceneSkeleton extends Component {
 
     const root = this.ensureNode('pause-overlay-runtime', this.uiRoot!);
     root.setPosition(0, 0, 0);
-    this.addUiTransform(root, canvas.width, canvas.height);
+    addUiTransform(root, canvas.width, canvas.height);
     this.drawDimOverlay(root, canvas.width, canvas.height);
     if (!root.getComponent(BlockInputEvents)) root.addComponent(BlockInputEvents);
 
@@ -736,8 +729,8 @@ export class GameSceneSkeleton extends Component {
     const panel = this.ensureNode('pause-panel', root);
     panel.setPosition(0, 12, 0);
     panel.setScale(1, 1, 1);
-    this.addUiTransform(panel, panelWidth, panelHeight);
-    this.drawHudPanel(panel, panelWidth, panelHeight, new Color(34, 38, 52, 236));
+    addUiTransform(panel, panelWidth, panelHeight);
+    drawPanel(panel, panelWidth, panelHeight, new Color(34, 38, 52, 236));
 
     const shouldAnimate = this.settings.animation && this.renderedPauseStage !== this.pauseState.stage;
     if (this.pauseState.stage === 'menu') this.renderPauseMenu(panel, panelWidth, panelHeight);
@@ -872,23 +865,23 @@ export class GameSceneSkeleton extends Component {
     node.setScale(1, 1, 1);
     const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
     opacity.opacity = 255;
-    this.addUiTransform(node, CARD_SIZE.width, CARD_SIZE.height);
+    addUiTransform(node, CARD_SIZE.width, CARD_SIZE.height);
     const parentSprite = node.getComponent(Sprite);
     if (parentSprite) parentSprite.destroy();
     const view = cardView(card);
     const fillNode = this.ensureNode('card-fill', node);
     fillNode.setPosition(0, 0, 0);
     fillNode.setSiblingIndex(0);
-    this.addUiTransform(fillNode, CARD_SIZE.width, CARD_SIZE.height);
+    addUiTransform(fillNode, CARD_SIZE.width, CARD_SIZE.height);
     this.drawCardBase(fillNode, CARD_SIZE.width, CARD_SIZE.height);
 
     const bgNode = this.ensureNode('card-bg', node);
     bgNode.setPosition(0, 0, 0);
     bgNode.setSiblingIndex(1);
-    this.addUiTransform(bgNode, CARD_SIZE.width, CARD_SIZE.height);
+    addUiTransform(bgNode, CARD_SIZE.width, CARD_SIZE.height);
     const sprite = bgNode.getComponent(Sprite) ?? bgNode.addComponent(Sprite);
     this.configureCardSprite(sprite);
-    this.loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite);
+    loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite, this.spriteFrames);
     node.off(Node.EventType.TOUCH_END);
     if (interactive) node.on(Node.EventType.TOUCH_END, () => this.toggleCard(card), this);
 
@@ -914,10 +907,10 @@ export class GameSceneSkeleton extends Component {
       if (suitPath) {
         const suitNode = this.ensureNode('card-suit-icon', node);
         suitNode.setPosition(0, -17, 0);
-        this.addUiTransform(suitNode, CARD_SUIT_ICON_SIZE, CARD_SUIT_ICON_SIZE);
+        addUiTransform(suitNode, CARD_SUIT_ICON_SIZE, CARD_SUIT_ICON_SIZE);
         const suitSprite = suitNode.getComponent(Sprite) ?? suitNode.addComponent(Sprite);
         this.configureCardSprite(suitSprite);
-        this.loadSprite(suitPath, suitSprite);
+        loadSprite(suitPath, suitSprite, this.spriteFrames);
       }
     }
     return node;
@@ -988,30 +981,21 @@ export class GameSceneSkeleton extends Component {
     parent: Node = this.uiRoot!,
     name?: string,
   ): Label {
-    const node = this.ensureNode(name ?? `button-${text}-${x}-${y}`, parent);
-    node.setPosition(x, y, 0);
-    this.addUiTransform(node, width, height);
-    const button = node.getComponent(Button) ?? node.addComponent(Button);
-    button.target = this.drawButtonBackground(node, width, height, enabled);
-    button.transition = Button.Transition.COLOR;
-    button.interactable = enabled;
-    button.normalColor = enabled ? new Color(255, 255, 255, 70) : new Color(255, 255, 255, 30);
-    button.pressedColor = new Color(255, 214, 226, 150);
-    button.hoverColor = new Color(255, 255, 255, 100);
-    button.disabledColor = new Color(255, 255, 255, 24);
-    node.off(Button.EventType.CLICK);
-    node.on(Button.EventType.CLICK, cb, this);
-
-    const labelNode = this.ensureNode('button-label', node);
-    this.addUiTransform(labelNode, width, height);
-    const label = labelNode.getComponent(Label) ?? labelNode.addComponent(Label);
-    label.string = text;
-    label.fontSize = 20;
-    label.lineHeight = 24;
-    label.horizontalAlign = Label.HorizontalAlign.CENTER;
-    label.verticalAlign = Label.VerticalAlign.CENTER;
-    label.color = labelColor(enabled);
-    return label;
+    return addUiButton(this.ensureNode.bind(this), {
+      text,
+      x,
+      y,
+      width,
+      height,
+      enabled,
+      cb,
+      parent,
+      name: name ?? `button-${text}-${x}-${y}`,
+      selected: false,
+      fontSize: 20,
+      lineHeight: 24,
+      owner: this,
+    });
   }
 
   private addLabel(
@@ -1024,17 +1008,17 @@ export class GameSceneSkeleton extends Component {
     height = 72,
     name?: string,
   ): Label {
-    const node = this.ensureNode(name ?? `label-${text}-${x}-${y}`, parent);
-    node.setPosition(x, y, 0);
-    this.addUiTransform(node, width, height);
-    const label = node.getComponent(Label) ?? node.addComponent(Label);
-    label.string = text;
-    label.fontSize = fontSize;
-    label.lineHeight = fontSize + 5;
-    label.horizontalAlign = Label.HorizontalAlign.CENTER;
-    label.verticalAlign = Label.VerticalAlign.CENTER;
-    label.color = new Color(255, 255, 255, 255);
-    return label;
+    return addUiLabel(this.ensureNode.bind(this), {
+      text,
+      x,
+      y,
+      fontSize,
+      parent,
+      width,
+      height,
+      name: name ?? `label-${text}-${x}-${y}`,
+      lineHeightOffset: 5,
+    });
   }
 
   private showStatus(text: string): void {
@@ -1272,25 +1256,6 @@ export class GameSceneSkeleton extends Component {
     }
   }
 
-  private drawButtonBackground(parent: Node, width: number, height: number, enabled: boolean): Node {
-    const node = this.ensureNode('button-bg', parent);
-    this.addUiTransform(node, width, height);
-    const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
-    graphics.clear();
-    graphics.fillColor = enabled ? new Color(255, 255, 255, 70) : new Color(255, 255, 255, 30);
-    graphics.roundRect(-width / 2, -height / 2, width, height, 8);
-    graphics.fill();
-    return node;
-  }
-
-  private drawHudPanel(parent: Node, width: number, height: number, fill: Color): void {
-    const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
-    graphics.clear();
-    graphics.fillColor = fill;
-    graphics.roundRect(-width / 2, -height / 2, width, height, 8);
-    graphics.fill();
-  }
-
   private drawDimOverlay(parent: Node, width: number, height: number): void {
     const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
     graphics.clear();
@@ -1303,12 +1268,6 @@ export class GameSceneSkeleton extends Component {
     if (tone === 'strong') return new Color(124, 218, 150, 230);
     if (tone === 'mid') return new Color(255, 210, 112, 230);
     return new Color(255, 134, 134, 230);
-  }
-
-  private addUiTransform(node: Node, width: number, height: number): UITransform {
-    const transform = node.getComponent(UITransform) ?? node.addComponent(UITransform);
-    transform.setContentSize(width, height);
-    return transform;
   }
 
   private canvasSize(): { width: number; height: number } {
@@ -1330,18 +1289,4 @@ export class GameSceneSkeleton extends Component {
     };
   }
 
-  private loadSprite(path: ResourcePath, sprite: Sprite | null): void {
-    if (!sprite) return;
-    const cached = this.spriteFrames.get(path);
-    if (cached) {
-      sprite.spriteFrame = cached;
-      return;
-    }
-    resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
-      if (!error && frame) {
-        this.spriteFrames.set(path, frame);
-        sprite.spriteFrame = frame;
-      }
-    });
-  }
 }
