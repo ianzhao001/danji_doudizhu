@@ -19,6 +19,33 @@ describe('asset keys', () => {
     expect(paths.every((path) => !/\.(png|wav|mp3|otf|ttf)$/i.test(path))).toBe(true);
     expect(resourcePath('lobbyBg')).toBe('art/backgrounds/lobby-bg');
     expect(resourcePath('audioButton')).toBe('audio/button');
+    expect(resourcePath('landlordRoleBadge')).toBe('art/avatars/landlord-role-badge');
+    expect(resourcePath('buttonPrimary')).toBe('art/ui/btn-primary');
+    expect(resourcePath('splash')).toBe('art/misc/splash');
+  });
+
+  it('maps final reviewed ART-IMPORT sprites to resources paths', () => {
+    expect(resourcePath('farmerRoleBadge')).toBe('art/avatars/farmer-role-badge');
+    expect(resourcePath('avatarFrame')).toBe('art/avatars/avatar-frame');
+    expect(resourcePath('buttonSecondary')).toBe('art/ui/btn-secondary');
+    expect(resourcePath('buttonDisabled')).toBe('art/ui/btn-disabled');
+    expect(resourcePath('iconPlay')).toBe('art/ui/icon-play');
+    expect(resourcePath('iconPass')).toBe('art/ui/icon-pass');
+    expect(resourcePath('iconHint')).toBe('art/ui/icon-hint');
+    expect(resourcePath('iconBid')).toBe('art/ui/icon-bid');
+    expect(resourcePath('iconBack')).toBe('art/ui/icon-back');
+    expect(resourcePath('iconSettings')).toBe('art/ui/icon-settings');
+    expect(resourcePath('badgeMultiplier')).toBe('art/ui/badge-multiplier');
+    expect(resourcePath('badgeTurn')).toBe('art/ui/badge-turn');
+    expect(resourcePath('badgeCountdownRing')).toBe('art/ui/badge-countdown-ring');
+    expect(resourcePath('emphasisBomb')).toBe('art/ui/emphasis-bomb');
+    expect(resourcePath('emphasisRocket')).toBe('art/ui/emphasis-rocket');
+    expect(resourcePath('emphasisSpring')).toBe('art/ui/emphasis-spring');
+    expect(resourcePath('panelPopup')).toBe('art/ui/panel-popup');
+    expect(resourcePath('appIcon')).toBe('art/misc/app-icon');
+    expect(resourcePath('emptyRecords')).toBe('art/misc/empty-records');
+    expect(resourcePath('settlementWinBadge')).toBe('art/misc/badge-win');
+    expect(resourcePath('settlementLoseBadge')).toBe('art/misc/badge-lose');
   });
 
   it('covers every card-view assetKey produced from a full deck', () => {
