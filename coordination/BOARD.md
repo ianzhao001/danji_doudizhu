@@ -726,8 +726,11 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0✅,T-A1✅,T-0✅,T-C0✅ | **ready**（含 P-Text copy rider·分阶段送审） |
 | P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0✅,T-0✅,T-C0✅ | **ready**（6 子屏全覆盖·入口真按钮·分阶段送审） |
 | P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付**：清单落盘，Wave 2 并入 P-G 消费 |
+| ART-06 | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report（导入属 ART-IMPORT-06） | E-0 ✅ | **ready**（横版 844×390 背景×3：gameTableBg/lobbyBg/settlementBg·出 preview→用户视觉终审） |
+| ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`+`.meta`；P-G/P-L 换回 `loadSprite` | ART-06 终审✅, P-G/P-L | blocked |
 | V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
 > **派发**：Wave 0 T-DOC ✅ 已并 main（`4b5188d`）。**Wave 1 ✅ 全部落 main**：E-0 `6e6ea7a` / T-A1 `2e66085` / T-C0 `8e386e8` / T-0 `dceff17`；T-A2 审计闭合。main `38628a0`·134/659 绿·typecheck 净。
 > **Wave 2 已派发（2026-07-02）**：**P-G ‖ P-L** 两条单写者流水线并行，文件域不相交（game-scene / lobby），依赖全 done。spec：`tasks/P-G.md`（消费 P-Text）、`tasks/P-L.md`。分支 `task/P-G`、`task/P-L` 已建。按新协议：分阶段送审 → 架构 `approved` → 执行者 `claim/merge/release`（共用单 lane，排队）。**V（Wave 3）待 P-G+P-L 入 main。**
+> **美术策略（用户指定 2026-07-02）**：**竖转横的资源文件由执行者「文生图」生成**。横屏方向相关的只有背景（cards/avatars/ui/icons 方向无关，不重生）。ART-06 现在与 P-G/P-L **并行派发**出横版背景 preview → 用户视觉终审 → ART-IMPORT-06 导入并把 P-G/P-L 运行时占位换回真图。分支 `task/ART-06-landscape-backgrounds` 已建。
