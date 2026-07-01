@@ -22,6 +22,7 @@
 - `npm --prefix test test` 全绿（含本任务测试）
 - `npm --prefix test run typecheck` 无错
 - 仅改声明的文件域；未 import `cc`
+- 合并按新流程：架构在报告/BOARD 给 `approved` 后，执行者回到 main 重跑 test/typecheck，全绿再执行 `./coordination/agentctl.sh claim <ID>` → `merge <ID>` → `release <ID>`
 
 ## 测试命令
 `npm --prefix test test`
