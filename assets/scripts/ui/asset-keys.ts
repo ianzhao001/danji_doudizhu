@@ -91,6 +91,10 @@ export function resourcePath(key: ResourceKey): ResourcePath {
   return RESOURCE_PATHS[key];
 }
 
+export function spriteFrameResourcePath(path: ResourcePath): string {
+  return `${path}/spriteFrame`;
+}
+
 export function cardAssetPath(assetKey: string): ResourcePath | null {
   const [rankRaw, suit] = assetKey.split('-');
   const rank = Number(rankRaw);

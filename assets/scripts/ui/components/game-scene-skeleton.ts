@@ -51,7 +51,14 @@ import { deriveLastActions, type SeatLastAction } from '../last-action-view';
 import { askQuit, cancelQuit, closeMenu, initialPause, openMenu, type PauseState } from '../pause-menu';
 import type { Rect, TableRegions } from '../table-layout';
 import { toggleSetting, type ToggleKey } from '../settings-view';
-import { RESOURCE_PATHS, cardAssetPath, cueAudioPath, suitAssetPath } from '../asset-keys';
+import {
+  RESOURCE_PATHS,
+  cardAssetPath,
+  cueAudioPath,
+  spriteFrameResourcePath,
+  suitAssetPath,
+  type ResourcePath,
+} from '../asset-keys';
 
 const { ccclass, property } = _decorator;
 
@@ -1323,14 +1330,14 @@ export class GameSceneSkeleton extends Component {
     };
   }
 
-  private loadSprite(path: string, sprite: Sprite | null): void {
+  private loadSprite(path: ResourcePath, sprite: Sprite | null): void {
     if (!sprite) return;
     const cached = this.spriteFrames.get(path);
     if (cached) {
       sprite.spriteFrame = cached;
       return;
     }
-    resources.load(path, SpriteFrame, (error, frame) => {
+    resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
       if (!error && frame) {
         this.spriteFrames.set(path, frame);
         sprite.spriteFrame = frame;

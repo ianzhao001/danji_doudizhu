@@ -6,6 +6,7 @@ import {
   cardAssetPath,
   cueAudioPath,
   resourcePath,
+  spriteFrameResourcePath,
   suitAssetPath,
 } from '../../assets/scripts/ui/asset-keys';
 import { createDeck, Rank, Suit } from '../../assets/scripts/rules';
@@ -22,6 +23,11 @@ describe('asset keys', () => {
     expect(resourcePath('landlordRoleBadge')).toBe('art/avatars/landlord-role-badge');
     expect(resourcePath('buttonPrimary')).toBe('art/ui/btn-primary');
     expect(resourcePath('splash')).toBe('art/misc/splash');
+  });
+
+  it('maps image resources to their Cocos SpriteFrame sub-asset path', () => {
+    expect(spriteFrameResourcePath(RESOURCE_PATHS.cardTemplate)).toBe('art/cards/card-template/spriteFrame');
+    expect(spriteFrameResourcePath(RESOURCE_PATHS.lobbyBg)).toBe('art/backgrounds/lobby-bg/spriteFrame');
   });
 
   it('maps final reviewed ART-IMPORT sprites to resources paths', () => {

@@ -26,7 +26,7 @@ import { deriveDifficultyPicker } from '../difficulty-picker-view';
 import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
 import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
-import { RESOURCE_PATHS } from '../asset-keys';
+import { RESOURCE_PATHS, spriteFrameResourcePath, type ResourcePath } from '../asset-keys';
 
 const { ccclass, property } = _decorator;
 const SETTINGS_KEY = 'doudizhu.settings';
@@ -675,9 +675,9 @@ export class LobbyScene extends Component {
     return transform;
   }
 
-  private loadSprite(path: string, sprite: Sprite | null): void {
+  private loadSprite(path: ResourcePath, sprite: Sprite | null): void {
     if (!sprite) return;
-    resources.load(path, SpriteFrame, (error, frame) => {
+    resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
       if (!error && frame) sprite.spriteFrame = frame;
     });
   }
