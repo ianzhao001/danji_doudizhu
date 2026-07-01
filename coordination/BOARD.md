@@ -117,6 +117,8 @@ main 现状：**128 测试文件 / 632 用例全绿、typecheck 净、纯层零 
 > - misc(3)：`badge-win`、`badge-lose`、`empty-records`
 > - **可留 texture(2)**：`misc/app-icon`、`misc/splash`（build/平台设置·非 resources.load(SpriteFrame) 目标）
 > **决策**：用户选「先修后合」。分支/worktree 保留待重导后重新提交；架构复验每个 meta `userData.type=="sprite-frame"` + 含 sprite-frame 子资产 + UUID 仍唯一 + 653 绿后再 `merge --no-ff`。M6-D1 sign-off 在此前不得声称美术可用。
+>
+> **✅ 返工复审通过并入 main `4334e81`（2026-07-01）**：返工 `37d7d24` 用 Creator asset-db（save-asset-meta + reimport）把 22 个 sprite 转 `type:sprite-frame`（真实 `@f9941` 子资产·trim 几何真实·与既有 card-template 结构逐字同型·loader 可用）；delta **严格仅 22 `.png.meta` + 1 report**（无 PNG/asset-keys/测试/纯层改动）；app-icon/splash 仍 texture；**50 meta / 50 唯一 base UUID·零跨文件碰撞·sub-uuid 均自 base 派生**；无手写痕迹/临时扩展残留。复跑 **133 files / 653 tests 绿·typecheck 净·diff --check 净·无 cc**。worktree/分支已清理。**ART-IMPORT-02/03/04/05 全部 done。发布收口最后一个 gate 关闭 → M6-D1 可执行。**
 
 ### 🔍 第九批合并验证（架构 · 2026-06-29 · 用户指令「验证最新次合入」）
 > 结论：**第九批（L1-L4 + ART-02/03/04）合并干净，无 blocker，保持合并不撤销。**

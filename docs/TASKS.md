@@ -4,6 +4,8 @@
 
 > 2026-07-01 收口更新：M6-editor 后续编辑器 UI 已审查通过并入 main `a817c98`（M3-57 toast/timer、M3-63 AI thinking/last action、M3-64 advisor、M3-55 tutorial、M3-46a help、M3-46b pause overlay、M3-59 difficulty picker、M3-45 stats/records；均为运行时注入，未改 scene/meta/root 配置；390×844 截图 + CDP errors `[]`）。最终验证 **128 测试文件 / 632 用例全绿、typecheck 净**。剩余本地 gate：ART-IMPORT-02/03/04 与 ART-05 待用户视觉终审，M6-D1 发布/QA 文档收尾待最终发布 gate。
 
+> 2026-07-01 发布收口推进：**M4-42 困难 AI 中盘纵深**审查通过并入 main `641b6a8`；**ART-IMPORT-02/03/04/05 美术导入**用户视觉终审通过 →（返工 sprite-frame 修正后）审查通过并入 main `4334e81`（30 PNG 导入 `art/{avatars,ui,cards,misc}/`·22 场景 sprite 为 sprite-frame·50/50 唯一 UUID·133 文件/653 绿）。**发布收口最后 gate 关闭，仅剩 M6-D1 发布验收记录（架构文档收尾）待执行。**
+
 > 2026-07-01 第十五批派发（M6-editor 两轮审查转化·5 任务·均非阻塞）：第二批编辑器 UI（M3-45/46a/46b/55/57/59/63/64）+ 第三轮 round-runtime/运行时审查**均通过**，发现转出 5 个文件域互不相交的打磨/硬化任务——纯逻辑 **M6-G18**（round-runtime 诊断可见性 + replay 盲区）·**M3-68**（screen-view 去 dead `cues`）已 **ready** 可即认领；编辑器串行 **M3-65**（lobby home 重排 + 子屏不透出）·**M3-66**（HUD 叠压消除 + 暂停冻结计时）·**M3-67**（去每帧存储 I/O + 修 submitting 死锁 + 音频并发）**blocked** 待本批入 main。详见 coordination/BOARD.md「第十五批」。
 
 > 2026-07-01 第十五批 wave 1 验收并入 main：**M3-65 + M3-66 已并 main `7b9a111`**（审查通过·128/632 绿·typecheck 净·`diff --check` 净·纯层零 cc·未改 scene/meta/root·4 张 390×844 截图 + CDP errors `[]`·timer 冻结 CDP `3151ms→3151ms` 实证）。**M3-67 解锁翻 ready**（依赖第二批已在 main·编辑器串行接其后）。
