@@ -718,7 +718,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 |----|----|----|----|----|----|
 | T-DOC | 0 | 协议/脚本/模板 | `PROTOCOL.md`,`BOARD.md`,`agentctl.sh`,`templates/*` | — | **done `4b5188d`**（旧协议·架构合并·133/654 绿·typecheck 净·bash -n 通过） |
 | V-0 | 0 | baseline 记录 | `reports/V-0-baseline.md` | — | **ready**（规划者/用户直接落盘·不 gate Wave 1） |
-| E-0 | 1 | 编辑器配置(用户) | `project.json`,`*.scene`(Creator 生成) | T-DOC ✅ | **ready** |
+| E-0 | 1 | 设计分辨率(执行者·worktree) | `settings/v2/packages/project.json`（**不碰 .scene**·cc.Canvas 运行时自适配） | T-DOC ✅ | **ready** |
 | T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC ✅ | **ready**（待架构种失败测试） |
 | T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | **ready** |
 | T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **ready** |
