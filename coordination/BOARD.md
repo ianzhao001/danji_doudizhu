@@ -721,11 +721,11 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | E-0 | 1 | 设计分辨率(执行者·worktree) | `settings/v2/packages/project.json`（**不碰 .scene**·cc.Canvas 运行时自适配） | T-DOC ✅ | **approved** @ `912d463`（架构核对：仅 designResolution 四字段 844×390/false/true·测试净）→ 执行者 `claim/merge/release` |
 | T-A1 | 1 | 纯逻辑 | `ui/table-layout.ts`+`test/ui/table-layout*.test.ts` | T-DOC ✅ | **approved** @ `3b8a798`（架构核对：portrait 契约不破·landscape 分支正确·134/659 绿·typecheck 净·失败测试未改）→ 执行者 `claim/merge/release` |
 | T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | **in-review** @ `8ccc921`（代码审查通过·typecheck+654 绿+forbidden grep 净；**待用户 Creator 冒烟**：lobby+game 渲染/按钮可点/Console 净后转 approved。新 `ui-helpers.ts` 需 Creator 生成 `.meta`（late sync）） |
-| T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **ready** |
+| T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **approved** @ `94f8b2f`（架构核对：58 键逐条审计完整·SpriteFrame 统一走 spriteFrameResourcePath·音频/字体/appIcon/splash 例外成立·「asset-keys.ts 不改」决策合理·仅新增 2 份 report 无代码风险）→ 执行者 `claim/merge/release` |
 | T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 | 审计 |
 | P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0,T-A1,T-0,T-C0 | blocked |
 | P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0,T-0,T-C0 | blocked |
-| P-Text | 2 | 契约(规划者交付) | 文案清单 + `ui/strings.ts`(架构维护) | — | 规划者产出中 |
+| P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付**：清单落盘，Wave 2 并入 P-G 消费 |
 | V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
