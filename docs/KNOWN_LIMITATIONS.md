@@ -18,6 +18,7 @@
 
 - AI 只基于 `GameSnapshot` 与 `viewerHand` 决策，不读取隐藏手牌。
 - 难度差异已由 selfplay 与策略测试覆盖，但仍是启发式 AI，不承诺最优解。
+- Hard（M4-42）中盘纵深消费 handStrength/cardMemory/endgame，但 **cardMemory 消费偏浅**：`AiStrategy` 快照当前不带出牌历史，`trackPlayed([], hand)` 只能做「整副牌减自手牌」的静态公开推断，无法随对局进程收敛外部剩牌估计。留待快照扩展 play history 后深化（不影响合法性/确定性/胜率优势）。
 - turn timer 仅做提示，不会超时自动代打，避免改变 `round-runtime` 契约。
 
 ## Save And Resume

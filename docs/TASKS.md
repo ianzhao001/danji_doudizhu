@@ -106,7 +106,7 @@
 - [x] AI 合法性不变量审计（三档横切护栏）。〔M4-08 已并 main（第四批，绿护栏）〕
 - [x] 叫抢判强逻辑单一真相源 + 阈值 exhaustive。〔M4-09 已并 main（优化批）：抽 isStrongHand，chooseBid/chooseBidByLevel 复用〕
 - [x] 叫抢 dispatch 去重。〔M4-10 已并 main：`actionForStrength` 单一真相源，chooseBid/chooseBidByLevel 复用〕
-- [ ] 困难 AI 中盘策略纵深（第四轮审查转化·第十六批·**产品 2026-07-01 解 gate → ready·已派发**）。〔M4-42 消费 M4-30/31/32（手牌强度/记牌/残局）增强 Hard 中盘——手牌塑形/控权意识/记牌消费/终局规划·验收以 selfplay 对 Normal 胜率优势 + 合法性不变量·分支 `task/M4-42-hard-ai-depth` 已建·纯 spec 自写验证〕
+- [x] 困难 AI 中盘策略纵深（第四轮审查转化·第十六批·**审查通过并入 main `641b6a8`·2026-07-01**）。〔M4-42 消费 M4-30/31/32（手牌强度/记牌/残局）增强 Hard 中盘——手牌塑形/控权意识/记牌消费/终局规划·selfplay Hard 地主 7/12 均分 0.83 vs Normal 3/12 -1.83·合法性/确定性/G14 隐藏态全绿·133/652〕
 
 ## M5 完整单机体验
 
