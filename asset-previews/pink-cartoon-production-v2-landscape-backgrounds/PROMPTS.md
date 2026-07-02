@@ -26,10 +26,24 @@ Prompt:
 
 ## settlementBg
 
-- Preview: `settlement-bg-landscape.png` (1844x853)
-- Thumbnail: `thumbs/settlement-bg-landscape-thumb.png` (422x195)
+- Preview: `settlement-bg-landscape.png` (1313x1198, RGBA alpha, aspect 1.096:1)
+- Thumbnail: `thumbs/settlement-bg-landscape-thumb.png` (422x385)
 - Source copy: `source/settlement-bg-landscape.generated.png`
 
 Prompt:
 
-> Create a wide 2.16:1 landscape settlement panel background for a cute Dou Dizhu card game, target composition 844x390. Style must match pastel pink 2D paper-craft, puffy sticker-like edges, matte candy velvet texture, warm cream center, strawberry pink ribbons, coral borders, tiny flowers, stars, clouds, soft blue and lavender accents. Scene: a horizontal ornate popup/panel frame, centered cream writing area with lots of empty space for result rows, rounded pink border, ribbon banner decoration at top without any text, small card-back decorations only at the far corners, cloud clusters along lower edge. Transparent-looking outer edge is okay but use a clean full image background. No text, no numbers, no readable card ranks, no suit symbols, no watermark, no casino chips, no cash, no betting imagery.
+> Create one ornate settlement result panel for a cute single-player Dou Dizhu card game, designed for a bounded landscape UI sprite with approximately 1.1:1 aspect ratio, not a full-screen background. The subject must be isolated on a perfectly flat solid #00ff00 chroma-key background for later background removal. Create a front-facing rounded popup panel frame with a warm cream empty center for result rows, pastel pink ribbon banner at the top with no text, rounded coral-pink border, small flowers, stars, clouds, and playing-card-back decorations near the corners only. Keep the center mostly empty and readable. Style: polished 2D pastel paper-craft, puffy sticker-like edges, matte candy velvet texture, matching the pink cartoon Dou Dizhu asset pack. Composition: centered full panel, generous padding, no cropped sides, no full-screen scene composition. No text, no numbers, no readable card ranks, no suit symbols, no watermark, no casino chips, no cash, no betting imagery, no black background, no black corners.
+
+Postprocess:
+
+```sh
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/imagegen/scripts/remove_chroma_key.py" \
+  --input asset-previews/pink-cartoon-production-v2-landscape-backgrounds/source/settlement-bg-landscape.generated.png \
+  --out asset-previews/pink-cartoon-production-v2-landscape-backgrounds/settlement-bg-landscape.png \
+  --auto-key border \
+  --soft-matte \
+  --transparent-threshold 18 \
+  --opaque-threshold 220 \
+  --despill \
+  --force
+```
