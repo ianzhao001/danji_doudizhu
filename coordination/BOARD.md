@@ -727,7 +727,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0✅,T-0✅,T-C0✅ | **done `456afac`** |
 | P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付+已消费**：P-G `83f9e7d` 落地（seatName 你/左家/右家·去 AI/座位N/出牌区占位味） |
 | ART-06 | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report | E-0 ✅ | **approved(全3张)** @ `24aacd1`（game/lobby 满屏 RGB·settlementBg 返工为 RGBA 透明外区+不透明奶油中心·1313×1198 aspect 1.096 贴面板不变形·无黑角·用户视觉终审通过） |
-| ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | ART-06 ✅, P-G ✅, P-L ✅ | **ready**（导入 3 横图覆盖同键 + P-G/P-L 占位换真图 + settlementBg 面板 sprite 尺寸/类型）|
+| ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | **ART-06 需先合 main**, P-G ✅, P-L ✅ | **blocked→ready(待 ART-06 done)**：spec `tasks/ART-IMPORT-06.md` 就绪；**先 `done ART-06`（把 previews 合 main），架构再从含 previews 的 main 建 `task/ART-IMPORT-06`**（避免拿不到源图） |
 | V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
