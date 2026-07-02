@@ -39,10 +39,24 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
   - `screen.designResolution: 844x390`
   - `screen.orientation: auto`（构建配置读数，非本任务文件域）
 
+## CDP visual gate 证据
+- 执行脚本：`node /tmp/doudizhu-v11-visual-smoke.mjs P-L /Users/admin/Documents/Cocos/斗地主.worktrees/P-L/build/web-mobile /tmp/doudizhu-v11-visual-gate/P-L`
+- 输出：`/tmp/doudizhu-v11-visual-gate/P-L/summary.json`
+- 结论：4 个横屏尺寸 × 6 个子屏均截图完成，`productErrors=[]`；入口按钮按压后成功进入 `game` 场景。
+- 四横屏 × 六子屏截图：
+  - 844x390：`P-L-844x390-home.png` / `tutorial.png` / `help.png` / `stats.png` / `records.png` / `difficulty-settings.png`
+  - 812x375：`P-L-812x375-home.png` / `tutorial.png` / `help.png` / `stats.png` / `records.png` / `difficulty-settings.png`
+  - 915x412：`P-L-915x412-home.png` / `tutorial.png` / `help.png` / `stats.png` / `records.png` / `difficulty-settings.png`
+  - 780x360：`P-L-780x360-home.png` / `tutorial.png` / `help.png` / `stats.png` / `records.png` / `difficulty-settings.png`
+- 入口按钮交互证据：
+  - pressed：`/tmp/doudizhu-v11-visual-gate/P-L/P-L-844x390-home-start-button-pressed.png`
+  - CDP 读数：`afterClickScene=game`，交互过程 `productErrors=[]`。
+- 目检结论：home 三栏、教程、帮助、战绩、历史、难度/设置在 844x390、812x375、915x412、780x360 下无明显溢出/叠压；主入口为真按钮且有按压态。
+
 ## 与 spec 的偏差 / 关键决策
 - 任务书中的「难度/设置」没有新增独立 `LobbyScreen` 枚举值；它们作为 home 的两个主面板完成横屏覆盖，避免引入新导航状态。
 - 「继续游戏」当前沿用现有大厅无存档接入条件，点击进入 game scene；本任务不实现存档分流功能。
-- 四横屏截图、6 子屏 CDP `productErrors=[]`、按钮按压交互证据仍需审查者在 Creator/浏览器预览链路补验；本报告已完成代码、Vitest/typecheck、Creator web-mobile build 烟测。
+- CDP visual gate 使用本地 Chrome headless + SwiftShader 跑 web-mobile build；in-app Browser MCP 当前无可用 browser target，故未走该通道。
 
 ## 疑问（给架构）
 - 无。
@@ -55,4 +69,4 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
 - [x] 未改测试、未碰他人模块
 - [x] 未获 `approved` 前未合并 main
 - [x] UI 组件内使用 `cc`，未改纯层、未新增纯层 `cc` import
-- [ ] 四横屏截图/CDP/入口按钮交互运行时证据（待审查者或 Creator 预览补验）
+- [x] 四横屏截图/CDP/入口按钮交互运行时证据
