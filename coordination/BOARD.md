@@ -726,8 +726,8 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0✅,T-A1✅,T-0✅,T-C0✅ | **done `c17e4bd`** |
 | P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0✅,T-0✅,T-C0✅ | **done `456afac`** |
 | P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付+已消费**：P-G `83f9e7d` 落地（seatName 你/左家/右家·去 AI/座位N/出牌区占位味） |
-| ART-06 | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report | E-0 ✅ | **changes-requested** @ `d3e9b6c`（用户视觉终审：**game/lobby 通过**；**settlementBg 打回**——RGB 无 alpha + 黑角(0,0,0,255)，loadSprite 到有界 settlement 面板会显黑边，且 1844×853(2.16:1) 贴 ~1.1:1 面板变形。修法：settlementBg 重出/后处理为**透明外区(RGBA)或干净非黑底**、按 settlement 面板用途构图；game/lobby 保留） |
-| ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`+`.meta`；P-G/P-L 换回 `loadSprite` | ART-06(全3张)终审✅ | blocked（P-G/P-L 已 done；待 settlementBg 返工过审。可选：game/lobby 已过可先行分批导入） |
+| ART-06 | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report | E-0 ✅ | **approved(全3张)** @ `24aacd1`（game/lobby 满屏 RGB·settlementBg 返工为 RGBA 透明外区+不透明奶油中心·1313×1198 aspect 1.096 贴面板不变形·无黑角·用户视觉终审通过） |
+| ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | ART-06 ✅, P-G ✅, P-L ✅ | **ready**（导入 3 横图覆盖同键 + P-G/P-L 占位换真图 + settlementBg 面板 sprite 尺寸/类型）|
 | V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
