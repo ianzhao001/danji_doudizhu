@@ -13,6 +13,7 @@
 - 背景：停止加载竖版 `lobbyBg`，运行时绘制纯色/渐变占位背景，横图 ready 前不拉伸旧图。
 - 命名规范：运行时节点改为稳定语义名，例如 `home-start-button`、`entry-tutorial-button`、`records-outcome-win` 等，二级页按钮也带稳定名称。
 - 文案：按 P-Text 结论，lobby 可见文案保持原样，仅做布局与按钮化。
+- changes-requested 返工：`hideLegacyScaffold` 从 `node.name === name || startsWith(name + '-')` 改为遍历全部 direct children 并按 `startsWith(name)` 隐藏，覆盖 Creator 遗留的 `"start-label          开始新局"` 这类空格填充节点名。
 
 ## 测试与类型检查输出
 ```
@@ -52,6 +53,20 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
   - pressed：`/tmp/doudizhu-v11-visual-gate/P-L/P-L-844x390-home-start-button-pressed.png`
   - CDP 读数：`afterClickScene=game`，交互过程 `productErrors=[]`。
 - 目检结论：home 三栏、教程、帮助、战绩、历史、难度/设置在 844x390、812x375、915x412、780x360 下无明显溢出/叠压；主入口为真按钮且有按压态。
+
+## changes-requested 返工复验
+- 修复点：legacy scaffold 节点名以 `title-label` / `start-label` / `settings-label` / `records-label` 为前缀，但中间是空格填充而非 `-`；修后按前缀隐藏所有 direct children，不再只隐藏第一个命中项。
+- 重跑验证：
+  - `npm --prefix test test` → 134 files / 659 tests passed。
+  - `npm --prefix test run typecheck` → passed。
+  - Creator web-mobile build → 日志 `build Task (web-mobile) Finished in (4 s)`。
+  - CDP smoke → `/tmp/doudizhu-v11-visual-gate/P-L/summary.json`，25 screenshots，`productErrors=[]`。
+- Legacy 节点 CDP 审计：`/tmp/doudizhu-v11-visual-gate/P-L/legacy-scaffold-audit.json`
+  - `title-label          斗地主` → `active=false`, `activeInHierarchy=false`
+  - `start-label          开始新局` → `active=false`, `activeInHierarchy=false`
+  - `settings-label       设置` → `active=false`, `activeInHierarchy=false`
+  - `records-label        战绩` → `active=false`, `activeInHierarchy=false`
+- 目检补验：`P-L-844x390-home.png` 与 `P-L-780x360-home.png` 已无顶部漂「开始新局」，难度面板后无遗留文字重影；其余 5 子屏重新截图，未见 legacy label 泄漏。
 
 ## 与 spec 的偏差 / 关键决策
 - 任务书中的「难度/设置」没有新增独立 `LobbyScreen` 枚举值；它们作为 home 的两个主面板完成横屏覆盖，避免引入新导航状态。

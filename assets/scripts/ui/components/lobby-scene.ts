@@ -623,9 +623,10 @@ export class LobbyScene extends Component {
   }
 
   private hideLegacyScaffold(): void {
-    for (const name of LEGACY_LABEL_NODE_NAMES) {
-      const child = this.node.children.find((node) => node.name === name || node.name.startsWith(`${name}-`));
-      if (child) child.active = false;
+    for (const child of this.node.children) {
+      if (LEGACY_LABEL_NODE_NAMES.some((name) => child.name.startsWith(name))) {
+        child.active = false;
+      }
     }
     this.setHomeLabelsVisible(false);
   }
