@@ -72,6 +72,7 @@ const CARD_SIZE = { width: 52, height: 74 };
 const CARD_SUIT_ICON_SIZE = 22;
 const HAND_LIFT = 18;
 const LANDSCAPE_CANVAS = { width: 844, height: 390 };
+const GAME_TABLE_BACKGROUND_ASPECT = 1844 / 853;
 const CARD_PRESS_SCALE = 0.96;
 const CARD_PRESS_OPACITY = 214;
 const TURN_TIMER_MS = 15_000;
@@ -748,6 +749,8 @@ export class GameSceneSkeleton extends Component {
       : Math.min(420, Math.max(360, canvas.height - 220));
     addUiTransform(panel, panelWidth, panelHeight);
     const sprite = panel.getComponent(Sprite) ?? panel.addComponent(Sprite);
+    sprite.type = Sprite.Type.SIMPLE;
+    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
     loadSprite(RESOURCE_PATHS.settlementBg, sprite, this.spriteFrames);
     this.addLabel(result.resultText, 0, panelHeight * 0.36, 34, panel, 220, 72, 'result-title');
     this.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.22, 20, panel, 240, 40, 'result-multiplier');
@@ -1331,21 +1334,17 @@ export class GameSceneSkeleton extends Component {
 
   private renderPlaceholderBackground(canvas: { width: number; height: number }): void {
     if (this.background) this.background.node.active = false;
-    const node = this.ensureNode('game-placeholder-background', this.node);
+    const node = this.ensureNode('game-table-background-runtime', this.node);
     node.setSiblingIndex(0);
     node.setPosition(0, 0, 0);
-    addUiTransform(node, canvas.width, canvas.height);
-    const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
-    graphics.clear();
-    graphics.fillColor = new Color(28, 82, 74, 255);
-    graphics.rect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
-    graphics.fill();
-    graphics.fillColor = new Color(34, 112, 90, 190);
-    graphics.roundRect(-canvas.width * 0.32, -canvas.height * 0.24, canvas.width * 0.64, canvas.height * 0.48, 18);
-    graphics.fill();
-    graphics.fillColor = new Color(255, 255, 255, 18);
-    graphics.roundRect(-canvas.width * 0.44, canvas.height * 0.28, canvas.width * 0.88, 14, 7);
-    graphics.fill();
+    const width = Math.max(canvas.width, canvas.height * GAME_TABLE_BACKGROUND_ASPECT);
+    const height = Math.max(canvas.height, canvas.width / GAME_TABLE_BACKGROUND_ASPECT);
+    addUiTransform(node, width, height);
+    node.getComponent(Graphics)?.clear();
+    const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
+    sprite.type = Sprite.Type.SIMPLE;
+    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+    loadSprite(RESOURCE_PATHS.gameTableBg, sprite, this.spriteFrames);
   }
 
   private setCardPressed(node: Node, pressed: boolean): void {

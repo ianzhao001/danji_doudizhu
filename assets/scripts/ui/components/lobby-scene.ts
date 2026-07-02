@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, Graphics, Label, Node, Sprite, UITransform } from 'cc';
+import { _decorator, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UITransform } from 'cc';
 import { AiLevel } from '../../ai';
 import {
   deserializeStats,
@@ -26,13 +26,15 @@ import { deriveDifficultyPicker } from '../difficulty-picker-view';
 import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
 import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
-import { addButton as addUiButton, addLabel as addUiLabel, addUiTransform, drawPanel } from './ui-helpers';
+import { RESOURCE_PATHS } from '../asset-keys';
+import { addButton as addUiButton, addLabel as addUiLabel, addUiTransform, drawPanel, loadSprite } from './ui-helpers';
 
 const { ccclass, property } = _decorator;
 const SETTINGS_KEY = 'doudizhu.settings';
 const STATS_KEY = 'doudizhu.stats';
 const RECORDS_KEY = 'doudizhu.records';
 const LANDSCAPE_CANVAS = { width: 844, height: 390 };
+const LOBBY_BACKGROUND_ASPECT = 1846 / 852;
 const LEGACY_LABEL_NODE_NAMES = [
   'title-label',
   'start-label',
@@ -123,6 +125,7 @@ export class LobbyScene extends Component {
     role: 'all',
     order: 'newest',
   };
+  private readonly spriteFrames = new Map<string, SpriteFrame>();
 
   onLoad(): void {
     if (this.background) this.background.node.active = false;
@@ -642,21 +645,17 @@ export class LobbyScene extends Component {
 
   private renderPlaceholderBackground(canvas: { width: number; height: number }): void {
     if (this.background) this.background.node.active = false;
-    const node = this.ensureNode('lobby-placeholder-background', this.node);
+    const node = this.ensureNode('lobby-background-runtime', this.node);
     node.setSiblingIndex(0);
     node.setPosition(0, 0, 0);
-    addUiTransform(node, canvas.width, canvas.height);
-    const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
-    graphics.clear();
-    graphics.fillColor = new Color(32, 48, 64, 255);
-    graphics.rect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
-    graphics.fill();
-    graphics.fillColor = new Color(42, 76, 86, 210);
-    graphics.rect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height * 0.48);
-    graphics.fill();
-    graphics.fillColor = new Color(255, 255, 255, 18);
-    graphics.roundRect(-canvas.width * 0.42, canvas.height * 0.3, canvas.width * 0.84, 12, 6);
-    graphics.fill();
+    const width = Math.max(canvas.width, canvas.height * LOBBY_BACKGROUND_ASPECT);
+    const height = Math.max(canvas.height, canvas.width / LOBBY_BACKGROUND_ASPECT);
+    addUiTransform(node, width, height);
+    node.getComponent(Graphics)?.clear();
+    const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
+    sprite.type = Sprite.Type.SIMPLE;
+    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+    loadSprite(RESOURCE_PATHS.lobbyBg, sprite, this.spriteFrames);
   }
 
   private canvasSize(): { width: number; height: number } {
