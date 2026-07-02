@@ -723,10 +723,10 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | **done `dceff17`** |
 | T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **done `8e386e8`** |
 | T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 ✅ | **done（审计闭合）**：`screen-view.ts:48-49` 纯透传 `tableLayout(w,h)`，T-A1 修好即自动生效，无需改 |
-| P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0✅,T-A1✅,T-0✅,T-C0✅ | **ready**（含 P-Text copy rider·分阶段送审） |
-| P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0✅,T-0✅,T-C0✅ | **ready**（6 子屏全覆盖·入口真按钮·分阶段送审） |
-| P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付**：清单落盘，Wave 2 并入 P-G 消费 |
-| ART-06 | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report（导入属 ART-IMPORT-06） | E-0 ✅ | **ready**（横版 844×390 背景×3：gameTableBg/lobbyBg/settlementBg·出 preview→用户视觉终审） |
+| P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0✅,T-A1✅,T-0✅,T-C0✅ | **in-review** @ `83f9e7d`（**代码审通过**：renderSeats→opponent 角/纯色占位/按压反馈不触发 render+off-before-on/P-Text 全落地·134/659 绿·typecheck 净·scope 净；**待四横屏 CDP smoke** 后 flip approved） |
+| P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0✅,T-0✅,T-C0✅ | **in-review** @ `1622d77`（**代码审通过**：home 三栏/6 子屏横屏化/入口真按钮删裸导航/纯色占位/命名规范·134/659 绿·typecheck 净·scope 净；**待四横屏×子屏 CDP smoke** 后 flip approved） |
+| P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付+已消费**：P-G `83f9e7d` 落地（seatName 你/左家/右家·去 AI/座位N/出牌区占位味） |
+| ART-06 | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report（导入属 ART-IMPORT-06） | E-0 ✅ | **in-review** @ `d3e9b6c`（3 张横版背景 preview·**架构预筛通过**：横构图/基线一致/构图对位·未碰 assets/resources；**待用户视觉终审**） |
 | ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`+`.meta`；P-G/P-L 换回 `loadSprite` | ART-06 终审✅, P-G/P-L | blocked |
 | V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
 
