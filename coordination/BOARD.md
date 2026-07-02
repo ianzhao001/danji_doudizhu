@@ -723,7 +723,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-0 | 1 | 编辑器/运行时重构 | 新 `ui/components/ui-helpers.ts`+两巨组件改 import | T-DOC ✅ | **done `dceff17`** |
 | T-C0 | 1 | 契约/审计 | `ui/asset-keys.ts`(+test)+`reports/T-C0-asset-key-audit.md` | T-DOC ✅ | **done `8e386e8`** |
 | T-A2 | 1 | 审计项 | —（确认 screen-view 透传无需改） | T-A1 ✅ | **done（审计闭合）**：`screen-view.ts:48-49` 纯透传 `tableLayout(w,h)`，T-A1 修好即自动生效，无需改 |
-| P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0✅,T-A1✅,T-0✅,T-C0✅ | **approved** @ `6a54fb6`（代码审+四横屏 CDP smoke 通过：AIs 上角/手牌铺底/780×360 不溢出/按压 255→214→255·1→0.96→1/全档 productErrors=[]/P-Text+phase 中文映射；非阻塞观察：renderStatus 去「轮到你」兜底可后补）→ 执行者 `done P-G` |
+| P-G | 2 | 编辑器/运行时 | `ui/components/game-scene-skeleton.ts` | E-0✅,T-A1✅,T-0✅,T-C0✅ | merge-claimed:P-G |
 | P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0✅,T-0✅,T-C0✅ | **changes-requested** @ `8ffe130`（代码/6子屏 smoke 大体通过，但**目检发现遗留标签泄漏**：`hideLegacyScaffold` 用 `startsWith('<name>-')` 连字符匹配，而 lobby.scene 节点名是 `"start-label␠␠␠开始新局"`（空格填充）→ title/start/settings/records-label 全没藏掉，顶部漂「开始新局」+ 面板后重影。修法：匹配改 `startsWith(name)`/按空白切分；修后重跑 home smoke 确认无泄漏/重影） |
 | P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付+已消费**：P-G `83f9e7d` 落地（seatName 你/左家/右家·去 AI/座位N/出牌区占位味） |
 | ART-06 | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report（导入属 ART-IMPORT-06） | E-0 ✅ | **in-review** @ `d3e9b6c`（3 张横版背景 preview·**架构预筛通过**：横构图/基线一致/构图对位·未碰 assets/resources；**待用户视觉终审**） |
