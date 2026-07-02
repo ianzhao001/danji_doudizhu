@@ -14,6 +14,7 @@ import {
   UIOpacity,
   Vec3,
   director,
+  resources,
   sys,
   tween,
 } from 'cc';
@@ -70,6 +71,9 @@ const SESSION_KEYS: SessionKeys = {
 const CARD_SIZE = { width: 52, height: 74 };
 const CARD_SUIT_ICON_SIZE = 22;
 const HAND_LIFT = 18;
+const LANDSCAPE_CANVAS = { width: 844, height: 390 };
+const CARD_PRESS_SCALE = 0.96;
+const CARD_PRESS_OPACITY = 214;
 const TURN_TIMER_MS = 15_000;
 const UI_TICK_RENDER_MS = 180;
 const SCAFFOLD_NODE_NAMES = [
@@ -110,6 +114,24 @@ function suitText(suit: Suit | 'joker'): string {
     default:
       return '★';
   }
+}
+
+function seatName(seat: number): string {
+  if (seat === 0) return '你';
+  if (seat === 1) return '左家';
+  if (seat === 2) return '右家';
+  return `座位${seat + 1}`;
+}
+
+function seatNameWithRole(seat: number, isLandlord: boolean): string {
+  return `${seatName(seat)}${isLandlord ? '（地主）' : ''}`;
+}
+
+function phaseText(phase: string): string {
+  if (phase === 'bidding') return '叫地主';
+  if (phase === 'playing') return '对局中';
+  if (phase === 'settled') return '本局结算';
+  return phase;
 }
 
 @ccclass('GameSceneSkeleton')
@@ -163,7 +185,7 @@ export class GameSceneSkeleton extends Component {
   private liveRenderNodes: Set<Node> | null = null;
 
   onLoad(): void {
-    loadSprite(RESOURCE_PATHS.gameTableBg, this.background, this.spriteFrames);
+    if (this.background) this.background.node.active = false;
     if (this.cardTemplate) this.cardTemplate.node.active = false;
     this.hideSceneScaffold();
     this.audioSource = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
@@ -275,6 +297,7 @@ export class GameSceneSkeleton extends Component {
     }
 
     const canvas = this.canvasSize();
+    this.renderPlaceholderBackground(canvas);
     const vm = deriveScreenVM({
       snapshot,
       bidding,
@@ -300,7 +323,7 @@ export class GameSceneSkeleton extends Component {
     this.renderAdvisor(snapshot, vm.layout, canvas);
     this.renderBidding(bidding ? vm.bidding : undefined, vm.layout, canvas);
     this.renderHand(vm.hand, vm.layout, canvas);
-    this.renderStatus(this.statusText || (this.runtime.isPlayerTurn() ? '轮到你' : '等待'), vm.layout, canvas);
+    this.renderStatus(this.statusText, vm.layout, canvas);
     this.renderTurnTimer(vm.layout, canvas);
     this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, vm.layout, canvas);
     this.renderToasts(vm.layout, canvas);
@@ -324,8 +347,8 @@ export class GameSceneSkeleton extends Component {
     const landlordPos = this.screenPoint(canvas, canvas.width / 6, infoY);
     const multiplierPos = this.screenPoint(canvas, canvas.width / 2, infoY);
     const handPos = this.screenPoint(canvas, (canvas.width * 5) / 6, infoY);
-    this.addLabel(phase, phasePos.x, phasePos.y, 18, this.uiRoot!, 140, 30, 'top-phase');
-    this.addLabel(`地主 ${topBar.landlordSeat + 1}`, landlordPos.x, landlordPos.y, 16, this.uiRoot!, 110, 30, 'top-landlord');
+    this.addLabel(phaseText(phase), phasePos.x, phasePos.y, 18, this.uiRoot!, 140, 30, 'top-phase');
+    this.addLabel(`地主：${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 16, this.uiRoot!, 120, 30, 'top-landlord');
     this.addLabel(`倍数 ×${topBar.multiplier}`, multiplierPos.x, multiplierPos.y, 16, this.uiRoot!, 110, 30, 'top-multiplier');
     this.addLabel(`手牌 ${handCount}`, handPos.x, handPos.y, 16, this.uiRoot!, 110, 30, 'top-hand-count');
   }
@@ -337,15 +360,24 @@ export class GameSceneSkeleton extends Component {
       { key: 'animation', label: '动效', on: settings.animation, fx: 0.5 },
       { key: 'vibration', label: '震动', on: settings.vibration, fx: 0.78 },
     ];
-    const y = layout.opponentLeft.y + layout.opponentLeft.height * 0.35;
+    const landscape = this.isLandscape(canvas);
+    const y = landscape
+      ? Math.max(
+          layout.opponentLeft.y + layout.opponentLeft.height + 10,
+          layout.playArea.y - 13,
+        )
+      : layout.opponentLeft.y + layout.opponentLeft.height * 0.35;
+    const landscapeXs = [canvas.width / 2 - 96, canvas.width / 2, canvas.width / 2 + 96];
     for (const control of controls) {
-      const pos = this.screenPoint(canvas, canvas.width * control.fx, y);
+      const index = controls.indexOf(control);
+      const x = landscape ? landscapeXs[index] : canvas.width * control.fx;
+      const pos = this.screenPoint(canvas, x, y);
       this.addButton(
         `${control.label}${control.on ? '开' : '关'}`,
         pos.x,
         pos.y,
-        88,
-        32,
+        landscape ? 72 : 88,
+        landscape ? 26 : 32,
         true,
         () => this.toggleRuntimeSetting(control.key),
         this.uiRoot!,
@@ -360,10 +392,10 @@ export class GameSceneSkeleton extends Component {
     layout: TableRegions,
     canvas: { width: number; height: number },
   ): void {
-    const left = this.rectPoint(layout.playArea, canvas, 0.06, 0.24);
-    const right = this.rectPoint(layout.playArea, canvas, 0.94, 0.24);
-    this.addLabel(`AI 左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, left.x, left.y, 16, this.uiRoot!, 108, 64, 'seat-left');
-    this.addLabel(`AI 右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, right.x, right.y, 16, this.uiRoot!, 108, 64, 'seat-right');
+    const left = this.rectPoint(layout.opponentLeft, canvas, 0.5, 0.5);
+    const right = this.rectPoint(layout.opponentRight, canvas, 0.5, 0.5);
+    this.addLabel(`左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, left.x, left.y, 16, this.uiRoot!, 108, 64, 'seat-left');
+    this.addLabel(`右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, right.x, right.y, 16, this.uiRoot!, 108, 64, 'seat-right');
   }
 
   private renderSeatFeedback(layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -394,7 +426,7 @@ export class GameSceneSkeleton extends Component {
     drawPanel(root, pos.width, 28, new Color(37, 42, 58, 176));
 
     const dots = this.settings.animation ? '.'.repeat(thinking.dots) : '';
-    const label = this.addLabel(`${thinking.label}${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
+    const label = this.addLabel(`${seatName(thinking.seat)}思考中${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
     label.color = new Color(221, 242, 255, 255);
   }
 
@@ -416,9 +448,9 @@ export class GameSceneSkeleton extends Component {
     area.setPosition(pos.x, pos.y, 0);
     addUiTransform(area, width, height);
 
-    const labelText = top ? `座位${top.seat + 1}` : '自由出牌';
-    const label = this.addLabel(`出牌区\n${labelText}`, 0, 34, 18, area, 170, 48, 'play-area-label');
-    label.lineHeight = 28;
+    const labelText = top ? `${seatName(top.seat)}·已出牌` : '自由出牌';
+    const label = this.addLabel(labelText, 0, 34, 18, area, 170, 34, 'play-area-label');
+    label.lineHeight = 24;
     if (!top) {
       this.lastPlayAreaSignature = '';
       return;
@@ -445,20 +477,23 @@ export class GameSceneSkeleton extends Component {
 
   private renderStrengthMeter(hand: Card[], layout: TableRegions, canvas: { width: number; height: number }): void {
     const strength = deriveStrengthMeter(evaluateHand(hand));
-    const centerY = layout.actionButtons.y - 30;
+    const landscape = this.isLandscape(canvas);
+    const centerY = landscape
+      ? layout.playArea.y + layout.playArea.height + Math.min(14, Math.max(10, (layout.actionButtons.y - (layout.playArea.y + layout.playArea.height)) * 0.36))
+      : layout.actionButtons.y - 30;
     const pos = this.screenPoint(canvas, canvas.width / 2, centerY);
-    const width = Math.min(260, Math.max(210, canvas.width - 96));
-    const height = 34;
+    const width = landscape ? Math.min(218, Math.max(194, canvas.width * 0.27)) : Math.min(260, Math.max(210, canvas.width - 96));
+    const height = landscape ? 26 : 34;
     const root = this.ensureNode('hud-strength-meter', this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
     addUiTransform(root, width, height);
     drawPanel(root, width, height, new Color(48, 40, 58, 178));
 
     const barWidth = width - 104;
-    const barHeight = 8;
+    const barHeight = landscape ? 6 : 8;
     const barX = 30;
     const bar = this.ensureNode('hud-strength-bar', root);
-    bar.setPosition(barX, -7, 0);
+    bar.setPosition(barX, landscape ? -5 : -7, 0);
     addUiTransform(bar, barWidth, barHeight);
     const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
     graphics.clear();
@@ -470,17 +505,27 @@ export class GameSceneSkeleton extends Component {
     graphics.roundRect(-barWidth / 2, -barHeight / 2, filled, barHeight, 4);
     graphics.fill();
 
-    this.addLabel('手牌强度', -width / 2 + 46, 5, 13, root, 86, 22, 'hud-strength-title');
-    this.addLabel(`${strength.label} ${strength.pct}%`, width / 2 - 56, 5, 13, root, 104, 22, 'hud-strength-value');
+    this.addLabel('手牌强度', -width / 2 + 44, landscape ? 3 : 5, landscape ? 12 : 13, root, 82, 20, 'hud-strength-title');
+    this.addLabel(`${strength.label} ${strength.pct}%`, width / 2 - 54, landscape ? 3 : 5, landscape ? 12 : 13, root, 102, 20, 'hud-strength-value');
   }
 
   private renderCardMemory(hand: Card[], layout: TableRegions, canvas: { width: number; height: number }): void {
     const memory = deriveCardMemoryView(trackPlayed(this.fullGameEvents, hand));
     const rows = this.memoryExpanded ? memory.rows : memory.rows.slice(0, 6);
-    const panelWidth = Math.min(334, Math.max(286, canvas.width - 44));
-    const panelHeight = this.memoryExpanded ? 112 : 58;
-    const centerY = layout.actionButtons.y - (this.memoryExpanded ? 98 : 76);
-    const pos = this.screenPoint(canvas, canvas.width / 2, centerY);
+    const landscape = this.isLandscape(canvas);
+    const panelWidth = landscape
+      ? (this.memoryExpanded ? 220 : 196)
+      : Math.min(334, Math.max(286, canvas.width - 44));
+    const panelHeight = landscape
+      ? (this.memoryExpanded ? 104 : 72)
+      : (this.memoryExpanded ? 112 : 58);
+    const centerX = landscape
+      ? Math.max(panelWidth / 2 + 12, layout.playArea.x - panelWidth / 2 - 14)
+      : canvas.width / 2;
+    const centerY = landscape
+      ? layout.playArea.y + layout.playArea.height * 0.55
+      : layout.actionButtons.y - (this.memoryExpanded ? 98 : 76);
+    const pos = this.screenPoint(canvas, centerX, centerY);
     const root = this.ensureNode('hud-card-memory', this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
     addUiTransform(root, panelWidth, panelHeight);
@@ -501,7 +546,7 @@ export class GameSceneSkeleton extends Component {
       const col = index % cols;
       const line = Math.floor(index / cols);
       const x = -panelWidth / 2 + 16 + cellWidth / 2 + col * cellWidth;
-      const y = panelHeight / 2 - 52 - line * 24;
+      const y = panelHeight / 2 - (landscape ? 44 : 52) - line * (landscape ? 19 : 24);
       const text = `${row.rankLabel}${row.remaining}`;
       const item = this.addLabel(text, x, y, 12, root, cellWidth, 22, `hud-memory-${index}`);
       item.color = row.exhausted ? new Color(255, 255, 255, 112) : new Color(255, 250, 228, 255);
@@ -509,7 +554,7 @@ export class GameSceneSkeleton extends Component {
 
     if (!this.memoryExpanded) {
       const more = memory.rows.length - rows.length;
-      this.addLabel(`+${more}`, panelWidth / 2 - 22, -11, 12, root, 34, 22, 'hud-memory-more');
+      this.addLabel(`+${more}`, panelWidth / 2 - 22, landscape ? -20 : -11, 12, root, 34, 22, 'hud-memory-more');
     }
   }
 
@@ -565,7 +610,7 @@ export class GameSceneSkeleton extends Component {
     layout: TableRegions,
     canvas: { width: number; height: number },
   ): void {
-    const y = layout.actionButtons.y + layout.actionButtons.height * 0.78;
+    const y = layout.actionButtons.y + layout.actionButtons.height * (this.isLandscape(canvas) ? 0.48 : 0.78);
     const playPos = this.screenPoint(canvas, layout.actionButtons.x + layout.actionButtons.width * 0.1, y);
     const passPos = this.screenPoint(canvas, layout.actionButtons.x + layout.actionButtons.width * 0.5, y);
     const hintPos = this.screenPoint(canvas, layout.actionButtons.x + layout.actionButtons.width * 0.9, y);
@@ -575,25 +620,32 @@ export class GameSceneSkeleton extends Component {
   }
 
   private renderStatus(text: string, layout: TableRegions, canvas: { width: number; height: number }): void {
-    const pos = this.screenPoint(canvas, canvas.width / 2, layout.playerHand.y + 2);
+    if (!text) return;
+    const y = this.isLandscape(canvas) ? layout.actionButtons.y - 10 : layout.playerHand.y + 2;
+    const pos = this.screenPoint(canvas, canvas.width / 2, y);
     this.addLabel(text, pos.x, pos.y, 18, this.uiRoot!, 180, 32, 'status-label');
   }
 
   private renderTurnTimer(layout: TableRegions, canvas: { width: number; height: number }): void {
     if (!this.syncTurnTimerKey()) return;
     const timer = deriveTurnTimer(TURN_TIMER_MS - this.turnTimerElapsedMs, TURN_TIMER_MS);
-    const width = Math.min(188, Math.max(150, layout.actionButtons.width - 88));
-    const height = 22;
-    const pos = this.screenPoint(canvas, canvas.width / 2, layout.actionButtons.y + 13);
+    const landscape = this.isLandscape(canvas);
+    const width = landscape ? 126 : Math.min(188, Math.max(150, layout.actionButtons.width - 88));
+    const height = landscape ? 20 : 22;
+    const timerX = landscape ? Math.min(canvas.width - width / 2 - 18, canvas.width / 2 + 178) : canvas.width / 2;
+    const timerY = landscape
+      ? layout.playArea.y + layout.playArea.height + Math.min(14, Math.max(10, (layout.actionButtons.y - (layout.playArea.y + layout.playArea.height)) * 0.36))
+      : layout.actionButtons.y + 13;
+    const pos = this.screenPoint(canvas, timerX, timerY);
     const root = this.ensureNode('turn-timer-runtime', this.uiRoot!);
     root.setPosition(pos.x, pos.y, 0);
     addUiTransform(root, width, height);
     drawPanel(root, width, height, new Color(34, 39, 52, 166));
 
-    const barWidth = width - 68;
-    const barHeight = 5;
+    const barWidth = width - (landscape ? 54 : 68);
+    const barHeight = landscape ? 4 : 5;
     const bar = this.ensureNode('turn-timer-bar', root);
-    bar.setPosition(-14, -3, 0);
+    bar.setPosition(landscape ? -10 : -14, landscape ? -3 : -3, 0);
     addUiTransform(bar, barWidth, barHeight);
     const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
     graphics.clear();
@@ -604,7 +656,7 @@ export class GameSceneSkeleton extends Component {
     graphics.roundRect(-barWidth / 2, -barHeight / 2, Math.round((barWidth * timer.pct) / 100), barHeight, 3);
     graphics.fill();
 
-    const label = this.addLabel(`计时 ${timer.label}`, width / 2 - 35, 1, 12, root, 60, 20, 'turn-timer-label');
+    const label = this.addLabel(`计时 ${timer.label}`, width / 2 - (landscape ? 31 : 35), 1, 12, root, landscape ? 56 : 60, 20, 'turn-timer-label');
     label.color = timer.urgent ? new Color(255, 196, 196, 255) : new Color(238, 248, 255, 255);
   }
 
@@ -615,13 +667,15 @@ export class GameSceneSkeleton extends Component {
   ): void {
     if (!snapshot?.viewerHand || !this.runtime?.isPlayerTurn() || this.runtime.phase() !== 'playing') return;
     const centerY = this.advisorCenterY(layout);
-    const togglePos = this.screenPoint(canvas, layout.actionButtons.x + 34, centerY);
+    const landscape = this.isLandscape(canvas);
+    const toggleX = landscape ? Math.max(84, canvas.width / 2 - 178) : layout.actionButtons.x + 34;
+    const togglePos = this.screenPoint(canvas, toggleX, centerY);
     this.addButton(
       this.advisorEnabled ? '建议开' : '建议关',
       togglePos.x,
       togglePos.y,
-      70,
-      30,
+      landscape ? 64 : 70,
+      landscape ? 24 : 30,
       true,
       () => this.toggleAdvisor(),
       this.uiRoot!,
@@ -632,9 +686,11 @@ export class GameSceneSkeleton extends Component {
     const insight = deriveInsightView(adviseAction(snapshot.viewerHand, snapshot.top?.pattern ?? null));
     if (!insight.text) return;
 
-    const width = Math.min(226, Math.max(188, canvas.width - 156));
-    const height = 30;
-    const panelX = Math.min(canvas.width - width / 2 - 24, layout.actionButtons.x + layout.actionButtons.width * 0.66);
+    const width = landscape ? Math.min(190, Math.max(164, canvas.width * 0.22)) : Math.min(226, Math.max(188, canvas.width - 156));
+    const height = landscape ? 24 : 30;
+    const panelX = landscape
+      ? Math.max(width / 2 + 18, canvas.width / 2 - 86)
+      : Math.min(canvas.width - width / 2 - 24, layout.actionButtons.x + layout.actionButtons.width * 0.66);
     const panelPos = this.screenPoint(canvas, panelX, centerY);
     const root = this.ensureNode('advisor-panel', this.uiRoot!);
     root.setPosition(panelPos.x, panelPos.y, 0);
@@ -646,11 +702,14 @@ export class GameSceneSkeleton extends Component {
         : new Color(37, 42, 58, 184);
     drawPanel(root, width, height, color);
 
-    const label = this.addLabel(insight.text, 0, 1, 13, root, width - 18, height - 4, 'advisor-label');
+    const label = this.addLabel(insight.text, 0, 1, landscape ? 12 : 13, root, width - 18, height - 4, 'advisor-label');
     label.color = insight.emphasize ? new Color(221, 255, 224, 255) : new Color(255, 248, 226, 255);
   }
 
   private advisorCenterY(layout: TableRegions): number {
+    if (layout.playArea.width > layout.playArea.height * 2) {
+      return layout.playArea.y + layout.playArea.height + Math.min(14, Math.max(10, (layout.actionButtons.y - (layout.playArea.y + layout.playArea.height)) * 0.36));
+    }
     const defaultY = layout.playArea.y + layout.playArea.height + 56;
     return this.memoryExpanded && this.advisorEnabled ? layout.playArea.y + layout.playArea.height + 24 : defaultY;
   }
@@ -680,15 +739,20 @@ export class GameSceneSkeleton extends Component {
     const panel = this.ensureNode('settlement-panel-runtime', this.uiRoot!);
     panel.setPosition(0, Math.round(canvas.height * 0.005), 0);
     panel.setScale(1, 1, 1);
-    const panelWidth = Math.min(330, Math.max(280, canvas.width - 60));
-    const panelHeight = Math.min(420, Math.max(360, canvas.height - 220));
+    const landscape = this.isLandscape(canvas);
+    const panelWidth = landscape
+      ? Math.min(360, Math.max(300, canvas.width * 0.42))
+      : Math.min(330, Math.max(280, canvas.width - 60));
+    const panelHeight = landscape
+      ? Math.min(318, Math.max(278, canvas.height - 54))
+      : Math.min(420, Math.max(360, canvas.height - 220));
     addUiTransform(panel, panelWidth, panelHeight);
     const sprite = panel.getComponent(Sprite) ?? panel.addComponent(Sprite);
     loadSprite(RESOURCE_PATHS.settlementBg, sprite, this.spriteFrames);
     this.addLabel(result.resultText, 0, panelHeight * 0.36, 34, panel, 220, 72, 'result-title');
     this.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.22, 20, panel, 240, 40, 'result-multiplier');
     this.addLabel(result.springText || '本局结算', 0, panelHeight * 0.12, 18, panel, 240, 40, 'result-spring');
-    this.addLabel(result.scores.map((row) => `座位${row.seat + 1}${row.isLandlord ? '(地主)' : ''}: ${row.score}`).join('\n'), 0, -panelHeight * 0.08, 18, panel, 260, 120, 'result-scores');
+    this.addLabel(result.scores.map((row) => `${seatNameWithRole(row.seat, row.isLandlord)}: ${row.score}`).join('\n'), 0, -panelHeight * 0.08, 18, panel, 280, 112, 'result-scores');
     this.addButton('再来一局', -74, -panelHeight * 0.37, 116, 42, true, () => this.startGame(true), panel, 'result-new');
     this.addButton('返回大厅', 74, -panelHeight * 0.37, 116, 42, true, () => director.loadScene('lobby'), panel, 'result-lobby');
     if (this.settings.animation) this.animateScaleIn(panel, 0.92, 180);
@@ -882,8 +946,17 @@ export class GameSceneSkeleton extends Component {
     const sprite = bgNode.getComponent(Sprite) ?? bgNode.addComponent(Sprite);
     this.configureCardSprite(sprite);
     loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite, this.spriteFrames);
+    node.off(Node.EventType.TOUCH_START);
     node.off(Node.EventType.TOUCH_END);
-    if (interactive) node.on(Node.EventType.TOUCH_END, () => this.toggleCard(card), this);
+    node.off(Node.EventType.TOUCH_CANCEL);
+    if (interactive) {
+      node.on(Node.EventType.TOUCH_START, () => this.setCardPressed(node, true), this);
+      node.on(Node.EventType.TOUCH_END, () => {
+        this.setCardPressed(node, false);
+        this.toggleCard(card);
+      }, this);
+      node.on(Node.EventType.TOUCH_CANCEL, () => this.setCardPressed(node, false), this);
+    }
 
     const faceColor = this.cardFaceColor(view.suitKey);
     const cornerLabel = this.addLabel(
@@ -1042,9 +1115,9 @@ export class GameSceneSkeleton extends Component {
   private eventToastText(event: FlowEvent): string | null {
     if (event.type === 'round') {
       const round = event.event;
-      if (round.type === 'bomb') return `座位${round.seat + 1} 炸弹！`;
-      if (round.type === 'rocket') return `座位${round.seat + 1} 火箭！`;
-      if (round.type === 'pass') return `座位${round.seat + 1} 不要`;
+      if (round.type === 'bomb') return `${seatName(round.seat)} 炸弹！`;
+      if (round.type === 'rocket') return `${seatName(round.seat)} 火箭！`;
+      if (round.type === 'pass') return `${seatName(round.seat)} 不要`;
       return null;
     }
     if (event.type === 'settled') {
@@ -1256,6 +1329,36 @@ export class GameSceneSkeleton extends Component {
     }
   }
 
+  private renderPlaceholderBackground(canvas: { width: number; height: number }): void {
+    if (this.background) this.background.node.active = false;
+    const node = this.ensureNode('game-placeholder-background', this.node);
+    node.setSiblingIndex(0);
+    node.setPosition(0, 0, 0);
+    addUiTransform(node, canvas.width, canvas.height);
+    const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = new Color(28, 82, 74, 255);
+    graphics.rect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+    graphics.fill();
+    graphics.fillColor = new Color(34, 112, 90, 190);
+    graphics.roundRect(-canvas.width * 0.32, -canvas.height * 0.24, canvas.width * 0.64, canvas.height * 0.48, 18);
+    graphics.fill();
+    graphics.fillColor = new Color(255, 255, 255, 18);
+    graphics.roundRect(-canvas.width * 0.44, canvas.height * 0.28, canvas.width * 0.88, 14, 7);
+    graphics.fill();
+  }
+
+  private setCardPressed(node: Node, pressed: boolean): void {
+    const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+    opacity.opacity = pressed ? CARD_PRESS_OPACITY : 255;
+    const scale = pressed ? CARD_PRESS_SCALE : 1;
+    node.setScale(scale, scale, 1);
+  }
+
+  private isLandscape(canvas: { width: number; height: number }): boolean {
+    return canvas.width >= canvas.height;
+  }
+
   private drawDimOverlay(parent: Node, width: number, height: number): void {
     const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
     graphics.clear();
@@ -1273,8 +1376,8 @@ export class GameSceneSkeleton extends Component {
   private canvasSize(): { width: number; height: number } {
     const size = this.node.getComponent(UITransform)?.contentSize;
     return {
-      width: Math.max(1, size?.width ?? 390),
-      height: Math.max(1, size?.height ?? 844),
+      width: Math.max(1, size?.width ?? LANDSCAPE_CANVAS.width),
+      height: Math.max(1, size?.height ?? LANDSCAPE_CANVAS.height),
     };
   }
 
