@@ -727,7 +727,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-L | 2 | 编辑器/运行时 | `ui/components/lobby-scene.ts` | E-0✅,T-0✅,T-C0✅ | **done `456afac`** |
 | P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付+已消费**：P-G `83f9e7d` 落地（seatName 你/左家/右家·去 AI/座位N/出牌区占位味） |
 | ART-06-landscape-backgrounds | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report | E-0 ✅ | **done `ba30494`** |
-| ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | ART-06 ✅`ba30494`, P-G ✅, P-L ✅ | **ready·已建分支**：3 张横版 preview 已在 main（`asset-previews/pink-cartoon-production-v2-landscape-backgrounds/`：game 1844×853 / lobby 1846×852 / settlement 1313×1198 RGBA）；架构从含 previews 的 main（`1fc3e50`）建 `task/ART-IMPORT-06`；spec `tasks/ART-IMPORT-06.md` 就绪 |
+| ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | ART-06 ✅`ba30494`, P-G ✅, P-L ✅ | **approved** @ `f40924e`（3 图与 approved preview 逐字节一致·`.meta` Creator 生成含 settlement `hasAlpha:true`+自动 trim·P-G/P-L cover-fit 不拉伸·settlement SIMPLE+CUSTOM 透明边无黑·四横屏×3 屏 `productErrors=[]`·文件域零越界·无悬空节点引用）。执行者可 `claim→merge→release`。**视觉门另发现域外遗留文案 bug→T-COPY-BID** |
 | V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0) | P-G,P-L | blocked |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
