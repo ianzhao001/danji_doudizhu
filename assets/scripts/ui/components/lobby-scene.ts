@@ -244,6 +244,15 @@ export class LobbyScene extends Component {
     drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 232));
     this.addLabel('难度', 0, panelHeight / 2 - 34, 22, panel, panelWidth - 34, 34, 'difficulty-title');
 
+    const rowWidth = panelWidth - 18;
+    const rowPadding = 10;
+    const titleWidth = 44;
+    const currentWidth = 40;
+    const gap = 8;
+    const descWidth = Math.max(104, rowWidth - rowPadding * 2 - titleWidth - currentWidth - gap * 2);
+    const titleX = -rowWidth / 2 + rowPadding + titleWidth / 2;
+    const descX = titleX + titleWidth / 2 + gap + descWidth / 2;
+    const currentX = rowWidth / 2 - rowPadding - currentWidth / 2;
     const picker = deriveDifficultyPicker(current);
     picker.options.forEach((option, index) => {
       const rowY = panelHeight / 2 - 84 - index * 54;
@@ -261,26 +270,26 @@ export class LobbyScene extends Component {
       );
       const title = this.addLabel(
         option.label,
-        -panelWidth / 2 + 54,
+        titleX,
         rowY,
         15,
         panel,
-        54,
+        titleWidth,
         24,
         `difficulty-label-${option.level}`,
         option.selected ? new Color(255, 236, 197, 255) : new Color(255, 255, 255, 238),
       );
       title.lineHeight = 18;
-      const lines = wrapText(option.description, 14).slice(0, 2);
+      const lines = wrapText(option.description, Math.max(8, Math.floor(descWidth / 12))).slice(0, 2);
       const single = lines.length === 1;
       lines.forEach((line, lineIndex) => {
         this.addLabel(
           line,
-          6,
+          descX,
           rowY + (single ? 0 : 7 - lineIndex * 15),
           12,
           panel,
-          panelWidth - 112,
+          descWidth,
           16,
           `difficulty-desc-${option.level}-${lineIndex}`,
           new Color(255, 255, 255, 215),
@@ -289,11 +298,11 @@ export class LobbyScene extends Component {
       if (option.selected) {
         this.addLabel(
           '当前',
-          panelWidth / 2 - 36,
+          currentX,
           rowY,
           12,
           panel,
-          42,
+          currentWidth,
           20,
           `difficulty-current-${option.level}`,
           new Color(255, 236, 197, 255),
