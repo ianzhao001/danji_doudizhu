@@ -30,6 +30,9 @@ describe('M3-00 事件提示映射', () => {
     expect(cueForFlowEvent(deal)).toBe('deal');
     expect(cueForFlowEvent(landlordDecided)).toBe('landlordDecided');
     expect(cueForFlowEvent(settled)).toBe('settled');
+    // T-FLOW-BID：亮底牌事件映射（cueAudioPath/pulseParams 对该 cue 走 default-null；UI 消费属 P-G3②）
+    const bottomRevealed: FlowEvent = { type: 'bottomRevealed', cards: pat.cards };
+    expect(cueForFlowEvent(bottomRevealed)).toBe('bottomRevealed');
     const round: FlowEvent = { type: 'round', event: { type: 'bomb', seat: 1 } };
     expect(cueForFlowEvent(round)).toBe('bomb');
   });

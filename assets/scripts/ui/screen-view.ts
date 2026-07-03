@@ -32,14 +32,21 @@ export function deriveScreenVM(args: {
   recentEvents: FlowEvent[];
   layoutOpts: { containerWidth: number; containerHeight?: number; cardWidth: number; liftOffset: number };
   settlement?: Settlement;
+  biddingHand?: Card[];
 }): ScreenVM {
-  const { snapshot, bidding, heroSeat, selectedCards, layoutOpts, settlement } = args;
+  const { snapshot, bidding, heroSeat, selectedCards, layoutOpts, settlement, biddingHand } = args;
   const hand = snapshot
     ? layoutHandInteractive({
         hand: snapshot.viewerHand ?? [],
         selected: selectedCards,
         ...layoutOpts,
       })
+    : biddingHand
+      ? layoutHandInteractive({
+          hand: biddingHand,
+          selected: [],
+          ...layoutOpts,
+        })
     : [];
 
   return {

@@ -31,7 +31,7 @@ import {
   winEventFrom,
 } from './driver';
 import { levelPolicies } from './policies';
-import { defaultBidPolicy, type BidPolicy, type FlowEvent, type PlayPolicy } from './types';
+import { defaultBidPolicy, type BidPolicy, type BiddingDealView, type FlowEvent, type PlayPolicy } from './types';
 import { createBidding } from '../game';
 
 const DEFAULT_BASE_SCORE = 1;
@@ -74,6 +74,8 @@ export interface RoundRuntime {
   phase(): 'bidding' | 'playing' | 'settled' | 'disposed';
   currentSnapshot(): GameSnapshot | null;
   currentBidding(): BiddingState | null;
+  /** 叫抢期只读发牌视图（T-FLOW-BID）：bidding 相返回英雄 17 张副本 + [17,17,17]；其余相返回 null。 */
+  biddingDeal(): BiddingDealView | null;
   isPlayerTurn(): boolean;
   legalInputs(): PlayerInput[] | null;
   submitPlayerAction(input: PlayerInput): Promise<SubmitResult>;
@@ -157,6 +159,18 @@ class RoundRuntimeImpl implements RoundRuntime {
 
   currentBidding(): BiddingState | null {
     return this.currentPhase === 'bidding' && this.bidding ? readonlyBidding(this.bidding) : null;
+  }
+
+  biddingDeal(): BiddingDealView | null {
+    if (this.currentPhase !== 'bidding' || !this.currentDeal) return null;
+    return {
+      viewerHand: this.currentDeal.hands[this.heroSeat].slice(),
+      handCounts: [
+        this.currentDeal.hands[0].length,
+        this.currentDeal.hands[1].length,
+        this.currentDeal.hands[2].length,
+      ],
+    };
   }
 
   isPlayerTurn(): boolean {
@@ -362,6 +376,13 @@ class RoundRuntimeImpl implements RoundRuntime {
     const flowEvents: FlowEvent[] = [];
     pushRoundEvents(flowEvents, this.gameEvents, { state: this.state, events: result.events });
     for (const event of flowEvents) this.emit(event, bucket);
+    if (bucket?.some((event) => event.type === 'landlordDecided')) return;
+    this.persist?.({
+      round: this.state,
+      heroSeat: this.heroSeat,
+      bidMultiplier: this.bidMultiplier,
+      events: this.gameEvents.slice(),
+    });
   }
 
   private enterPlaying(bucket?: FlowEvent[]): void {
@@ -374,6 +395,8 @@ class RoundRuntimeImpl implements RoundRuntime {
       { type: 'landlordDecided', landlord: this.bidding.landlord, bidMultiplier: this.bidding.multiplier },
       bucket,
     );
+    if (this.isDisposed()) return;
+    this.emit({ type: 'bottomRevealed', cards: this.currentDeal.bottom.slice() }, bucket);
     if (this.isDisposed()) return;
     this.state = createPlayingState(this.currentDeal, this.bidding.landlord);
     if (this.isDisposed()) return;

@@ -18,6 +18,7 @@ export const CUE_IDS = [
   'bid',
   'redeal',
   'landlordDecided',
+  'bottomRevealed',
   'settled',
 ] as const;
 
