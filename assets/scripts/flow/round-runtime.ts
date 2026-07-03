@@ -162,8 +162,15 @@ class RoundRuntimeImpl implements RoundRuntime {
   }
 
   biddingDeal(): BiddingDealView | null {
-    // T-FLOW-BID 架构桩——实现方实现函数体（见 coordination/tasks/T-FLOW-BID.md）。
-    return null;
+    if (this.currentPhase !== 'bidding' || !this.currentDeal) return null;
+    return {
+      viewerHand: this.currentDeal.hands[this.heroSeat].slice(),
+      handCounts: [
+        this.currentDeal.hands[0].length,
+        this.currentDeal.hands[1].length,
+        this.currentDeal.hands[2].length,
+      ],
+    };
   }
 
   isPlayerTurn(): boolean {
@@ -369,6 +376,13 @@ class RoundRuntimeImpl implements RoundRuntime {
     const flowEvents: FlowEvent[] = [];
     pushRoundEvents(flowEvents, this.gameEvents, { state: this.state, events: result.events });
     for (const event of flowEvents) this.emit(event, bucket);
+    if (bucket?.some((event) => event.type === 'landlordDecided')) return;
+    this.persist?.({
+      round: this.state,
+      heroSeat: this.heroSeat,
+      bidMultiplier: this.bidMultiplier,
+      events: this.gameEvents.slice(),
+    });
   }
 
   private enterPlaying(bucket?: FlowEvent[]): void {
@@ -381,6 +395,8 @@ class RoundRuntimeImpl implements RoundRuntime {
       { type: 'landlordDecided', landlord: this.bidding.landlord, bidMultiplier: this.bidding.multiplier },
       bucket,
     );
+    if (this.isDisposed()) return;
+    this.emit({ type: 'bottomRevealed', cards: this.currentDeal.bottom.slice() }, bucket);
     if (this.isDisposed()) return;
     this.state = createPlayingState(this.currentDeal, this.bidding.landlord);
     if (this.isDisposed()) return;
