@@ -62,6 +62,24 @@ describe('screen view model', () => {
     expect(vm.topBar.landlordSeat).toBeNull();
   });
 
+  // T-FLOW-BID（架构种入·不可改）：叫抢期传入 biddingHand → hand VM 铺出 17 张、动作仍全关。
+  it('derives bidding-phase hand from biddingHand (T-FLOW-BID)', () => {
+    const biddingHand = cards('3 3 4 4 5 5 6 6 7 7 8 8 9 9 10 10 J');
+    const vm = deriveScreenVM({
+      bidding: createBidding(0),
+      heroSeat: 0,
+      selectedCards: [],
+      recentEvents: [],
+      layoutOpts,
+      biddingHand,
+    } as Parameters<typeof deriveScreenVM>[0]);
+
+    expect(vm.hand).toHaveLength(17);
+    expect(vm.actions).toEqual({ play: false, pass: false, hint: false });
+    expect(vm.bidding).toBeDefined();
+    // 不提供 biddingHand 的旧行为不变（上一用例已锁 hand=[]）
+  });
+
   it('derives settled result and topBar from explicit settlement', () => {
     const vm = deriveScreenVM({
       snapshot: snapshot({ phase: GamePhase.Settled, winner: Side.Landlord }),

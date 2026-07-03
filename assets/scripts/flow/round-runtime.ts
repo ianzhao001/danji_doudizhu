@@ -31,7 +31,7 @@ import {
   winEventFrom,
 } from './driver';
 import { levelPolicies } from './policies';
-import { defaultBidPolicy, type BidPolicy, type FlowEvent, type PlayPolicy } from './types';
+import { defaultBidPolicy, type BidPolicy, type BiddingDealView, type FlowEvent, type PlayPolicy } from './types';
 import { createBidding } from '../game';
 
 const DEFAULT_BASE_SCORE = 1;
@@ -74,6 +74,8 @@ export interface RoundRuntime {
   phase(): 'bidding' | 'playing' | 'settled' | 'disposed';
   currentSnapshot(): GameSnapshot | null;
   currentBidding(): BiddingState | null;
+  /** 叫抢期只读发牌视图（T-FLOW-BID）：bidding 相返回英雄 17 张副本 + [17,17,17]；其余相返回 null。 */
+  biddingDeal(): BiddingDealView | null;
   isPlayerTurn(): boolean;
   legalInputs(): PlayerInput[] | null;
   submitPlayerAction(input: PlayerInput): Promise<SubmitResult>;
@@ -157,6 +159,11 @@ class RoundRuntimeImpl implements RoundRuntime {
 
   currentBidding(): BiddingState | null {
     return this.currentPhase === 'bidding' && this.bidding ? readonlyBidding(this.bidding) : null;
+  }
+
+  biddingDeal(): BiddingDealView | null {
+    // T-FLOW-BID 架构桩——实现方实现函数体（见 coordination/tasks/T-FLOW-BID.md）。
+    return null;
   }
 
   isPlayerTurn(): boolean {

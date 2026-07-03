@@ -44,8 +44,15 @@ export type FlowEvent =
   | { type: 'bid'; action: BidAction; multiplier: number }
   | { type: 'redeal'; attempt: number }
   | { type: 'landlordDecided'; landlord: SeatIndex; bidMultiplier: number }
+  | { type: 'bottomRevealed'; cards: Card[] } // 地主确定后亮 3 张底牌（T-FLOW-BID；在 landlordDecided 之后、首个 round 事件之前）
   | { type: 'round'; event: GameEvent }
   | { type: 'settled'; settlement: Settlement };
+
+/** 叫抢期只读发牌视图（T-FLOW-BID）：只暴露英雄手牌副本与三家计数，不泄露他人手牌/底牌。 */
+export interface BiddingDealView {
+  viewerHand: Card[];
+  handCounts: [number, number, number];
+}
 
 export interface FlowResult {
   landlord: SeatIndex;
