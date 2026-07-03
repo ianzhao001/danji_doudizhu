@@ -728,7 +728,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付+已消费**：P-G `83f9e7d` 落地（seatName 你/左家/右家·去 AI/座位N/出牌区占位味） |
 | ART-06-landscape-backgrounds | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report | E-0 ✅ | **done `ba30494`** |
 | ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | ART-06 ✅`ba30494`, P-G ✅, P-L ✅ | **done `68f1436`** |
-| V | 3 | 收口 | 四横屏冒烟+PLAYTEST(对照 V-0)·**发布态真背景** | P-G✅,P-L✅,ART-IMPORT-06(approved,待 merge) | **ready(待 ART-IMPORT-06 落 main)**：用户已同意 V 排在 swap-in 之后跑「最终发布态截图」；playtest 收集同类文案 nit → 按域補发 scoped-fix |
+| V | 3 | 收口·验证 | `reports/V.report.md`（verify-only·不改产品码） | P-G✅,P-L✅,ART-IMPORT-06✅`68f1436` | **ready·已建分支**：main `7b7ee53` 发布态真背景；spec `tasks/V.md`；四横屏**真实一局 e2e**（大厅→开始新局→叫抢→出牌→暂停/恢复→结算→回大厅）+ 交互复核 + **发现清单按域归档**（预登记 T-COPY-BID 现状复核）；V-0 未落盘→不做回归 diff；主观 playtest 终审归用户 |
 | T-COPY-BID | scoped-fix | 纯 view 文案 | `assets/scripts/ui/bidding-view.ts` + `test/ui/bidding-view.test.ts` | — | **todo（V 后批修）**：`bidding-view.ts:28/38` `请座位 ${turn+1} 行动` 暴露原始座位号（座位1=左家）→ 改用 你/左家/右家（函数已持有 `turn`+`viewerSeat`，可相对措辞 轮到你/等待左家…）；纯层禁 import cc；测试即契约由架构改。**视觉门(ART-IMPORT-06 game 截图)发现**，与 V playtest 同类文案 nit 合并批修 |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
