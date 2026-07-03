@@ -6,7 +6,8 @@
 
 import { enumerateMoves, legalFollows } from '../../rules';
 import type { AiStrategy } from '../strategy';
-import { conservativeAction, requireHand } from './_shared';
+import { conservativeAction, isTeammateTop, requireHand, toPlay } from './_shared';
+import { chooseNormalLeadMove } from './lead-score';
 
 /** 保炸弹策略桩：实现见 M4-02。 */
 export const normalStrategy: AiStrategy = (snapshot) => {
@@ -14,5 +15,15 @@ export const normalStrategy: AiStrategy = (snapshot) => {
   const moves = snapshot.top ? legalFollows(hand, snapshot.top.pattern) : enumerateMoves(hand);
 
   if (snapshot.top && moves.length === 0) return { type: 'pass', seat: snapshot.turn };
+  if (
+    snapshot.top &&
+    isTeammateTop(snapshot) &&
+    snapshot.handCounts[snapshot.landlord] > 2 &&
+    snapshot.handCounts[snapshot.turn] > 2
+  ) {
+    return { type: 'pass', seat: snapshot.turn };
+  }
+  if (!snapshot.top) return toPlay(snapshot, chooseNormalLeadMove(hand, moves));
+
   return conservativeAction(snapshot, hand, moves);
 };
