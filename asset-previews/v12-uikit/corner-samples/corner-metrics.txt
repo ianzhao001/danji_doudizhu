@@ -1,0 +1,35 @@
+existing-btn-primary 240x96 sample=corner-samples/existing-btn-primary-corners-24px.png
+  tl: alpha_min=0 alpha_max=255 alpha_std=87.05 rgb_std_max=100.58
+  tr: alpha_min=0 alpha_max=255 alpha_std=88.37 rgb_std_max=101.26
+  bl: alpha_min=0 alpha_max=255 alpha_std=88.51 rgb_std_max=101.26
+  br: alpha_min=0 alpha_max=255 alpha_std=89.72 rgb_std_max=101.93
+existing-btn-secondary 240x96 sample=corner-samples/existing-btn-secondary-corners-24px.png
+  tl: alpha_min=0 alpha_max=255 alpha_std=87.05 rgb_std_max=90.55
+  tr: alpha_min=0 alpha_max=255 alpha_std=88.37 rgb_std_max=92.03
+  bl: alpha_min=0 alpha_max=255 alpha_std=88.51 rgb_std_max=91.24
+  br: alpha_min=0 alpha_max=255 alpha_std=89.72 rgb_std_max=92.33
+existing-btn-disabled 240x96 sample=corner-samples/existing-btn-disabled-corners-24px.png
+  tl: alpha_min=0 alpha_max=255 alpha_std=87.05 rgb_std_max=76.31
+  tr: alpha_min=0 alpha_max=255 alpha_std=88.37 rgb_std_max=76.1
+  bl: alpha_min=0 alpha_max=255 alpha_std=88.51 rgb_std_max=75.74
+  br: alpha_min=0 alpha_max=255 alpha_std=89.72 rgb_std_max=76.94
+existing-panel-popup 900x1100 sample=corner-samples/panel-popup-corners-24px.png
+  tl: alpha_min=0 alpha_max=0 alpha_std=0.0 rgb_std_max=0.0
+  tr: alpha_min=0 alpha_max=0 alpha_std=0.0 rgb_std_max=0.0
+  bl: alpha_min=0 alpha_max=0 alpha_std=0.0 rgb_std_max=0.0
+  br: alpha_min=0 alpha_max=0 alpha_std=0.0 rgb_std_max=0.0
+v12-btn-primary 240x96 sample=corner-samples/btn-primary-corners-24px.png
+  tl: alpha_min=7 alpha_max=255 alpha_std=108.67 rgb_std_max=119.18
+  tr: alpha_min=7 alpha_max=255 alpha_std=108.67 rgb_std_max=119.18
+  bl: alpha_min=14 alpha_max=255 alpha_std=95.41 rgb_std_max=94.65
+  br: alpha_min=14 alpha_max=255 alpha_std=95.41 rgb_std_max=94.65
+v12-btn-secondary 240x96 sample=corner-samples/btn-secondary-corners-24px.png
+  tl: alpha_min=7 alpha_max=255 alpha_std=108.66 rgb_std_max=116.26
+  tr: alpha_min=7 alpha_max=255 alpha_std=108.66 rgb_std_max=116.26
+  bl: alpha_min=14 alpha_max=255 alpha_std=95.41 rgb_std_max=90.54
+  br: alpha_min=14 alpha_max=255 alpha_std=95.41 rgb_std_max=90.54
+v12-btn-disabled 240x96 sample=corner-samples/btn-disabled-corners-24px.png
+  tl: alpha_min=4 alpha_max=255 alpha_std=113.42 rgb_std_max=104.98
+  tr: alpha_min=4 alpha_max=255 alpha_std=113.42 rgb_std_max=104.98
+  bl: alpha_min=8 alpha_max=255 alpha_std=100.96 rgb_std_max=68.86
+  br: alpha_min=8 alpha_max=255 alpha_std=100.96 rgb_std_max=68.86
