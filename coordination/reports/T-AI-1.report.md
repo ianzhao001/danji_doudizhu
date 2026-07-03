@@ -66,3 +66,13 @@
 
 - 本分支已满足 T-AI-1 新增目标测试、质量门、相关 hard/hint/conservative 回归、typecheck 和纯层禁 `cc`。
 - 合并前需要规划者/架构者处理 M4-42 与 T-AI-1 的相对强弱合同：要么给 Hard 新增 T-AI-2/T-HARD 后续增强，要么更新 `hard-depth` 中依赖旧 Normal 基线的胜率断言。
+
+## 合并证据（审查者复审回填）
+
+- 规划者裁定 + 种子修正：`3ffe8e9` — `hard-depth` 用例 4 摘除 `winRate/averageScore(Hard 地主) ≥ Normal 基线` 排序断言（12-seed 代理实测反转 Hard 0.5 vs Normal 0.667，非实现缺陷），保留 selfplay 不变量并留墓碑注释。三档排序契约迁移至 T-AI-2 对称质量门（Hard−Normal ≥ +0.03 / 90 局/侧），迁移期 main 上 Normal>Hard 为 BOARD 登记过渡态。纯测试提交，执行者实现 `9196d6c` 未动。
+- 复审前回归（分支 `3ffe8e9`）：
+  - `npm --prefix test test`：136 files / 669 tests passed
+  - `npm --prefix test run typecheck`：tsc --noEmit passed
+- merge commit：`9353f76`（--no-ff merge）
+- 合并后基线：139 files / 703 tests 绿 + typecheck 净
+- BOARD 状态：done `9353f76`

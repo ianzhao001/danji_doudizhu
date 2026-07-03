@@ -48,3 +48,13 @@ Received: ["play","pass","bomb","rocket","reset","win","deal","bid","redeal","la
 
 - 本任务行为目标和 flow/runtime/screen-view 回归均已通过。
 - 合并前需要架构者同步 `cue-id-consistency.test.ts` 的 `EXPECTED_CUE_IDS`，或另派 UI cue 一致性修复任务。
+
+## 合并证据（审查者复审回填）
+
+- 规划者种子修正：`4589323` — `cue-id-consistency.test.ts` 三处补 `bottomRevealed`（`EXPECTED_CUE_IDS` / `FLOW_EVENTS` 样本 / 映射期望）。纯测试提交，执行者实现 `dd86bb6` 未动。
+- 复审前回归（分支 `4589323`）：
+  - `npm --prefix test test`：135 files / 664 tests passed
+  - `npm --prefix test run typecheck`：tsc --noEmit passed
+- merge commit：`2f5f220`（--no-ff merge）
+- 合并后基线：139 files / 703 tests 绿 + typecheck 净
+- BOARD 状态：done `2f5f220`

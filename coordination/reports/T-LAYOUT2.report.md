@@ -112,11 +112,12 @@ rg -n "from ['\"]cc['\"]|import .*['\"]cc['\"]" assets/scripts/ui/table-zones.ts
 | playerHand | 0,284,780,76 |
 
 ## 合并证据（approved 后由审查者回填）
-- 合并前回归：
-  - `npm --prefix test test`：
-  - `npm --prefix test run typecheck`：
-- merge commit：
-- BOARD 状态：
+- 合并前回归（分支 ef9eb2b）：
+  - `npm --prefix test test`：135 files / 688 tests passed
+  - `npm --prefix test run typecheck`：tsc --noEmit passed
+- merge commit：`adfb876`（--no-ff merge）
+- 合并后基线：139 files / 703 tests 绿 + typecheck 净
+- BOARD 状态：done `adfb876`
 
 ## 与 spec 的偏差 / 关键决策
 - `actionBar` 复用 legacy `actionButtons`，便于 P-G3 迁移时保持旧按钮区域语义。

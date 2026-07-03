@@ -750,10 +750,10 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
 |----|----|----|----|----|----|
 | T-DEDUP | 1 | 纯逻辑+组件机械替换 | 新 `data/storage-keys.ts` + settings/difficultyConfig(isAiLevel 归一) + handStrength/cardMemory(rank 数组) + 两巨组件 ~7 行 import | — | **done `d8b892b`** |
-| T-LAYOUT2 | 1 | 纯逻辑 | 新 `ui/table-zones.ts`(架构落桩) + `table-layout.ts` 数值微调 | — | **ready·已建分支+落桩+失败测试已种**：spec `tasks/T-LAYOUT2.md`；11 个命名 zone·相位可见集互斥（bidding/playing 集内两两间距 ≥8px·四横屏）·legacy 6 字段与 tableLayout 深相等 |
-| T-FLOW-BID | 1 | 纯逻辑(flow) | `flow/round-runtime.ts` + `ui/screen-view.ts`（types.ts/driver.ts/policies.ts 只读·契约已由架构补） | — | **ready·已建分支+接口桩+失败测试已种**：spec `tasks/T-FLOW-BID.md`；`biddingDeal()` 读口+`bottomRevealed` 事件+**逐手存档 rider**（现状 playing 中途退出回滚到开局）；不做叫抢期序列化 |
-| T-AI-1 | 1 | 纯逻辑(ai) | 新 `ai/levels/lead-score.ts` + `normal.ts` 重写 + `_shared.ts` 只加 + `hard.ts` 两处机械替换 | Wave0 契约 ✅（已种） | **ready·已建分支+契约已重写+质量门已种**：spec `tasks/T-AI-1.md`；组合首出（34567 顺子等 5 用例）+ 农民不压队友；质量门 Normal 组合率 ≥0.35 / 压队友 ≤0.20 / 胜率差 ≥+0.05；**compareMoves 语义红线不动** |
-| T-AI-2 | 1.5 | 纯逻辑(ai) | `hard.ts` + `endgame.ts` + difficultyConfig 文案 | T-AI-1 落 main | **blocked·已提级**：T-AI-1 合入后**立即**由规划者建分支+种时机契约（裁定 2026-07-04：三档胜率排序契约自 hard-depth 小样本代理**迁移至本任务质量门** Hard−Normal ≥ +0.03 对称 90 局/侧；迁移期 main 上 Normal>Hard 为已知过渡态，本任务负责关闭） |
+| T-LAYOUT2 | 1 | 纯逻辑 | 新 `ui/table-zones.ts`(架构落桩) + `table-layout.ts` 数值微调 | — | **done `adfb876`**：11 zone·相位互斥·legacy 深相等·135/688 绿+typecheck 净 |
+| T-FLOW-BID | 1 | 纯逻辑(flow) | `flow/round-runtime.ts` + `ui/screen-view.ts`（types.ts/driver.ts/policies.ts 只读·契约已由架构补） | — | **done `2f5f220`**：biddingDeal 读口+bottomRevealed 事件+逐手存档 rider；规划者种子修正 `4589323`（cue-id-consistency 三处补 bottomRevealed）→ 135/664 绿+typecheck 净 |
+| T-AI-1 | 1 | 纯逻辑(ai) | 新 `ai/levels/lead-score.ts` + `normal.ts` 重写 + `_shared.ts` 只加 + `hard.ts` 两处机械替换 | Wave0 契约 ✅（已种） | **done `9353f76`**：组合首出+农民配合+质量门全绿；规划者裁定 `3ffe8e9`（hard-depth 排序断言迁移至 T-AI-2 质量门）→ 136/669 绿+typecheck 净 |
+| T-AI-2 | 1.5 | 纯逻辑(ai) | `hard.ts` + `endgame.ts` + difficultyConfig 文案 | ~~T-AI-1 落 main~~ ✅ | **ready·已提级·待规划者建分支**：T-AI-1 已合入（`9353f76`），本任务立即派发；三档胜率排序契约自 hard-depth 小样本代理**迁移至本任务质量门** Hard−Normal ≥ +0.03 对称 90 局/侧；迁移期 main 上 Normal>Hard 为已知过渡态（BOARD 登记），本任务负责关闭 |
 | ART-UIKIT | 1 | 美术·文生图 | `asset-previews/v12-uikit/` + report（不碰 resources） | — | **ready·已建分支**：spec `tasks/ART-UIKIT.md`；名字牌/底牌托架 + btn/panel 九宫格安全判定（不安全才重制）+ 64/176px 拉伸模拟图；**最早做**（用户图审=外部时钟） |
 | ART-IMPORT-UIKIT | 1.5 | 美术·导入 | `assets/resources/art/**`+`.meta`(Creator) + `asset-keys.ts` 新键 + 键测试；**禁碰两巨组件** | ART-UIKIT 用户终审过 | blocked（图审后架构出 spec 建分支） |
 | P-G3 | 2 | 巨组件流水线(四阶段) | `game-scene-skeleton.ts` + 新 `ui/components/game-scene/*.ts`(4 模块) | ②依赖 T-DEDUP+T-LAYOUT2+T-FLOW-BID；③依赖 ART-IMPORT-UIKIT | todo（Wave 1 纯层落 main 后架构出 spec）：①move-only 拆 4 热区 ②消费 zones+叫抢快照+per-seat 落点+17 对重叠检查单+结算遮罩+seed 注入口+叫抢计时 ③33 张美术接线 ④文案；③④可交换 |
