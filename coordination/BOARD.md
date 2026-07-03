@@ -731,7 +731,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | V | 3 | 收口·验证 | `reports/V.report.md`（verify-only·不改产品码） | P-G✅,P-L✅,ART-IMPORT-06✅`68f1436` | **done `4b28584`** |
 | E-ORIENT | scoped-fix(V#1) | 编辑器/配置 | `settings/v2/packages/builder.json` + report | E-0 ✅ | **approved** @ `931a8ff`：queue 瞬态块已删净，builder.json 仅 `__version__`+`common.packages.web-mobile`（`orientation:landscape`）；执行者解包 Creator 类型定义确认该键为正确 schema（auto/landscape/portrait）、试过 project.json general.orientation 无效已回退；构建 `settings.json` = `orientation:landscape` / 844×390、四横屏 `productErrors=[]`。可 `claim→merge→release`。**注**：CLI shorthand 不合并 builder.json 属 Creator 行为，发布走 GUI 构建生效；建议发布前在 Creator Build 面板做一次 GUI 构建终验 |
 | T-COPY-BID | scoped-fix(V#2) | 纯 view 文案 | `assets/scripts/ui/bidding-view.ts` + `test/ui/bidding-view.test.ts`(架构种) | — | **done `cdb88c8`** |
-| T-FIX-GS | scoped-fix(V#3+#4) | view-model+运行时 | `screen-view.ts` + `game-scene-skeleton.ts` + `test/ui/screen-view.test.ts`(架构种) | — | **approved** @ `0641727`：#3 `landlordSeat` 改 `SeatIndex/null`+`?? null`+消费侧 `if(!==null)` null-gate（叫抢态**已亲验无「地主：」**）；#4 landscape 结算按钮上移+分数区收窄（780×360 亲验底部余量 minMargin≈39px）；`landscape` 变量 `renderResult:745` 已定义；**实现提交未改测试**；134/659 绿+typecheck 净+CDP `productErrors=[]`。可 `claim→merge→release` |
+| T-FIX-GS | scoped-fix(V#3+#4) | view-model+运行时 | `screen-view.ts` + `game-scene-skeleton.ts` + `test/ui/screen-view.test.ts`(架构种) | — | merge-claimed:T-FIX-GS |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
 > **派发**：Wave 0 T-DOC ✅ 已并 main（`4b5188d`）。**Wave 1 ✅ 全部落 main**：E-0 `6e6ea7a` / T-A1 `2e66085` / T-C0 `8e386e8` / T-0 `dceff17`；T-A2 审计闭合。main `38628a0`·134/659 绿·typecheck 净。
