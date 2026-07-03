@@ -72,16 +72,24 @@ function leadSnap(over: Partial<GameSnapshot>): GameSnapshot {
   };
 }
 
-describe('M4-05 simple/normal 对外行为不变（length 优先于 tiebreak）', () => {
-  it('含同长多型候选的手牌，simple/normal 领出仍出最小单 3', () => {
-    const s = leadSnap({});
-    for (const level of [AiLevel.Simple, AiLevel.Normal]) {
-      const a = strategyFor(level)(s, createRng(1));
-      expect(a.type).toBe('play');
-      if (a.type === 'play') {
-        expect(a.cards).toHaveLength(1);
-        expect(a.cards[0].rank).toBe(Rank.R3);
-      }
+describe('T-AI-1 领出行为分档（simple 锚定最小单；normal 组合优先）', () => {
+  it('simple：含同长多型候选的手牌，领出仍出最小单 3（新手锚点·不变契约）', () => {
+    const a = strategyFor(AiLevel.Simple)(leadSnap({}), createRng(1));
+    expect(a.type).toBe('play');
+    if (a.type === 'play') {
+      expect(a.cards).toHaveLength(1);
+      expect(a.cards[0].rank).toBe(Rank.R3);
+    }
+  });
+
+  it('normal：3 4 5 6 7 7 7 领出改出 5 张顺子 34567（T-AI-1 组合首出）', () => {
+    const a = strategyFor(AiLevel.Normal)(leadSnap({}), createRng(1));
+    expect(a.type).toBe('play');
+    if (a.type === 'play') {
+      const pattern = recognize(a.cards);
+      expect(a.cards).toHaveLength(5);
+      expect(pattern?.category).toBe(Category.Straight);
+      expect(pattern?.mainRank).toBe(Rank.R7);
     }
   });
 });

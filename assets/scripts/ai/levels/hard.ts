@@ -13,6 +13,7 @@ import {
   type Card,
   type Move,
 } from '../../rules';
+import { cardKey } from '../../rules/guards';
 import { trackPlayed } from '../cardMemory';
 import { canFinishInOneMove, finishingFollow } from '../endgame';
 import { evaluateHand } from '../handStrength';
@@ -21,6 +22,7 @@ import {
   bombLikeMoves,
   compareMoves,
   conservativeAction,
+  isTeammateTop,
   pickLargest,
   pickSmallest,
   pickSmallestBombLike,
@@ -40,10 +42,6 @@ function rankCounts(cards: Card[]): ReadonlyMap<Rank, number> {
     counts.set(card.rank, (counts.get(card.rank) ?? 0) + 1);
   }
   return counts;
-}
-
-function cardKey(card: Card): string {
-  return `${card.rank}:${card.suit}`;
 }
 
 function removeMoveCards(hand: Card[], move: Move): Card[] {
@@ -99,10 +97,6 @@ function estimateMemoryPressure(hand: Card[]): MemoryPressure {
     unseenHighCards,
     possibleBombRanks,
   };
-}
-
-function isTeammateTop(snapshot: Parameters<AiStrategy>[0]): boolean {
-  return snapshot.top !== null && snapshot.turn !== snapshot.landlord && snapshot.top.seat !== snapshot.landlord;
 }
 
 function categoryShapingBonus(move: Move): number {

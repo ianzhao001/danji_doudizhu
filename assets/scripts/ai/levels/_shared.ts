@@ -28,6 +28,15 @@ export function requireHand(snapshot: Snapshot): Card[] {
   return snapshot.viewerHand;
 }
 
+export function isTeammateTop(snapshot: Snapshot): boolean {
+  return (
+    snapshot.top !== null &&
+    snapshot.turn !== snapshot.landlord &&
+    snapshot.top.seat !== snapshot.landlord &&
+    snapshot.top.seat !== snapshot.turn
+  );
+}
+
 function sortedCards(move: Move): Card[] {
   return move.cards.slice().sort((a, b) => {
     if (a.rank !== b.rank) return a.rank - b.rank;
