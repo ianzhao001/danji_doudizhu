@@ -728,7 +728,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-Text | 2 | 文案清单(P-G copy rider) | `coordination/tasks/P-Text-copy-list.md`(不单独分支·不改 strings.ts) | — | **已交付+已消费**：P-G `83f9e7d` 落地（seatName 你/左家/右家·去 AI/座位N/出牌区占位味） |
 | ART-06-landscape-backgrounds | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report | E-0 ✅ | **done `ba30494`** |
 | ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | ART-06 ✅`ba30494`, P-G ✅, P-L ✅ | **done `68f1436`** |
-| V | 3 | 收口·验证 | `reports/V.report.md`（verify-only·不改产品码） | P-G✅,P-L✅,ART-IMPORT-06✅`68f1436` | merge-claimed:V |
+| V | 3 | 收口·验证 | `reports/V.report.md`（verify-only·不改产品码） | P-G✅,P-L✅,ART-IMPORT-06✅`68f1436` | **done `4b28584`** |
 | E-ORIENT | scoped-fix(V#1) | 编辑器/配置 | `settings/v2/packages/project.json`(+Creator 写的方向配置) + report | E-0 ✅ | **ready·已建分支**：spec `tasks/E-ORIENT.md`；用户裁决**先修·执行者试改 project.json**；目标=构建 `settings.json` `orientation:"landscape"`（保持 844×390）+ 四横屏 sanity；**Blocker(横屏目标)** |
 | T-COPY-BID | scoped-fix(V#2) | 纯 view 文案 | `assets/scripts/ui/bidding-view.ts` + `test/ui/bidding-view.test.ts`(架构种) | — | **ready·已建分支+失败测试已种**：spec `tasks/T-COPY-BID.md`；用户定稿**相对措辞**：`轮到你叫地主` / `等待左家叫地主` / `轮到你抢地主`（seatLabel 0你/1左家/2右家，锚定座位0）；done/redeal 不变；纯层禁 cc |
 | T-FIX-GS | scoped-fix(V#3+#4) | view-model+运行时 | `screen-view.ts` + `game-scene-skeleton.ts` + `test/ui/screen-view.test.ts`(架构种) | — | **ready·已建分支+失败测试已种**：spec `tasks/T-FIX-GS.md`；#3 用户裁决**未决隐藏地主字段**（`landlordSeat: …?? null`，消费侧 null 不建 label）；#4 780×360 结算底部留余量；四横屏截图验收 |
