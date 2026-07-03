@@ -77,6 +77,13 @@ v12 三态按钮移除了现有按钮两侧花饰，保留纯按钮底板：
   - `stretch-sim/panel-popup-stretch.png`
 - ✅ `git status --short` 复核未触碰 `assets/resources/**`。
 
+## 用户视觉终审
+
+- 终审日期：2026-07-04
+- 终审结论：通过
+- 终审人：用户
+- 备注：用户确认 ART-UIKIT v12 preview 包通过，可进入后续 ART-IMPORT-UIKIT 规格派发。
+
 ## 后续
 
-等待用户视觉终审。若通过，后续 ART-IMPORT-UIKIT 再导入到 `assets/resources/**` 并配置 Creator 九宫格 border；本任务不执行导入。
+后续 ART-IMPORT-UIKIT 再导入到 `assets/resources/**` 并配置 Creator 九宫格 border；本任务不执行导入。
