@@ -38,3 +38,9 @@ node_modules
 asset-previews/
 # 协作用的临时 worktree（放仓库外 sibling，这里兜底）
 *.worktrees/
+# 协作临时状态
+.cowork-temp/
+# macOS
+.DS_Store
+# Cocos 编辑器运行时配置
+settings/v2/packages/cocos-service.json
