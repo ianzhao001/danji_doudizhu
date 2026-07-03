@@ -1,13 +1,13 @@
 # R-WAVE2 — v1.2 Wave 2 审查任务书（审查者专用）
 
-- 适用任务：T-AI-2 / P-G3（四阶段）/ P-L3（两阶段）/ ART-IMPORT-UIKIT（用户图审后由规划者补 spec 与本检查单）
+- 适用任务：T-AI-2 / P-G3（四阶段）/ P-L3（两阶段）/ ART-IMPORT-UIKIT
 - 流程/能力边界/阻塞升级：同 [R-WAVE1.md](R-WAVE1.md) 通用核验 1-6 条（文件域、种子完整性、双绿、红线、非文字模态只审证据、blocked 转规划者）。
 - 合并 lane：T-AI-2 随到随合；P-G3/P-L3 分阶段提审、**整分支合并**在各自末阶段 approved 后执行（两流水线共用单 lane 排队）。
 
 ---
 
 ## R:T-AI-2 检查单
-- [ ] 种子全绿：`hard-timing`（pressing 领出/残局收割/不挥霍守卫）+ `hardening`（改后 pressing 领 K）+ `quality` Hard 门（组合率 ≥0.50 且 ≥Normal+5pp；压队友 ≤0.08；胜率差 Hard−Normal ≥+0.03、Hard−Simple ≥+0.10）+ `difficulty-config` 文案契约。
+- [ ] 种子全绿：`hard-timing`（pressing 领出/残局收割/不挥霍守卫）+ `hardening`（改后 pressing 领 K）+ `quality` Hard 门（组合率 ≥0.50 且 ≥Normal−5pp[同带不回落]；压队友 ≤0.08；胜率差 Hard−Normal ≥+0.03、Hard−Simple ≥+0.10）+ `difficulty-config` 文案契约。
 - [ ] **零改动全绿**：`hard.test.ts`/`hard-depth`/`normal-combo`/`tie-breaker`/`simple`/`conservative-action-paths`/`hint*`。
 - [ ] **红线**：`simple.ts`/`normal.ts`/`lead-score.ts`/`compareMoves` 未动（`git diff` 逐行核）；`_shared.ts` 只加不改；无 `rng.` 新调用（确定性）。
 - [ ] difficultyConfig 仅 description 改动（label/thinkDelayMs 不动）。
@@ -39,6 +39,14 @@
 - [ ] `productErrors=[]`；vitest/typecheck 不回归。
 **阶段②**
 - [ ] 同 P-G3③ 口径：接线齐全、三态/九宫格无变形、home+6 子屏截图。
+
+## R:ART-IMPORT-UIKIT 检查单
+- [ ] 文件域仅：`assets/resources/art/ui/*.png`(+`.meta` Creator 生成) + `ui/asset-keys.ts`(新 2 键) + report；**未碰两巨组件**（接线归 P-G3③/P-L3②）。
+- [ ] 导入图与 main 上 `asset-previews/v12-uikit/` 对应 preview **逐字节一致**（sha256 对比：seat-nameplate / bottom-cards-dock / btn 三态重制版）。
+- [ ] `panel-popup.png` **未被替换**（仅 `.meta` 配 border）。
+- [ ] 九宫格 border 机械核验：btn-*×3 / panel-popup / seat-nameplate / bottom-cards-dock 的 `.meta` borderLeft/Right/Top/Bottom **全部 >0**（对照执行者报告的取值依据）。
+- [ ] 种子键断言转绿（`seatNameplate: 'art/ui/seat-nameplate'`、`bottomCardsDock: 'art/ui/bottom-cards-dock'`）；全量 vitest/typecheck 不回归。
+- [ ] `.meta` 由 Creator 生成（报告记 UUID 与 border 值），不手写。
 
 ---
 验收披露/阻塞升级格式沿用 [R-WAVE1.md](R-WAVE1.md) 尾部模板。
