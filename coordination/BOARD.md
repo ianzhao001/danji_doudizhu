@@ -730,7 +730,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | ART-06 ✅`ba30494`, P-G ✅, P-L ✅ | **done `68f1436`** |
 | V | 3 | 收口·验证 | `reports/V.report.md`（verify-only·不改产品码） | P-G✅,P-L✅,ART-IMPORT-06✅`68f1436` | **done `4b28584`** |
 | E-ORIENT | scoped-fix(V#1) | 编辑器/配置 | `settings/v2/packages/builder.json` + report | E-0 ✅ | **changes-requested** @ `1218b3c`：配置落点**接受**（`common.packages.web-mobile.orientation:landscape` 是 Creator GUI 构建面板读取的持久位，构建 `settings.json` 已验 `orientation:landscape`/844×390）；但 diff 夹带 **`BuildTaskManager.queue[...]` 瞬态构建任务快照**需删（会话态、不该入库）→ 只留 `__version__`+`common.packages`。CLI shorthand 不合并 builder.json 属 Creator 固有行为、可文档化、非阻塞 |
-| T-COPY-BID | scoped-fix(V#2) | 纯 view 文案 | `assets/scripts/ui/bidding-view.ts` + `test/ui/bidding-view.test.ts`(架构种) | — | merge-claimed:T-COPY-BID |
+| T-COPY-BID | scoped-fix(V#2) | 纯 view 文案 | `assets/scripts/ui/bidding-view.ts` + `test/ui/bidding-view.test.ts`(架构种) | — | **done `cdb88c8`** |
 | T-FIX-GS | scoped-fix(V#3+#4) | view-model+运行时 | `screen-view.ts` + `game-scene-skeleton.ts` + `test/ui/screen-view.test.ts`(架构种) | — | **approved** @ `0641727`：#3 `landlordSeat: SeatIndex\|null`+`?? null`+消费侧 `if(!==null)` null-gate（叫抢态**已亲验无「地主：」**）；#4 landscape 结算按钮上移+分数区收窄（780×360 亲验底部余量 minMargin≈39px）；`landscape` 变量 `renderResult:745` 已定义；**实现提交未改测试**；134/659 绿+typecheck 净+CDP `productErrors=[]`。可 `claim→merge→release` |
 
 > **状态词表补充（T-DOC 落地后生效）**：新增过渡态 `approved`（架构给·报告级）、`merge-claimed:<ID>`（锁级·transient）；**终态仍 `done <commit>`**，不引入持久 `merged`。
