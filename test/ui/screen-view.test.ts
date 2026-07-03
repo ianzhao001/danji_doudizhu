@@ -58,6 +58,8 @@ describe('screen view model', () => {
     expect(vm.bidding).toBeDefined();
     expect(vm.hand).toEqual([]);
     expect(vm.actions).toEqual({ play: false, pass: false, hint: false });
+    // T-FIX-GS #3：叫抢阶段地主未决 → topBar.landlordSeat 应为 null（消费侧据此隐藏「地主：」标签）
+    expect(vm.topBar.landlordSeat).toBeNull();
   });
 
   it('derives settled result and topBar from explicit settlement', () => {
@@ -87,7 +89,7 @@ describe('screen view model', () => {
     expect(vm.actions).toEqual({ play: false, pass: false, hint: false });
     expect(vm.bidding).toBeUndefined();
     expect(vm.result).toBeUndefined();
-    expect(vm.topBar).toEqual({ multiplier: 1, bombs: 0, landlordSeat: 0 });
+    expect(vm.topBar).toEqual({ multiplier: 1, bombs: 0, landlordSeat: null });
     expect(vm.layout.topBar).toBeDefined();
   });
 
