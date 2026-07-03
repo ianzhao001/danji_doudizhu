@@ -18,6 +18,7 @@ const EXPECTED_CUE_IDS = [
   'bid',
   'redeal',
   'landlordDecided',
+  'bottomRevealed',
   'settled',
 ] as const satisfies readonly CueId[];
 
@@ -44,6 +45,7 @@ const FLOW_EVENTS: FlowEvent[] = [
   { type: 'bid', action: { type: 'call', seat: 0 }, multiplier: 1 },
   { type: 'redeal', attempt: 1 },
   { type: 'landlordDecided', landlord: 0, bidMultiplier: 1 },
+  { type: 'bottomRevealed', cards: [{ rank: Rank.R3, suit: Suit.Spade }] },
   { type: 'round', event: { type: 'bomb', seat: 1 } },
   { type: 'settled', settlement: { multiplier: 1, spring: 'none', bombs: 0, scores: [2, -1, -1] } },
 ];
@@ -61,7 +63,7 @@ describe('CueId consistency guard', () => {
   });
 
   it('maps every FlowEvent type to a valid CueId and unwraps round events', () => {
-    expect(FLOW_EVENTS.map(cueForFlowEvent)).toEqual(['deal', 'bid', 'redeal', 'landlordDecided', 'bomb', 'settled']);
+    expect(FLOW_EVENTS.map(cueForFlowEvent)).toEqual(['deal', 'bid', 'redeal', 'landlordDecided', 'bottomRevealed', 'bomb', 'settled']);
     const cues: CueId[] = FLOW_EVENTS.map(cueForFlowEvent);
     expect(cues).toHaveLength(FLOW_EVENTS.length);
     for (const event of FLOW_EVENTS) {
