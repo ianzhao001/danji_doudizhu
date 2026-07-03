@@ -39,6 +39,79 @@ export interface TableZones extends TableRegions {
 }
 
 export function tableZones(width: number, height: number): TableZones {
-  void tableLayout(width, height);
-  throw new Error('T-LAYOUT2: implement tableZones (see coordination/tasks/T-LAYOUT2.md)');
+  const legacy = tableLayout(width, height);
+  const gap = 8;
+  const infoStripHeight = Math.min(14, Math.max(12, Math.round(height * 0.034)));
+  const infoStripWidth = Math.min(260, Math.max(176, Math.round(width * 0.28)));
+  const opponentBottom = Math.max(
+    legacy.opponentLeft.y + legacy.opponentLeft.height,
+    legacy.opponentRight.y + legacy.opponentRight.height,
+  );
+  const dropHeight = legacy.playArea.height;
+  const dropWidth = Math.min(128, Math.max(108, Math.round(width * 0.15)));
+  const dockWidth = Math.min(220, Math.max(176, Math.round(width * 0.24)));
+  const bottomDockHeight = Math.min(30, Math.max(24, Math.round(height * 0.07)));
+  const statusHeight = Math.min(24, Math.max(20, Math.round(height * 0.055)));
+  const sideWidth = Math.min(118, Math.max(96, Math.round(width * 0.13)));
+  const dockHeight = Math.min(32, Math.max(28, Math.round(height * 0.08)));
+  const sideY = legacy.actionButtons.y + legacy.actionButtons.height + gap;
+
+  return {
+    ...legacy,
+    infoStrip: centered(width, infoStripWidth, legacy.topBar.y + legacy.topBar.height + gap, infoStripHeight),
+    bottomCardsDock: centered(width, dockWidth, legacy.opponentLeft.y, bottomDockHeight),
+    dropZoneLeft: {
+      x: legacy.opponentLeft.x + legacy.opponentLeft.width + gap,
+      y: opponentBottom + gap,
+      width: dropWidth,
+      height: dropHeight,
+    },
+    dropZoneRight: {
+      x: legacy.opponentRight.x - gap - dropWidth,
+      y: opponentBottom + gap,
+      width: dropWidth,
+      height: dropHeight,
+    },
+    dropZoneHero: { ...legacy.playArea },
+    statusLine: centered(
+      width,
+      Math.min(240, Math.max(168, Math.round(width * 0.26))),
+      legacy.playArea.y + legacy.playArea.height + gap,
+      statusHeight,
+    ),
+    actionBar: { ...legacy.actionButtons },
+    strengthMeter: {
+      x: Math.max(gap, legacy.actionButtons.x - gap - sideWidth),
+      y: legacy.actionButtons.y,
+      width: sideWidth,
+      height: legacy.actionButtons.height,
+    },
+    turnTimer: {
+      x: Math.min(width - gap - sideWidth, legacy.actionButtons.x + legacy.actionButtons.width + gap),
+      y: legacy.actionButtons.y,
+      width: sideWidth,
+      height: legacy.actionButtons.height,
+    },
+    memoryDock: {
+      x: Math.max(gap, legacy.actionButtons.x - gap - sideWidth),
+      y: sideY,
+      width: sideWidth,
+      height: dockHeight,
+    },
+    advisorDock: {
+      x: Math.min(width - gap - sideWidth, legacy.actionButtons.x + legacy.actionButtons.width + gap),
+      y: sideY,
+      width: sideWidth,
+      height: dockHeight,
+    },
+  };
+}
+
+function centered(width: number, rectWidth: number, y: number, height: number): Rect {
+  return {
+    x: Math.round((width - rectWidth) / 2),
+    y,
+    width: rectWidth,
+    height,
+  };
 }

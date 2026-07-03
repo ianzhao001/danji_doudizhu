@@ -71,19 +71,21 @@ export function tableLayout(containerWidth?: number, containerHeight?: number): 
 }
 
 function landscapeLayout(width: number, height: number): TableRegions {
-  const topBarHeight = Math.min(48, Math.max(38, Math.round(height * 0.112)));
-  const verticalGap = Math.min(12, Math.max(8, Math.round(height * 0.026)));
-  const opponentWidth = Math.min(154, Math.max(120, Math.round(width * 0.18)));
-  const opponentHeight = Math.min(58, Math.max(48, Math.round(height * 0.135)));
-  const opponentY = topBarHeight + verticalGap;
-  const playAreaWidth = Math.min(320, Math.max(250, Math.round(width * 0.36)));
-  const playAreaHeight = Math.min(104, Math.max(84, Math.round(height * 0.236)));
+  const topBarHeight = Math.min(32, Math.max(27, Math.round(height * 0.075)));
+  const verticalGap = 8;
+  const infoStripHeight = Math.min(14, Math.max(12, Math.round(height * 0.034)));
+  const opponentWidth = Math.min(150, Math.max(118, Math.round(width * 0.16)));
+  const opponentHeight = Math.min(52, Math.max(46, Math.round(height * 0.13)));
+  const opponentY = topBarHeight + verticalGap + infoStripHeight + verticalGap;
+  const playAreaWidth = Math.min(180, Math.max(142, Math.round(width * 0.2)));
+  const playAreaHeight = Math.min(30, Math.max(26, Math.round(height * 0.07)));
   const playAreaY = opponentY + opponentHeight + verticalGap;
-  const playerHandHeight = Math.min(96, Math.max(82, Math.round(height * 0.236)));
+  const playerHandHeight = Math.min(86, Math.max(76, Math.round(height * 0.21)));
   const playerHandY = height - playerHandHeight;
-  const actionHeight = Math.min(46, Math.max(40, Math.round(height * 0.11)));
-  const actionWidth = Math.min(300, Math.max(230, Math.round(width * 0.34)));
-  const actionY = playerHandY - verticalGap - actionHeight;
+  const actionHeight = Math.min(38, Math.max(34, Math.round(height * 0.095)));
+  const actionWidth = Math.min(270, Math.max(238, Math.round(width * 0.31)));
+  const statusHeight = Math.min(24, Math.max(20, Math.round(height * 0.055)));
+  const actionY = playAreaY + playAreaHeight + verticalGap + statusHeight + verticalGap;
 
   return {
     topBar: { x: 0, y: 0, width, height: topBarHeight },
