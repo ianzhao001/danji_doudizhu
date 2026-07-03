@@ -8,7 +8,7 @@ export interface HandStrength {
   longestStraight: number;
 }
 
-const ALL_RANKS: Rank[] = [
+export const ALL_RANKS: readonly Rank[] = [
   Rank.R3,
   Rank.R4,
   Rank.R5,

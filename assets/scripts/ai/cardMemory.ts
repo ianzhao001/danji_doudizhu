@@ -1,32 +1,15 @@
-import { createDeck, type Card, Rank } from '../rules';
+import { createDeck, type Card } from '../rules';
 import type { GameEvent } from '../game';
+import { ALL_RANKS } from './handStrength';
 
 export interface CardMemory {
   readonly remainingByRank: Readonly<Record<number, number>>;
   readonly playedCount: number;
 }
 
-const RANKS: Rank[] = [
-  Rank.R3,
-  Rank.R4,
-  Rank.R5,
-  Rank.R6,
-  Rank.R7,
-  Rank.R8,
-  Rank.R9,
-  Rank.R10,
-  Rank.J,
-  Rank.Q,
-  Rank.K,
-  Rank.A,
-  Rank.R2,
-  Rank.SmallJoker,
-  Rank.BigJoker,
-];
-
 function initialRemaining(): Record<number, number> {
   const remaining: Record<number, number> = {};
-  for (const rank of RANKS) remaining[rank] = 0;
+  for (const rank of ALL_RANKS) remaining[rank] = 0;
   for (const card of createDeck()) remaining[card.rank] += 1;
   return remaining;
 }

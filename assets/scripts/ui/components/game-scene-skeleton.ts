@@ -25,6 +25,7 @@ import { trackPlayed } from '../../ai/cardMemory';
 import { adviseAction } from '../../ai/insight';
 import { commitFinishedRound, persistRound, restoreRound, type SessionKeys } from '../../data/session';
 import { difficultyConfig } from '../../data/difficultyConfig';
+import { STORAGE_KEYS } from '../../data/storage-keys';
 import { defaultSettings, type Settings } from '../../data/settings';
 import { loadSettings, saveSettings } from '../../data/settingsStorage';
 import { startRoundRuntime, resumeRoundRuntime, type RoundRuntime } from '../../flow/round-runtime';
@@ -61,11 +62,11 @@ import { addButton as addUiButton, addLabel as addUiLabel, addUiTransform, drawP
 const { ccclass, property } = _decorator;
 
 const HERO_SEAT: SeatIndex = 0;
-const SETTINGS_KEY = 'doudizhu.settings';
+const SETTINGS_KEY = STORAGE_KEYS.settings;
 const SESSION_KEYS: SessionKeys = {
-  save: 'doudizhu.save',
-  stats: 'doudizhu.stats',
-  records: 'doudizhu.records',
+  save: STORAGE_KEYS.save,
+  stats: STORAGE_KEYS.stats,
+  records: STORAGE_KEYS.records,
 };
 
 const CARD_SIZE = { width: 52, height: 74 };

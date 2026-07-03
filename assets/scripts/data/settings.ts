@@ -29,7 +29,7 @@ export function defaultSettings(): Settings {
   };
 }
 
-function isAiLevel(value: unknown): value is AiLevel {
+export function isAiLevel(value: unknown): value is AiLevel {
   return Object.values(AiLevel).includes(value as AiLevel);
 }
 

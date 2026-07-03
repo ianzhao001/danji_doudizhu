@@ -11,6 +11,9 @@ export interface StorageKeys {
   readonly records: string;
 }
 
-export const STORAGE_KEYS: StorageKeys = (() => {
-  throw new Error('T-DEDUP: implement storage-keys (see coordination/tasks/T-DEDUP.md)');
-})();
+export const STORAGE_KEYS = {
+  settings: 'doudizhu.settings',
+  save: 'doudizhu.save',
+  stats: 'doudizhu.stats',
+  records: 'doudizhu.records',
+} as const satisfies StorageKeys;
