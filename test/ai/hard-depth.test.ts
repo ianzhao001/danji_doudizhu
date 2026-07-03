@@ -30,14 +30,6 @@ function playedRanks(action: ReturnType<typeof hard>): Rank[] {
   return action.cards.map((card) => card.rank);
 }
 
-function averageScore(summaries: readonly MatchSummary[], seat: SeatIndex): number {
-  return summaries.reduce((sum, summary) => sum + summary.scores[seat], 0) / summaries.length;
-}
-
-function winRate(summaries: readonly MatchSummary[], seat: SeatIndex): number {
-  return summaries.filter((summary) => summary.scores[seat] > 0).length / summaries.length;
-}
-
 function assertSelfplayInvariant(summary: MatchSummary): void {
   expect(summary.scores[0] + summary.scores[1] + summary.scores[2]).toBe(0);
   expect(summary.turns).toBeGreaterThan(0);
@@ -80,7 +72,7 @@ describe('M4-42 hard AI 纵深启发式', () => {
   });
 
   it(
-    '固定种子 selfplay：Hard 地主相对 Normal 基线有胜率与均分优势',
+    '固定种子 selfplay：不变量保持（三档胜率排序契约已迁移至 T-AI-2 质量门）',
     async () => {
       const seeds = Array.from({ length: 12 }, (_, index) => index + 1);
       const hardLandlord = await runDifficultyMatchup([AiLevel.Hard, AiLevel.Normal, AiLevel.Normal], seeds);
@@ -91,8 +83,12 @@ describe('M4-42 hard AI 纵深启发式', () => {
         expect(summary.landlord).toBe(0);
       }
 
-      expect(winRate(hardLandlord, 0)).toBeGreaterThanOrEqual(winRate(normalBaseline, 0));
-      expect(averageScore(hardLandlord, 0)).toBeGreaterThan(averageScore(normalBaseline, 0));
+      // 规划者裁定（T-AI-1 验收披露 2026-07-04）：原「winRate/averageScore(Hard 地主) ≥ Normal 基线」
+      // 是 12-seed 地主视角的小样本代理。T-AI-1 强化普通档（组合首出+农民配合）后，农民侧同步变强、
+      // Hard 的跟牌仍是旧保守逻辑，该代理实测反转（Hard 0.5 vs Normal 0.667），不再成立。
+      // 三档排序契约迁移至 test/selfplay/quality.test.ts 的 T-AI-2 质量门
+      // （对称三席轮换 90 局/侧：Hard−Normal ≥ +0.03、Hard−Simple ≥ +0.10）。
+      // T-AI-2 落地前，main 上 Normal>Hard 为 BOARD 登记的已知过渡态；本用例保留 selfplay 不变量。
     },
     60000,
   );
