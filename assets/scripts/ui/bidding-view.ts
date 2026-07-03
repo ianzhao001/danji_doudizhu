@@ -20,12 +20,22 @@ function button(id: BiddingButton['id'], label: string, enabled: boolean): Biddi
   return { id, label, enabled };
 }
 
+function seatLabel(seat: SeatIndex): string {
+  if (seat === 0) return '你';
+  if (seat === 1) return '左家';
+  return '右家';
+}
+
+function promptForTurn(turn: SeatIndex, viewerSeat: SeatIndex, verb: string): string {
+  return turn === viewerSeat ? `轮到你${verb}` : `等待${seatLabel(turn)}${verb}`;
+}
+
 export function deriveBiddingView(state: BiddingState, viewerSeat: SeatIndex): BiddingView {
   const enabled = state.turn === viewerSeat;
 
   if (state.phase === 'calling') {
     return {
-      prompt: `请座位 ${state.turn + 1} 行动`,
+      prompt: promptForTurn(state.turn, viewerSeat, '叫地主'),
       buttons: [
         button('call', '叫地主', enabled),
         button('pass', '不叫', enabled),
@@ -35,7 +45,7 @@ export function deriveBiddingView(state: BiddingState, viewerSeat: SeatIndex): B
 
   if (state.phase === 'grabbing') {
     return {
-      prompt: `请座位 ${state.turn + 1} 行动`,
+      prompt: promptForTurn(state.turn, viewerSeat, '抢地主'),
       buttons: [
         button('grab', '抢', enabled),
         button('pass', '不抢', enabled),
