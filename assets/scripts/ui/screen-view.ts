@@ -17,7 +17,7 @@ export interface ScreenVM {
   actions: ActionButtonsState;
   bidding?: BiddingView;
   result?: ResultView;
-  topBar: { multiplier: number; bombs: number; landlordSeat: SeatIndex };
+  topBar: { multiplier: number; bombs: number; landlordSeat: SeatIndex | null };
 }
 
 function emptyActions(): ActionButtonsState {
@@ -54,7 +54,7 @@ export function deriveScreenVM(args: {
     topBar: {
       multiplier: settlement?.multiplier ?? 1,
       bombs: settlement?.bombs ?? 0,
-      landlordSeat: snapshot?.landlord ?? 0,
+      landlordSeat: snapshot?.landlord ?? null,
     },
   };
 }
