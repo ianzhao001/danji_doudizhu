@@ -738,3 +738,26 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > **Wave 2 已派发（2026-07-02）**：**P-G ‖ P-L** 两条单写者流水线并行，文件域不相交（game-scene / lobby），依赖全 done。spec：`tasks/P-G.md`（消费 P-Text）、`tasks/P-L.md`。分支 `task/P-G`、`task/P-L` 已建。按新协议：分阶段送审 → 架构 `approved` → 执行者 `claim/merge/release`（共用单 lane，排队）。**V（Wave 3）待 P-G+P-L 入 main。**
 > **美术策略（用户指定 2026-07-02）**：**竖转横的资源文件由执行者「文生图」生成**。横屏方向相关的只有背景（cards/avatars/ui/icons 方向无关，不重生）。ART-06 现在与 P-G/P-L **并行派发**出横版背景 preview → 用户视觉终审 → ART-IMPORT-06 导入并把 P-G/P-L 运行时占位换回真图。分支 `task/ART-06-landscape-backgrounds` 已建。
 > **✅ v1.1 横屏化闭合（2026-07-03）**：Wave 3 收口 V `2c88109` + 三 scoped-fix 全落 main：T-COPY-BID `cdb88c8`（叫抢相对措辞）/ T-FIX-GS `d94c790`（地主未决隐藏 + 780×360 结算余量）/ E-ORIENT `2f10e2a`（`builder.json` web-mobile `orientation:landscape`）。**main `d3e1fed`·134/660 绿·typecheck 净**（架构独立复跑）。五目标全闭合（残留bug/命名文案/横屏/真按钮/交互）。**遗留发布前用户侧终检（非阻塞）**：① Creator GUI 构建一次确认 orientation 生效；② 主观 playtest 手感终审。
+
+---
+
+## v1.2 深度打磨批（UI 真皮肤 + 布局重造 + 流程对标 + AI 强化 + 设计债 · 2026-07-03）
+
+> 规划书：`/Users/admin/.claude/plans/beta-1-bug-2-label-3-4-btn-5-ai-curious-muffin.md`（v1.2 版·用户已批）。用户暂停发布，五目标：①UI 文本框感→真皮肤（**33/45 张已导入美术从未接线**，接线为主+定向文生图）②17 对元素重叠→相位可见集布局契约 ③流程对标斗地主（叫抢期可见 17 张+亮底牌+逐手存档）④AI 只出单牌→三档差异化 ⑤设计债审查落任务书。用户三裁决：接线优先 / 最小流程版+逐手存档 / 三档差异化。
+> **BOARD 纪律**：状态列禁用字面竖线（v1.1 教训：`\|` 切坏 awk 解析）。
+
+| ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
+|----|----|----|----|----|----|
+| T-DEDUP | 1 | 纯逻辑+组件机械替换 | 新 `data/storage-keys.ts` + settings/difficultyConfig(isAiLevel 归一) + handStrength/cardMemory(rank 数组) + 两巨组件 ~7 行 import | — | **ready·已建分支+失败测试已种**：spec `tasks/T-DEDUP.md`；**lane 排第一**（消 key 漂移隐雷+赶在 P-G3/P-L3 建分支前） |
+| T-LAYOUT2 | 1 | 纯逻辑 | 新 `ui/table-zones.ts`(架构落桩) + `table-layout.ts` 数值微调 | — | **ready·已建分支+落桩+失败测试已种**：spec `tasks/T-LAYOUT2.md`；11 个命名 zone·相位可见集互斥（bidding/playing 集内两两间距 ≥8px·四横屏）·legacy 6 字段与 tableLayout 深相等 |
+| T-FLOW-BID | 1 | 纯逻辑(flow) | `flow/round-runtime.ts` + `ui/screen-view.ts`（types.ts/driver.ts/policies.ts 只读·契约已由架构补） | — | **ready·已建分支+接口桩+失败测试已种**：spec `tasks/T-FLOW-BID.md`；`biddingDeal()` 读口+`bottomRevealed` 事件+**逐手存档 rider**（现状 playing 中途退出回滚到开局）；不做叫抢期序列化 |
+| T-AI-1 | 1 | 纯逻辑(ai) | 新 `ai/levels/lead-score.ts` + `normal.ts` 重写 + `_shared.ts` 只加 + `hard.ts` 两处机械替换 | Wave0 契约 ✅（已种） | **ready·已建分支+契约已重写+质量门已种**：spec `tasks/T-AI-1.md`；组合首出（34567 顺子等 5 用例）+ 农民不压队友；质量门 Normal 组合率 ≥0.35 / 压队友 ≤0.20 / 胜率差 ≥+0.05；**compareMoves 语义红线不动** |
+| T-AI-2 | 1.5 | 纯逻辑(ai) | `hard.ts` + `endgame.ts` + difficultyConfig 文案 | T-AI-1 落 main | **blocked**：spec `tasks/T-AI-2.md` 骨架就绪；T-AI-1 合后架构建分支+种时机契约 |
+| ART-UIKIT | 1 | 美术·文生图 | `asset-previews/v12-uikit/` + report（不碰 resources） | — | **ready·已建分支**：spec `tasks/ART-UIKIT.md`；名字牌/底牌托架 + btn/panel 九宫格安全判定（不安全才重制）+ 64/176px 拉伸模拟图；**最早做**（用户图审=外部时钟） |
+| ART-IMPORT-UIKIT | 1.5 | 美术·导入 | `assets/resources/art/**`+`.meta`(Creator) + `asset-keys.ts` 新键 + 键测试；**禁碰两巨组件** | ART-UIKIT 用户终审过 | blocked（图审后架构出 spec 建分支） |
+| P-G3 | 2 | 巨组件流水线(四阶段) | `game-scene-skeleton.ts` + 新 `ui/components/game-scene/*.ts`(4 模块) | ②依赖 T-DEDUP+T-LAYOUT2+T-FLOW-BID；③依赖 ART-IMPORT-UIKIT | todo（Wave 1 纯层落 main 后架构出 spec）：①move-only 拆 4 热区 ②消费 zones+叫抢快照+per-seat 落点+17 对重叠检查单+结算遮罩+seed 注入口+叫抢计时 ③33 张美术接线 ④文案；③④可交换 |
+| P-L3 | 2 | 巨组件流水线(两阶段) | `lobby-scene.ts` | ①依赖 T-FLOW-BID；②依赖 ART-IMPORT-UIKIT | todo：①「继续游戏」真续局(savedSlot 现硬编码 null)+布局微调 ②美术接线 |
+| V2 | 3 | 收口·验证 | `reports/V2.report.md`(verify-only) | P-G3+P-L3+T-AI-2 | blocked：四横屏固定 seed 真实一局 e2e + AI 观察指标表 + PLAYTEST |
+
+> **延后项（设计债·带简报待派）**：记牌深度（GameSnapshot 需出牌历史，hard 现 `trackPlayed([],hand)` 传空=假记牌）；round-runtime(439 行) 拆分；save 双序列化与叫抢期存档**整并一次**升 v2（避免两次迁移税）；audio/卡面/tween 模块化。
+> **Wave 1 派发（2026-07-03）**：五任务并行、文件域两两零交集（T-DEDUP 退出 ai/levels；ART-IMPORT 禁碰组件；T-FLOW-BID 的 driver/policies/types 只读）。merge lane 顺序：T-DEDUP → T-LAYOUT2 → T-FLOW-BID → T-AI-1（ART-UIKIT 审后随到随合）。P-G3 分支在 T-DEDUP+T-LAYOUT2+T-FLOW-BID 落 main 后创建。
