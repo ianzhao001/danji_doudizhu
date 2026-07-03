@@ -729,7 +729,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ART-06-landscape-backgrounds | 美术(并行) | **文生图·执行者生成** | `asset-previews/*`+report | E-0 ✅ | **done `ba30494`** |
 | ART-IMPORT-06 | 美术 | 导入+swap-in | `assets/resources/art/backgrounds/*`(+`.meta` Creator 生成)；`game-scene-skeleton.ts`/`lobby-scene.ts` 换回 `loadSprite` | ART-06 ✅`ba30494`, P-G ✅, P-L ✅ | **done `68f1436`** |
 | V | 3 | 收口·验证 | `reports/V.report.md`（verify-only·不改产品码） | P-G✅,P-L✅,ART-IMPORT-06✅`68f1436` | **done `4b28584`** |
-| E-ORIENT | scoped-fix(V#1) | 编辑器/配置 | `settings/v2/packages/builder.json` + report | E-0 ✅ | **approved** @ `931a8ff`：queue 瞬态块已删净，builder.json 仅 `__version__`+`common.packages.web-mobile`（`orientation:landscape`）；执行者解包 Creator 类型定义确认该键为正确 schema（auto/landscape/portrait）、试过 project.json general.orientation 无效已回退；构建 `settings.json` = `orientation:landscape` / 844×390、四横屏 `productErrors=[]`。可 `claim→merge→release`。**注**：CLI shorthand 不合并 builder.json 属 Creator 行为，发布走 GUI 构建生效；建议发布前在 Creator Build 面板做一次 GUI 构建终验 |
+| E-ORIENT | scoped-fix(V#1) | 编辑器/配置 | `settings/v2/packages/builder.json` + report | E-0 ✅ | merge-claimed:E-ORIENT |
 | T-COPY-BID | scoped-fix(V#2) | 纯 view 文案 | `assets/scripts/ui/bidding-view.ts` + `test/ui/bidding-view.test.ts`(架构种) | — | **done `cdb88c8`** |
 | T-FIX-GS | scoped-fix(V#3+#4) | view-model+运行时 | `screen-view.ts` + `game-scene-skeleton.ts` + `test/ui/screen-view.test.ts`(架构种) | — | **done `d94c790`** |
 
