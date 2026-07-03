@@ -338,7 +338,7 @@ export class GameSceneSkeleton extends Component {
 
   private renderTopBar(
     phase: string,
-    topBar: { multiplier: number; bombs: number; landlordSeat: number },
+    topBar: { multiplier: number; bombs: number; landlordSeat: number | null },
     handCount: number,
     layout: TableRegions,
     canvas: { width: number; height: number },
@@ -349,7 +349,9 @@ export class GameSceneSkeleton extends Component {
     const multiplierPos = this.screenPoint(canvas, canvas.width / 2, infoY);
     const handPos = this.screenPoint(canvas, (canvas.width * 5) / 6, infoY);
     this.addLabel(phaseText(phase), phasePos.x, phasePos.y, 18, this.uiRoot!, 140, 30, 'top-phase');
-    this.addLabel(`地主：${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 16, this.uiRoot!, 120, 30, 'top-landlord');
+    if (topBar.landlordSeat !== null) {
+      this.addLabel(`地主：${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 16, this.uiRoot!, 120, 30, 'top-landlord');
+    }
     this.addLabel(`倍数 ×${topBar.multiplier}`, multiplierPos.x, multiplierPos.y, 16, this.uiRoot!, 110, 30, 'top-multiplier');
     this.addLabel(`手牌 ${handCount}`, handPos.x, handPos.y, 16, this.uiRoot!, 110, 30, 'top-hand-count');
   }
@@ -755,9 +757,20 @@ export class GameSceneSkeleton extends Component {
     this.addLabel(result.resultText, 0, panelHeight * 0.36, 34, panel, 220, 72, 'result-title');
     this.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.22, 20, panel, 240, 40, 'result-multiplier');
     this.addLabel(result.springText || '本局结算', 0, panelHeight * 0.12, 18, panel, 240, 40, 'result-spring');
-    this.addLabel(result.scores.map((row) => `${seatNameWithRole(row.seat, row.isLandlord)}: ${row.score}`).join('\n'), 0, -panelHeight * 0.08, 18, panel, 280, 112, 'result-scores');
-    this.addButton('再来一局', -74, -panelHeight * 0.37, 116, 42, true, () => this.startGame(true), panel, 'result-new');
-    this.addButton('返回大厅', 74, -panelHeight * 0.37, 116, 42, true, () => director.loadScene('lobby'), panel, 'result-lobby');
+    const scoresHeight = landscape ? Math.min(98, panelHeight * 0.31) : 112;
+    const buttonY = landscape ? -panelHeight * 0.31 : -panelHeight * 0.37;
+    this.addLabel(
+      result.scores.map((row) => `${seatNameWithRole(row.seat, row.isLandlord)}: ${row.score}`).join('\n'),
+      0,
+      landscape ? -panelHeight * 0.075 : -panelHeight * 0.08,
+      18,
+      panel,
+      280,
+      scoresHeight,
+      'result-scores',
+    );
+    this.addButton('再来一局', -74, buttonY, 116, 42, true, () => this.startGame(true), panel, 'result-new');
+    this.addButton('返回大厅', 74, buttonY, 116, 42, true, () => director.loadScene('lobby'), panel, 'result-lobby');
     if (this.settings.animation) this.animateScaleIn(panel, 0.92, 180);
   }
 
