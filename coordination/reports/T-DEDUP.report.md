@@ -81,8 +81,8 @@ rg -n "from ['\\\"]cc['\\\"]|import .*['\\\"]cc['\\\"]" assets/scripts/rules ass
 - 合并前回归：
   - `npm --prefix test test`：135 files / 662 tests passed
   - `npm --prefix test run typecheck`：tsc --noEmit passed
-- merge commit：（合并后回填）
-- 合并后基线：（合并后回填）
+- merge commit：`d8b892b`（--no-ff merge）
+- 合并后基线：135 files / 662 tests 绿 + typecheck 净
 
 ## 与 spec 的偏差 / 关键决策
 - `handStrength.ts` 与 `cardMemory.ts` 的 rank 顺序和内容完全一致，因此以 `handStrength.ts` 导出的 `ALL_RANKS` 作为单一源，行为不变。
