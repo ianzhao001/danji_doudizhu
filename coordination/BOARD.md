@@ -749,7 +749,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 
 | ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
 |----|----|----|----|----|----|
-| T-DEDUP | 1 | 纯逻辑+组件机械替换 | 新 `data/storage-keys.ts` + settings/difficultyConfig(isAiLevel 归一) + handStrength/cardMemory(rank 数组) + 两巨组件 ~7 行 import | — | **approved** @ 961880e（审查者一次通过·检查单 10/10·0 打回） |
+| T-DEDUP | 1 | 纯逻辑+组件机械替换 | 新 `data/storage-keys.ts` + settings/difficultyConfig(isAiLevel 归一) + handStrength/cardMemory(rank 数组) + 两巨组件 ~7 行 import | — | merge-claimed:T-DEDUP |
 | T-LAYOUT2 | 1 | 纯逻辑 | 新 `ui/table-zones.ts`(架构落桩) + `table-layout.ts` 数值微调 | — | **ready·已建分支+落桩+失败测试已种**：spec `tasks/T-LAYOUT2.md`；11 个命名 zone·相位可见集互斥（bidding/playing 集内两两间距 ≥8px·四横屏）·legacy 6 字段与 tableLayout 深相等 |
 | T-FLOW-BID | 1 | 纯逻辑(flow) | `flow/round-runtime.ts` + `ui/screen-view.ts`（types.ts/driver.ts/policies.ts 只读·契约已由架构补） | — | **ready·已建分支+接口桩+失败测试已种**：spec `tasks/T-FLOW-BID.md`；`biddingDeal()` 读口+`bottomRevealed` 事件+**逐手存档 rider**（现状 playing 中途退出回滚到开局）；不做叫抢期序列化 |
 | T-AI-1 | 1 | 纯逻辑(ai) | 新 `ai/levels/lead-score.ts` + `normal.ts` 重写 + `_shared.ts` 只加 + `hard.ts` 两处机械替换 | Wave0 契约 ✅（已种） | **ready·已建分支+契约已重写+质量门已种**：spec `tasks/T-AI-1.md`；组合首出（34567 顺子等 5 用例）+ 农民不压队友；质量门 Normal 组合率 ≥0.35 / 压队友 ≤0.20 / 胜率差 ≥+0.05；**compareMoves 语义红线不动** |
