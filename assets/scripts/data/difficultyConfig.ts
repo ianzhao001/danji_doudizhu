@@ -1,4 +1,5 @@
 import { AiLevel } from '../ai/strategy';
+import { isAiLevel } from './settings';
 
 export interface DifficultyConfig {
   level: AiLevel;
@@ -28,10 +29,6 @@ export const DIFFICULTY_CONFIGS: Record<AiLevel, DifficultyConfig> = {
     thinkDelayMs: { min: 250, max: 500 },
   },
 };
-
-function isAiLevel(value: unknown): value is AiLevel {
-  return Object.values(AiLevel).includes(value as AiLevel);
-}
 
 export function difficultyConfig(level: AiLevel): DifficultyConfig {
   return DIFFICULTY_CONFIGS[isAiLevel(level) ? level : AiLevel.Normal];

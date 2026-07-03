@@ -13,6 +13,7 @@ import {
   type RecordsState,
   type Settings,
 } from '../../data';
+import { STORAGE_KEYS } from '../../data/storage-keys';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import {
   deriveLobbyView,
@@ -30,9 +31,9 @@ import { RESOURCE_PATHS } from '../asset-keys';
 import { addButton as addUiButton, addLabel as addUiLabel, addUiTransform, drawPanel, loadSprite } from './ui-helpers';
 
 const { ccclass, property } = _decorator;
-const SETTINGS_KEY = 'doudizhu.settings';
-const STATS_KEY = 'doudizhu.stats';
-const RECORDS_KEY = 'doudizhu.records';
+const SETTINGS_KEY = STORAGE_KEYS.settings;
+const STATS_KEY = STORAGE_KEYS.stats;
+const RECORDS_KEY = STORAGE_KEYS.records;
 const LANDSCAPE_CANVAS = { width: 844, height: 390 };
 const LOBBY_BACKGROUND_ASPECT = 1846 / 852;
 const LEGACY_LABEL_NODE_NAMES = [

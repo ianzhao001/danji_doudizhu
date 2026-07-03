@@ -11,12 +11,12 @@
  *   import { strategyFor, AiLevel } from '../../assets/scripts/ai';
  */
 
-import { AiLevel, strategyFor } from '../../assets/scripts/ai';
-import { runHeadlessRound, type PlayPolicy } from '../../assets/scripts/flow';
+import { AiLevel } from '../../assets/scripts/ai';
+import { levelPolicies, runHeadlessRound, type PlayPolicy } from '../../assets/scripts/flow';
 
-/** M4-04B：抽离 routing 构造，便于逐座位证明分发。架构落桩——实现方实现函数体（复用已导入的 AiLevel/PlayPolicy）。 */
+/** M4-04B routing 构造。T-DEDUP：不再复制生产路由——直接复用 flow/policies 的 levelPolicies（测试验证生产实现本体，消除契约漂移盲区）。 */
 export function buildRoutingPolicy(levels: [AiLevel, AiLevel, AiLevel]): PlayPolicy {
-  return ({ snapshot, rng }) => strategyFor(levels[snapshot.turn])(snapshot, rng);
+  return levelPolicies(levels).playPolicy;
 }
 
 export interface MatchSummary {
