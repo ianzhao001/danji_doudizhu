@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/ART-GAME-REMAKE`
-- 状态：in-review（等待用户逐件图审；未进入 import）
+- 状态：in-review（用户图审打回重排已提交；等待用户复审；未进入 import）
 
 ## 改了哪些文件
 
@@ -112,9 +112,9 @@ cards/suit-club-v13.png 4a80a76d6c98aff9 128x128 alpha True corners True
 cards/suit-diamond-v13.png 4df5921f0fc127f2 128x128 alpha True corners True
 cards/suit-heart-v13.png 0af62567b214f762 128x128 alpha True corners True
 cards/suit-spade-v13.png f1fb7153001e6ba6 128x128 alpha True corners True
-composites/v13/composite-780x360-playing-v13.png 5ba40f95ab8ce1bf 780x360 alpha False corners False
-composites/v13/composite-844x390-bidding-v13.png 5ad5c84b58b1a9e5 844x390 alpha False corners False
-composites/v13/composite-844x390-settlement-v13.png f52799c94ec2e088 844x390 alpha False corners False
+composites/v13/composite-780x360-playing-v13.png 35f31c6a455785da 780x360 alpha False corners False
+composites/v13/composite-844x390-bidding-v13.png 7f6d951c84e66c1e 844x390 alpha False corners False
+composites/v13/composite-844x390-settlement-v13.png 0d5f3809d9dffde0 844x390 alpha False corners False
 ```
 
 完整 sha256 见 `asset-previews/v13-pink-game-remake/manifest-v13.json` 与 `PROMPTS.md`。
@@ -192,6 +192,63 @@ git status --short --untracked-files=all
 - `settlement-banner-win-v13` / `settlement-banner-lose-v13` 为无字装饰底图；合成预览中的「地主胜利」是 composite 上的代码字效果示意，不是正式资产内文字。
 - Joker 使用原创小丑/皇冠图案区分大小王，无 `JOKER` 文字，避免 image_gen 文字瑕疵。
 - `ui/badge-role-v13.png` 是 UI sheet 附加裁切件，不在本轮必选 import 清单内。
+
+## 用户图审打回返工段（Codex · 2026-07-05）
+
+### 打回项
+
+- 用户反馈 1：`bidding`、`playing`、`settlement` 三个页面里三个人有两个人重叠，需参考此前示意图的布局避免人物重叠。
+- 用户反馈 2：三个人的大小需要一样；玩家角色是在自己手牌的左边，不能出现在牌桌上。
+- 关联根因：`T-LAYOUT3` 审查者已打回 `heroBody` 与 `opponentLeftBody` zone 重叠；布局返工已在 `task/T-LAYOUT3` 提交 `7c9a55b` 与二次提交 `927b375`。
+
+### 修复方式
+
+- 未重新生成 image_gen 源图，未替换正式分项资产。
+- 只更新 `finalize_imagegen_v13.py` 的合成预览 `ZONE_SIZES`：
+  - 844×390：三名 body 统一 `152×234`；玩家 `x=8..160`，手牌从 `x=176` 开始。
+  - 780×360：三名 body 统一 `140×216`；玩家 `x=8..148`，手牌从 `x=164` 开始。
+- 合成时角色使用 alpha bbox 适配同尺寸 zone，避免透明边导致玩家视觉上偏小。
+- 重新生成三张 composite、`review-sheet-v2.png`、`manifest-v13.json` 与 `PROMPTS.md`。
+- `PROMPTS.md` 已记录本轮用户图审打回与 `T-LAYOUT3` 修复提交指针。
+
+### 返工后机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+
+manifest_count 39
+composites/v13/composite-844x390-bidding-v13.png 7f6d951c84e66c1e 844x390 alpha False corners False
+composites/v13/composite-780x360-playing-v13.png 35f31c6a455785da 780x360 alpha False corners False
+composites/v13/composite-844x390-settlement-v13.png 0d5f3809d9dffde0 844x390 alpha False corners False
+review-sheet-v2.png c78907d97ba47e84 1800x1320 alpha False corners False
+```
+
+### 返工后目检
+
+- `composite-844x390-bidding-v13.png`：三名角色同尺寸；玩家在手牌左侧，不进入牌桌中央；无人物互叠。
+- `composite-780x360-playing-v13.png`：三名角色同尺寸；玩家在手牌左侧，底部手牌区未被人物压住。
+- `composite-844x390-settlement-v13.png`：暗幕下三名角色同尺寸并保留围桌关系；玩家仍在手牌左侧/左下区域。
+
+### 返工后测试与类型检查输出
+
+```
+npm --prefix test test
+Test Files  140 passed (140)
+Tests       711 passed (711)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
 
 ## 疑问 / 需规划者裁定
 

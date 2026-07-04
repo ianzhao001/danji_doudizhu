@@ -66,23 +66,23 @@ CARD_SPECS = [
 
 ZONE_SIZES = {
   "844x390": {
-    "heroBody": (8, 140, 152, 164),
-    "leftBody": (8, 47, 169, 249),
-    "rightBody": (667, 47, 169, 249),
+    "heroBody": (8, 156, 152, 234),
+    "leftBody": (168, 47, 152, 234),
+    "rightBody": (684, 47, 152, 234),
     "heroNameplate": (8, 271, 152, 33),
-    "leftNameplate": (16, 179, 152, 33),
-    "rightNameplate": (684, 179, 152, 33),
+    "leftNameplate": (176, 171, 152, 33),
+    "rightNameplate": (684, 171, 152, 33),
     "hand": (176, 304, 660, 86),
     "action": (287, 247, 270, 49),
     "settlement": (186, 35, 473, 195),
   },
   "780x360": {
-    "heroBody": (8, 130, 140, 150),
-    "leftBody": (8, 43, 156, 229),
-    "rightBody": (616, 43, 156, 229),
+    "heroBody": (8, 144, 140, 216),
+    "leftBody": (156, 43, 140, 216),
+    "rightBody": (632, 43, 140, 216),
     "heroNameplate": (8, 249, 140, 31),
-    "leftNameplate": (16, 164, 140, 31),
-    "rightNameplate": (632, 164, 140, 31),
+    "leftNameplate": (164, 157, 140, 31),
+    "rightNameplate": (632, 157, 140, 31),
     "hand": (164, 280, 608, 80),
     "action": (264, 227, 252, 45),
     "settlement": (172, 32, 437, 180),
@@ -201,9 +201,9 @@ def build_scene_composite(zone_key: str, size: tuple[int, int], out: Path, mode:
   bg = Image.open(OUT_BG / "game-table-bg-v13.png").convert("RGBA").resize(size, Image.Resampling.LANCZOS)
   canvas = bg.copy()
 
-  paste_fit(canvas, OUT_AVATAR / "left-ai-body-v13.png", zones["leftBody"])
-  paste_fit(canvas, OUT_AVATAR / "right-ai-body-v13.png", zones["rightBody"])
-  paste_fit(canvas, OUT_AVATAR / "hero-body-v13.png", zones["heroBody"])
+  paste_subject_fit(canvas, OUT_AVATAR / "left-ai-body-v13.png", zones["leftBody"])
+  paste_subject_fit(canvas, OUT_AVATAR / "right-ai-body-v13.png", zones["rightBody"])
+  paste_subject_fit(canvas, OUT_AVATAR / "hero-body-v13.png", zones["heroBody"])
   paste_fit(canvas, OUT_UI / "seat-nameplate-v13.png", zones["leftNameplate"])
   paste_fit(canvas, OUT_UI / "seat-nameplate-v13.png", zones["rightNameplate"])
   paste_fit(canvas, OUT_UI / "seat-nameplate-v13.png", zones["heroNameplate"])
@@ -246,6 +246,16 @@ def build_scene_composite(zone_key: str, size: tuple[int, int], out: Path, mode:
 
 def paste_fit(canvas: Image.Image, asset_path: Path, rect: tuple[int, int, int, int]) -> None:
   asset = Image.open(asset_path).convert("RGBA")
+  x, y, w, h = rect
+  fitted = contain(asset, (w, h), 0)
+  canvas.alpha_composite(fitted, (x, y))
+
+
+def paste_subject_fit(canvas: Image.Image, asset_path: Path, rect: tuple[int, int, int, int]) -> None:
+  asset = Image.open(asset_path).convert("RGBA")
+  bbox = asset.getbbox()
+  if bbox is not None:
+    asset = asset.crop(bbox)
   x, y, w, h = rect
   fitted = contain(asset, (w, h), 0)
   canvas.alpha_composite(fitted, (x, y))
@@ -429,6 +439,7 @@ def write_prompts() -> None:
     "- Existing `*-preview.png`, `review-sheet.png`, and `composites/composite-*.png` are **layout mockup only / 非正式资产** from the older Pillow pass.",
     "- Formal `*-v13.png` assets in this package are derived from built-in `image_gen` source images under `source/generated-v13/`.",
     "- Pillow is used only for non-creative post-processing: crop, chroma-key removal, resize, 9-slice stretch simulation, review-sheet/composite layout, and sha256 calculation.",
+    "- User feedback fix 2026-07-05: bidding/playing/settlement composites were rejected because characters overlapped, the three body sizes were inconsistent, and the hero appeared on the tabletop instead of beside the hand. Composite zones now mirror T-LAYOUT3 fix `927b375`, use equal body rectangles, and keep the hero left of `heroHandLarge`; no image_gen source was regenerated.",
     "",
     "## Built-in image_gen source prompts",
     "",
