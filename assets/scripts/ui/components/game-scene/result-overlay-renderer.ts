@@ -1,7 +1,7 @@
-import { BlockInputEvents, Color, director, Sprite } from 'cc';
+import { BlockInputEvents, Color, director, Graphics, Sprite } from 'cc';
 import { RESOURCE_PATHS } from '../../asset-keys';
 import { deriveScreenVM } from '../../screen-view';
-import { addUiTransform, loadSprite } from '../ui-helpers';
+import { addUiTransform } from '../ui-helpers';
 import type { GameSceneRendererContext } from './seats-renderer';
 
 function seatName(seat: number): string {
@@ -45,7 +45,18 @@ export function renderResult(
   const sprite = panel.getComponent(Sprite) ?? panel.addComponent(Sprite);
   sprite.type = Sprite.Type.SIMPLE;
   sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-  loadSprite(RESOURCE_PATHS.settlementBg, sprite, ctx.spriteFrames);
+  ctx.loadSprite(RESOURCE_PATHS.settlementBg, sprite);
+  const fill = ctx.ensureNode('settlement-panel-fill', panel);
+  const fillWidth = panelWidth - 44;
+  const fillHeight = panelHeight - (landscape ? 92 : 120);
+  fill.setPosition(0, landscape ? -panelHeight * 0.025 : -panelHeight * 0.045, 0);
+  fill.setSiblingIndex(0);
+  addUiTransform(fill, fillWidth, fillHeight);
+  const fillGraphics = fill.getComponent(Graphics) ?? fill.addComponent(Graphics);
+  fillGraphics.clear();
+  fillGraphics.fillColor = new Color(255, 247, 226, 238);
+  fillGraphics.roundRect(-fillWidth / 2, -fillHeight / 2, fillWidth, fillHeight, 18);
+  fillGraphics.fill();
   ctx.addSprite(
     result.resultText === '胜利' ? RESOURCE_PATHS.settlementWinBadge : RESOURCE_PATHS.settlementLoseBadge,
     -106,
@@ -77,4 +88,6 @@ export function renderResult(
   ctx.addButton('再来一局', -74, buttonY, 116, 42, true, () => ctx.startGame(true), panel, 'result-new');
   ctx.addButton('返回大厅', 74, buttonY, 116, 42, true, () => director.loadScene('lobby'), panel, 'result-lobby');
   if (ctx.settings.animation) ctx.animateScaleIn(panel, 0.92, 180);
+  panel.setSiblingIndex(overlay.children.length - 1);
+  overlay.setSiblingIndex(ctx.uiRoot.children.length - 1);
 }

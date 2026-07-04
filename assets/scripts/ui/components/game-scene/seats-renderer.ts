@@ -1,4 +1,4 @@
-import { Color, Label, Node, SpriteFrame } from 'cc';
+import { Color, Label, Node, Sprite, SpriteFrame } from 'cc';
 import type { Settings } from '../../../data/settings';
 import type { FlowEvent } from '../../../flow/types';
 import type { RoundRuntime } from '../../../flow/round-runtime';
@@ -47,6 +47,7 @@ export interface GameSceneRendererContext {
     name?: string,
   ): Label;
   addSprite(path: ResourcePath, x: number, y: number, width: number, height: number, parent: Node, name: string, sliced?: boolean): Node;
+  loadSprite(path: ResourcePath, sprite: Sprite | null): void;
   drawPanelSkin(parent: Node, width: number, height: number, name?: string): Node;
   render(): void;
   setMemoryExpanded(value: boolean): void;
