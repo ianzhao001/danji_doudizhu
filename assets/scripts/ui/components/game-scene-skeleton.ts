@@ -49,10 +49,11 @@ import {
   RESOURCE_PATHS,
   cardAssetPath,
   cueAudioPath,
+  spriteFrameResourcePath,
   type ResourcePath,
   suitAssetPath,
 } from '../asset-keys';
-import { addLabel as addUiLabel, addUiTransform, loadSprite } from './ui-helpers';
+import { addLabel as addUiLabel, addUiTransform } from './ui-helpers';
 import {
   renderActions as renderActionsSection,
   renderAdvisor as renderAdvisorSection,
@@ -102,6 +103,28 @@ const SCAFFOLD_NODE_NAMES = [
   'card-template-002',
   'card-template-003',
   'card-template-004',
+];
+const SETTLEMENT_TRANSIENT_HUD_NODE_NAMES = [
+  'status-label',
+  'bidding-prompt',
+  'turn-timer-runtime',
+  'toast-layer-runtime',
+  'hud-strength-meter',
+  'hud-card-memory',
+  'advisor-toggle',
+  'advisor-panel',
+  'action-play',
+  'action-pass',
+  'action-hint',
+  'bid-call',
+  'bid-grab',
+  'bid-pass',
+  'last-action-0',
+  'last-action-1',
+  'last-action-2',
+  'ai-thinking-0',
+  'ai-thinking-1',
+  'ai-thinking-2',
 ];
 const BRIGHT_PANEL_TEXT = new Color(108, 46, 76, 255);
 const BRIGHT_PANEL_MUTED = new Color(142, 88, 108, 235);
@@ -343,21 +366,23 @@ export class GameSceneSkeleton extends Component {
     const handCounts = snapshot?.handCounts ?? biddingDeal?.handCounts ?? [0, 0, 0];
     const handCount = snapshot?.viewerHand?.length ?? biddingDeal?.viewerHand.length ?? 0;
     this.armDealAnimationLock(phase, vm.hand);
+    const showTransientHud = phase !== 'settled';
 
     this.beginRenderDiff();
+    if (!showTransientHud) this.hideSettledTransientHud();
     this.renderTopBar(phase, vm.topBar, handCount, layout, canvas);
     this.renderSeats(handCounts, snapshot?.landlord ?? null, layout, canvas);
-    this.renderSeatFeedback(layout, canvas);
+    if (showTransientHud) this.renderSeatFeedback(layout, canvas);
     this.renderBottomCardsDock(phase === 'bidding' ? null : this.revealedBottomCards, layout, canvas);
-    this.renderPlayArea(snapshot?.top ?? null, layout, canvas);
-    this.renderHud(snapshot?.viewerHand ?? [], layout, canvas);
+    this.renderPlayArea(snapshot?.top ?? null, layout, canvas, showTransientHud);
+    if (showTransientHud) this.renderHud(snapshot?.viewerHand ?? [], layout, canvas);
     this.renderHand(vm.hand, layout, canvas);
-    this.renderAdvisor(snapshot, layout, canvas);
+    if (showTransientHud) this.renderAdvisor(snapshot, layout, canvas);
     if (phase === 'bidding') this.renderBidding(vm.bidding, layout, canvas);
-    this.renderStatus(this.statusText || (phase === 'bidding' ? '叫抢阶段' : ''), layout, canvas);
-    this.renderTurnTimer(layout, canvas);
+    if (showTransientHud) this.renderStatus(this.statusText || (phase === 'bidding' ? '叫抢阶段' : ''), layout, canvas);
+    if (showTransientHud) this.renderTurnTimer(layout, canvas);
     if (phase === 'playing') this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, layout, canvas);
-    this.renderToasts(layout, canvas);
+    if (showTransientHud) this.renderToasts(layout, canvas);
     this.renderResult(vm.result, canvas);
     if (!vm.result) {
       this.renderPauseControl(layout, canvas);
@@ -385,6 +410,7 @@ export class GameSceneSkeleton extends Component {
       addLabel: this.addLabel.bind(this),
       addButton: this.addButton.bind(this),
       addSprite: this.addSprite.bind(this),
+      loadSprite: this.loadSprite.bind(this),
       drawPanelSkin: this.drawPanelSkin.bind(this),
       render: this.render.bind(this),
       setMemoryExpanded: (value) => {
@@ -495,11 +521,11 @@ export class GameSceneSkeleton extends Component {
       const sprite = back.getComponent(Sprite) ?? back.addComponent(Sprite);
       sprite.type = Sprite.Type.SIMPLE;
       sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-      loadSprite(RESOURCE_PATHS.cardBack, sprite, this.spriteFrames);
+      this.loadSprite(RESOURCE_PATHS.cardBack, sprite);
     }
   }
 
-  private renderPlayArea(top: TopPlay | null, layout: TableZones, canvas: { width: number; height: number }): void {
+  private renderPlayArea(top: TopPlay | null, layout: TableZones, canvas: { width: number; height: number }, showLabel = true): void {
     const area = this.ensureNode('play-area-runtime', this.uiRoot!);
     this.playAreaRoot = area;
     const dropZone = top?.seat === 1
@@ -513,9 +539,11 @@ export class GameSceneSkeleton extends Component {
     area.setPosition(pos.x, pos.y, 0);
     addUiTransform(area, width, height);
 
-    const labelText = top ? `${seatName(top.seat)}·已出牌` : '自由出牌';
-    const label = this.addLabel(labelText, 0, top ? height / 2 - 12 : 34, top ? 13 : 18, area, Math.min(170, width), top ? 22 : 34, 'play-area-label', TABLE_TEXT);
-    label.lineHeight = 24;
+    if (showLabel) {
+      const labelText = top ? `${seatName(top.seat)}·已出牌` : '自由出牌';
+      const label = this.addLabel(labelText, 0, top ? height / 2 - 12 : 34, top ? 13 : 18, area, Math.min(170, width), top ? 22 : 34, 'play-area-label', TABLE_TEXT);
+      label.lineHeight = 24;
+    }
     if (!top) {
       this.lastPlayAreaSignature = '';
       return;
@@ -826,7 +854,7 @@ export class GameSceneSkeleton extends Component {
     addUiTransform(bgNode, CARD_SIZE.width, CARD_SIZE.height);
     const sprite = bgNode.getComponent(Sprite) ?? bgNode.addComponent(Sprite);
     this.configureCardSprite(sprite);
-    loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite, this.spriteFrames);
+    this.loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite);
     node.off(Node.EventType.TOUCH_START);
     node.off(Node.EventType.TOUCH_END);
     node.off(Node.EventType.TOUCH_CANCEL);
@@ -864,7 +892,7 @@ export class GameSceneSkeleton extends Component {
         addUiTransform(suitNode, CARD_SUIT_ICON_SIZE, CARD_SUIT_ICON_SIZE);
         const suitSprite = suitNode.getComponent(Sprite) ?? suitNode.addComponent(Sprite);
         this.configureCardSprite(suitSprite);
-        loadSprite(suitPath, suitSprite, this.spriteFrames);
+        this.loadSprite(suitPath, suitSprite);
       }
     }
     return node;
@@ -1023,8 +1051,31 @@ export class GameSceneSkeleton extends Component {
     const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
     sprite.type = sliced ? Sprite.Type.SLICED : Sprite.Type.SIMPLE;
     sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-    loadSprite(path, sprite, this.spriteFrames);
+    this.loadSprite(path, sprite);
     return node;
+  }
+
+  private loadSprite(path: ResourcePath, sprite: Sprite | null): void {
+    if (!sprite) return;
+    const cached = this.spriteFrames.get(path);
+    if (cached) {
+      this.applySpriteFrame(sprite, cached);
+      return;
+    }
+    resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
+      if (error || !frame) return;
+      this.spriteFrames.set(path, frame);
+      this.applySpriteFrame(sprite, frame);
+    });
+  }
+
+  private applySpriteFrame(sprite: Sprite, frame: SpriteFrame): void {
+    if (!sprite.isValid || !sprite.node?.isValid) return;
+    try {
+      sprite.spriteFrame = frame;
+    } catch (error) {
+      if (sprite.isValid && sprite.node?.isValid) throw error;
+    }
   }
 
   private drawPanelSkin(parent: Node, width: number, height: number, name = 'panel-skin'): Node {
@@ -1290,6 +1341,23 @@ export class GameSceneSkeleton extends Component {
     this.liveRenderNodes = new Set<Node>();
   }
 
+  private hideSettledTransientHud(): void {
+    for (const name of SETTLEMENT_TRANSIENT_HUD_NODE_NAMES) this.hideLiveSubtree(name);
+  }
+
+  private hideLiveSubtree(name: string): void {
+    if (!this.uiRoot) return;
+    const node = this.uiRoot.getChildByName(name);
+    if (!node) return;
+    node.active = false;
+    this.markLiveSubtree(node);
+  }
+
+  private markLiveSubtree(node: Node): void {
+    this.liveRenderNodes?.add(node);
+    for (const child of node.children) this.markLiveSubtree(child);
+  }
+
   private endRenderDiff(): void {
     if (this.uiRoot && this.liveRenderNodes) this.pruneInactiveChildren(this.uiRoot);
     this.liveRenderNodes = null;
@@ -1327,7 +1395,7 @@ export class GameSceneSkeleton extends Component {
     const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
     sprite.type = Sprite.Type.SIMPLE;
     sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-    loadSprite(RESOURCE_PATHS.gameTableBg, sprite, this.spriteFrames);
+    this.loadSprite(RESOURCE_PATHS.gameTableBg, sprite);
   }
 
   private setCardPressed(node: Node, pressed: boolean): void {
