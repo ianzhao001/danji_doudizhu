@@ -755,7 +755,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-AI-1 | 1 | 纯逻辑(ai) | 新 `ai/levels/lead-score.ts` + `normal.ts` 重写 + `_shared.ts` 只加 + `hard.ts` 两处机械替换 | Wave0 契约 ✅（已种） | **done `9353f76`**：组合首出+农民配合+质量门全绿；规划者裁定 `3ffe8e9`（hard-depth 排序断言迁移至 T-AI-2 质量门）→ 136/669 绿+typecheck 净 |
 | T-AI-2 | 1.5 | 纯逻辑(ai) | `hard.ts` + `endgame.ts` + difficultyConfig 文案（仅 description） | T-AI-1 ✅`9353f76` | **done `7476412`** |
 | ART-UIKIT | 1 | 美术·文生图 | `asset-previews/v12-uikit/` + report（不碰 resources） | — | **done `7f71cf2`**：v12 preview 包齐（名字牌/底牌托架/btn×3/拉伸模拟/角部裁样）+ 用户视觉终审通过（2026-07-04）→ 139/703 绿+typecheck 净 |
-| ART-IMPORT-UIKIT | 1.5 | 美术·导入 | `assets/resources/art/ui/*.png`(+`.meta` Creator·panel-popup 仅配 border) + `asset-keys.ts` 新 2 键；**禁碰两巨组件** | ART-UIKIT ✅`7f71cf2` | merge-claimed:ART-IMPORT-UIKIT |
+| ART-IMPORT-UIKIT | 1.5 | 美术·导入 | `assets/resources/art/ui/*.png`(+`.meta` Creator·panel-popup 仅配 border) + `asset-keys.ts` 新 2 键；**禁碰两巨组件** | ART-UIKIT ✅`7f71cf2` | **done `5ad2223`** |
 | P-G3 | 2 | 巨组件流水线(四阶段) | `game-scene-skeleton.ts` + 新 `ui/components/game-scene/*.ts`(4 模块) | ①②依赖已满足；③依赖 ART-IMPORT-UIKIT | **ready·已建分支**：spec `tasks/P-G3.md`；①move-only 拆 4 热区（拆前基线截图+color-moved 核）→②消费 zones/biddingDeal/bottomRevealed+actionBar 相位互斥+17 对检查单+per-seat 落点+结算清场+chips 迁暂停菜单+叫抢计时+seed URL 口 →③美术接线（等 ART-IMPORT）→④文案（③④可交换）；审查按 `tasks/R-WAVE2.md` |
 | P-L3 | 2 | 巨组件流水线(两阶段) | `lobby-scene.ts` | ①依赖已满足；②依赖 ART-IMPORT-UIKIT | **ready·已建分支**：spec `tasks/P-L3.md`；①「继续游戏」接真存档（savedSlot 硬编码 null → 真读档；逐手存档已让续局有实值）+布局微调 →②美术接线；审查按 `tasks/R-WAVE2.md` |
 | V2 | 3 | 收口·验证 | `reports/V2.report.md`(verify-only) | P-G3+P-L3+T-AI-2 | blocked：四横屏固定 seed 真实一局 e2e + AI 观察指标表 + PLAYTEST |
