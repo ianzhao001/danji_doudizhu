@@ -1,10 +1,11 @@
-import { _decorator, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UITransform } from 'cc';
+import { _decorator, Button, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UITransform } from 'cc';
 import { AiLevel } from '../../ai';
 import {
   deserializeStats,
   digestRecords,
   emptyRecords,
   emptyStats,
+  loadSave,
   loadSettings,
   migrateRecords,
   saveSettings,
@@ -27,11 +28,12 @@ import { deriveDifficultyPicker } from '../difficulty-picker-view';
 import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
 import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
-import { RESOURCE_PATHS } from '../asset-keys';
-import { addButton as addUiButton, addLabel as addUiLabel, addUiTransform, drawPanel, loadSprite } from './ui-helpers';
+import { RESOURCE_PATHS, type ResourcePath } from '../asset-keys';
+import { addLabel as addUiLabel, addUiTransform, loadSprite } from './ui-helpers';
 
 const { ccclass, property } = _decorator;
 const SETTINGS_KEY = STORAGE_KEYS.settings;
+const SAVE_KEY = STORAGE_KEYS.save;
 const STATS_KEY = STORAGE_KEYS.stats;
 const RECORDS_KEY = STORAGE_KEYS.records;
 const LANDSCAPE_CANVAS = { width: 844, height: 390 };
@@ -42,6 +44,14 @@ const LEGACY_LABEL_NODE_NAMES = [
   'settings-label',
   'records-label',
 ];
+const PANEL_TEXT = new Color(108, 46, 76, 255);
+const PANEL_MUTED = new Color(142, 88, 108, 235);
+const PANEL_ACCENT = new Color(198, 68, 124, 255);
+const PANEL_GOOD = new Color(77, 126, 88, 245);
+const PANEL_BAD = new Color(176, 72, 88, 245);
+const BUTTON_PRIMARY_TEXT = new Color(116, 36, 82, 255);
+const BUTTON_SECONDARY_TEXT = new Color(34, 78, 132, 255);
+const BUTTON_DISABLED_TEXT = new Color(118, 108, 114, 180);
 
 const TOGGLE_LABELS: Record<ToggleKey, string> = {
   sound: '音效',
@@ -55,6 +65,7 @@ interface HelpRow {
 }
 
 interface HomeViewData {
+  hasSavedGame: boolean;
   rounds: string;
   winRate: string;
   netScore: string;
@@ -139,7 +150,8 @@ export class LobbyScene extends Component {
     const settings = loadSettings(cocosStorage(), SETTINGS_KEY);
     const stats = this.loadStats();
     const records = this.loadRecords();
-    const lobby = deriveLobbyView({ savedSlot: null, stats });
+    const savedSlot = this.loadSavedSlot();
+    const lobby = deriveLobbyView({ savedSlot, stats });
     const statsView = deriveStatsView(stats);
     const settingsView = deriveSettingsView(settings);
     const recordRows = deriveRecordsView(records, 1);
@@ -155,6 +167,7 @@ export class LobbyScene extends Component {
     this.setText(this.latestRecordLabel, recordRows[0]?.scoreLabel ?? '暂无战绩');
     this.setHomeLabelsVisible(false);
     this.renderRuntimeControls(settings, {
+      hasSavedGame: lobby.hasSavedGame,
       rounds: `局数 ${statsView.rounds}`,
       winRate: `胜率 ${statsView.winRatePct}%`,
       netScore: `净分 ${statsView.netScoreLabel}`,
@@ -184,7 +197,13 @@ export class LobbyScene extends Component {
     this.renderHomeScreen(settings, home);
   }
 
-  private openGameScene(): void {
+  private openGameScene(options: { forceNew?: boolean; requireSave?: boolean } = {}): void {
+    const storage = cocosStorage();
+    if (options.requireSave && this.loadSavedSlot() === null) {
+      this.render();
+      return;
+    }
+    if (options.forceNew) storage.removeItem(SAVE_KEY);
     const runtime = globalThis as typeof globalThis & {
       cc?: { director?: { loadScene(sceneName: string): void } };
     };
@@ -195,8 +214,8 @@ export class LobbyScene extends Component {
     if (!this.controlsRoot) return;
     const settingsView = deriveSettingsView(settings);
     const canvas = this.canvasSize();
-    const contentWidth = Math.min(canvas.width - 44, 796);
-    const panelHeight = Math.min(286, canvas.height - 72);
+    const contentWidth = Math.min(canvas.width - 40, 804);
+    const panelHeight = Math.min(292, canvas.height - 66);
     const summaryWidth = Math.min(232, Math.max(214, contentWidth * 0.29));
     const difficultyWidth = Math.min(292, Math.max(258, contentWidth * 0.34));
     const settingsWidth = summaryWidth;
@@ -207,21 +226,44 @@ export class LobbyScene extends Component {
     const summary = this.ensureNode('home-summary-panel', this.controlsRoot);
     summary.setPosition(leftX, 0, 0);
     addUiTransform(summary, summaryWidth, panelHeight);
-    drawPanel(summary, summaryWidth, panelHeight, new Color(34, 43, 58, 228));
+    this.drawPanelSkin(summary, summaryWidth, panelHeight);
     this.addLabel('斗地主', 0, panelHeight / 2 - 38, 28, summary, summaryWidth - 34, 40, 'home-title');
-    this.addButton('开始新局', 0, panelHeight / 2 - 88, summaryWidth - 42, 40, true, () => this.openGameScene(), summary, false, 'home-start-button');
-    this.addButton('继续游戏', 0, panelHeight / 2 - 136, summaryWidth - 42, 40, true, () => this.openGameScene(), summary, false, 'home-continue-button');
-    this.addLabel(home.rounds, -42, -26, 14, summary, 96, 24, 'home-rounds', new Color(255, 255, 255, 225));
-    this.addLabel(home.winRate, 48, -26, 14, summary, 100, 24, 'home-win-rate', new Color(255, 255, 255, 225));
-    this.addLabel(home.netScore, 0, -58, 15, summary, summaryWidth - 40, 26, 'home-net-score', new Color(255, 246, 213, 248));
-    this.addLabel(home.latestRecord, 0, -92, 13, summary, summaryWidth - 40, 24, 'home-latest-record', new Color(225, 235, 255, 210));
+    this.addButton(
+      '开始新局',
+      0,
+      panelHeight / 2 - 88,
+      summaryWidth - 38,
+      40,
+      true,
+      () => this.openGameScene({ forceNew: true }),
+      summary,
+      false,
+      'home-start-button',
+    );
+    this.addButton(
+      home.hasSavedGame ? '继续游戏' : '暂无存档',
+      0,
+      panelHeight / 2 - 138,
+      summaryWidth - 38,
+      40,
+      home.hasSavedGame,
+      () => this.openGameScene({ requireSave: true }),
+      summary,
+      false,
+      'home-continue-button',
+    );
+    this.addLabel(home.rounds, -42, -36, 14, summary, 96, 24, 'home-rounds', PANEL_MUTED);
+    this.addLabel(home.winRate, 48, -36, 14, summary, 100, 24, 'home-win-rate', PANEL_MUTED);
+    this.addLabel(home.netScore, 0, -68, 15, summary, summaryWidth - 40, 26, 'home-net-score', PANEL_ACCENT);
+    this.addLabel(home.latestRecord, 0, -102, 13, summary, summaryWidth - 40, 24, 'home-latest-record', PANEL_MUTED);
 
     this.renderDifficultyPanel(settingsView.difficulty, centerX, 0, difficultyWidth, panelHeight);
 
     const settingsPanel = this.ensureNode('home-settings-panel', this.controlsRoot);
     settingsPanel.setPosition(rightX, 0, 0);
     addUiTransform(settingsPanel, settingsWidth, panelHeight);
-    drawPanel(settingsPanel, settingsWidth, panelHeight, new Color(34, 43, 58, 220));
+    this.drawPanelSkin(settingsPanel, settingsWidth, panelHeight);
+    this.addSprite(RESOURCE_PATHS.iconSettings, -settingsWidth / 2 + 34, panelHeight / 2 - 34, 24, 24, settingsPanel, 'home-settings-icon');
     this.addLabel('设置', 0, panelHeight / 2 - 34, 22, settingsPanel, settingsWidth - 34, 34, 'home-settings-title');
     settingsView.toggles.forEach((toggle, index) => {
       this.addButton(
@@ -233,7 +275,7 @@ export class LobbyScene extends Component {
         true,
         () => this.persist(toggleSetting(loadSettings(cocosStorage(), SETTINGS_KEY), toggle.key)),
         settingsPanel,
-        false,
+        toggle.on,
         `home-toggle-${toggle.key}`,
       );
     });
@@ -245,7 +287,7 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('difficulty-picker-panel', this.controlsRoot);
     panel.setPosition(x, y, 0);
     addUiTransform(panel, panelWidth, panelHeight);
-    drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 232));
+    this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel('难度', 0, panelHeight / 2 - 34, 22, panel, panelWidth - 34, 34, 'difficulty-title');
 
     const rowWidth = panelWidth - 18;
@@ -281,7 +323,7 @@ export class LobbyScene extends Component {
         titleWidth,
         24,
         `difficulty-label-${option.level}`,
-        option.selected ? new Color(255, 236, 197, 255) : new Color(255, 255, 255, 238),
+        option.selected ? BUTTON_PRIMARY_TEXT : BUTTON_SECONDARY_TEXT,
       );
       title.lineHeight = 18;
       const lines = wrapText(option.description, Math.max(8, Math.floor(descWidth / 12))).slice(0, 2);
@@ -296,7 +338,7 @@ export class LobbyScene extends Component {
           descWidth,
           16,
           `difficulty-desc-${option.level}-${lineIndex}`,
-          new Color(255, 255, 255, 215),
+          option.selected ? BUTTON_PRIMARY_TEXT : BUTTON_SECONDARY_TEXT,
         );
       });
       if (option.selected) {
@@ -309,7 +351,7 @@ export class LobbyScene extends Component {
           currentWidth,
           20,
           `difficulty-current-${option.level}`,
-          new Color(255, 236, 197, 255),
+          BUTTON_PRIMARY_TEXT,
         );
       }
     });
@@ -358,7 +400,7 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('tutorial-panel', this.controlsRoot);
     panel.setPosition(0, 0, 0);
     addUiTransform(panel, panelWidth, panelHeight);
-    drawPanel(panel, panelWidth, panelHeight, new Color(42, 44, 58, 245));
+    this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel('新手教程', 0, panelHeight / 2 - 34, 22, panel, 240, 34, 'tutorial-heading');
     this.addLabel(`${currentIndex + 1}/${steps.length}`, panelWidth / 2 - 58, panelHeight / 2 - 34, 13, panel, 54, 24, 'tutorial-progress');
     this.addLabel(current.title, 0, panelHeight / 2 - 80, 24, panel, panelWidth - 96, 42, 'tutorial-title');
@@ -399,9 +441,9 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('help-panel', this.controlsRoot);
     panel.setPosition(0, 0, 0);
     addUiTransform(panel, panelWidth, panelHeight);
-    drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 245));
+    this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel('帮助', 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'help-heading');
-    this.addLabel(`${start + 1}-${Math.min(rows.length, start + visibleRows)}/${rows.length}`, panelWidth / 2 - 64, panelHeight / 2 - 34, 12, panel, 72, 22, 'help-progress', new Color(255, 255, 255, 210));
+    this.addLabel(`${start + 1}-${Math.min(rows.length, start + visibleRows)}/${rows.length}`, panelWidth / 2 - 64, panelHeight / 2 - 34, 12, panel, 72, 22, 'help-progress', PANEL_MUTED);
 
     visible.forEach((row, index) => {
       const y = panelHeight / 2 - 72 - index * 24;
@@ -415,7 +457,7 @@ export class LobbyScene extends Component {
         panelWidth - 96,
         24,
         `help-row-${index}`,
-        row.kind === 'title' ? new Color(255, 236, 197, 255) : new Color(255, 255, 255, 238),
+        row.kind === 'title' ? PANEL_ACCENT : PANEL_TEXT,
       );
     });
 
@@ -442,16 +484,17 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('stats-panel', this.controlsRoot);
     panel.setPosition(0, 0, 0);
     addUiTransform(panel, panelWidth, panelHeight);
-    drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 245));
+    this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel('战绩', 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'stats-heading');
     if (view.empty) {
-      this.addLabel('暂无完成对局', 0, panelHeight / 2 - 72, 13, panel, 150, 24, 'stats-empty', new Color(255, 255, 255, 190));
+      this.addSprite(RESOURCE_PATHS.emptyRecords, 0, 22, 72, 72, panel, 'stats-empty-art');
+      this.addLabel('暂无完成对局', 0, -34, 13, panel, 150, 24, 'stats-empty', PANEL_MUTED);
     }
 
     view.rows.forEach((row, index) => {
       const y = panelHeight / 2 - 78 - index * 28;
-      this.addLabel(row.label, -86, y, 13, panel, 140, 22, `stats-label-${index}`, new Color(255, 255, 255, 216));
-      this.addLabel(row.value, 92, y, 14, panel, 150, 22, `stats-value-${index}`, new Color(255, 246, 213, 250));
+      this.addLabel(row.label, -86, y, 13, panel, 140, 22, `stats-label-${index}`, PANEL_TEXT);
+      this.addLabel(row.value, 92, y, 14, panel, 150, 22, `stats-value-${index}`, PANEL_ACCENT);
     });
 
     this.addButton('历史', -72, -panelHeight / 2 + 34, 96, 36, true, () => {
@@ -475,7 +518,7 @@ export class LobbyScene extends Component {
     const panel = this.ensureNode('records-panel', this.controlsRoot);
     panel.setPosition(0, 0, 0);
     addUiTransform(panel, panelWidth, panelHeight);
-    drawPanel(panel, panelWidth, panelHeight, new Color(36, 42, 58, 245));
+    this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel('历史', 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'records-heading');
 
     this.renderFilterGroup(
@@ -523,9 +566,10 @@ export class LobbyScene extends Component {
       'records-order',
     );
 
-    this.addLabel(view.filterLabel, 0, -14, 13, panel, 260, 22, 'records-filter-label', new Color(255, 255, 255, 205));
+    this.addLabel(view.filterLabel, 0, -14, 13, panel, 260, 22, 'records-filter-label', PANEL_MUTED);
     if (view.empty) {
-      this.addLabel('暂无匹配历史', 0, -50, 16, panel, 180, 30, 'records-empty', new Color(255, 255, 255, 205));
+      this.addSprite(RESOURCE_PATHS.emptyRecords, 0, -34, 68, 68, panel, 'records-empty-art');
+      this.addLabel('暂无匹配历史', 0, -88, 16, panel, 180, 30, 'records-empty', PANEL_MUTED);
     } else {
       view.rows.forEach((row, index) => {
         const y = -50 - index * 26;
@@ -539,7 +583,7 @@ export class LobbyScene extends Component {
           panelWidth - 122,
           22,
           `records-row-${index}`,
-          row.outcomeLabel === '胜' ? new Color(228, 255, 219, 245) : new Color(255, 225, 225, 245),
+          row.outcomeLabel === '胜' ? PANEL_GOOD : PANEL_BAD,
         );
       });
     }
@@ -618,6 +662,15 @@ export class LobbyScene extends Component {
     }
   }
 
+  private loadSavedSlot(): ReturnType<typeof loadSave> {
+    try {
+      return loadSave(cocosStorage(), SAVE_KEY);
+    } catch (error) {
+      console.warn('loadSave failed', error);
+      return null;
+    }
+  }
+
   private setText(label: Label | null, text: string): void {
     if (label) label.string = text;
   }
@@ -676,7 +729,7 @@ export class LobbyScene extends Component {
     width: number,
     height: number,
     name: string,
-    color = new Color(255, 255, 255, 255),
+    color = PANEL_TEXT,
   ): Label {
     return addUiLabel(this.ensureNode.bind(this), {
       text,
@@ -704,21 +757,90 @@ export class LobbyScene extends Component {
     selected = false,
     name?: string,
   ): Label {
-    return addUiButton(this.ensureNode.bind(this), {
+    const nodeName = name ?? `button-${text}-${x}-${y}`;
+    const node = this.ensureNode(nodeName, parent);
+    node.setPosition(x, y, 0);
+    addUiTransform(node, width, height);
+    const button = node.getComponent(Button) ?? node.addComponent(Button);
+    const bg = this.addSprite(this.buttonSkinPath(nodeName, enabled, selected), 0, 0, width, height, node, 'button-bg', true);
+    bg.setSiblingIndex(0);
+    button.target = bg;
+    button.transition = Button.Transition.COLOR;
+    button.interactable = enabled;
+    button.normalColor = new Color(255, 255, 255, 255);
+    button.pressedColor = new Color(255, 235, 240, 255);
+    button.hoverColor = new Color(255, 255, 255, 255);
+    button.disabledColor = new Color(255, 255, 255, 255);
+    node.off(Button.EventType.CLICK);
+    node.on(Button.EventType.CLICK, cb, this);
+
+    const iconPath = this.buttonIconPath(nodeName);
+    const iconSize = Math.min(21, Math.max(16, height - 14));
+    const labelX = iconPath && width >= 72 ? 8 : 0;
+    const labelWidth = iconPath && width >= 72 ? width - 32 : width;
+    if (iconPath && width >= 72) {
+      this.addSprite(iconPath, -width / 2 + 20, 0, iconSize, iconSize, node, 'button-icon');
+    }
+
+    const label = addUiLabel(this.ensureNode.bind(this), {
       text,
-      x,
-      y,
-      width,
-      height,
-      enabled,
-      cb,
-      parent,
-      name: name ?? `button-${text}-${x}-${y}`,
-      selected,
+      x: labelX,
+      y: 0,
       fontSize: 16,
-      lineHeight: 20,
-      owner: this,
+      parent: node,
+      width: labelWidth,
+      height,
+      name: 'button-label',
+      color: this.buttonTextColor(nodeName, enabled, selected),
+      lineHeightOffset: 4,
     });
+    label.lineHeight = 20;
+    return label;
+  }
+
+  private buttonSkinPath(name: string, enabled: boolean, selected: boolean): ResourcePath {
+    if (!enabled) return RESOURCE_PATHS.buttonDisabled;
+    if (selected || name === 'home-start-button' || name === 'home-continue-button') return RESOURCE_PATHS.buttonPrimary;
+    return RESOURCE_PATHS.buttonSecondary;
+  }
+
+  private buttonTextColor(name: string, enabled: boolean, selected: boolean): Color {
+    if (!enabled) return BUTTON_DISABLED_TEXT;
+    return selected || name === 'home-start-button' || name === 'home-continue-button'
+      ? BUTTON_PRIMARY_TEXT
+      : BUTTON_SECONDARY_TEXT;
+  }
+
+  private buttonIconPath(name: string): ResourcePath | null {
+    if (name.endsWith('-back-button')) return RESOURCE_PATHS.iconBack;
+    return null;
+  }
+
+  private addSprite(
+    path: ResourcePath,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    parent: Node,
+    name: string,
+    sliced = false,
+  ): Node {
+    const node = this.ensureNode(name, parent);
+    node.setPosition(x, y, 0);
+    addUiTransform(node, width, height);
+    const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
+    sprite.type = sliced ? Sprite.Type.SLICED : Sprite.Type.SIMPLE;
+    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+    loadSprite(path, sprite, this.spriteFrames);
+    return node;
+  }
+
+  private drawPanelSkin(parent: Node, width: number, height: number, name = 'panel-skin'): Node {
+    parent.getComponent(Graphics)?.clear();
+    const skin = this.addSprite(RESOURCE_PATHS.panelPopup, 0, 0, width, height, parent, name, true);
+    skin.setSiblingIndex(0);
+    return skin;
   }
 
   private ensureNode(name: string, parent: Node): Node {
