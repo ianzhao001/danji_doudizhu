@@ -5,6 +5,7 @@ import type { RoundRuntime } from '../../../flow/round-runtime';
 import type { GameEvent, SeatIndex } from '../../../game';
 import { deriveAiThinking } from '../../ai-thinking-view';
 import { deriveLastActions, type SeatLastAction } from '../../last-action-view';
+import { RESOURCE_PATHS, type ResourcePath } from '../../asset-keys';
 import type { Rect, TableRegions } from '../../table-layout';
 import { addUiTransform, drawPanel } from '../ui-helpers';
 
@@ -32,6 +33,7 @@ export interface GameSceneRendererContext {
     width?: number,
     height?: number,
     name?: string,
+    color?: Color,
   ): Label;
   addButton(
     text: string,
@@ -44,6 +46,8 @@ export interface GameSceneRendererContext {
     parent?: Node,
     name?: string,
   ): Label;
+  addSprite(path: ResourcePath, x: number, y: number, width: number, height: number, parent: Node, name: string, sliced?: boolean): Node;
+  drawPanelSkin(parent: Node, width: number, height: number, name?: string): Node;
   render(): void;
   setMemoryExpanded(value: boolean): void;
   toggleAdvisor(): void;
@@ -60,6 +64,8 @@ export interface GameSceneRendererContext {
 }
 
 const HERO_SEAT: SeatIndex = 0;
+const NAMEPLATE_TEXT = new Color(108, 46, 76, 255);
+const NAMEPLATE_MUTED = new Color(142, 88, 108, 235);
 
 function seatName(seat: number): string {
   if (seat === 0) return '你';
@@ -77,8 +83,37 @@ export function renderSeats(
 ): void {
   const left = ctx.rectPoint(layout.opponentLeft, canvas, 0.5, 0.5);
   const right = ctx.rectPoint(layout.opponentRight, canvas, 0.5, 0.5);
-  ctx.addLabel(`左家\n${handCounts[1]}张${landlord === 1 ? '\n地主' : ''}`, left.x, left.y, 16, ctx.uiRoot, 108, 64, 'seat-left');
-  ctx.addLabel(`右家\n${handCounts[2]}张${landlord === 2 ? '\n地主' : ''}`, right.x, right.y, 16, ctx.uiRoot, 108, 64, 'seat-right');
+  renderSeatCard(ctx, 'seat-left', left.x, left.y, 1, handCounts[1], landlord, true);
+  renderSeatCard(ctx, 'seat-right', right.x, right.y, 2, handCounts[2], landlord, false);
+}
+
+function renderSeatCard(
+  ctx: GameSceneRendererContext,
+  name: string,
+  x: number,
+  y: number,
+  seat: SeatIndex,
+  handCount: number,
+  landlord: number | null,
+  cheerful: boolean,
+): void {
+  const root = ctx.ensureNode(name, ctx.uiRoot);
+  root.setPosition(x, y, 0);
+  addUiTransform(root, 132, 64);
+  const roleKnown = landlord !== null;
+  const isLandlord = landlord === seat;
+  const avatarPath = roleKnown
+    ? (isLandlord ? RESOURCE_PATHS.landlordRoleAvatar : RESOURCE_PATHS.farmerRoleAvatar)
+    : (cheerful ? RESOURCE_PATHS.aiCheerfulAvatar : RESOURCE_PATHS.aiCalmAvatar);
+  ctx.addSprite(avatarPath, -40, 2, 44, 44, root, 'seat-avatar');
+  ctx.addSprite(RESOURCE_PATHS.avatarFrame, -40, 2, 52, 52, root, 'seat-avatar-frame');
+  ctx.addSprite(RESOURCE_PATHS.seatNameplate, 26, 5, 92, 34, root, 'seat-nameplate', true);
+  const roleText = roleKnown ? (isLandlord ? '地主' : '农民') : '待定';
+  ctx.addLabel(`${seatName(seat)}  ${handCount}张`, 26, 9, 13, root, 82, 18, 'seat-name-label', NAMEPLATE_TEXT);
+  ctx.addLabel(roleText, 26, -8, 11, root, 78, 16, 'seat-role-label', NAMEPLATE_MUTED);
+  if (roleKnown) {
+    ctx.addSprite(isLandlord ? RESOURCE_PATHS.landlordRoleBadge : RESOURCE_PATHS.farmerRoleBadge, -58, -20, 24, 24, root, 'seat-role-badge');
+  }
 }
 
 export function renderSeatFeedback(

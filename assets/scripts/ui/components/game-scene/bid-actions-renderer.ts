@@ -1,6 +1,7 @@
 import { Color, Graphics } from 'cc';
 import { adviseAction } from '../../../ai/insight';
 import type { RoundRuntime } from '../../../flow/round-runtime';
+import { RESOURCE_PATHS } from '../../asset-keys';
 import { deriveInsightView } from '../../insight-view';
 import { deriveScreenVM } from '../../screen-view';
 import type { TableZones } from '../../table-zones';
@@ -71,6 +72,7 @@ export function renderTurnTimer(
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, width, height);
   drawPanel(root, width, height, new Color(34, 39, 52, 166));
+  ctx.addSprite(RESOURCE_PATHS.badgeCountdownRing, -width / 2 + 14, 0, 18, 18, root, 'turn-timer-badge');
 
   const barWidth = width - 54;
   const barHeight = 4;

@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/P-G3`
-- 状态：阶段①已提交 `fef74c7`；阶段②已实现待审；阶段③待 ART-IMPORT-UIKIT 落 main 后继续；阶段④未开始
+- 状态：阶段①已提交 `fef74c7`；阶段②已实现并获准继续；阶段③/④已实现待审
 
 ## 阶段①改动文件
 
@@ -159,10 +159,75 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
     - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-780x360-bidding-ready.png`
     - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-780x360-playing.png`
 
-## 阶段③/④状态
+## 阶段③/④开工同步
 
-- 阶段③未开始：依赖 ART-IMPORT-UIKIT 落 main 后接线。
-- 阶段④未开始：待阶段③后做命名/文案收尾。
+- 已在 worktree 内执行 `git merge main`，合入 main `95da87d`，生成 merge commit `866385e`。
+- ART-IMPORT-UIKIT 已在 main 提供 v12 uikit 资源与 `RESOURCE_PATHS.seatNameplate` / `RESOURCE_PATHS.bottomCardsDock` 等键；本阶段只做 game-scene 接线和命名/文案收尾。
+
+## 阶段③/④改动文件
+
+- `assets/scripts/ui/components/game-scene-skeleton.ts`
+- `assets/scripts/ui/components/game-scene/seats-renderer.ts`
+- `assets/scripts/ui/components/game-scene/bid-actions-renderer.ts`
+- `assets/scripts/ui/components/game-scene/result-overlay-renderer.ts`
+
+## 阶段③实现摘要
+
+- 按钮绘制从纯色 helper 换为本组件内 `btn-primary` / `btn-secondary` / `btn-disabled` 九宫格 Sprite 背景；出牌/不要/提示/叫抢/设置/返回类按钮按语义补 icon。
+- 弹窗与 toast 面板接 `panel-popup` 九宫格；底牌托架接 `bottom-cards-dock`；顶部信息条接 `badge-turn` / `badge-multiplier` / `seat-nameplate`。
+- 左右座位改为语义节点卡片：`seat-avatar`、`seat-avatar-frame`、`seat-nameplate`、`seat-role-badge`；未定角色用 AI 头像，定地主后切 landlord/farmer avatar/badge。
+- 回合计时节点补 `badge-countdown-ring`；结算面板补胜负 badge 与 spring emphasis；炸弹/火箭 cue 触发时补 emphasis 贴图动效。
+- 按 spec 保留代码绘制项：强度条、计时进度条、遮罩、小型 HUD/提示条的结构绘制未替换。
+
+## 阶段④实现摘要
+
+- 新增与保留节点均走可审查语义名：`top-phase-badge`、`top-landlord-nameplate`、`bottom-cards-dock-skin`、`seat-*`、`turn-timer-badge`、`result-outcome-badge`、`emphasis-*`。
+- 顶栏文案收窄为 `地主待定` / `地主你` / `倍数×N` / `手牌N`，避免横屏窄档拥挤；未引入调试文案或开发态说明。
+- 可读性返修：亮色按钮、名字牌、弹窗/结算面板上的文字统一改深色系；深色 HUD 小条仍保留浅字，避免亮色图上压亮色文字。
+
+## 阶段③/④测试与类型检查
+
+```
+npm --prefix test test
+=> Test Files 140 passed (140)
+=> Tests 711 passed (711)
+
+npm --prefix test run typecheck
+=> tsc --noEmit passed
+
+git diff --check
+=> passed
+```
+
+## 阶段③/④ Creator / CDP 证据
+
+- Creator build：
+
+```
+env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/Contents/MacOS/CocosCreator \
+  --project /Users/admin/Documents/Cocos/斗地主.worktrees/P-G3 \
+  --build "platform=web-mobile;buildPath=project://build;outputName=web-mobile;debug=false;md5Cache=false;sourceMaps=false;mainBundleCompressionType=merge_dep;startScene=dc62324b-10d4-4870-9518-1a34ce682067"
+```
+
+- Creator 返回既有 metrics exit code `36`；`temp/logs/project.log` 记录 `build Task (web-mobile) Finished in (4 s)`，并生成 `build/web-mobile/`。
+- 本机 Creator 用户配置存在 `~/.CocosCreator/editor/window.json` 恢复警告；该警告发生在 build finished 后，未影响包生成与 CDP 运行。
+- 标准 P-G smoke：`node /tmp/doudizhu-v11-visual-smoke.mjs P-G /Users/admin/Documents/Cocos/斗地主.worktrees/P-G3/build/web-mobile /tmp/doudizhu-wave2-p-g3-phase34-readable`
+  - 输出：`/tmp/doudizhu-wave2-p-g3-phase34-readable/summary.json`
+  - 结论：6 张截图，`productErrors=[]`。
+  - 四横屏 playing 截图：
+    - `/tmp/doudizhu-wave2-p-g3-phase34-readable/P-G-844x390-game.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase34-readable/P-G-812x375-game.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase34-readable/P-G-915x412-game.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase34-readable/P-G-780x360-game.png`
+  - 手牌交互截图：
+    - `/tmp/doudizhu-wave2-p-g3-phase34-readable/P-G-844x390-card-pressed.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase34-readable/P-G-844x390-card-released-selected.png`
+- ART node probe：`/tmp/doudizhu-wave2-p-g3-phase34-art-probe-final/summary.json`
+  - 截图：
+    - `/tmp/doudizhu-wave2-p-g3-phase34-art-probe-final/P-G3-844x390-bidding.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase34-art-probe-final/P-G3-844x390-playing.png`
+  - CDP 读数：`top-phase-badge`、`top-landlord-nameplate`、`top-multiplier-badge`、`bottom-cards-dock-skin`、`button-bg`、`button-icon`、`seat-avatar`、`seat-avatar-frame`、`seat-nameplate`、`seat-role-badge`、`turn-timer-badge` 均存在，`productErrors=[]`。
+- 人工抽样：已打开 `/tmp/doudizhu-wave2-p-g3-phase34-readable/P-G-844x390-game.png`；顶部信息条、座位头像/名字牌、底牌托架、按钮 icon/皮肤均可见；按钮/名字牌/顶栏深色文字可读，无明显遮挡；强度/计时/记牌器维持代码绘制。
 
 ## 自检
 
@@ -173,3 +238,5 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
 - [x] 全量 vitest / typecheck / diff check 通过。
 - [x] Creator build + CDP smoke 通过。
 - [x] 阶段②四横屏 locked/ready/playing CDP probe 通过。
+- [x] 阶段③/④ uikit 接线、语义命名、文案收尾完成。
+- [x] 阶段③/④ Creator build + 四横屏 CDP smoke + ART node probe 通过。

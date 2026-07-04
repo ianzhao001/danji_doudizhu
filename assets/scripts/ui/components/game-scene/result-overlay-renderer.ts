@@ -1,4 +1,4 @@
-import { BlockInputEvents, director, Sprite } from 'cc';
+import { BlockInputEvents, Color, director, Sprite } from 'cc';
 import { RESOURCE_PATHS } from '../../asset-keys';
 import { deriveScreenVM } from '../../screen-view';
 import { addUiTransform, loadSprite } from '../ui-helpers';
@@ -14,6 +14,10 @@ function seatName(seat: number): string {
 function seatNameWithRole(seat: number, isLandlord: boolean): string {
   return `${seatName(seat)}${isLandlord ? '（地主）' : ''}`;
 }
+
+const PANEL_TEXT = new Color(108, 46, 76, 255);
+const PANEL_MUTED = new Color(142, 88, 108, 235);
+const PANEL_ACCENT = new Color(198, 68, 124, 255);
 
 export function renderResult(
   ctx: GameSceneRendererContext,
@@ -42,9 +46,21 @@ export function renderResult(
   sprite.type = Sprite.Type.SIMPLE;
   sprite.sizeMode = Sprite.SizeMode.CUSTOM;
   loadSprite(RESOURCE_PATHS.settlementBg, sprite, ctx.spriteFrames);
-  ctx.addLabel(result.resultText, 0, panelHeight * 0.36, 34, panel, 220, 72, 'result-title');
-  ctx.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.22, 20, panel, 240, 40, 'result-multiplier');
-  ctx.addLabel(result.springText || '本局结算', 0, panelHeight * 0.12, 18, panel, 240, 40, 'result-spring');
+  ctx.addSprite(
+    result.resultText === '胜利' ? RESOURCE_PATHS.settlementWinBadge : RESOURCE_PATHS.settlementLoseBadge,
+    -106,
+    panelHeight * 0.35,
+    58,
+    58,
+    panel,
+    'result-outcome-badge',
+  );
+  ctx.addLabel(result.resultText, 8, panelHeight * 0.36, 34, panel, 220, 72, 'result-title', PANEL_TEXT);
+  ctx.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.22, 20, panel, 240, 40, 'result-multiplier', PANEL_ACCENT);
+  ctx.addLabel(result.springText || '本局结算', 0, panelHeight * 0.12, 18, panel, 240, 40, 'result-spring', PANEL_MUTED);
+  if (result.springText) {
+    ctx.addSprite(RESOURCE_PATHS.emphasisSpring, 110, panelHeight * 0.12, 34, 34, panel, 'result-spring-badge');
+  }
   const scoresHeight = landscape ? Math.min(98, panelHeight * 0.31) : 112;
   const buttonY = landscape ? -panelHeight * 0.31 : -panelHeight * 0.37;
   ctx.addLabel(
@@ -56,6 +72,7 @@ export function renderResult(
     280,
     scoresHeight,
     'result-scores',
+    PANEL_TEXT,
   );
   ctx.addButton('再来一局', -74, buttonY, 116, 42, true, () => ctx.startGame(true), panel, 'result-new');
   ctx.addButton('返回大厅', 74, buttonY, 116, 42, true, () => director.loadScene('lobby'), panel, 'result-lobby');
