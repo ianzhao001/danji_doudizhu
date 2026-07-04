@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/ART-GAME-REMAKE`
-- 状态：in-review（用户图审打回重排已提交；等待用户复审；未进入 import）
+- 状态：in-review（用户图审多轮打回已重排；等待用户复审；未进入 import）
 
 ## 改了哪些文件
 
@@ -249,6 +249,80 @@ tsc --noEmit passed
 git diff --check
 passed
 ```
+
+## 用户图审继续打回返工段（Codex · 2026-07-05 · final reference-placement pass）
+
+### 继续打回项
+
+- 用户反馈：左上角人物仍违背约束，出现在牌桌上面。
+- 用户反馈：可以整体缩小三个人物。
+- 用户反馈：需严格对比参考图中人物和牌桌的关系，人物位置、相对位置和大小尽量一致。
+- 用户反馈：可以改变背景里面牌桌的大小；左上和右上人物继续再往左边相对移动一点点。
+
+### 修复方式
+
+- `T-LAYOUT3` 已提交 `602c9b1`：三名 body 继续同尺寸，但缩小到 844×390 下 `120×191`、780×360 下 `112×176`；玩家仍在手牌左侧，左上/右上人物相对上一版继续左移。
+- 重新生成 1 张内置 `image_gen` 背景源图，使粉色牌桌更低、更大，贴近参考图的“人物站在桌后、玩家在左下手牌旁”的关系。
+  - 原始内置输出：`/Users/admin/.codex/generated_images/019f2d58-cc34-7472-9821-6580a3c4f362/ig_0bf088c2a871a614016a49421478608199b88bd8940dbe40a1.png`
+  - 工作区留存：`asset-previews/v13-pink-game-remake/source/generated-v13/game-table-bg-v13-source.png`
+- 复用既有角色/UI/卡牌 image_gen 源图，不重生人物，不改正式分项资源风格。
+- 更新 `finalize_imagegen_v13.py` 的 `ZONE_SIZES`，并重跑：
+  - `composites/v13/composite-844x390-bidding-v13.png`
+  - `composites/v13/composite-780x360-playing-v13.png`
+  - `composites/v13/composite-844x390-settlement-v13.png`
+  - `review-sheet-v2.png`
+  - `manifest-v13.json`
+  - `PROMPTS.md`
+
+### 最新目检记录（执行者辅助，不替代用户结论）
+
+- `composite-844x390-bidding-v13.png`：三名人物不重叠；左上/右上人物已继续左移；玩家在手牌左侧，未进入牌桌中央。
+- `composite-780x360-playing-v13.png`：三名人物整体缩小；左上人物贴左侧桌沿后方，右上人物不贴最右边；底部手牌可读。
+- `composite-844x390-settlement-v13.png`：暗幕下保留三人围桌关系，结算大字居中；玩家仍在左下手牌侧。
+
+### 最新机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+
+manifest_count 39
+source/generated-v13/game-table-bg-v13-source.png 5d25b99738156ef3 1844x853 alpha False corners False
+backgrounds/game-table-bg-v13.png 7c36e82a352354e0 1688x780 alpha False corners False
+composites/v13/composite-844x390-bidding-v13.png a19a59f53ce25d76 844x390 alpha False corners False
+composites/v13/composite-780x360-playing-v13.png 735c2c5fc3562fe1 780x360 alpha False corners False
+composites/v13/composite-844x390-settlement-v13.png 6c671bb01cb7c606 844x390 alpha False corners False
+review-sheet-v2.png fc5b4064a9ae1cdc 1800x1320 alpha False corners False
+```
+
+### 最新测试与类型检查输出
+
+```
+npm --prefix test test
+Test Files  140 passed (140)
+Tests       711 passed (711)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
+
+### 最新用户图审入口
+
+- `asset-previews/v13-pink-game-remake/review-sheet-v2.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-844x390-bidding-v13.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-780x360-playing-v13.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-844x390-settlement-v13.png`
+- `asset-previews/v13-pink-game-remake/PROMPTS.md`
+- `asset-previews/v13-pink-game-remake/manifest-v13.json`
 
 ## 疑问 / 需规划者裁定
 

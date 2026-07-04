@@ -23,10 +23,10 @@
   },
   {
     "path": "source/generated-v13/game-table-bg-v13-source.png",
-    "sha256": "310b2148d253abc8f758dd131052ebd03a6f37d687ee70dfe44edb2643ad408c",
+    "sha256": "5d25b99738156ef3f090308fd30668118f6383c20dae487f21c24c6245aa424b",
     "size": [
-      1846,
-      852
+      1844,
+      853
     ],
     "mode": "RGBA",
     "hasAlpha": false,
@@ -45,7 +45,7 @@
   },
   {
     "path": "backgrounds/game-table-bg-v13.png",
-    "sha256": "fc8278caddd316f765d5f8265b928c1542b675f551d80faff06a057c2796a949",
+    "sha256": "7c36e82a352354e0740773e01b42c7f7325b792fa87231e25c0587a89d9b88ec",
     "size": [
       1688,
       780
@@ -386,7 +386,7 @@
   },
   {
     "path": "composites/v13/composite-780x360-playing-v13.png",
-    "sha256": "35f31c6a455785da3c015a1d7af232237f4980ae1b116c6b858e5d113eb094e9",
+    "sha256": "735c2c5fc3562fe1072479133404e8ea4af6afdf11fef68dc7fe8b8ce803117f",
     "size": [
       780,
       360
@@ -397,7 +397,7 @@
   },
   {
     "path": "composites/v13/composite-844x390-bidding-v13.png",
-    "sha256": "7f6d951c84e66c1e9bbcb13a47b31b6643848e5d3a937850cf37c5e731eb5db1",
+    "sha256": "a19a59f53ce25d76b13fc26d8cac625e7901d61f74f1e3087625fe0b4c2a4730",
     "size": [
       844,
       390
@@ -408,7 +408,7 @@
   },
   {
     "path": "composites/v13/composite-844x390-settlement-v13.png",
-    "sha256": "0d5f3809d9dffde0bddb8881883a6b4ffb32fe5956868b424e9a8391eaccb6b9",
+    "sha256": "6c671bb01cb7c606de168082bf41c51c1dbd0063ac6b767b576343db05c7dd09",
     "size": [
       844,
       390
@@ -419,7 +419,7 @@
   },
   {
     "path": "review-sheet-v2.png",
-    "sha256": "c78907d97ba47e847b820a158666a2e598b2ece95fc638c9a556a4836c23f71d",
+    "sha256": "fc5b4064a9ae1cdc3c952338f4cf864cef1195ad3008522f4909be1e77804bdd",
     "size": [
       1800,
       1320

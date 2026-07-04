@@ -8,7 +8,7 @@
 - Existing `*-preview.png`, `review-sheet.png`, and `composites/composite-*.png` are **layout mockup only / 非正式资产** from the older Pillow pass.
 - Formal `*-v13.png` assets in this package are derived from built-in `image_gen` source images under `source/generated-v13/`.
 - Pillow is used only for non-creative post-processing: crop, chroma-key removal, resize, 9-slice stretch simulation, review-sheet/composite layout, and sha256 calculation.
-- User feedback fix 2026-07-05: bidding/playing/settlement composites were rejected because characters overlapped, the three body sizes were inconsistent, and the hero appeared on the tabletop instead of beside the hand. Composite zones now mirror T-LAYOUT3 fix `927b375`, use equal body rectangles, and keep the hero left of `heroHandLarge`; no image_gen source was regenerated.
+- User feedback fix 2026-07-05: bidding/playing/settlement composites were rejected because characters overlapped, the three body sizes were inconsistent, and the hero appeared on the tabletop instead of beside the hand. Follow-up feedback required the upper-left and upper-right characters to move further left, all three characters to be smaller, and the table/background relationship to match the reference more closely. Composite zones now mirror T-LAYOUT3 fix `602c9b1`, use equal body rectangles, keep the hero left of `heroHandLarge`, and use a regenerated built-in image_gen table background with a lower pink tabletop. Avatar/UI/card source images were reused.
 
 ## Built-in image_gen source prompts
 
@@ -32,9 +32,9 @@ Prompt summary: text-free pink cartoon card sprite sheet on flat #00ff00 chroma-
 
 - `source/generated-v13/avatars-v13-source.png` sha256 `c562ec6db7b0754f8aed6f11dfeee2412d116813bc4d5846a249cc48a793a6aa` size `1774x887` alpha `False` transparentCorners `False` userReview `waiting`
 - `source/generated-v13/cards-v13-source.png` sha256 `adfb127a6d433e1e0873fb36f8af7ddd13e4bec74e11e66e6cb023063414e221` size `1448x1086` alpha `False` transparentCorners `False` userReview `waiting`
-- `source/generated-v13/game-table-bg-v13-source.png` sha256 `310b2148d253abc8f758dd131052ebd03a6f37d687ee70dfe44edb2643ad408c` size `1846x852` alpha `False` transparentCorners `False` userReview `waiting`
+- `source/generated-v13/game-table-bg-v13-source.png` sha256 `5d25b99738156ef3f090308fd30668118f6383c20dae487f21c24c6245aa424b` size `1844x853` alpha `False` transparentCorners `False` userReview `waiting`
 - `source/generated-v13/ui-v13-source.png` sha256 `a94d2a26830bed8eff6be5cf7d17413a284e387835ff063c332133ab434b179c` size `1536x1024` alpha `False` transparentCorners `False` userReview `waiting`
-- `backgrounds/game-table-bg-v13.png` sha256 `fc8278caddd316f765d5f8265b928c1542b675f551d80faff06a057c2796a949` size `1688x780` alpha `False` transparentCorners `False` userReview `waiting`
+- `backgrounds/game-table-bg-v13.png` sha256 `7c36e82a352354e0740773e01b42c7f7325b792fa87231e25c0587a89d9b88ec` size `1688x780` alpha `False` transparentCorners `False` userReview `waiting`
 - `avatars/hero-body-v13.png` sha256 `f2cf7b839ccf0a56b5c0ced95865e0c9654d2e44668e2744f78cce978fec03c5` size `320x360` alpha `True` transparentCorners `True` userReview `waiting`
 - `avatars/left-ai-body-v13.png` sha256 `87d139fe18034eb3cf56ac85b5f8fc5229a98c0a895c3e2e3460bf4e1cf981f7` size `360x520` alpha `True` transparentCorners `True` userReview `waiting`
 - `avatars/right-ai-body-v13.png` sha256 `bb3a197ed1baf6896e614236e15f51a2560cf66ae2ddf75ad3dcf8ec8332ff13` size `360x520` alpha `True` transparentCorners `True` userReview `waiting`
@@ -65,7 +65,7 @@ Prompt summary: text-free pink cartoon card sprite sheet on flat #00ff00 chroma-
 - `stretch-simulations/btn-tertiary-v13-stretch.png` sha256 `ec216cb0bcbdb64345508596951fcf83f63b67dfbf66832d262e19b87bc8ad76` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
 - `stretch-simulations/seat-nameplate-v13-stretch.png` sha256 `365f5a37683585fb937a8726d9a430a7786e90b0758cc81f3ef781937921feaa` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
 - `stretch-simulations/settlement-panel-v13-stretch.png` sha256 `3a5e47dee7d2e67905938e5ec9f5d64c9fa7e3c432bb596221806070d82dd650` size `300x440` alpha `False` transparentCorners `False` userReview `waiting`
-- `composites/v13/composite-780x360-playing-v13.png` sha256 `35f31c6a455785da3c015a1d7af232237f4980ae1b116c6b858e5d113eb094e9` size `780x360` alpha `False` transparentCorners `False` userReview `waiting`
-- `composites/v13/composite-844x390-bidding-v13.png` sha256 `7f6d951c84e66c1e9bbcb13a47b31b6643848e5d3a937850cf37c5e731eb5db1` size `844x390` alpha `False` transparentCorners `False` userReview `waiting`
-- `composites/v13/composite-844x390-settlement-v13.png` sha256 `0d5f3809d9dffde0bddb8881883a6b4ffb32fe5956868b424e9a8391eaccb6b9` size `844x390` alpha `False` transparentCorners `False` userReview `waiting`
-- `review-sheet-v2.png` sha256 `c78907d97ba47e847b820a158666a2e598b2ece95fc638c9a556a4836c23f71d` size `1800x1320` alpha `False` transparentCorners `False` userReview `waiting`
+- `composites/v13/composite-780x360-playing-v13.png` sha256 `735c2c5fc3562fe1072479133404e8ea4af6afdf11fef68dc7fe8b8ce803117f` size `780x360` alpha `False` transparentCorners `False` userReview `waiting`
+- `composites/v13/composite-844x390-bidding-v13.png` sha256 `a19a59f53ce25d76b13fc26d8cac625e7901d61f74f1e3087625fe0b4c2a4730` size `844x390` alpha `False` transparentCorners `False` userReview `waiting`
+- `composites/v13/composite-844x390-settlement-v13.png` sha256 `6c671bb01cb7c606de168082bf41c51c1dbd0063ac6b767b576343db05c7dd09` size `844x390` alpha `False` transparentCorners `False` userReview `waiting`
+- `review-sheet-v2.png` sha256 `fc5b4064a9ae1cdc3c952338f4cf864cef1195ad3008522f4909be1e77804bdd` size `1800x1320` alpha `False` transparentCorners `False` userReview `waiting`

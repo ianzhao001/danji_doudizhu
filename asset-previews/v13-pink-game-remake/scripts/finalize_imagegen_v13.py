@@ -66,23 +66,23 @@ CARD_SPECS = [
 
 ZONE_SIZES = {
   "844x390": {
-    "heroBody": (8, 156, 152, 234),
-    "leftBody": (168, 47, 152, 234),
-    "rightBody": (684, 47, 152, 234),
-    "heroNameplate": (8, 271, 152, 33),
-    "leftNameplate": (176, 171, 152, 33),
-    "rightNameplate": (684, 171, 152, 33),
+    "heroBody": (17, 199, 120, 191),
+    "leftBody": (145, 47, 120, 191),
+    "rightBody": (577, 47, 120, 191),
+    "heroNameplate": (8, 271, 138, 33),
+    "leftNameplate": (153, 148, 152, 33),
+    "rightNameplate": (667, 148, 152, 33),
     "hand": (176, 304, 660, 86),
     "action": (287, 247, 270, 49),
     "settlement": (186, 35, 473, 195),
   },
   "780x360": {
-    "heroBody": (8, 144, 140, 216),
-    "leftBody": (156, 43, 140, 216),
-    "rightBody": (632, 43, 140, 216),
-    "heroNameplate": (8, 249, 140, 31),
-    "leftNameplate": (164, 157, 140, 31),
-    "rightNameplate": (632, 157, 140, 31),
+    "heroBody": (16, 184, 112, 176),
+    "leftBody": (136, 43, 112, 176),
+    "rightBody": (531, 43, 112, 176),
+    "heroNameplate": (8, 249, 130, 31),
+    "leftNameplate": (144, 136, 140, 31),
+    "rightNameplate": (615, 136, 140, 31),
     "hand": (164, 280, 608, 80),
     "action": (264, 227, 252, 45),
     "settlement": (172, 32, 437, 180),
@@ -204,6 +204,8 @@ def build_scene_composite(zone_key: str, size: tuple[int, int], out: Path, mode:
   paste_subject_fit(canvas, OUT_AVATAR / "left-ai-body-v13.png", zones["leftBody"])
   paste_subject_fit(canvas, OUT_AVATAR / "right-ai-body-v13.png", zones["rightBody"])
   paste_subject_fit(canvas, OUT_AVATAR / "hero-body-v13.png", zones["heroBody"])
+  restore_table_foreground(canvas, bg, zones["leftBody"])
+  restore_table_foreground(canvas, bg, zones["rightBody"])
   paste_fit(canvas, OUT_UI / "seat-nameplate-v13.png", zones["leftNameplate"])
   paste_fit(canvas, OUT_UI / "seat-nameplate-v13.png", zones["rightNameplate"])
   paste_fit(canvas, OUT_UI / "seat-nameplate-v13.png", zones["heroNameplate"])
@@ -259,6 +261,18 @@ def paste_subject_fit(canvas: Image.Image, asset_path: Path, rect: tuple[int, in
   x, y, w, h = rect
   fitted = contain(asset, (w, h), 0)
   canvas.alpha_composite(fitted, (x, y))
+
+
+def restore_table_foreground(canvas: Image.Image, background: Image.Image, rect: tuple[int, int, int, int]) -> None:
+  x, y, w, h = rect
+  top = y + round(h * 0.74)
+  left = max(0, x - 14)
+  right = min(canvas.width, x + w + 14)
+  bottom = min(canvas.height, y + h + 20)
+  if top >= bottom or left >= right:
+    return
+  patch = background.crop((left, top, right, bottom))
+  canvas.alpha_composite(patch, (left, top))
 
 
 def draw_cards(canvas: Image.Image, rect: tuple[int, int, int, int], count: int) -> None:
@@ -439,7 +453,7 @@ def write_prompts() -> None:
     "- Existing `*-preview.png`, `review-sheet.png`, and `composites/composite-*.png` are **layout mockup only / 非正式资产** from the older Pillow pass.",
     "- Formal `*-v13.png` assets in this package are derived from built-in `image_gen` source images under `source/generated-v13/`.",
     "- Pillow is used only for non-creative post-processing: crop, chroma-key removal, resize, 9-slice stretch simulation, review-sheet/composite layout, and sha256 calculation.",
-    "- User feedback fix 2026-07-05: bidding/playing/settlement composites were rejected because characters overlapped, the three body sizes were inconsistent, and the hero appeared on the tabletop instead of beside the hand. Composite zones now mirror T-LAYOUT3 fix `927b375`, use equal body rectangles, and keep the hero left of `heroHandLarge`; no image_gen source was regenerated.",
+    "- User feedback fix 2026-07-05: bidding/playing/settlement composites were rejected because characters overlapped, the three body sizes were inconsistent, and the hero appeared on the tabletop instead of beside the hand. Follow-up feedback required the upper-left and upper-right characters to move further left, all three characters to be smaller, and the table/background relationship to match the reference more closely. Composite zones now mirror T-LAYOUT3 fix `602c9b1`, use equal body rectangles, keep the hero left of `heroHandLarge`, and use a regenerated built-in image_gen table background with a lower pink tabletop. Avatar/UI/card source images were reused.",
     "",
     "## Built-in image_gen source prompts",
     "",
