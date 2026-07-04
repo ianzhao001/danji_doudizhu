@@ -5,6 +5,7 @@ import {
   digestRecords,
   emptyRecords,
   emptyStats,
+  loadSave,
   loadSettings,
   migrateRecords,
   saveSettings,
@@ -32,6 +33,7 @@ import { addButton as addUiButton, addLabel as addUiLabel, addUiTransform, drawP
 
 const { ccclass, property } = _decorator;
 const SETTINGS_KEY = STORAGE_KEYS.settings;
+const SAVE_KEY = STORAGE_KEYS.save;
 const STATS_KEY = STORAGE_KEYS.stats;
 const RECORDS_KEY = STORAGE_KEYS.records;
 const LANDSCAPE_CANVAS = { width: 844, height: 390 };
@@ -55,6 +57,7 @@ interface HelpRow {
 }
 
 interface HomeViewData {
+  hasSavedGame: boolean;
   rounds: string;
   winRate: string;
   netScore: string;
@@ -139,7 +142,8 @@ export class LobbyScene extends Component {
     const settings = loadSettings(cocosStorage(), SETTINGS_KEY);
     const stats = this.loadStats();
     const records = this.loadRecords();
-    const lobby = deriveLobbyView({ savedSlot: null, stats });
+    const savedSlot = this.loadSavedSlot();
+    const lobby = deriveLobbyView({ savedSlot, stats });
     const statsView = deriveStatsView(stats);
     const settingsView = deriveSettingsView(settings);
     const recordRows = deriveRecordsView(records, 1);
@@ -155,6 +159,7 @@ export class LobbyScene extends Component {
     this.setText(this.latestRecordLabel, recordRows[0]?.scoreLabel ?? '暂无战绩');
     this.setHomeLabelsVisible(false);
     this.renderRuntimeControls(settings, {
+      hasSavedGame: lobby.hasSavedGame,
       rounds: `局数 ${statsView.rounds}`,
       winRate: `胜率 ${statsView.winRatePct}%`,
       netScore: `净分 ${statsView.netScoreLabel}`,
@@ -184,7 +189,13 @@ export class LobbyScene extends Component {
     this.renderHomeScreen(settings, home);
   }
 
-  private openGameScene(): void {
+  private openGameScene(options: { forceNew?: boolean; requireSave?: boolean } = {}): void {
+    const storage = cocosStorage();
+    if (options.requireSave && this.loadSavedSlot() === null) {
+      this.render();
+      return;
+    }
+    if (options.forceNew) storage.removeItem(SAVE_KEY);
     const runtime = globalThis as typeof globalThis & {
       cc?: { director?: { loadScene(sceneName: string): void } };
     };
@@ -195,8 +206,8 @@ export class LobbyScene extends Component {
     if (!this.controlsRoot) return;
     const settingsView = deriveSettingsView(settings);
     const canvas = this.canvasSize();
-    const contentWidth = Math.min(canvas.width - 44, 796);
-    const panelHeight = Math.min(286, canvas.height - 72);
+    const contentWidth = Math.min(canvas.width - 40, 804);
+    const panelHeight = Math.min(292, canvas.height - 66);
     const summaryWidth = Math.min(232, Math.max(214, contentWidth * 0.29));
     const difficultyWidth = Math.min(292, Math.max(258, contentWidth * 0.34));
     const settingsWidth = summaryWidth;
@@ -209,12 +220,34 @@ export class LobbyScene extends Component {
     addUiTransform(summary, summaryWidth, panelHeight);
     drawPanel(summary, summaryWidth, panelHeight, new Color(34, 43, 58, 228));
     this.addLabel('斗地主', 0, panelHeight / 2 - 38, 28, summary, summaryWidth - 34, 40, 'home-title');
-    this.addButton('开始新局', 0, panelHeight / 2 - 88, summaryWidth - 42, 40, true, () => this.openGameScene(), summary, false, 'home-start-button');
-    this.addButton('继续游戏', 0, panelHeight / 2 - 136, summaryWidth - 42, 40, true, () => this.openGameScene(), summary, false, 'home-continue-button');
-    this.addLabel(home.rounds, -42, -26, 14, summary, 96, 24, 'home-rounds', new Color(255, 255, 255, 225));
-    this.addLabel(home.winRate, 48, -26, 14, summary, 100, 24, 'home-win-rate', new Color(255, 255, 255, 225));
-    this.addLabel(home.netScore, 0, -58, 15, summary, summaryWidth - 40, 26, 'home-net-score', new Color(255, 246, 213, 248));
-    this.addLabel(home.latestRecord, 0, -92, 13, summary, summaryWidth - 40, 24, 'home-latest-record', new Color(225, 235, 255, 210));
+    this.addButton(
+      '开始新局',
+      0,
+      panelHeight / 2 - 88,
+      summaryWidth - 38,
+      40,
+      true,
+      () => this.openGameScene({ forceNew: true }),
+      summary,
+      false,
+      'home-start-button',
+    );
+    this.addButton(
+      home.hasSavedGame ? '继续游戏' : '暂无存档',
+      0,
+      panelHeight / 2 - 138,
+      summaryWidth - 38,
+      40,
+      home.hasSavedGame,
+      () => this.openGameScene({ requireSave: true }),
+      summary,
+      false,
+      'home-continue-button',
+    );
+    this.addLabel(home.rounds, -42, -36, 14, summary, 96, 24, 'home-rounds', new Color(255, 255, 255, 225));
+    this.addLabel(home.winRate, 48, -36, 14, summary, 100, 24, 'home-win-rate', new Color(255, 255, 255, 225));
+    this.addLabel(home.netScore, 0, -68, 15, summary, summaryWidth - 40, 26, 'home-net-score', new Color(255, 246, 213, 248));
+    this.addLabel(home.latestRecord, 0, -102, 13, summary, summaryWidth - 40, 24, 'home-latest-record', new Color(225, 235, 255, 210));
 
     this.renderDifficultyPanel(settingsView.difficulty, centerX, 0, difficultyWidth, panelHeight);
 
@@ -615,6 +648,15 @@ export class LobbyScene extends Component {
     } catch (error) {
       console.warn('loadRecords failed', error);
       return emptyRecords();
+    }
+  }
+
+  private loadSavedSlot(): ReturnType<typeof loadSave> {
+    try {
+      return loadSave(cocosStorage(), SAVE_KEY);
+    } catch (error) {
+      console.warn('loadSave failed', error);
+      return null;
     }
   }
 
