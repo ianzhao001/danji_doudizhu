@@ -491,3 +491,41 @@ passed
 - [x] 未改测试、未碰他人模块
 - [x] 未获精确机器态 `approved` 前未合并 main；高风险 `approved-pending-planner` 未直接合并；获批后仅由审查者通过 `agentctl.sh claim/merge/release` 合并
 - [x] 未 import cc
+
+## 审查者评审段（GLM-5.2 · 2026-07-05 · approved · 0 打回轮次）
+
+### 评审范围
+- 分支：`task/ART-GAME-REMAKE`（最新提交 `9b2c98c`）
+- 基线：`743a36c`（task 分支创建点）→ main HEAD `6282492`
+- 文件域：`asset-previews/v13-pink-game-remake/` + `coordination/reports/ART-GAME-REMAKE.report.md`
+
+### R:ART-GAME-REMAKE 检查单核销
+
+- [x] **文件域**：task 分支自有提交（`743a36c..9b2c98c`）仅触 `asset-previews/v13-pink-game-remake/**` 与 `coordination/reports/ART-GAME-REMAKE.report.md`；未碰 `assets/scripts/`、`assets/resources/`、`assets/scene/`、`test/`、`.meta`、`cocos.config.json`、根 `package.json`/`tsconfig.json`；走 `task/ART-GAME-REMAKE` 分支（非直落 main）。
+- [x] **文生图出处核验**：5 张内置 `image_gen` 源图存于 `source/generated-v13/`（avatars/cards/ui/game-table-bg/bottom-cards-dock），正式 `*-v13.png` 均由源图裁切/去背/缩放得来；Pillow 仅做非创作后处理。旧 20 张 `*-preview.png`、`review-sheet.png`、3 张 `composites/composite-*.png` 在 `PROMPTS.md:8` 标注 `layout mockup only / 非正式资产`；未发现 Pillow 直出冒充正式件。
+- [x] **全量清单齐**：背景 1 + 立绘 3 + UI 12（名牌/按钮四态/结算横幅×2/面板/托架/徽章×2 + 附加 badge-role）+ 卡牌 8（template/back/花色×4/joker×2）= 24 正式件；九宫格拉伸模拟 7 件（btn×4/panel/nameplate/dock，各含 64px/176px 两档）；composites 3 张（844×390 叫抢/780×360 出牌/844×390 结算）；review-sheet-v2.png + manifest-v13.json + PROMPTS.md 齐。
+- [x] **无第三方 IP/logo**：PROMPTS.md 明确「不复刻第三方 IP、logo、角色或图标」；各源图 prompt 含 `no logo, no third-party IP` 约束。
+- [x] **无加倍/金币/第四座位等非功能元素**：PROMPTS.md 无此类元素；方向稿仅风格参考，正式脚本合成稿只保留现有功能入口。
+- [x] **用户图审结论逐件记录**：报告含用户单轮图审记录表，7 大项均 `passed`（review-sheet 总览/叫抢合成/出牌合成/结算合成/卡牌 8 件/九宫格 7 件/主观终审项）；两轮返工（人物重叠+底牌托架不可识别）均有用户反馈原文、修复方式与重跑机械校验。
+
+### 机械证据复核
+
+- **sha256 逐件复核**：manifest-v13.json 40 条记录，对 worktree 实际文件逐件 `sha256` 比对——**40/40 一致，0 不匹配**。PROMPTS.md 内 sha256 与 manifest 一致。
+- **alpha/透明角校验**：正式透明件（avatars×3/ui×12/cards×8）`hasAlpha=true`/`transparentCorners=true`；背景与 composite `hasAlpha=false`/`transparentCorners=false`——与用途一致。
+- **manifest 分组**：cards 8 / stretch-simulations 7 / ui 12 / avatars 3 / backgrounds 1 / composites 3 / source 5 / review-sheet-v2 1 = 40。
+- **客闸**：`npm --prefix test test` → 140 files / 711 tests passed；`npm --prefix test run typecheck` → exit 0；`git diff --check` → passed。
+
+### 全量回扫与分流
+
+- **回扫范围**：task 分支 `743a36c..9b2c98c` 全部 6 提交逐行审 + main `6282492` 全仓回归扫描。
+- **代码/测试/场景/meta 零触碰**：task 分支未改任何 `.ts`/`.test.ts`/`.scene`/`.meta`/`.json` 配置——纯美术 preview + 报告，无跨模块回归面。
+- **merge dry run**：`git merge --no-commit --no-ff task/ART-GAME-REMAKE` → Automatic merge went well，无冲突（main 自 `743a36c` 后仅并 T-LAYOUT3，文件域不交）。
+- **域内致命**：0
+- **域外致命**：0
+- **拿不准（非阻断·转规划者）**：0
+- **结论**：证据链完整，客闸全绿，用户图审逐项 passed，文件域纯净——`approved`。
+
+### 风险判定
+
+- 常规任务（仅 `asset-previews/` + 报告，未触共享契约/状态机/rules/跨模块）→ 双闸即可，不需规划者批量结构性把关。
+
