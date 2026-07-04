@@ -521,3 +521,74 @@ passed
 rg -n "from 'cc'|from \"cc\"|import .*cc" assets/scripts/ui/table-zones.ts || true
 仅命中源码注释中的 `import cc` 禁止说明；无实际 `cc` import。
 ```
+
+---
+
+## 审查者复审段（GLM-5.2 · 2026-07-05 · round 1 changes-requested → 复审）
+
+### 复审范围
+
+- 增量审：三次返工提交 `7c9a55b` / `927b375` / `602c9b1`（仅 `table-zones.ts` + 本报告）
+- 全量回扫：`table-zones` 全仓消费方 + `table-layout` legacy 依赖链 + 分层不变量
+- 技术门复跑（worktree `../斗地主.worktrees/T-LAYOUT3`，HEAD `602c9b1`）：
+  - `npm --prefix test exec -- vitest run ui/table-zones-v13.test.ts ui/table-zones.test.ts` → 2 文件 / 44 用例全绿
+  - `npm --prefix test test` → **141 文件 / 727 用例全绿**
+  - `npm --prefix test run typecheck` → tsc --noEmit exit 0
+  - `git diff --check` → exit 0
+  - `grep "from 'cc'" assets/scripts/ui/table-zones.ts` → 无匹配
+
+### 复审重点逐项核销
+
+**① 四横屏 heroBody / opponentLeftBody / opponentRightBody 不重叠**
+
+独立 tsx 验证四档 pairwise gap + intersection：
+
+| 分辨率 | H-L gap | H-R gap | L-R gap | H-L inter | H-R inter | L-R inter |
+|----|----|----|----|----|----|----|
+| 844×390 | 8 | 440 | 312 | 0 | 0 | 0 |
+| 812×375 | 8 | 424 | 301 | 0 | 0 | 0 |
+| 915×412 | 8 | 489 | 357 | 0 | 0 | 0 |
+| 780×360 | 8 | 403 | 283 | 0 | 0 | 0 |
+
+所有 gap ≥ 8px、intersection = 0。round 1 域内致命已修复。
+
+**② 玩家位于手牌左侧，不进入牌桌中央**
+
+四档 `heroBody.x + heroBody.width ≤ heroHandLarge.x` 均成立（844×390: 137 ≤ 176 ✓，其余同形）。heroBody 锚定左下贴屏（`heroBodyY = height - bodyHeight`），不进入手牌区或牌桌中央。
+
+**③ 左上、右上人物相对用户参考图已左移，且不压手牌**
+
+- 不压手牌：四档 `opponentLeftBody / opponentRightBody` vs `heroHandLarge` gap = 61–74px（≥ 8 ✓）
+- 已左移：round 2→3 diff 显示 `opponentLeftBody.x` 从 `heroBody.x + heroBody.width + gap` 起算（仍为玩家右侧 8px 分离），`opponentRightBody.x = width - rightBodyInset - bodyWidth - round(width*0.055)`（从右缘向内收并左移）。代码层面已左移；**相对用户参考图的视觉吻合度由用户终审判定**。
+
+**④ legacy 6 字段仍与 tableLayout(width, height) 深相等**
+
+独立 tsx 逐字段 `JSON.stringify` 比对四档 `topBar / opponentLeft / opponentRight / playArea / actionButtons / playerHand` 全部深相等。`tableLayout` 调用结果直接 `...legacy` 展开入返回对象，未改 `table-layout.ts`。
+
+**⑤ 未改种子测试、未 import cc、未越域**
+
+- `git diff ff43262..HEAD --stat` 仅 3 文件：`table-zones.ts`(+116) / `T-LAYOUT3.report.md`(+523) / `table-zones-v13.test.ts`(+93·种子提交 only)
+- 种子测试 `table-zones-v13.test.ts` 仅出现在种子提交 `eca5345`（架构种子），执行者 4 个提交（`45f2450`/`7c9a55b`/`927b375`/`602c9b1`）均未碰 `test/`
+- `grep "from 'cc'" assets/scripts/ui/table-zones.ts` → 无匹配
+- `git diff ff43262..HEAD -- assets/scripts/ui/table-zones.ts` 纯加法：接口新增 9 字段、`tableZones()` 末尾 `...v13` 展开、新 `gameRemakeZones()` + `clamp()` 函数；legacy 字段逐字未改
+
+### 全量回扫结果
+
+- **消费方回归**：`game-scene-skeleton.ts:349` 调 `tableZones(canvas.width, canvas.height)` 但仅消费 legacy zone（`topBar`/`infoStrip`/`opponentLeft`/`playArea`/`bottomCardsDock`/`dropZone*`/`playerHand`）；`game-scene/{bid-actions-renderer,hud-renderer,result-overlay-renderer,seats-renderer}.ts` 均不消费 v13 新增 zone。当前无运行时回归；P-G4 接线时才消费 v13 zone。
+- **跨任务回归**：无。`table-zones.ts` 改动纯加法，legacy zone 数值不变；`table-layout.ts` 未改；其它模块零触碰。
+- **分层不变量**：`table-zones.ts` 无 `cc` import；仅 import `table-layout`（同层 ui 纯岛），分层正确。
+- **合并预检**：`git merge-tree` 预演 `task/T-LAYOUT3` → main 无冲突（main 自 `ff43262` 起仅改 spec/BOARD，task 分支未碰这些文件，3-way merge 自动取 main 版本）。
+
+### 非阻断建议（拿不准 → 转规划者·round 1 遗留）
+
+以下两项在 round 1 已转规划者，本轮仍为非阻断（不阻塞合并）：
+
+1. **body vs nameplate 间距**：nameplate 设计上"贴近"body（注释"贴近玩家立绘下方"），gap 为负属 by-design。若规划者认为 nameplate 是独立 zone 需 ≥ 8px 间距，另拆微调任务。
+2. **settlementShowcase 相位互斥**：settlementShowcase 是"结算覆盖区"（注释"暗幕牌桌上的胜负大字与三家分数面板"），与底层 body/nameplate 不同相位（结算时 body 可能隐藏或被暗幕覆盖）。若规划者认为需明确相位互斥契约，在 P-G4 spec 中补明。
+
+### 结论
+
+**approved** — round 1 域内致命（heroBody vs opponentLeftBody 四档重叠）已在三次返工中修复，四档 pairwise gap ≥ 8px、intersection = 0。复审重点五项逐项通过：四横屏 body 不重叠 / 玩家位于手牌左侧 / 左上右上人物已左移且不压手牌 / legacy 6 字段深相等 / 未改种子未 import cc 未越域。全量回扫无回归。视觉吻合度（相对用户参考图的人物位置）由用户终审判定。
+
+打回轮次：1（round 1 changes-requested → round 3 复审 approved）
+非阻断建议：2 项转规划者（body/nameplate 间距豁免？settlementShowcase 相位互斥？——round 1 遗留，仍非阻断）
