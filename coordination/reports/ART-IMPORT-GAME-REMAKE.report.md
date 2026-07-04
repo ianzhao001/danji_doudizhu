@@ -257,3 +257,39 @@ M  assets/scripts/ui/asset-keys.ts
 
 常规任务（美术导入，未触共享契约/状态机/rules），双闸即可。审查者本人跑双闸全绿后执行 claim/merge/release。
 
+
+## 验收披露段（审查者 GLM-5.2 · 2026-07-05）
+
+### 评审结论
+
+**approved** — ART-IMPORT-GAME-REMAKE 审查通过,已合并入 main。
+
+### 打回轮次
+
+0 轮。
+
+### 全量回扫范围与分流结果
+
+- **回扫范围**:全仓 diff(`git diff main..task/ART-IMPORT-GAME-REMAKE`)+ main 既有 art/ .meta UUID 碰撞检查 + 新键消费检查 + .meta 结构真实性抽查 + 跨模块回归推理。
+- **域内致命**:无。
+- **域外致命**:无。
+- **拿不准(非阻断)**:无。
+- **阻塞**:无。
+
+### 合并证据
+
+- claim:`502ef7a chore(ART-IMPORT-GAME-REMAKE): claim merge lane`
+- merge:`8437b85 merge task/ART-IMPORT-GAME-REMAKE`(--no-ff,48 文件 +3364 行)
+- release:`3fe7317 chore(ART-IMPORT-GAME-REMAKE): record merge evidence`
+- 分支 `task/ART-IMPORT-GAME-REMAKE` 已删除,worktree 已清理。
+
+### 最终测试基线
+
+合并后 main(`3fe7317`)审查者独立复跑:
+- `npm --prefix test test` → **141 文件 / 727 用例全绿**(26.63s)
+- `npm --prefix test run typecheck` → tsc --noEmit 通过(exit 0)
+- `git diff --check` → passed
+
+### 下一步
+
+ART-IMPORT-GAME-REMAKE done,P-G4-UI-REMAKE 依赖已满足(ART-IMPORT + T-LAYOUT3 均 done)。交规划者派发 P-G4-UI-REMAKE。
