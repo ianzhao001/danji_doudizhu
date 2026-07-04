@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/ART-GAME-REMAKE`
-- 状态：in-review（v13 全量 preview 已收尾，等待用户单轮图审；未进入 import）
+- 状态：ready-for-review（v13 全量 preview 已收尾；用户单轮图审通过；待审查者按 R:ART-GAME-REMAKE 审证据链并合并；未进入 import）
 
 ## 改了哪些文件
 
@@ -138,8 +138,8 @@ composites/v13/composite-844x390-settlement-v13.png 0d5f3809d9dffde0 844x390 alp
   - `asset-previews/v13-pink-game-remake/manifest-v13.json`
   - `asset-previews/v13-pink-game-remake/PROMPTS.md`
 - 结果摘要：正式 `-v13` 清单齐；透明件 alpha 与透明四角通过；旧 Pillow 文件保留但已标注非正式；未导入 `assets/resources`。
-- 用户主观终审状态：等待逐件图审
-- 执行者配合用户终审记录：等待用户结论；需记录 pink 风格一致性、整体布局、名字牌对比度、手牌可读性、按钮易点性、结算观感。
+- 用户主观终审状态：通过（用户 2026-07-05 明确回复「通过，进入下一步」）
+- 执行者配合用户终审记录：用户已确认 pink 风格一致性、整体布局、人物与牌桌关系、名字牌对比度、手牌可读性、按钮易点性、结算观感、卡牌 8 件、九宫格模拟 7 件无其他问题。
 - 审查边界：审查者仅核验证据链、步骤、环境、日志、用户终审记录与可复现说明；不亲验图像质量，不替代用户下主观结论。
 
 ## 测试与类型检查输出
@@ -398,17 +398,17 @@ git diff --check
 passed
 ```
 
-### 用户单轮图审记录表（待用户填写结论）
+### 用户单轮图审记录表（用户 2026-07-05 通过）
 
 | 项 | 路径 / 范围 | 用户结论 |
 |----|----|----|
-| review sheet 总览 | `asset-previews/v13-pink-game-remake/review-sheet-v2.png` | waiting |
-| 叫抢合成 | `composites/v13/composite-844x390-bidding-v13.png` | waiting |
-| 出牌合成 | `composites/v13/composite-780x360-playing-v13.png` | waiting |
-| 结算合成 | `composites/v13/composite-844x390-settlement-v13.png` | waiting |
-| 卡牌 8 件 | `cards/*-v13.png` | waiting |
-| 九宫格模拟 7 件 | `stretch-simulations/*-v13-stretch.png` | waiting |
-| pink 风格一致性 / 整体布局 / 名字牌对比度 / 手牌可读性 / 按钮易点性 / 结算观感 | 用户主观终审项 | waiting |
+| review sheet 总览 | `asset-previews/v13-pink-game-remake/review-sheet-v2.png` | passed |
+| 叫抢合成 | `composites/v13/composite-844x390-bidding-v13.png` | passed |
+| 出牌合成 | `composites/v13/composite-780x360-playing-v13.png` | passed |
+| 结算合成 | `composites/v13/composite-844x390-settlement-v13.png` | passed |
+| 卡牌 8 件 | `cards/*-v13.png` | passed |
+| 九宫格模拟 7 件 | `stretch-simulations/*-v13-stretch.png` | passed |
+| pink 风格一致性 / 整体布局 / 人物与牌桌关系 / 名字牌对比度 / 手牌可读性 / 按钮易点性 / 结算观感 | 用户主观终审项 | passed |
 
 ## 用户图审打回返工段（Codex · 2026-07-05 · bottom-cards dock）
 
@@ -470,15 +470,16 @@ passed
 ## 批次交接记录 / 下一步
 
 - 所属批次 / 任务号：UI-REMAKE 第四波 / `ART-GAME-REMAKE`
-- 本回合结论 / 状态：v13 逐件 image_gen preview 已完成，等待用户逐件图审；未进入 import。
-- 下一步找谁：执行者配合用户终审
-- 用户终审配合：请用户查看 `review-sheet-v2.png`、`PROMPTS.md` 正式清单、`composites/v13/` 三张合成图和 `stretch-simulations/`；执行者记录通过/打回件清单。
+- 本回合结论 / 状态：v13 逐件 image_gen preview 已完成，用户单轮图审通过，等待审查者按 R:ART-GAME-REMAKE 审证据链并合并；未进入 import。
+- 下一步找谁：审查者（GLM-5.2）
+- 原因：`R-UI-REMAKE.md` 明确 `ART-GAME-REMAKE` preview 分支审后合；合并后 `ART-IMPORT-GAME-REMAKE` 才能稳定从 main 的已通过 preview 取料。
+- 用户终审配合：已完成；用户结论为 passed，无待用户补审项。
 - 给下一窗口的可粘贴提示词（指针化）：
 
 ```
-你是本仓库 斗地主 的执行型 AI，配合用户进行 ART-GAME-REMAKE 用户图审。本任务不导入 assets。
-先读：coordination/PROTOCOL.md、coordination/tasks/ART-GAME-REMAKE.md、coordination/reports/ART-GAME-REMAKE.report.md、coordination/BOARD.md 的 UI-REMAKE 段。
-本回合最小增量：task/ART-GAME-REMAKE 已生成 v13 image_gen 正式 preview，入口为 asset-previews/v13-pink-game-remake/review-sheet-v2.png、PROMPTS.md、manifest-v13.json、composites/v13/；请记录用户对 pink 风格一致性、整体布局、名字牌对比度、手牌可读性、按钮易点性、结算观感的逐件结论，不要替用户判断。
+你是本仓库 斗地主 的审查型 AI，审查任务 ART-GAME-REMAKE。
+先读：coordination/PROTOCOL.md、coordination/tasks/ART-GAME-REMAKE.md、coordination/tasks/R-UI-REMAKE.md 的 R:ART-GAME-REMAKE、coordination/reports/ART-GAME-REMAKE.report.md、coordination/BOARD.md 的 UI-REMAKE 段。
+当前分支：task/ART-GAME-REMAKE，最新执行提交含 v13 image_gen preview 与用户单轮图审通过记录。请按 R:ART-GAME-REMAKE 审文件域、image_gen 证据链、正式清单、PROMPTS/manifest sha256、旧 Pillow 件非正式标注、用户逐项 passed 记录；审查者不替代视觉主观判断，只核证据完整性。通过后按协议写 approved，并由审查者在 main 工作树执行 claim/merge/release 合并 ART-GAME-REMAKE。合并后下一步进入 ART-IMPORT-GAME-REMAKE。
 ```
 
 ## 自检（对照验收项）
