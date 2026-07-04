@@ -761,7 +761,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | V2 | 3 | 收口·验证（verify-only·spec `tasks/V2.md`·审查单 `tasks/R-WAVE3.md`） | `reports/V2.report.md` + `reports/V2-*.png` | P-G3 ✅`38cc821` + P-L3 ✅`62324c4` + T-AI-2 ✅`7476412` | done 2f3dfa5 |
 | T-FIX-SETTLE | 3 | scoped-fix(V2-ISSUE-1·editor-evidence·spec `tasks/T-FIX-SETTLE.md`·审查单 R-WAVE3) | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | V2 ✅`2f3dfa5` | done 6df0c88 |
 
-> **延后项（设计债·带简报待派）**：记牌深度（GameSnapshot 需出牌历史，hard 现 `trackPlayed([],hand)` 传空=假记牌）；round-runtime(439 行) 拆分；save 双序列化与叫抢期存档**整并一次**升 v2（避免两次迁移税）；audio/卡面/tween 模块化；ui-helpers 皮肤化共享件（P-G3/P-L3 各自本地实现 addButton/addSprite/drawPanelSkin 重复 + 旧 addUiButton/drawPanel 成死导出——抽共享 + 清死码；审查者建议单 2026-07-04 规划者采纳归档，v1.3 与巨组件模块化同批派）。
+> **延后项（设计债·带简报待派）**：记牌深度（GameSnapshot 需出牌历史，hard 现 `trackPlayed([],hand)` 传空=假记牌）；round-runtime(439 行) 拆分；save 双序列化与叫抢期存档**整并一次**升 v2（避免两次迁移税）；audio/卡面/tween 模块化；ui-helpers 皮肤化共享件（P-G3/P-L3 各自本地实现 addButton/addSprite/drawPanelSkin 重复 + 旧 addUiButton/drawPanel 成死导出——抽共享 + 清死码；审查者建议单 2026-07-04 规划者采纳归档，v1.3 与巨组件模块化同批派）；lobby v13 风格统一（第四波管线修正②派生——game-scene 走 v13 新键、lobby 留 v12，后续独立任务统一）。
 > **Wave 1 派发（2026-07-03）**：五任务并行、文件域两两零交集（T-DEDUP 退出 ai/levels；ART-IMPORT 禁碰组件；T-FLOW-BID 的 driver/policies/types 只读）。merge lane 顺序：T-DEDUP → T-LAYOUT2 → T-FLOW-BID → T-AI-1（ART-UIKIT 审后随到随合）。P-G3 分支在 T-DEDUP+T-LAYOUT2+T-FLOW-BID 落 main 后创建。
 > **Wave 1 裁定（规划者·2026-07-04·依审查者验收披露）**：①T-DEDUP **裁定：确认 done `d8b892b`**（合并后 135/662 绿）。②T-LAYOUT2 审查通过——待审查者按 lane 合并。③T-FLOW-BID 审查判「实现正确、种子缺陷」，**规划者已修种子** `4589323`（cue-id 一致性护栏补 bottomRevealed；根因=Wave0 种子只跑子集未跑全量，已记教训），分支全绿 135/664 → 请审查者复审合并。④T-AI-1 审查判「实现正确、跨任务合同冲突」，**规划者裁定**：hard-depth 12-seed 地主视角小样本代理在普通档强化后天然失效（实测 Hard 0.5 vs Normal 0.667），排序契约**迁移至 T-AI-2 质量门**，已修种子 `3ffe8e9`（保留不变量、摘除排序断言+墓碑注释），分支全绿 136/669 → 请审查者复审合并；T-AI-2 提级为 T-AI-1 落 main 后立即派发。⑤ART-UIKIT 技术门过，**等待用户视觉终审**（preview：`asset-previews/v12-uikit/`，看 `uikit-review-sheet.png` 总览 + `stretch-sim/` 拉伸模拟）。
 > **Wave 1 终局裁定（规划者·2026-07-04·三 lane 合并后）**：T-LAYOUT2 **裁定：确认 done `adfb876`** / T-FLOW-BID **裁定：确认 done `2f5f220`** / T-AI-1 **裁定：确认 done `9353f76`**。审查者复审两处种子修正与规划者披露一致（纯测试提交、执行者实现逐字未动）。**main 基线 139 文件/703 全绿 + typecheck 净（规划者独立复跑确认）**。已合并三任务的 worktree+分支清理由审查者执行（`git worktree remove ../斗地主.worktrees/<ID>` + `git branch -d task/<ID>`，post-merge 安全）。
@@ -791,9 +791,18 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
 |----|----|----|----|----|----|
 | ART-GAME-REMAKE | 0 | 美术 preview-only | `asset-previews/v13-pink-game-remake/` + report | T-FIX-SETTLE ✅`6df0c88` | ready |
-| ART-IMPORT-GAME-REMAKE | 1 | 美术导入 | `assets/resources/art/**` 过审项 + `.meta` + `asset-keys.ts` + report | ART-GAME-REMAKE 用户视觉终审 | todo |
-| T-LAYOUT3 | 1 | 纯 UI 布局 | `table-zones.ts` + 新 `test/ui/table-zones-v13.test.ts` + report | — | ready |
-| P-G4-UI-REMAKE | 2 | 游戏内 UI 接线 | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | ART-IMPORT-GAME-REMAKE ✅ + T-LAYOUT3 ✅ | todo |
+| ART-IMPORT-GAME-REMAKE | 1 | 美术导入（**新文件`-v13`+纯增键·不同名覆盖**·spec 修订版） | `art/*/*-v13.png` + `.meta` + `asset-keys.ts` 纯增 v13 键 + report | ART-GAME-REMAKE 用户图审通过 | blocked |
+| T-LAYOUT3 | 1 | 纯 UI 布局（种子已验红 16/16·typecheck 净） | `table-zones.ts` + 新 `test/ui/table-zones-v13.test.ts` + report | — | ready |
+| P-G4-UI-REMAKE | 2 | 游戏内 UI 接线（spec 修订版） | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | ART-IMPORT-GAME-REMAKE + T-LAYOUT3 | blocked |
+| V3 | 3 | 收口·验证（verify-only·spec `tasks/V3.md`·审查单 R-UI-REMAKE R:V3） | `reports/V3.report.md` + `reports/V3-*.png` | P-G4-UI-REMAKE | blocked |
 
 > **派发顺序**：先做 `ART-GAME-REMAKE` preview 并等用户视觉终审；`T-LAYOUT3` 可并行做纯布局契约；资源导入必须等用户图审通过；`P-G4-UI-REMAKE` 等导入 + 布局均 done 后再做。审查单：`coordination/tasks/R-UI-REMAKE.md`。
 > **种子证据**：`ART-GAME-REMAKE` preview gate 已入 main `ff43262`；`task/T-LAYOUT3` 已建并种红测试 `eca5345`（`test/ui/table-zones-v13.test.ts` 16 红，typecheck 净）。
+>
+> **第四波收编裁定（规划者·2026-07-05·执行 plan 已获用户批准）**：
+> - **T-FIX-SETTLE 终局裁定：确认 done `6df0c88`**——settled 相位门控 20 瞬时节点 + overlay 置顶 + 面板底衬 + loadSprite 安全包装；四横屏 transient 全 0 且暗幕下牌桌保留（正合 V2-ISSUE-1 仲裁口径）；再来一局/返回大厅回归链齐；打回 0 轮。main `7b2f03a` 基线 **140 文件/711 全绿 + typecheck 净（规划者独立复跑确认）**。v1.2 收口条件①闭合；条件②用户终审=**观感不过**（「UI 过于难看」）→ 触发本第四波；**用户裁决（2026-07-05）：并入 v1.2 顺延，v1.2 终点 = V3 done + 用户终审通过**。
+> - **UI-REMAKE 批次追认**：执行者预谋划骨架（4 spec + R 单 + T-LAYOUT3 种子）**追认有效**；种子实跑验证 **16/16 红 + typecheck 净**（规划者 2026-07-05）。纪律注记：preview 直落 main `ff43262` 属用户特批一次性豁免，后续一律任务分支+lane。
+> - **方向稿定档（用户 2026-07-05）**：`source/ai-direction-sheet.png` 即 v13 目标方向，逐件成品只做**单轮图审**；**范围=全量重做**（用户裁决：含卡面模板/牌背/花色/Joker/托架）。
+> - **管线修正①（文生图）**：Pillow 脚本分项图/合成图降级为**布局示意**（质感低于现役 v12 + 文字互叠，规划者亲验裁定），正式资产一律 image_gen 逐件文生图（沿 v12 ART-UIKIT 流程先例）。
+> - **管线修正②（新键不覆盖）**：import 由「同名替换」改为 **`-v13` 新文件 + asset-keys 纯增 `xxxV13` 键**——btn-*/panel-popup 为大厅共用键，同名替换会静默重皮大厅（违反不改大厅约束）且不可回滚；「lobby v13 风格统一」登记设计债。
+> - **修订落盘**：ART-GAME-REMAKE / ART-IMPORT-GAME-REMAKE / P-G4-UI-REMAKE / R-UI-REMAKE 四 spec 修订版 + V3 预置（`tasks/V3.md` + R:V3）。lane：T-LAYOUT3 随到随合；ART 链按 逐件文生图→用户图审→import→P-G4 整分支→V3；均常规任务双闸。分支：`task/ART-GAME-REMAKE` 由规划者自 main 建；`task/T-LAYOUT3` 已存在（种子 `eca5345`）。
