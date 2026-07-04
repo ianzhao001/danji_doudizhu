@@ -3,10 +3,10 @@
 # 用法：
 #   ./coordination/agentctl.sh new     <ID>   # 架构：基于 main 建任务分支 task/<ID>
 #   ./coordination/agentctl.sh work    <ID>   # 实现方：为任务分支建独立 worktree
-#   ./coordination/agentctl.sh claim   <ID>   # 执行者：获批后抢占单一 merge lane
-#   ./coordination/agentctl.sh merge   <ID>   # 执行者：合并已 claim 的 task/<ID>
-#   ./coordination/agentctl.sh release <ID>   # 执行者：记录 done、移除 worktree、删除分支
-#   ./coordination/agentctl.sh done    <ID>   # 执行者：claim -> merge -> release 组合别名
+#   ./coordination/agentctl.sh claim   <ID>   # 审查者：approved 后抢占单一 merge lane
+#   ./coordination/agentctl.sh merge   <ID>   # 审查者：合并已 claim 的 task/<ID>
+#   ./coordination/agentctl.sh release <ID>   # 审查者：记录 done、移除 worktree、删除分支
+#   ./coordination/agentctl.sh done    <ID>   # 审查者：claim -> merge -> release 组合别名
 #   ./coordination/agentctl.sh status         # 列分支、worktree 与 merge lane
 set -euo pipefail
 
@@ -20,10 +20,10 @@ usage() {
 usage:
   agentctl.sh new     <ID>   # create task/<ID> from main
   agentctl.sh work    <ID>   # create ../斗地主.worktrees/<ID>
-  agentctl.sh claim   <ID>   # mark approved task as merge-claimed:<ID>
-  agentctl.sh merge   <ID>   # merge claimed task/<ID> into main
-  agentctl.sh release <ID>   # mark done <commit>, remove worktree and branch
-  agentctl.sh done    <ID>   # claim -> merge -> release
+  agentctl.sh claim   <ID>   # reviewer marks exact approved task as merge-claimed:<ID>
+  agentctl.sh merge   <ID>   # reviewer merges claimed task/<ID> into main
+  agentctl.sh release <ID>   # reviewer marks done <commit>, removes worktree and branch
+  agentctl.sh done    <ID>   # reviewer claim -> merge -> release
   agentctl.sh status         # list branches, worktrees, and merge lane
 EOF
 }
@@ -115,13 +115,13 @@ board_task_status() {
 ensure_task_approved() {
   local status
   status="$(board_task_status)"
-  [[ "$status" == *approved* ]] || die "task $id is not approved in BOARD (current status: ${status:-missing})"
+  [[ "$status" == "approved" ]] || die "task $id must have exact BOARD status 'approved' before claim (current status: ${status:-missing})"
 }
 
 ensure_task_claimed() {
   local status
   status="$(board_task_status)"
-  [[ "$status" == *"merge-claimed:$id"* ]] || die "task $id is not merge-claimed:$id in BOARD (current status: ${status:-missing})"
+  [[ "$status" == "merge-claimed:$id" ]] || die "task $id is not merge-claimed:$id in BOARD (current status: ${status:-missing})"
 }
 
 ensure_no_merge_lane_claimed() {
@@ -190,7 +190,7 @@ merge_task() {
   ensure_task_worktree_clean "$WT_BASE/$id"
   git -C "$ROOT" merge --no-ff "task/$id" \
     -m "merge task/$id" \
-    -m "approved-by planner" \
+    -m "approved-by reviewer" \
     -m "test/typecheck 绿"
   echo "merged task/$id"
 }
@@ -204,7 +204,7 @@ release_task() {
   ensure_task_worktree_clean "$WT_BASE/$id"
   git -C "$ROOT" merge-base --is-ancestor "task/$id" HEAD || die "task/$id is not merged into HEAD; run merge first"
   merged_commit="$(git -C "$ROOT" rev-parse --short HEAD)"
-  set_board_task_status "**done \`$merged_commit\`**"
+  set_board_task_status "done $merged_commit"
   commit_board_status "chore($id): record merge evidence"
   if worktree_registered "$WT_BASE/$id"; then
     git -C "$ROOT" worktree remove "$WT_BASE/$id"
@@ -219,10 +219,10 @@ done_task() {
   local status
   ensure_single_board_task_line
   status="$(board_task_status)"
-  if [[ "$status" == *"merge-claimed:$id"* ]]; then
+  if [[ "$status" == "merge-claimed:$id" ]]; then
     merge_task
     release_task
-  elif [[ "$status" == *approved* ]]; then
+  elif [[ "$status" == "approved" ]]; then
     claim_task
     merge_task
     release_task
@@ -282,7 +282,7 @@ case "$cmd" in
         status = $(NF - 1)
         gsub(/^[ \t]+|[ \t]+$/, "", task)
         gsub(/^[ \t]+|[ \t]+$/, "", status)
-        if (status ~ /approved/ || status ~ /merge-claimed:/) {
+        if (status == "approved" || status == "approved-pending-planner" || status ~ /^merge-claimed:/) {
           print task ": " status
         }
       }

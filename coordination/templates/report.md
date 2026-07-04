@@ -2,7 +2,7 @@
 
 - 实现方标识：
 - 分支：`task/<ID>`
-- 状态：in-review / blocked / changes-requested / approved / merge-claimed:<ID> / done <commit>
+- 状态：in-review / blocked / changes-requested / approved / approved-pending-planner / merge-claimed:<ID> / done <commit>
 
 ## 改了哪些文件
 -
@@ -12,13 +12,20 @@
 <贴 npm --prefix test test 与 npm --prefix test run typecheck 结果>
 ```
 
+## 工作树状态
+```
+<贴 git status --short --untracked-files=all；越域未跟踪文件必须清理或说明>
+```
+
 ## 非文字模态 / IDE 实操验收证据（如适用，由执行者填写）
 - 验收面：图像 / 音频 / 视频 / Cocos Creator / IDE / 浏览器调试 / 其他
 - 环境与版本：
 - 操作步骤：
 - 原始证据路径（截图/录屏/样本/日志）：
 - 结果摘要：
-- 用户终审状态（如适用）：等待 / 通过 / 不通过 / 不适用
+- 用户主观终审状态（如适用）：等待 / 通过 / 不通过 / 不适用
+- 执行者配合用户终审记录（如适用）：用户结论原文 / 确认时间 / 证据路径 / 操作环境
+- 审查边界：审查者仅核验证据链、步骤、环境、日志、用户终审记录与可复现说明；不亲验图像/音频/视频，不操作 Cocos Creator/IDE/浏览器，不替代用户下主观结论。
 
 ## 合并证据（approved 后由审查者回填）
 - 合并前回归：
@@ -26,7 +33,7 @@
   - `npm --prefix test run typecheck`：
 - merge commit：
 - BOARD 状态：
-- 规划者批量结构性把关（仅高风险任务）：结论 / 关注点 / 放行　或　不适用（常规任务）
+- 规划者批量结构性把关（仅高风险任务）：结论 / 关注点 / 放行并改回 `approved`　或　不适用（常规任务）
 
 ## 全量回扫（审查者·写 approved 前一次）
 - 回扫范围 / 方法：<全仓通读 / grep / 交互面排查；不止本任务 diff>
@@ -61,12 +68,14 @@
 - 所属批次 / 任务号：
 - 本回合结论 / 状态：
 - 下一步找谁：规划者 / 执行者 / 审查者 / 用户终审
+- 用户终审配合（如适用）：由执行者配合用户进行 / 不适用
 - 给下一窗口的可粘贴提示词（指针化）：<角色 + `<IDs>` + 要读文件清单>
 
 ## 自检（对照验收项）
 - [ ] 测试全绿
 - [ ] typecheck 无错
+- [ ] `git status --short --untracked-files=all` 已记录，越域未跟踪文件已清理或说明
 - [ ] 仅改声明文件域
 - [ ] 未改测试、未碰他人模块
-- [ ] 未获 `approved` 前未合并 main；获批后仅通过 `agentctl.sh claim/merge/release` 合并
+- [ ] 未获精确机器态 `approved` 前未合并 main；高风险 `approved-pending-planner` 未直接合并；获批后仅由审查者通过 `agentctl.sh claim/merge/release` 合并
 - [ ] 未 import cc
