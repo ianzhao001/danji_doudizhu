@@ -758,7 +758,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ART-IMPORT-UIKIT | 1.5 | 美术·导入 | `assets/resources/art/ui/*.png`(+`.meta` Creator·panel-popup 仅配 border) + `asset-keys.ts` 新 2 键；**禁碰两巨组件** | ART-UIKIT ✅`7f71cf2` | **done `5ad2223`**：sha256 逐字节一致·border 四值>0·双键契约绿（裁定 2026-07-04） |
 | P-G3 | 2 | 巨组件流水线(四阶段) | `game-scene-skeleton.ts` + 新 `ui/components/game-scene/*.ts`(4 模块) | ①②✅approved；③依赖 ART-IMPORT-UIKIT ✅`5ad2223` | **done `38cc821`** |
 | P-L3 | 2 | 巨组件流水线(两阶段) | `lobby-scene.ts` | ①✅approved；②依赖 ART-IMPORT-UIKIT ✅`5ad2223` | **done `62324c4`** |
-| V2 | 3 | 收口·验证（verify-only·spec `tasks/V2.md`·审查单 `tasks/R-WAVE3.md`） | `reports/V2.report.md` + `reports/V2-*.png` | P-G3 ✅`38cc821` + P-L3 ✅`62324c4` + T-AI-2 ✅`7476412` | merge-claimed:V2 |
+| V2 | 3 | 收口·验证（verify-only·spec `tasks/V2.md`·审查单 `tasks/R-WAVE3.md`） | `reports/V2.report.md` + `reports/V2-*.png` | P-G3 ✅`38cc821` + P-L3 ✅`62324c4` + T-AI-2 ✅`7476412` | done 2f3dfa5 |
 
 > **延后项（设计债·带简报待派）**：记牌深度（GameSnapshot 需出牌历史，hard 现 `trackPlayed([],hand)` 传空=假记牌）；round-runtime(439 行) 拆分；save 双序列化与叫抢期存档**整并一次**升 v2（避免两次迁移税）；audio/卡面/tween 模块化；ui-helpers 皮肤化共享件（P-G3/P-L3 各自本地实现 addButton/addSprite/drawPanelSkin 重复 + 旧 addUiButton/drawPanel 成死导出——抽共享 + 清死码；审查者建议单 2026-07-04 规划者采纳归档，v1.3 与巨组件模块化同批派）。
 > **Wave 1 派发（2026-07-03）**：五任务并行、文件域两两零交集（T-DEDUP 退出 ai/levels；ART-IMPORT 禁碰组件；T-FLOW-BID 的 driver/policies/types 只读）。merge lane 顺序：T-DEDUP → T-LAYOUT2 → T-FLOW-BID → T-AI-1（ART-UIKIT 审后随到随合）。P-G3 分支在 T-DEDUP+T-LAYOUT2+T-FLOW-BID 落 main 后创建。
