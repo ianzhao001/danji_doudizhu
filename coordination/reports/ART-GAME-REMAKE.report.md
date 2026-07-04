@@ -529,3 +529,33 @@ passed
 
 - 常规任务（仅 `asset-previews/` + 报告，未触共享契约/状态机/rules/跨模块）→ 双闸即可，不需规划者批量结构性把关。
 
+
+## 验收披露段（GLM-5.2 · 2026-07-05 · 合并后补录）
+
+### 评审结论
+- `approved`——证据链完整，R:ART-GAME-REMAKE 六项检查单全部核销，客闸全绿，用户图审逐项 passed。
+
+### 打回轮次
+- 0 轮（审查者未打回；执行者经历了用户图审两轮返工，已记录在报告正文）。
+
+### 全量回扫范围与分流结果
+- 回扫范围：task 分支 `743a36c..9b2c98c` 全部 6 提交逐行审 + main `6282492` 全仓回归。
+- task 分支未改任何 `.ts`/`.test.ts`/`.scene`/`.meta`/配置——纯美术 preview + 报告，无跨模块回归面。
+- merge dry run 无冲突（main 自 `743a36c` 后仅并 T-LAYOUT3，文件域不交）。
+- 域内致命：0 · 域外致命：0 · 拿不准（非阻断→规划者）：0
+
+### 合并证据
+- merge commit: `a629ef3`（`--no-ff`）
+- merge lane: `claim` @ `a086398` → `merge` @ `a629ef3` → `release` @ `1185f12`
+- BOARD 状态：`done a629ef3`
+- worktree + 分支已清理（`task/ART-GAME-REMAKE` deleted）
+
+### 最终测试基线
+- main `1185f12`：**141 文件 / 727 用例全绿** + typecheck 净 + `git diff --check` 净。
+- 纯层零 cc 不变（本任务未碰代码层）。
+
+### 下一步
+- `ART-IMPORT-GAME-REMAKE` unblocked（依赖 `ART-GAME-REMAKE 用户图审通过` 已满足）。
+- 按 UI-REMAKE lane：`ART-IMPORT-GAME-REMAKE` → `P-G4-UI-REMAKE` → `V3`。
+- 交规划者做终局裁定。
+
