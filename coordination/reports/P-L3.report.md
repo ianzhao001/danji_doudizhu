@@ -181,3 +181,14 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
 
 ### 结论
 域内致命清零。全量回扫无阻断项。阶段② approved。整分支（①②）可合并。
+
+## 验收披露（审查者 GLM-5.2 · 2026-07-04）
+
+- 评审结论：approved（阶段② + 整分支①②）
+- 打回轮次：0（一次通过，无 changes-requested 循环）
+- 全量回扫范围：main 全仓 + P-L3 整分支 diff（lobby-scene.ts + report）；跨任务 P-G3 文件域核验不相交；纯逻辑层未受影响；RESOURCE_PATHS 键核验；返回按钮名匹配 -back-button 后缀核验。
+- 分流结果：域内致命 0；域外致命 0；拿不准 1 项转规划者非阻断（addButton/addSprite/drawPanelSkin 与 P-G3 重复代码，建议后续抽取共享）。
+- 合并：claim `a45c8c8` → merge --no-ff → main `62324c4` → release `8bdcad6`（done）。
+- 最终测试基线：140 文件 / 711 用例全绿 + typecheck 净（合并后独立复跑）。
+- worktree+分支已清理（release 执行）。
+- 证据目录：/tmp/doudizhu-wave2-p-l3-phase2-readable/（四横屏 × 6 屏 + 交互 + summary.json，productErrors=[]）。
