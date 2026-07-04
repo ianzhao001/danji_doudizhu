@@ -1,6 +1,7 @@
 # P-G3 — game-scene 四阶段流水线：拆分 → 消费新契约/修重叠 → 美术接线 → 文案
 
-- 状态：ready（阶段①②可开工；③依赖 ART-IMPORT-UIKIT）
+- 状态：in-progress（①② approved 未合并；**③④ 已派发 2026-07-04**——依赖 ART-IMPORT-UIKIT ✅ done `5ad2223` 已落 main，③④顺序可交换）
+- **开工同步门（③ 前必做）**：worktree 内先 `git merge main`——取回 v12 美术（seat-nameplate/bottom-cards-dock/btn×3 重制/panel-popup border）+ `asset-keys.ts` 双键（`seatNameplate`/`bottomCardsDock`）+ T-AI-2。规划者已核：分支与 main 自基点起**双向零文件重叠**，干净合并。
 - 类型：编辑器/运行时（单写者流水线，分阶段 commit + 分段提审）
 - 文件域（**只允许改这些**）：
   - `assets/scripts/ui/components/game-scene-skeleton.ts`

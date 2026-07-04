@@ -1,6 +1,7 @@
 # P-L3 — lobby 两阶段流水线：真续局 + 布局微调 → 美术接线
 
-- 状态：ready（阶段①可开工；②依赖 ART-IMPORT-UIKIT）
+- 状态：in-progress（① approved 未合并；**② 已派发 2026-07-04**——依赖 ART-IMPORT-UIKIT ✅ done `5ad2223` 已落 main）
+- **开工同步门（② 前必做）**：worktree 内先 `git merge main`（取 v12 美术 + asset-keys 双键；规划者已核双向零文件重叠，干净合并）。
 - 类型：编辑器/运行时（单写者流水线，分阶段 commit + 分段提审）
 - 文件域（**只允许改这些**）：
   - `assets/scripts/ui/components/lobby-scene.ts`
