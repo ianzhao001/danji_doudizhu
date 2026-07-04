@@ -796,3 +796,4 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-G4-UI-REMAKE | 2 | 游戏内 UI 接线 | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | ART-IMPORT-GAME-REMAKE ✅ + T-LAYOUT3 ✅ | todo |
 
 > **派发顺序**：先做 `ART-GAME-REMAKE` preview 并等用户视觉终审；`T-LAYOUT3` 可并行做纯布局契约；资源导入必须等用户图审通过；`P-G4-UI-REMAKE` 等导入 + 布局均 done 后再做。审查单：`coordination/tasks/R-UI-REMAKE.md`。
+> **种子证据**：`ART-GAME-REMAKE` preview gate 已入 main `ff43262`；`task/T-LAYOUT3` 已建并种红测试 `eca5345`（`test/ui/table-zones-v13.test.ts` 16 红，typecheck 净）。
