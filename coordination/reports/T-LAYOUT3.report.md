@@ -144,3 +144,71 @@ git status --short --untracked-files=all
 - [x] 未改测试、未碰他人模块
 - [x] 未获精确机器态 `approved` 前未合并 main；高风险 `approved-pending-planner` 未直接合并；获批后仅由审查者通过 `agentctl.sh claim/merge/release` 合并
 - [x] 未 import cc
+
+---
+
+## 审查者评审段（GLM-5.2 · 2026-07-05）
+
+### 评审范围
+
+- `git diff main..task/T-LAYOUT3`（提交 `45f2450`，基线 merge-base `ff43262`）
+- 逐行细读 `assets/scripts/ui/table-zones.ts` 新增 115 行 + 种子测试 `test/ui/table-zones-v13.test.ts` 93 行
+- 全量回扫：`table-zones` 全仓消费方（`game-scene-skeleton.ts`、`game-scene/*` 4 模块、`test/ui/table-zones*.test.ts`）+ `table-layout` legacy 依赖链
+- 技术门复跑（worktree `../斗地主.worktrees/T-LAYOUT3`，HEAD `45f2450`）：
+  - `npm --prefix test test` → **141 文件 / 727 用例全绿**（main 711 + 16 新增）
+  - `npm --prefix test run typecheck` → tsc --noEmit exit 0
+  - `git diff --check` → exit 0
+  - `grep "from 'cc'" assets/scripts/ui/table-zones.ts` → 无匹配（纯层零 cc）
+
+### 检查单核销（R:T-LAYOUT3 · R-UI-REMAKE.md 修订版）
+
+- [x] 种子 `test/ui/table-zones-v13.test.ts` 未被改动（`git show 45f2450 --stat` 确认提交仅含 `table-zones.ts` + 报告，未碰 `test/`）
+- [x] `TableZones` 纯加法：接口新增 9 个 v13 zone 字段，legacy 11 字段（T-LAYOUT2 的 `infoStrip`/`bottomCardsDock`/`dropZone*`/`statusLine`/`actionBar`/`strengthMeter`/`turnTimer`/`memoryDock`/`advisorDock` + `TableRegions`）逐字未改；`tableZones()` return `{ ...legacy, ...legacyZones, ...v13 }`，v13 字段名不与 legacy 冲突
+- [x] legacy 6 字段兼容：`const legacy = tableLayout(width, height)` + `...legacy` 展开保证 `topBar`/`opponentLeft`/`opponentRight`/`playArea`/`actionButtons`/`playerHand` 与 `tableLayout()` 深相等
+- [x] 既有 `test/ui/table-zones.test.ts`（T-LAYOUT2 28 用例）零改动全绿
+- [x] `tableActionBar` 高度 `clamp(round(height*0.125), 44, 56)` ≥44px ✓（四档实测 49/47/52/45）
+- [x] 纯层无 `cc` import
+- [x] 全量 test/typecheck/diff-check 绿（见上技术门）
+
+### 🔴 域内致命 — changes-requested
+
+**heroBody 与 opponentLeftBody 在所有四横屏重叠，违反布局契约"关键可见集不重叠，最小间距 8px"**
+
+spec `tasks/T-LAYOUT3.md` 布局契约明确："关键可见集不重叠，最小间距 8px"；R 检查单 R:T-LAYOUT3 明确："四横屏新增 zone 落屏不重叠"。三名角色立绘围桌是 v13 核心设计（spec 目标："三名角色立绘区"），同时可见，不应重叠。
+
+实测（`rectGap(a,b) = max(x方向间距, y方向间距)`，负值=重叠）：
+
+| 分辨率 | heroBody vs opponentLeftBody gap | 重叠面积(px) |
+|----|----|----|
+| 844×390 | -156 | ~152×156 |
+| 812×375 | -149 | ~146×149 |
+| 915×412 | -165 | ~156×165 |
+| 780×360 | -142 | ~140×142 |
+
+根因分析：`gameRemakeZones()` 中 `opponentLeftBody` 占据左侧从 `topBodyY`(~47) 到 `heroHandLarge.y - gap`(~296) 的整个高度（height = `heroHandLarge.y - gap - topBodyY` ≈ 249），而 `heroBody` 也放在左侧（`x: gap`），`heroBodyY = clamp(round(height*0.36), 128, ...)` = 140，远小于 opponentLeftBody 底边 296。两者 x 都从 `gap`(8) 开始，x 方向也重叠。设计意图应是 opponentLeftBody 在左上、heroBody 在左下，但 y 范围计算未做互斥分离。
+
+**修复要求**：调整 `gameRemakeZones()` 使 heroBody 与 opponentLeftBody 在 x 或 y 方向分离（间距 ≥8px），同时保持现有 16 个种子测试全绿。可选方向（执行者自判）：
+1. heroBody 移至中间偏下（x 不与 opponentLeftBody 重叠）
+2. 缩短 opponentLeftBody 高度，给 heroBody 腾出左下方空间
+3. 重新分配左侧空间，opponentLeftBody 上半、heroBody 下半
+
+### 非阻断建议（拿不准 → 转规划者）
+
+以下重叠可能 by-design，但 spec 未明确说明，转规划者判断是否需要修：
+
+1. **body vs nameplate**（heroBody vs heroNameplate gap=-33、opponentLeftBody vs opponentLeftNameplate gap=-117）：nameplate 设计上贴在 body 上/内，可能预期。但 spec 说"最小间距 8px"，若 nameplate 与 body 属同一可见集则需分离。建议规划者明确 nameplate 是否"贴附"于 body（免间距约束）还是独立 zone（需间距）。
+2. **body/nameplate vs settlementShowcase**（gap=-90 ~ -194）：settlementShowcase 是结算覆盖区，设计上在结算相位覆盖牌桌。若与 body/nameplate 不同相位（结算时 body 隐藏），重叠 OK。建议规划者明确 settlementShowcase 与底层 zone 的相位互斥关系。
+3. **opponentLeftNameplate vs settlementShowcase**（gap=-51）：同上。
+
+### 全量回扫结果
+
+- **消费方回归**：`tableZones()` 的消费方（`game-scene-skeleton.ts:349`、`game-scene/hud-renderer.ts`、`game-scene/bid-actions-renderer.ts`、`game-scene/seats-renderer.ts`）当前只消费 legacy zone（`layout.actionBar`/`layout.playerHand`/`layout.opponentLeft` 等），不消费 v13 新增 zone。P-G4 接线时才消费 `heroBody`/`tableActionBar`/`heroHandLarge` 等。因此当前重叠不会造成运行时回归——但 P-G4 接线后会直接继承此缺陷，必须在本任务修复。
+- **跨任务回归**：无。`table-zones.ts` 改动纯加法，不影响 legacy zone 数值；`table-layout.ts` 未改；其它模块零触碰。
+- **分层不变量**：`table-zones.ts` 无 `cc` import；仅 import `table-layout`（同层 ui 纯岛），分层正确。
+
+### 结论
+
+**changes-requested** — 域内致命（heroBody vs opponentLeftBody 四档重叠，违反 spec 布局契约"关键可见集不重叠"+ R 检查单"新增 zone 落屏不重叠"）。打回执行者在 `task/T-LAYOUT3` 原分支修复 `gameRemakeZones()` 布局计算，使 heroBody 与 opponentLeftBody 间距 ≥8px，重跑全量 test/typecheck/diff-check 后再次提审。
+
+打回轮次：1
+非阻断建议：3 项转规划者（body/nameplate 间距豁免？settlementShowcase 相位互斥？）
