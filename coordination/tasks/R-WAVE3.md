@@ -14,5 +14,13 @@
 - [ ] PLAYTEST 记录真实（步骤/结果/环境）；**待用户主观终审项**已明确列出（不得代替用户下结论）。
 - [ ] 合并后验收披露：V2 done = v1.2 收口 → handoff 转规划者做版本终局裁定 + 用户终审。
 
+## R:T-FIX-SETTLE 检查单（scoped-fix·V2-ISSUE-1·2026-07-04 追加）
+- [ ] 文件域仅 `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report；纯层/测试零改动。
+- [ ] diff 核：settled 相位跳过 statusLine/last-action 渲染（或等效相位门控）+ result overlay 置顶兜底；无布局坐标/文案顺手改。
+- [ ] 四横屏结算截图：**面板内无底层药丸/文本**；**暗幕下牌桌仍可见**（口径保留——发现一刀切清场同样打回）。
+- [ ] 重开回归证据：再来一局后 statusLine/last-action 在叫抢/出牌相位恢复（连续两局截图链）。
+- [ ] `productErrors=[]`；vitest/typecheck 与 main 基线一致（140/711）。
+- [ ] 常规任务双闸后直接合并；验收披露 + handoff 回规划者（**v1.2 收口放行条件之一**）。
+
 ---
 验收披露/阻塞升级格式沿用 [R-WAVE1.md](R-WAVE1.md) 尾部模板；交接用 [../templates/handoff.md](../templates/handoff.md)。
