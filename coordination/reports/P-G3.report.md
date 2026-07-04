@@ -240,3 +240,54 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
 - [x] 阶段②四横屏 locked/ready/playing CDP probe 通过。
 - [x] 阶段③/④ uikit 接线、语义命名、文案收尾完成。
 - [x] 阶段③/④ Creator build + 四横屏 CDP smoke + ART node probe 通过。
+
+## 审查者评审（GLM-5.2 · 2026-07-04 · 阶段③④ + 整分支合并闸）
+
+### 评审范围
+覆盖 P-G3 阶段③④增量（commit de5a055）及整分支（main..task/P-G3）全量回扫。①②已 approved 不复审实现，但纳入全量回扫。
+
+### 检查单核销（R-WAVE2）
+**阶段③（美术接线）**
+- [x] 33+新图接线齐全：buttonPrimary/Secondary/Disabled、iconPlay/Pass/Hint/Bid/Back/Settings、panelPopup、seatNameplate、bottomCardsDock、badgeTurn/Multiplier/CountdownRing、landlordRoleAvatar/FarmerRoleAvatar、aiCheerfulAvatar/CalmAvatar、avatarFrame、landlordRoleBadge/FarmerRoleBadge、settlementWinBadge/LoseBadge、emphasisBomb/Rocket/Spring、emptyRecords——asset-keys.ts 逐键核验存在。
+- [x] 按钮三态：Button.Transition.COLOR + primary/secondary/disabled 三皮（buttonSkinPath 按节点名+enabled 选取）。
+- [x] 面板九宫格：panel-popup Sprite.Type.SLICED（drawPanelSkin 替代 drawPanel，先 clear Graphics 再贴 skin）。
+- [x] 强度条/计时条/遮罩仍代码绘制：hud-renderer/bid-actions-renderer 的 drawPanel/Graphics 保留未替换。
+- [x] 按钮三态/面板无变形：四横屏截图 + ART node probe 证据齐（productErrors=[]）。
+
+**阶段④（文案命名）**
+- [x] 文案：地主待定/地主你/倍数×N/手牌N，无开发味。
+- [x] 节点命名语义化：top-phase-badge、top-landlord-nameplate、bottom-cards-dock-skin、seat-avatar/frame/nameplate/role-badge、turn-timer-badge、result-outcome-badge、emphasis-*。
+
+### 红线
+- 未碰 test/**（git diff main..task/P-G3 -- test/ 为空）。
+- 未碰 flow/ai/data 纯层（git diff --stat 纯层目录为空）。
+- .meta 为 Creator 生成（ver 4.0.24, importer typescript, uuid 唯一, subMetas 空）。
+- .scene 未碰。
+
+### 测试与类型检查（审查者独立复跑）
+- main 基线：140 文件 / 711 用例全绿 + typecheck 净。
+- P-G3 worktree typecheck 净。
+- diff --check 净。
+
+### 可读性返修核查
+- 颜色常量均为深色系：BRIGHT_PANEL_TEXT(108,46,76)/BRIGHT_PANEL_MUTED(142,88,108)/TABLE_TEXT(74,70,72)/BUTTON_PRIMARY_TEXT(116,36,82)/BUTTON_SECONDARY_TEXT(34,78,132)/BUTTON_DISABLED_TEXT(118,108,114)。
+- addUiLabel（ui-helpers.ts）正确消费 color 参数：`label.color = options.color ?? white`——深色常量生效。
+- 无后续覆盖（toast/pause hint 覆盖为相同值）。
+- image skill 截图分析：文字在亮色背景上清晰可辨（gemini 颜色识别不精确但一致报告"可辨"）。
+- 执行者人工抽样确认深色文字可读。
+
+### 全量回扫
+- addUiButton/drawPanel 在 main 上只被本两巨组件引用——合并后改用本地实现，ui-helpers 导出保留无害。
+- RESOURCE_PATHS 引用键全部存在（asset-keys.ts 逐键核验）。
+- 按钮名匹配 buttonSkinPath/buttonIconPath 判断（bid-call/bid-grab → primary+iconBid；action-play → primary+iconPlay；bid-pass → secondary 无 icon）。
+- Button.Transition.COLOR 的 normalColor/pressedColor/disabledColor 设置合理（pressed 浅粉反馈）。
+- renderEmphasis 节点复用（ensureNode），不泄露；tween 完成后 opacity=0 但节点复用。
+- 跨任务：P-G3 与 P-L3 文件域不相交，无交互点。
+- 纯逻辑层未受影响。
+
+### 拿不准（非阻断建议单 → 转规划者）
+1. addButton/addSprite/drawPanelSkin 在 P-G3 与 P-L3 间重复实现（文件域限制致无法共享）。建议后续在 ui-helpers.ts 抽取共享按钮方法。不阻断合并。
+2. 名字牌文字 NAMEPLATE_TEXT(108,46,76 深粉) 在 seat-nameplate 背景上对比度可能偏低（主观审美）。交用户视觉终审。不阻断合并。
+
+### 结论
+域内致命清零。全量回扫无阻断项。阶段③④ approved。整分支（①②③④）可合并。
