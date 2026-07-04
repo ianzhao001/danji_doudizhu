@@ -1,37 +1,85 @@
-# v13 pink game remake preview prompts
+# v13 pink game remake image_gen prompts
 
 目标：保持现有 pink 粉色卡通风格，只借鉴用户参考截图的布局与元素层级，不复刻第三方 IP、logo、角色或图标。
 
-内置 image_gen 方向稿：`source/ai-direction-sheet.png`，仅作风格参考；其中出现的非当前功能按钮不进入正式接线。
+## Pipeline Ruling
 
-脚本生成资产：`python3 asset-previews/v13-pink-game-remake/scripts/generate_preview_assets.py`。
+- `source/ai-direction-sheet.png` is the user-approved direction reference.
+- Existing `*-preview.png`, `review-sheet.png`, and `composites/composite-*.png` are **layout mockup only / 非正式资产** from the older Pillow pass.
+- Formal `*-v13.png` assets in this package are derived from built-in `image_gen` source images under `source/generated-v13/`.
+- Pillow is used only for non-creative post-processing: crop, chroma-key removal, resize, 9-slice stretch simulation, review-sheet/composite layout, and sha256 calculation.
+- User feedback fix 2026-07-05: bidding/playing/settlement composites were rejected because characters overlapped, the three body sizes were inconsistent, and the hero appeared on the tabletop instead of beside the hand. Follow-up feedback required the upper-left and upper-right characters to move further left, all three characters to be smaller, and the table/background relationship to match the reference more closely. Composite zones match the T-LAYOUT3 main merge `1b523df`, use equal body rectangles, keep the hero left of `heroHandLarge`, and use a regenerated built-in image_gen table background with a lower pink tabletop. Avatar/UI/card source images were reused.
 
-正式接线限制：只允许使用现有功能入口：叫地主 / 不叫 / 抢 / 不抢 / 出牌 / 不要 / 提示 / 暂停 / 再来一局 / 返回大厅。
+## Review package checklist
 
-## Generated files
+- Formal source images: 5 built-in image_gen sources under `source/generated-v13/` (4 sheets plus one dedicated bottom-cards dock source).
+- Formal item previews: background 1, body avatars 3, UI sprites 12, card sprites 8.
+- Card sprite coverage: template, back, spade, heart, club, diamond, small Joker, big Joker.
+- Stretch simulations: 7 sheets; each sheet shows 64px and 176px horizontal 9-slice candidates.
+- Composite previews: 844x390 bidding, 780x360 playing, 844x390 settlement.
+- User review entry: `review-sheet-v2.png`; per-file sha256 is listed below and in `manifest-v13.json`.
 
-- `avatars/hero-body-preview.png` sha256 `ea1fbdd376c71a5f`
-- `avatars/left-ai-body-preview.png` sha256 `135cb973f5645acc`
-- `avatars/right-ai-body-preview.png` sha256 `fb39d10e4e3e120d`
-- `backgrounds/game-table-bg-preview.png` sha256 `92086a7982238474`
-- `cards/card-back-preview.png` sha256 `31bf775b88dfdff5`
-- `cards/card-template-preview.png` sha256 `f12ce3ed75430db8`
-- `cards/joker-big-preview.png` sha256 `e320fb47ea63e7ef`
-- `cards/joker-small-preview.png` sha256 `4e88fa6338005e71`
-- `cards/suit-club-preview.png` sha256 `2f054549ff4ba7f4`
-- `cards/suit-diamond-preview.png` sha256 `d48cf8369a5c5472`
-- `cards/suit-heart-preview.png` sha256 `6a6c938893008648`
-- `cards/suit-spade-preview.png` sha256 `2ad441d28bca5b85`
-- `composites/composite-780x360-playing.png` sha256 `e6ee8eec223633fd`
-- `composites/composite-844x390-bidding.png` sha256 `6769caa294431aac`
-- `composites/composite-844x390-settlement.png` sha256 `5b4b351a3614433d`
-- `review-sheet.png` sha256 `8f0198c751f4034e`
-- `source/ai-direction-sheet.png` sha256 `55648a45df56292d`
-- `ui/badge-lose-preview.png` sha256 `4e80a623b61775ad`
-- `ui/badge-win-preview.png` sha256 `b503e599a8ebdf05`
-- `ui/bottom-cards-dock-preview.png` sha256 `2d67aed7f1c3082c`
-- `ui/btn-disabled-preview.png` sha256 `7d4c4b922014c806`
-- `ui/btn-primary-preview.png` sha256 `49a31c628e0dcea4`
-- `ui/btn-secondary-preview.png` sha256 `663fdaf15b4f727b`
-- `ui/seat-nameplate-preview.png` sha256 `fd0f1cbd22466e7a`
-- `ui/settlement-panel-preview.png` sha256 `9df3294b8f83b227`
+## Built-in image_gen source prompts
+
+### `source/generated-v13/game-table-bg-v13-source.png`
+
+Prompt summary: original sweet pink cartoon landscape game table background; large oval table; no characters, no cards, no UI buttons, no logo, no readable text.
+
+### `source/generated-v13/avatars-v13-source.png`
+
+Prompt summary: three original cute cartoon female player body sprites on flat #00ff00 chroma-key background; no labels, no logo, no third-party IP.
+
+### `source/generated-v13/ui-v13-source.png`
+
+Prompt summary: 4x3 text-free pink cartoon UI sprite sheet on flat #00ff00 chroma-key background: nameplate, buttons, settlement ribbons/panel, dock, timer/multiplier/role badges.
+
+### `source/generated-v13/bottom-cards-dock-v13-source.png`
+
+Prompt summary: dedicated front-facing flat three-card back dock source on flat #00ff00 chroma-key background; generated after user rejected the prior dock as unclear; no perspective, no plaque/button treatment, no text.
+
+### `source/generated-v13/cards-v13-source.png`
+
+Prompt summary: text-free pink cartoon card sprite sheet on flat #00ff00 chroma-key background: card template, back, suits, Joker skins.
+
+## Formal generated files
+
+- `source/generated-v13/avatars-v13-source.png` sha256 `c562ec6db7b0754f8aed6f11dfeee2412d116813bc4d5846a249cc48a793a6aa` size `1774x887` alpha `False` transparentCorners `False` userReview `approved`
+- `source/generated-v13/bottom-cards-dock-v13-source.png` sha256 `ac28d51bc2d961f7126b49e2c2515f4bf112c3df68451cef56c490ce84305f22` size `1672x941` alpha `False` transparentCorners `False` userReview `approved`
+- `source/generated-v13/cards-v13-source.png` sha256 `adfb127a6d433e1e0873fb36f8af7ddd13e4bec74e11e66e6cb023063414e221` size `1448x1086` alpha `False` transparentCorners `False` userReview `approved`
+- `source/generated-v13/game-table-bg-v13-source.png` sha256 `5d25b99738156ef3f090308fd30668118f6383c20dae487f21c24c6245aa424b` size `1844x853` alpha `False` transparentCorners `False` userReview `approved`
+- `source/generated-v13/ui-v13-source.png` sha256 `a94d2a26830bed8eff6be5cf7d17413a284e387835ff063c332133ab434b179c` size `1536x1024` alpha `False` transparentCorners `False` userReview `approved`
+- `backgrounds/game-table-bg-v13.png` sha256 `7c36e82a352354e0740773e01b42c7f7325b792fa87231e25c0587a89d9b88ec` size `1688x780` alpha `False` transparentCorners `False` userReview `approved`
+- `avatars/hero-body-v13.png` sha256 `f2cf7b839ccf0a56b5c0ced95865e0c9654d2e44668e2744f78cce978fec03c5` size `320x360` alpha `True` transparentCorners `True` userReview `approved`
+- `avatars/left-ai-body-v13.png` sha256 `87d139fe18034eb3cf56ac85b5f8fc5229a98c0a895c3e2e3460bf4e1cf981f7` size `360x520` alpha `True` transparentCorners `True` userReview `approved`
+- `avatars/right-ai-body-v13.png` sha256 `bb3a197ed1baf6896e614236e15f51a2560cf66ae2ddf75ad3dcf8ec8332ff13` size `360x520` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/badge-multiplier-v13.png` sha256 `e31db64b06626c56be174ef353cdb2a6c67de1d75b6e686a658f3f2d4d108501` size `180x180` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/badge-role-v13.png` sha256 `256b5c4c6a05614c404dcd9577a29499bd33e5f01ffe1cc0fcd563f6fbf9d262` size `180x180` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/badge-timer-v13.png` sha256 `e4e3b36b27271b49946045b1ed9c8a356162297f7dc5d2c523c3131b852ab31d` size `180x180` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/bottom-cards-dock-v13.png` sha256 `87932111eac3a59c3a60623ae2a72be034fc8006f65d635f2deeaebefa4b6bec` size `440x140` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/btn-disabled-v13.png` sha256 `ee859ef5bd84d724220093429480cf0c815ad6ec31036d77b366a2ea4f753342` size `480x160` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/btn-primary-v13.png` sha256 `5fd35d740d5e44d1130aec19d1ff3571cd60c2d394d373f107402b65b9c78952` size `480x160` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/btn-secondary-v13.png` sha256 `fd8e4989d0b3c7fc9d7497653db40fa4f28c71a8b9d5a166e69d5df10ca8c269` size `480x160` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/btn-tertiary-v13.png` sha256 `4f66efeb4430da48bd31e6aa6a59b4a4acacfadb2ea9432ad03509f4349c0e54` size `480x160` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/seat-nameplate-v13.png` sha256 `439301a5435380d6ebdc7a87474b72e4beaa250227dd89ecd6033f0ca8cee1c1` size `360x96` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/settlement-banner-lose-v13.png` sha256 `e9f51f5bc7e7c15a45e4fb04ddbc60ae4c646f3ec9fd6f1173c91e7b3ffa3eaa` size `640x180` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/settlement-banner-win-v13.png` sha256 `f0c234fc697e6b0f7128ce9e93e1e0e8eb90426fb1253e122165e2128413d296` size `640x180` alpha `True` transparentCorners `True` userReview `approved`
+- `ui/settlement-panel-v13.png` sha256 `4face92eebd2a792a87521b46cbf567c031550d9d91a096150c86d9e96002974` size `760x380` alpha `True` transparentCorners `True` userReview `approved`
+- `cards/card-back-v13.png` sha256 `30768ee5b3994c8755e39cf9a434a4084af3b3f529fbe5a7bb944dcd35fbf4d4` size `220x320` alpha `True` transparentCorners `True` userReview `approved`
+- `cards/card-template-v13.png` sha256 `45d9aecc40e1d65e8b5e9199f9f69edc66d0cf2de4635846ac566f9f993692f2` size `220x320` alpha `True` transparentCorners `True` userReview `approved`
+- `cards/joker-big-v13.png` sha256 `4b635fac10d47c2d34067fd02f9f81c3deac3655edd3f2f32962a83443683230` size `220x320` alpha `True` transparentCorners `True` userReview `approved`
+- `cards/joker-small-v13.png` sha256 `3e15df7fc116269319d61e633e56863d9cd53b423644e8db1a8c3d4cab9066d8` size `220x320` alpha `True` transparentCorners `True` userReview `approved`
+- `cards/suit-club-v13.png` sha256 `4a80a76d6c98aff99ecb40a86cd6ddcd2f5f0988fb0127b0d7d6c8750ea01f59` size `128x128` alpha `True` transparentCorners `True` userReview `approved`
+- `cards/suit-diamond-v13.png` sha256 `4df5921f0fc127f2578f1862791a7297a1513ed1539f8cdcba23f0233d259edb` size `128x128` alpha `True` transparentCorners `True` userReview `approved`
+- `cards/suit-heart-v13.png` sha256 `0af62567b214f7621d511cb0afd351b303e891c72fb687706e9d2c4686f3bcd2` size `128x128` alpha `True` transparentCorners `True` userReview `approved`
+- `cards/suit-spade-v13.png` sha256 `f1fb7153001e6ba63de04c3e0ada096aca722004ee25d04d5b6a722b2a167a53` size `128x128` alpha `True` transparentCorners `True` userReview `approved`
+- `stretch-simulations/bottom-cards-dock-v13-stretch.png` sha256 `26b90861d3338470edc0c9906f660629d43a41df63a1090b23ef2aeac9c4c3d3` size `300x220` alpha `False` transparentCorners `False` userReview `approved`
+- `stretch-simulations/btn-disabled-v13-stretch.png` sha256 `fab09cc7651ed91f920735fe22e4cf32b8bc8416e312e779afe9780b8eb22450` size `300x220` alpha `False` transparentCorners `False` userReview `approved`
+- `stretch-simulations/btn-primary-v13-stretch.png` sha256 `f855525526514105706aa0d0be5263f54cd76b9ebb61829fc38efc724edf5e35` size `300x220` alpha `False` transparentCorners `False` userReview `approved`
+- `stretch-simulations/btn-secondary-v13-stretch.png` sha256 `d8c7e6e9188b5862dc94ee94c06ba2a343a67f4773ba72e3dd302909a7328e72` size `300x220` alpha `False` transparentCorners `False` userReview `approved`
+- `stretch-simulations/btn-tertiary-v13-stretch.png` sha256 `ec216cb0bcbdb64345508596951fcf83f63b67dfbf66832d262e19b87bc8ad76` size `300x220` alpha `False` transparentCorners `False` userReview `approved`
+- `stretch-simulations/seat-nameplate-v13-stretch.png` sha256 `365f5a37683585fb937a8726d9a430a7786e90b0758cc81f3ef781937921feaa` size `300x220` alpha `False` transparentCorners `False` userReview `approved`
+- `stretch-simulations/settlement-panel-v13-stretch.png` sha256 `3a5e47dee7d2e67905938e5ec9f5d64c9fa7e3c432bb596221806070d82dd650` size `300x440` alpha `False` transparentCorners `False` userReview `approved`
+- `composites/v13/composite-780x360-playing-v13.png` sha256 `bb6c02e5e248ca093b935a0c91329066e4e672a73d9be2409debd3fd4ab80583` size `780x360` alpha `False` transparentCorners `False` userReview `approved`
+- `composites/v13/composite-844x390-bidding-v13.png` sha256 `0a6844153bcfca1f0398e1d345b010efdd5e56b7a59824f14bf196ccbea5146f` size `844x390` alpha `False` transparentCorners `False` userReview `approved`
+- `composites/v13/composite-844x390-settlement-v13.png` sha256 `6c671bb01cb7c606de168082bf41c51c1dbd0063ac6b767b576343db05c7dd09` size `844x390` alpha `False` transparentCorners `False` userReview `approved`
+- `review-sheet-v2.png` sha256 `d5edeb9de81866ff4ed02d2ebf95bb535d2f223108c78f633e0f57939cf0ac3f` size `1800x1320` alpha `False` transparentCorners `False` userReview `approved`

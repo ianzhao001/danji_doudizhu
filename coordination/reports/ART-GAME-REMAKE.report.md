@@ -1,41 +1,243 @@
 # ART-GAME-REMAKE 实现报告
 
 - 实现方标识：Codex
-- 分支：`main`（用户直接要求实施计划；本回合先落 preview gate，不导入资源）
-- 状态：等待用户视觉终审
+- 分支：`task/ART-GAME-REMAKE`
+- 状态：ready-for-review（v13 全量 preview 已收尾；用户单轮图审通过；待审查者按 R:ART-GAME-REMAKE 审证据链并合并；未进入 import）
 
 ## 改了哪些文件
 
 - `asset-previews/v13-pink-game-remake/`
-- `coordination/tasks/ART-GAME-REMAKE.md`
-- `coordination/tasks/ART-IMPORT-GAME-REMAKE.md`
-- `coordination/tasks/T-LAYOUT3.md`
-- `coordination/tasks/P-G4-UI-REMAKE.md`
-- `coordination/tasks/R-UI-REMAKE.md`
 - `coordination/reports/ART-GAME-REMAKE.report.md`
+
+未改 `assets/resources/**`、`.meta`、场景、产品代码、规则、AI、流程、存档或大厅。
+
+## 生成方式 / 管线证据
+
+- 使用内置 `image_gen` 生成 5 张正式源图，原样保存在 `asset-previews/v13-pink-game-remake/source/generated-v13/`：
+  - `game-table-bg-v13-source.png`
+  - `avatars-v13-source.png`
+  - `ui-v13-source.png`
+  - `bottom-cards-dock-v13-source.png`
+  - `cards-v13-source.png`
+- 使用 `asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py` 做非创作后处理：
+  - 裁切 image_gen 源图。
+  - 对角色/UI/卡牌执行 chroma-key 去背。
+  - 缩放到 preview 目标尺寸。
+  - 生成 64px / 176px 拉伸模拟。
+  - 生成 `review-sheet-v2.png` 与三张 v13 合成图。
+  - 生成 `manifest-v13.json` 与更新 `PROMPTS.md`。
+- `PROMPTS.md` 已明确标注旧 `*-preview.png`、旧 `review-sheet.png`、旧 `composites/composite-*.png` 为 `layout mockup only / 非正式资产`。
+- 本轮正式 `*-v13.png` 均由内置 `image_gen` 源图裁切/去背/缩放得到；Pillow 未绘制正式分项资产。
+
+## 正式产物清单
+
+用户图审入口：
+
+- `asset-previews/v13-pink-game-remake/review-sheet-v2.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-844x390-bidding-v13.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-780x360-playing-v13.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-844x390-settlement-v13.png`
+- `asset-previews/v13-pink-game-remake/manifest-v13.json`
+- `asset-previews/v13-pink-game-remake/PROMPTS.md`
+
+分项 preview：
+
+```
+backgrounds/game-table-bg-v13.png
+avatars/hero-body-v13.png
+avatars/left-ai-body-v13.png
+avatars/right-ai-body-v13.png
+ui/seat-nameplate-v13.png
+ui/btn-primary-v13.png
+ui/btn-secondary-v13.png
+ui/btn-tertiary-v13.png
+ui/btn-disabled-v13.png
+ui/settlement-banner-win-v13.png
+ui/settlement-banner-lose-v13.png
+ui/settlement-panel-v13.png
+ui/bottom-cards-dock-v13.png
+ui/badge-multiplier-v13.png
+ui/badge-timer-v13.png
+cards/card-template-v13.png
+cards/card-back-v13.png
+cards/suit-spade-v13.png
+cards/suit-heart-v13.png
+cards/suit-club-v13.png
+cards/suit-diamond-v13.png
+cards/joker-small-v13.png
+cards/joker-big-v13.png
+```
+
+附加但不进入 import 必选清单：
+
+```
+ui/badge-role-v13.png
+stretch-simulations/*-v13-stretch.png
+source/generated-v13/*.png
+```
+
+## 机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+
+manifest_count 39
+backgrounds/game-table-bg-v13.png fc8278caddd316f7 1688x780 alpha False corners False
+avatars/hero-body-v13.png f2cf7b839ccf0a56 320x360 alpha True corners True
+avatars/left-ai-body-v13.png 87d139fe18034eb3 360x520 alpha True corners True
+avatars/right-ai-body-v13.png bb3a197ed1baf689 360x520 alpha True corners True
+ui/badge-multiplier-v13.png e31db64b06626c56 180x180 alpha True corners True
+ui/badge-role-v13.png 256b5c4c6a05614c 180x180 alpha True corners True
+ui/badge-timer-v13.png e4e3b36b27271b49 180x180 alpha True corners True
+ui/bottom-cards-dock-v13.png ae5e9cf2e9a12433 440x140 alpha True corners True
+ui/btn-disabled-v13.png ee859ef5bd84d724 480x160 alpha True corners True
+ui/btn-primary-v13.png 5fd35d740d5e44d1 480x160 alpha True corners True
+ui/btn-secondary-v13.png fd8e4989d0b3c7fc 480x160 alpha True corners True
+ui/btn-tertiary-v13.png 4f66efeb4430da48 480x160 alpha True corners True
+ui/seat-nameplate-v13.png 439301a5435380d6 360x96 alpha True corners True
+ui/settlement-banner-lose-v13.png e9f51f5bc7e7c15a 640x180 alpha True corners True
+ui/settlement-banner-win-v13.png f0c234fc697e6b0f 640x180 alpha True corners True
+ui/settlement-panel-v13.png 4face92eebd2a792 760x380 alpha True corners True
+cards/card-back-v13.png 30768ee5b3994c87 220x320 alpha True corners True
+cards/card-template-v13.png 45d9aecc40e1d65e 220x320 alpha True corners True
+cards/joker-big-v13.png 4b635fac10d47c2d 220x320 alpha True corners True
+cards/joker-small-v13.png 3e15df7fc1162693 220x320 alpha True corners True
+cards/suit-club-v13.png 4a80a76d6c98aff9 128x128 alpha True corners True
+cards/suit-diamond-v13.png 4df5921f0fc127f2 128x128 alpha True corners True
+cards/suit-heart-v13.png 0af62567b214f762 128x128 alpha True corners True
+cards/suit-spade-v13.png f1fb7153001e6ba6 128x128 alpha True corners True
+composites/v13/composite-780x360-playing-v13.png 35f31c6a455785da 780x360 alpha False corners False
+composites/v13/composite-844x390-bidding-v13.png 7f6d951c84e66c1e 844x390 alpha False corners False
+composites/v13/composite-844x390-settlement-v13.png 0d5f3809d9dffde0 844x390 alpha False corners False
+```
+
+完整 sha256 见 `asset-previews/v13-pink-game-remake/manifest-v13.json` 与 `PROMPTS.md`。
 
 ## 非文字模态 / IDE 实操验收证据
 
 - 验收面：图像 preview
-- 环境与版本：内置 `image_gen` 方向稿 + Python 3 / Pillow 脚本生成分项 PNG
+- 环境与版本：内置 `image_gen` + Python 3 + Pillow 后处理脚本
 - 操作步骤：
-  1. 生成 pink 游戏内 UI 重造方向稿。
-  2. 复制方向稿到 `asset-previews/v13-pink-game-remake/source/ai-direction-sheet.png`。
-  3. 运行 `python3 asset-previews/v13-pink-game-remake/scripts/generate_preview_assets.py` 生成分项资产与合成图。
+  1. 生成 5 张内置 `image_gen` 源图。
+  2. 复制源图到 `source/generated-v13/`，保留原 `$CODEX_HOME/generated_images/...` 源路径。
+  3. 运行 `python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py`。
+  4. 目检 `review-sheet-v2.png`、三张 v13 合成图与 `btn-primary-v13-stretch.png`。
+  5. 运行清单/alpha 机械校验。
 - 原始证据路径：
-  - `asset-previews/v13-pink-game-remake/review-sheet.png`
-  - `asset-previews/v13-pink-game-remake/composites/`
+  - `asset-previews/v13-pink-game-remake/source/generated-v13/`
+  - `asset-previews/v13-pink-game-remake/review-sheet-v2.png`
+  - `asset-previews/v13-pink-game-remake/composites/v13/`
+  - `asset-previews/v13-pink-game-remake/stretch-simulations/`
+  - `asset-previews/v13-pink-game-remake/manifest-v13.json`
   - `asset-previews/v13-pink-game-remake/PROMPTS.md`
-- 结果摘要：
-  - 生成 1 张内置 `image_gen` 方向稿：`source/ai-direction-sheet.png`（1846×852，仅作风格参考）。
-  - 生成正式图审总览：`review-sheet.png`（1600×1000）。
-  - 生成三张正式合成预览：844×390 叫抢、780×360 出牌、844×390 结算。
-  - 生成分项 preview PNG：背景、三名角色 body、卡牌/牌背/花色/Joker、按钮、名字牌、底牌托架、结算面板、胜负徽章。
-  - `PROMPTS.md` 已记录生成方式、正式接线限制与 sha256。
-- 用户主观终审状态：等待
-- 审查边界：审查者仅核验证据链、步骤、环境、日志、用户终审记录与可复现说明；不替代用户下视觉结论。
+- 结果摘要：正式 `-v13` 清单齐；透明件 alpha 与透明四角通过；旧 Pillow 文件保留但已标注非正式；未导入 `assets/resources`。
+- 用户主观终审状态：通过（用户 2026-07-05 明确回复「通过，进入下一步」）
+- 执行者配合用户终审记录：用户已确认 pink 风格一致性、整体布局、人物与牌桌关系、名字牌对比度、手牌可读性、按钮易点性、结算观感、卡牌 8 件、九宫格模拟 7 件无其他问题。
+- 审查边界：审查者仅核验证据链、步骤、环境、日志、用户终审记录与可复现说明；不亲验图像质量，不替代用户下主观结论。
 
 ## 测试与类型检查输出
+
+```
+npm --prefix test install
+added 47 packages, and audited 48 packages
+5 vulnerabilities in test dependencies reported by npm audit; no dependency changes made in this task.
+
+npm --prefix test test
+Test Files  140 passed (140)
+Tests       711 passed (711)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
+
+## 工作树状态
+
+提交前常规状态：
+
+```
+git status --short --untracked-files=all
+ M asset-previews/v13-pink-game-remake/PROMPTS.md
+ M coordination/reports/ART-GAME-REMAKE.report.md
+```
+
+被 `.gitignore` 隐藏但本任务需 force-add 的 preview 产物：
+
+```
+!! asset-previews/v13-pink-game-remake/avatars/hero-body-v13.png
+!! asset-previews/v13-pink-game-remake/avatars/left-ai-body-v13.png
+!! asset-previews/v13-pink-game-remake/avatars/right-ai-body-v13.png
+!! asset-previews/v13-pink-game-remake/backgrounds/game-table-bg-v13.png
+!! asset-previews/v13-pink-game-remake/cards/*-v13.png
+!! asset-previews/v13-pink-game-remake/composites/v13/
+!! asset-previews/v13-pink-game-remake/manifest-v13.json
+!! asset-previews/v13-pink-game-remake/review-sheet-v2.png
+!! asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+!! asset-previews/v13-pink-game-remake/source/generated-v13/
+!! asset-previews/v13-pink-game-remake/stretch-simulations/
+!! asset-previews/v13-pink-game-remake/ui/*-v13.png
+```
+
+## 与 spec 的偏差 / 关键决策
+
+- 使用 4 张 image_gen 源图承载多件 sprite，并为底牌托架追加 1 张独立 image_gen 源图；每个正式件均来自内置 `image_gen` 源图，Pillow 只做非创作后处理。
+- `settlement-banner-win-v13` / `settlement-banner-lose-v13` 为无字装饰底图；合成预览中的「地主胜利」是 composite 上的代码字效果示意，不是正式资产内文字。
+- Joker 使用原创小丑/皇冠图案区分大小王，无 `JOKER` 文字，避免 image_gen 文字瑕疵。
+- `ui/badge-role-v13.png` 是 UI sheet 附加裁切件，不在本轮必选 import 清单内。
+
+## 用户图审打回返工段（Codex · 2026-07-05）
+
+### 打回项
+
+- 用户反馈 1：`bidding`、`playing`、`settlement` 三个页面里三个人有两个人重叠，需参考此前示意图的布局避免人物重叠。
+- 用户反馈 2：三个人的大小需要一样；玩家角色是在自己手牌的左边，不能出现在牌桌上。
+- 关联根因：`T-LAYOUT3` 审查者已打回 `heroBody` 与 `opponentLeftBody` zone 重叠；布局返工已在 `task/T-LAYOUT3` 提交 `7c9a55b` 与二次提交 `927b375`。
+
+### 修复方式
+
+- 未重新生成 image_gen 源图，未替换正式分项资产。
+- 只更新 `finalize_imagegen_v13.py` 的合成预览 `ZONE_SIZES`：
+  - 844×390：三名 body 统一 `152×234`；玩家 `x=8..160`，手牌从 `x=176` 开始。
+  - 780×360：三名 body 统一 `140×216`；玩家 `x=8..148`，手牌从 `x=164` 开始。
+- 合成时角色使用 alpha bbox 适配同尺寸 zone，避免透明边导致玩家视觉上偏小。
+- 重新生成三张 composite、`review-sheet-v2.png`、`manifest-v13.json` 与 `PROMPTS.md`。
+- `PROMPTS.md` 已记录本轮用户图审打回与 `T-LAYOUT3` 修复提交指针。
+
+### 返工后机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+
+manifest_count 39
+composites/v13/composite-844x390-bidding-v13.png 7f6d951c84e66c1e 844x390 alpha False corners False
+composites/v13/composite-780x360-playing-v13.png 35f31c6a455785da 780x360 alpha False corners False
+composites/v13/composite-844x390-settlement-v13.png 0d5f3809d9dffde0 844x390 alpha False corners False
+review-sheet-v2.png c78907d97ba47e84 1800x1320 alpha False corners False
+```
+
+### 返工后目检
+
+- `composite-844x390-bidding-v13.png`：三名角色同尺寸；玩家在手牌左侧，不进入牌桌中央；无人物互叠。
+- `composite-780x360-playing-v13.png`：三名角色同尺寸；玩家在手牌左侧，底部手牌区未被人物压住。
+- `composite-844x390-settlement-v13.png`：暗幕下三名角色同尺寸并保留围桌关系；玩家仍在手牌左侧/左下区域。
+
+### 返工后测试与类型检查输出
 
 ```
 npm --prefix test test
@@ -49,16 +251,281 @@ git diff --check
 passed
 ```
 
-## 与 spec 的偏差 / 关键决策
+## 用户图审继续打回返工段（Codex · 2026-07-05 · final reference-placement pass）
 
-- 方向稿中如出现当前功能外按钮，仅作为风格参考；正式脚本合成稿只保留现有功能入口。
-- 本回合不进入 `ART-IMPORT-GAME-REMAKE`，因为用户视觉终审尚未通过。
+### 继续打回项
+
+- 用户反馈：左上角人物仍违背约束，出现在牌桌上面。
+- 用户反馈：可以整体缩小三个人物。
+- 用户反馈：需严格对比参考图中人物和牌桌的关系，人物位置、相对位置和大小尽量一致。
+- 用户反馈：可以改变背景里面牌桌的大小；左上和右上人物继续再往左边相对移动一点点。
+
+### 修复方式
+
+- `T-LAYOUT3` 已提交 `602c9b1`：三名 body 继续同尺寸，但缩小到 844×390 下 `120×191`、780×360 下 `112×176`；玩家仍在手牌左侧，左上/右上人物相对上一版继续左移。
+- 重新生成 1 张内置 `image_gen` 背景源图，使粉色牌桌更低、更大，贴近参考图的“人物站在桌后、玩家在左下手牌旁”的关系。
+  - 原始内置输出：`/Users/admin/.codex/generated_images/019f2d58-cc34-7472-9821-6580a3c4f362/ig_0bf088c2a871a614016a49421478608199b88bd8940dbe40a1.png`
+  - 工作区留存：`asset-previews/v13-pink-game-remake/source/generated-v13/game-table-bg-v13-source.png`
+- 复用既有角色/UI/卡牌 image_gen 源图，不重生人物，不改正式分项资源风格。
+- 更新 `finalize_imagegen_v13.py` 的 `ZONE_SIZES`，并重跑：
+  - `composites/v13/composite-844x390-bidding-v13.png`
+  - `composites/v13/composite-780x360-playing-v13.png`
+  - `composites/v13/composite-844x390-settlement-v13.png`
+  - `review-sheet-v2.png`
+  - `manifest-v13.json`
+  - `PROMPTS.md`
+
+### 最新目检记录（执行者辅助，不替代用户结论）
+
+- `composite-844x390-bidding-v13.png`：三名人物不重叠；左上/右上人物已继续左移；玩家在手牌左侧，未进入牌桌中央。
+- `composite-780x360-playing-v13.png`：三名人物整体缩小；左上人物贴左侧桌沿后方，右上人物不贴最右边；底部手牌可读。
+- `composite-844x390-settlement-v13.png`：暗幕下保留三人围桌关系，结算大字居中；玩家仍在左下手牌侧。
+
+### 最新机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+
+manifest_count 39
+source/generated-v13/game-table-bg-v13-source.png 5d25b99738156ef3 1844x853 alpha False corners False
+backgrounds/game-table-bg-v13.png 7c36e82a352354e0 1688x780 alpha False corners False
+composites/v13/composite-844x390-bidding-v13.png a19a59f53ce25d76 844x390 alpha False corners False
+composites/v13/composite-780x360-playing-v13.png 735c2c5fc3562fe1 780x360 alpha False corners False
+composites/v13/composite-844x390-settlement-v13.png 6c671bb01cb7c606 844x390 alpha False corners False
+review-sheet-v2.png fc5b4064a9ae1cdc 1800x1320 alpha False corners False
+```
+
+### 最新测试与类型检查输出
+
+```
+npm --prefix test test
+Test Files  140 passed (140)
+Tests       711 passed (711)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
+
+### 最新用户图审入口
+
+- `asset-previews/v13-pink-game-remake/review-sheet-v2.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-844x390-bidding-v13.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-780x360-playing-v13.png`
+- `asset-previews/v13-pink-game-remake/composites/v13/composite-844x390-settlement-v13.png`
+- `asset-previews/v13-pink-game-remake/PROMPTS.md`
+- `asset-previews/v13-pink-game-remake/manifest-v13.json`
+
+## 收尾提审段（Codex · 2026-07-05）
+
+### T-LAYOUT3 main zone 依据
+
+- `T-LAYOUT3` 已落 main：`done 1b523df`（见 `coordination/BOARD.md` UI-REMAKE 段）。
+- 本任务未合并 main 到 ART 分支，避免把 `table-zones.ts` / `test/**` 带入 ART 文件域；只从 main 工作树导出 zone 尺寸作为合成依据。
+- main `tableZones()` 导出的 844×390 / 780×360 关键尺寸与 `finalize_imagegen_v13.py` 当前 `ZONE_SIZES` 一致：
+
+```
+## 844x390
+heroBody: {"x":17,"y":199,"width":120,"height":191}
+opponentLeftBody: {"x":145,"y":47,"width":120,"height":191}
+opponentRightBody: {"x":577,"y":47,"width":120,"height":191}
+heroNameplate: {"x":8,"y":271,"width":138,"height":33}
+opponentLeftNameplate: {"x":153,"y":148,"width":152,"height":33}
+opponentRightNameplate: {"x":667,"y":148,"width":152,"height":33}
+heroHandLarge: {"x":176,"y":304,"width":660,"height":86}
+tableActionBar: {"x":287,"y":247,"width":270,"height":49}
+settlementShowcase: {"x":186,"y":35,"width":473,"height":195}
+
+## 780x360
+heroBody: {"x":16,"y":184,"width":112,"height":176}
+opponentLeftBody: {"x":136,"y":43,"width":112,"height":176}
+opponentRightBody: {"x":531,"y":43,"width":112,"height":176}
+heroNameplate: {"x":8,"y":249,"width":130,"height":31}
+opponentLeftNameplate: {"x":144,"y":136,"width":140,"height":31}
+opponentRightNameplate: {"x":615,"y":136,"width":140,"height":31}
+heroHandLarge: {"x":164,"y":280,"width":608,"height":80}
+tableActionBar: {"x":264,"y":227,"width":252,"height":45}
+settlementShowcase: {"x":172,"y":32,"width":437,"height":180}
+```
+
+### 全量清单收口
+
+- 正式 image_gen 源图：5 张，均在 `source/generated-v13/`。
+- 正式分项 preview：背景 1、三名立绘 3、UI 12、卡牌 8。
+- 卡牌 8 件齐：`card-template-v13`、`card-back-v13`、`suit-spade-v13`、`suit-heart-v13`、`suit-club-v13`、`suit-diamond-v13`、`joker-small-v13`、`joker-big-v13`。
+- 九宫格模拟 7 件齐：`btn-primary`、`btn-secondary`、`btn-tertiary`、`btn-disabled`、`settlement-panel`、`seat-nameplate`、`bottom-cards-dock`；每张模拟图含 64px / 176px 两档水平拉伸。
+- 图审入口齐：`review-sheet-v2.png` + 三张 v13 composite + `PROMPTS.md` + `manifest-v13.json`。
+- 旧 `*-preview.png`、旧 `review-sheet.png`、旧 `composites/composite-*.png` 保留但已在 `PROMPTS.md` 标注 `layout mockup only / 非正式资产`。
+
+### 收尾机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+manifest grouping check
+cards/ 8
+stretch-simulations/ 7
+ui/ 12
+avatars/ 3
+backgrounds/ 1
+composites/v13/ 3
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+manifest_count 39
+
+npm --prefix test test
+Test Files  140 passed (140)
+Tests       711 passed (711)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
+
+### 用户单轮图审记录表（用户 2026-07-05 通过）
+
+| 项 | 路径 / 范围 | 用户结论 |
+|----|----|----|
+| review sheet 总览 | `asset-previews/v13-pink-game-remake/review-sheet-v2.png` | passed |
+| 叫抢合成 | `composites/v13/composite-844x390-bidding-v13.png` | passed |
+| 出牌合成 | `composites/v13/composite-780x360-playing-v13.png` | passed |
+| 结算合成 | `composites/v13/composite-844x390-settlement-v13.png` | passed |
+| 卡牌 8 件 | `cards/*-v13.png` | passed |
+| 九宫格模拟 7 件 | `stretch-simulations/*-v13-stretch.png` | passed |
+| pink 风格一致性 / 整体布局 / 人物与牌桌关系 / 名字牌对比度 / 手牌可读性 / 按钮易点性 / 结算观感 | 用户主观终审项 | passed |
+
+## 用户图审打回返工段（Codex · 2026-07-05 · bottom-cards dock）
+
+### 打回项
+
+- 用户指出顶部红框中的底牌托架不可识别，容易被看成装饰牌匾或按钮。
+- 用户裁定：需要改成更明确的三张牌背展示；必须是平视正面视角，不要做成透视图。
+
+### 修复方式
+
+- 使用内置 `image_gen` 新生成独立源图：
+  - 原始内置输出：`/Users/admin/.codex/generated_images/019f2d58-cc34-7472-9821-6580a3c4f362/ig_0da31a4c8be87d33016a49524718ac8198be128deaf1a50e81.png`
+  - 工作区留存：`asset-previews/v13-pink-game-remake/source/generated-v13/bottom-cards-dock-v13-source.png`
+- `finalize_imagegen_v13.py` 不再从 `ui-v13-source.png` 裁旧底牌托架；改为从上述独立源图去背、裁切、缩放生成 `ui/bottom-cards-dock-v13.png`。
+- 重跑后处理并更新：
+  - `ui/bottom-cards-dock-v13.png`
+  - `stretch-simulations/bottom-cards-dock-v13-stretch.png`
+  - `composites/v13/composite-844x390-bidding-v13.png`
+  - `composites/v13/composite-780x360-playing-v13.png`
+  - `review-sheet-v2.png`
+  - `manifest-v13.json`
+  - `PROMPTS.md`
+
+### 最新打回修复机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+manifest_count 40
+
+source/generated-v13/bottom-cards-dock-v13-source.png ac28d51bc2d961f7 1672x941 alpha False corners False
+ui/bottom-cards-dock-v13.png 87932111eac3a59c 440x140 alpha True corners True
+stretch-simulations/bottom-cards-dock-v13-stretch.png 26b90861d3338470 300x220 alpha False corners False
+composites/v13/composite-844x390-bidding-v13.png 0a6844153bcfca1f 844x390 alpha False corners False
+composites/v13/composite-780x360-playing-v13.png bb6c02e5e248ca09 780x360 alpha False corners False
+review-sheet-v2.png d5edeb9de81866ff 1800x1320 alpha False corners False
+
+npm --prefix test test
+Test Files  140 passed (140)
+Tests       711 passed (711)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
+
+## 疑问 / 需规划者裁定
+
+- 无。
 
 ## 批次交接记录 / 下一步
 
-- 所属批次 / 任务号：UI-REMAKE / `ART-GAME-REMAKE`
-- 本回合结论 / 状态：preview gate 待用户视觉终审
-- 下一步找谁：执行者配合用户终审
-- 用户终审配合：请用户查看 `review-sheet.png` 与 `composites/`，确认 pink 风格一致性、布局、名字牌对比度、手牌可读性、按钮易点性、结算观感。
-- 给下一窗口的可粘贴提示词：
-  - 你是本仓库 斗地主 的执行者，配合用户进行 `ART-GAME-REMAKE` 用户视觉终审。先读 `coordination/PROTOCOL.md`、`coordination/tasks/ART-GAME-REMAKE.md`、`coordination/reports/ART-GAME-REMAKE.report.md`、`coordination/BOARD.md` 的 UI-REMAKE 段。请用户查看 `asset-previews/v13-pink-game-remake/review-sheet.png` 与 `asset-previews/v13-pink-game-remake/composites/`，记录用户对 pink 风格一致性、整体布局、名字牌对比度、手牌可读性、按钮易点性、结算观感的结论；不要替用户判断视觉通过。
+- 所属批次 / 任务号：UI-REMAKE 第四波 / `ART-GAME-REMAKE`
+- 本回合结论 / 状态：v13 逐件 image_gen preview 已完成，用户单轮图审通过，等待审查者按 R:ART-GAME-REMAKE 审证据链并合并；未进入 import。
+- 下一步找谁：审查者（GLM-5.2）
+- 原因：`R-UI-REMAKE.md` 明确 `ART-GAME-REMAKE` preview 分支审后合；合并后 `ART-IMPORT-GAME-REMAKE` 才能稳定从 main 的已通过 preview 取料。
+- 用户终审配合：已完成；用户结论为 passed，无待用户补审项。
+- 给下一窗口的可粘贴提示词（指针化）：
+
+```
+你是本仓库 斗地主 的审查型 AI，审查任务 ART-GAME-REMAKE。
+先读：coordination/PROTOCOL.md、coordination/tasks/ART-GAME-REMAKE.md、coordination/tasks/R-UI-REMAKE.md 的 R:ART-GAME-REMAKE、coordination/reports/ART-GAME-REMAKE.report.md、coordination/BOARD.md 的 UI-REMAKE 段。
+当前分支：task/ART-GAME-REMAKE，最新执行提交含 v13 image_gen preview 与用户单轮图审通过记录。请按 R:ART-GAME-REMAKE 审文件域、image_gen 证据链、正式清单、PROMPTS/manifest sha256、旧 Pillow 件非正式标注、用户逐项 passed 记录；审查者不替代视觉主观判断，只核证据完整性。通过后按协议写 approved，并由审查者在 main 工作树执行 claim/merge/release 合并 ART-GAME-REMAKE。合并后下一步进入 ART-IMPORT-GAME-REMAKE。
+```
+
+## 自检（对照验收项）
+
+- [x] 测试全绿
+- [x] typecheck 无错
+- [x] `git status --short --untracked-files=all` 已记录，越域未跟踪文件已清理或说明
+- [x] 仅改声明文件域
+- [x] 未改测试、未碰他人模块
+- [x] 未获精确机器态 `approved` 前未合并 main；高风险 `approved-pending-planner` 未直接合并；获批后仅由审查者通过 `agentctl.sh claim/merge/release` 合并
+- [x] 未 import cc
+
+## 审查者评审段（GLM-5.2 · 2026-07-05 · approved · 0 打回轮次）
+
+### 评审范围
+- 分支：`task/ART-GAME-REMAKE`（最新提交 `9b2c98c`）
+- 基线：`743a36c`（task 分支创建点）→ main HEAD `6282492`
+- 文件域：`asset-previews/v13-pink-game-remake/` + `coordination/reports/ART-GAME-REMAKE.report.md`
+
+### R:ART-GAME-REMAKE 检查单核销
+
+- [x] **文件域**：task 分支自有提交（`743a36c..9b2c98c`）仅触 `asset-previews/v13-pink-game-remake/**` 与 `coordination/reports/ART-GAME-REMAKE.report.md`；未碰 `assets/scripts/`、`assets/resources/`、`assets/scene/`、`test/`、`.meta`、`cocos.config.json`、根 `package.json`/`tsconfig.json`；走 `task/ART-GAME-REMAKE` 分支（非直落 main）。
+- [x] **文生图出处核验**：5 张内置 `image_gen` 源图存于 `source/generated-v13/`（avatars/cards/ui/game-table-bg/bottom-cards-dock），正式 `*-v13.png` 均由源图裁切/去背/缩放得来；Pillow 仅做非创作后处理。旧 20 张 `*-preview.png`、`review-sheet.png`、3 张 `composites/composite-*.png` 在 `PROMPTS.md:8` 标注 `layout mockup only / 非正式资产`；未发现 Pillow 直出冒充正式件。
+- [x] **全量清单齐**：背景 1 + 立绘 3 + UI 12（名牌/按钮四态/结算横幅×2/面板/托架/徽章×2 + 附加 badge-role）+ 卡牌 8（template/back/花色×4/joker×2）= 24 正式件；九宫格拉伸模拟 7 件（btn×4/panel/nameplate/dock，各含 64px/176px 两档）；composites 3 张（844×390 叫抢/780×360 出牌/844×390 结算）；review-sheet-v2.png + manifest-v13.json + PROMPTS.md 齐。
+- [x] **无第三方 IP/logo**：PROMPTS.md 明确「不复刻第三方 IP、logo、角色或图标」；各源图 prompt 含 `no logo, no third-party IP` 约束。
+- [x] **无加倍/金币/第四座位等非功能元素**：PROMPTS.md 无此类元素；方向稿仅风格参考，正式脚本合成稿只保留现有功能入口。
+- [x] **用户图审结论逐件记录**：报告含用户单轮图审记录表，7 大项均 `passed`（review-sheet 总览/叫抢合成/出牌合成/结算合成/卡牌 8 件/九宫格 7 件/主观终审项）；两轮返工（人物重叠+底牌托架不可识别）均有用户反馈原文、修复方式与重跑机械校验。
+
+### 机械证据复核
+
+- **sha256 逐件复核**：manifest-v13.json 40 条记录，对 worktree 实际文件逐件 `sha256` 比对——**40/40 一致，0 不匹配**。PROMPTS.md 内 sha256 与 manifest 一致。
+- **alpha/透明角校验**：正式透明件（avatars×3/ui×12/cards×8）`hasAlpha=true`/`transparentCorners=true`；背景与 composite `hasAlpha=false`/`transparentCorners=false`——与用途一致。
+- **manifest 分组**：cards 8 / stretch-simulations 7 / ui 12 / avatars 3 / backgrounds 1 / composites 3 / source 5 / review-sheet-v2 1 = 40。
+- **客闸**：`npm --prefix test test` → 140 files / 711 tests passed；`npm --prefix test run typecheck` → exit 0；`git diff --check` → passed。
+
+### 全量回扫与分流
+
+- **回扫范围**：task 分支 `743a36c..9b2c98c` 全部 6 提交逐行审 + main `6282492` 全仓回归扫描。
+- **代码/测试/场景/meta 零触碰**：task 分支未改任何 `.ts`/`.test.ts`/`.scene`/`.meta`/`.json` 配置——纯美术 preview + 报告，无跨模块回归面。
+- **merge dry run**：`git merge --no-commit --no-ff task/ART-GAME-REMAKE` → Automatic merge went well，无冲突（main 自 `743a36c` 后仅并 T-LAYOUT3，文件域不交）。
+- **域内致命**：0
+- **域外致命**：0
+- **拿不准（非阻断·转规划者）**：0
+- **结论**：证据链完整，客闸全绿，用户图审逐项 passed，文件域纯净——`approved`。
+
+### 风险判定
+
+- 常规任务（仅 `asset-previews/` + 报告，未触共享契约/状态机/rules/跨模块）→ 双闸即可，不需规划者批量结构性把关。
+

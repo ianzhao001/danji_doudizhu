@@ -1,0 +1,442 @@
+[
+  {
+    "path": "source/generated-v13/avatars-v13-source.png",
+    "sha256": "c562ec6db7b0754f8aed6f11dfeee2412d116813bc4d5846a249cc48a793a6aa",
+    "size": [
+      1774,
+      887
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "source/generated-v13/bottom-cards-dock-v13-source.png",
+    "sha256": "ac28d51bc2d961f7126b49e2c2515f4bf112c3df68451cef56c490ce84305f22",
+    "size": [
+      1672,
+      941
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "source/generated-v13/cards-v13-source.png",
+    "sha256": "adfb127a6d433e1e0873fb36f8af7ddd13e4bec74e11e66e6cb023063414e221",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "source/generated-v13/game-table-bg-v13-source.png",
+    "sha256": "5d25b99738156ef3f090308fd30668118f6383c20dae487f21c24c6245aa424b",
+    "size": [
+      1844,
+      853
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "source/generated-v13/ui-v13-source.png",
+    "sha256": "a94d2a26830bed8eff6be5cf7d17413a284e387835ff063c332133ab434b179c",
+    "size": [
+      1536,
+      1024
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "backgrounds/game-table-bg-v13.png",
+    "sha256": "7c36e82a352354e0740773e01b42c7f7325b792fa87231e25c0587a89d9b88ec",
+    "size": [
+      1688,
+      780
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "avatars/hero-body-v13.png",
+    "sha256": "f2cf7b839ccf0a56b5c0ced95865e0c9654d2e44668e2744f78cce978fec03c5",
+    "size": [
+      320,
+      360
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "avatars/left-ai-body-v13.png",
+    "sha256": "87d139fe18034eb3cf56ac85b5f8fc5229a98c0a895c3e2e3460bf4e1cf981f7",
+    "size": [
+      360,
+      520
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "avatars/right-ai-body-v13.png",
+    "sha256": "bb3a197ed1baf6896e614236e15f51a2560cf66ae2ddf75ad3dcf8ec8332ff13",
+    "size": [
+      360,
+      520
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/badge-multiplier-v13.png",
+    "sha256": "e31db64b06626c56be174ef353cdb2a6c67de1d75b6e686a658f3f2d4d108501",
+    "size": [
+      180,
+      180
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/badge-role-v13.png",
+    "sha256": "256b5c4c6a05614c404dcd9577a29499bd33e5f01ffe1cc0fcd563f6fbf9d262",
+    "size": [
+      180,
+      180
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/badge-timer-v13.png",
+    "sha256": "e4e3b36b27271b49946045b1ed9c8a356162297f7dc5d2c523c3131b852ab31d",
+    "size": [
+      180,
+      180
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/bottom-cards-dock-v13.png",
+    "sha256": "87932111eac3a59c3a60623ae2a72be034fc8006f65d635f2deeaebefa4b6bec",
+    "size": [
+      440,
+      140
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/btn-disabled-v13.png",
+    "sha256": "ee859ef5bd84d724220093429480cf0c815ad6ec31036d77b366a2ea4f753342",
+    "size": [
+      480,
+      160
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/btn-primary-v13.png",
+    "sha256": "5fd35d740d5e44d1130aec19d1ff3571cd60c2d394d373f107402b65b9c78952",
+    "size": [
+      480,
+      160
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/btn-secondary-v13.png",
+    "sha256": "fd8e4989d0b3c7fc9d7497653db40fa4f28c71a8b9d5a166e69d5df10ca8c269",
+    "size": [
+      480,
+      160
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/btn-tertiary-v13.png",
+    "sha256": "4f66efeb4430da48bd31e6aa6a59b4a4acacfadb2ea9432ad03509f4349c0e54",
+    "size": [
+      480,
+      160
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/seat-nameplate-v13.png",
+    "sha256": "439301a5435380d6ebdc7a87474b72e4beaa250227dd89ecd6033f0ca8cee1c1",
+    "size": [
+      360,
+      96
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/settlement-banner-lose-v13.png",
+    "sha256": "e9f51f5bc7e7c15a45e4fb04ddbc60ae4c646f3ec9fd6f1173c91e7b3ffa3eaa",
+    "size": [
+      640,
+      180
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/settlement-banner-win-v13.png",
+    "sha256": "f0c234fc697e6b0f7128ce9e93e1e0e8eb90426fb1253e122165e2128413d296",
+    "size": [
+      640,
+      180
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "ui/settlement-panel-v13.png",
+    "sha256": "4face92eebd2a792a87521b46cbf567c031550d9d91a096150c86d9e96002974",
+    "size": [
+      760,
+      380
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "cards/card-back-v13.png",
+    "sha256": "30768ee5b3994c8755e39cf9a434a4084af3b3f529fbe5a7bb944dcd35fbf4d4",
+    "size": [
+      220,
+      320
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "cards/card-template-v13.png",
+    "sha256": "45d9aecc40e1d65e8b5e9199f9f69edc66d0cf2de4635846ac566f9f993692f2",
+    "size": [
+      220,
+      320
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "cards/joker-big-v13.png",
+    "sha256": "4b635fac10d47c2d34067fd02f9f81c3deac3655edd3f2f32962a83443683230",
+    "size": [
+      220,
+      320
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "cards/joker-small-v13.png",
+    "sha256": "3e15df7fc116269319d61e633e56863d9cd53b423644e8db1a8c3d4cab9066d8",
+    "size": [
+      220,
+      320
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "cards/suit-club-v13.png",
+    "sha256": "4a80a76d6c98aff99ecb40a86cd6ddcd2f5f0988fb0127b0d7d6c8750ea01f59",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "cards/suit-diamond-v13.png",
+    "sha256": "4df5921f0fc127f2578f1862791a7297a1513ed1539f8cdcba23f0233d259edb",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "cards/suit-heart-v13.png",
+    "sha256": "0af62567b214f7621d511cb0afd351b303e891c72fb687706e9d2c4686f3bcd2",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "cards/suit-spade-v13.png",
+    "sha256": "f1fb7153001e6ba63de04c3e0ada096aca722004ee25d04d5b6a722b2a167a53",
+    "size": [
+      128,
+      128
+    ],
+    "mode": "RGBA",
+    "hasAlpha": true,
+    "transparentCorners": true
+  },
+  {
+    "path": "stretch-simulations/bottom-cards-dock-v13-stretch.png",
+    "sha256": "26b90861d3338470edc0c9906f660629d43a41df63a1090b23ef2aeac9c4c3d3",
+    "size": [
+      300,
+      220
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "stretch-simulations/btn-disabled-v13-stretch.png",
+    "sha256": "fab09cc7651ed91f920735fe22e4cf32b8bc8416e312e779afe9780b8eb22450",
+    "size": [
+      300,
+      220
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "stretch-simulations/btn-primary-v13-stretch.png",
+    "sha256": "f855525526514105706aa0d0be5263f54cd76b9ebb61829fc38efc724edf5e35",
+    "size": [
+      300,
+      220
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "stretch-simulations/btn-secondary-v13-stretch.png",
+    "sha256": "d8c7e6e9188b5862dc94ee94c06ba2a343a67f4773ba72e3dd302909a7328e72",
+    "size": [
+      300,
+      220
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "stretch-simulations/btn-tertiary-v13-stretch.png",
+    "sha256": "ec216cb0bcbdb64345508596951fcf83f63b67dfbf66832d262e19b87bc8ad76",
+    "size": [
+      300,
+      220
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "stretch-simulations/seat-nameplate-v13-stretch.png",
+    "sha256": "365f5a37683585fb937a8726d9a430a7786e90b0758cc81f3ef781937921feaa",
+    "size": [
+      300,
+      220
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "stretch-simulations/settlement-panel-v13-stretch.png",
+    "sha256": "3a5e47dee7d2e67905938e5ec9f5d64c9fa7e3c432bb596221806070d82dd650",
+    "size": [
+      300,
+      440
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "composites/v13/composite-780x360-playing-v13.png",
+    "sha256": "bb6c02e5e248ca093b935a0c91329066e4e672a73d9be2409debd3fd4ab80583",
+    "size": [
+      780,
+      360
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "composites/v13/composite-844x390-bidding-v13.png",
+    "sha256": "0a6844153bcfca1f0398e1d345b010efdd5e56b7a59824f14bf196ccbea5146f",
+    "size": [
+      844,
+      390
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "composites/v13/composite-844x390-settlement-v13.png",
+    "sha256": "6c671bb01cb7c606de168082bf41c51c1dbd0063ac6b767b576343db05c7dd09",
+    "size": [
+      844,
+      390
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
+    "path": "review-sheet-v2.png",
+    "sha256": "d5edeb9de81866ff4ed02d2ebf95bb535d2f223108c78f633e0f57939cf0ac3f",
+    "size": [
+      1800,
+      1320
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  }
+]
