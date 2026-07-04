@@ -12,7 +12,7 @@
 
 ## Review package checklist
 
-- Formal source sheets: 4 built-in image_gen sources under `source/generated-v13/`.
+- Formal source images: 5 built-in image_gen sources under `source/generated-v13/` (4 sheets plus one dedicated bottom-cards dock source).
 - Formal item previews: background 1, body avatars 3, UI sprites 12, card sprites 8.
 - Card sprite coverage: template, back, spade, heart, club, diamond, small Joker, big Joker.
 - Stretch simulations: 7 sheets; each sheet shows 64px and 176px horizontal 9-slice candidates.
@@ -33,6 +33,10 @@ Prompt summary: three original cute cartoon female player body sprites on flat #
 
 Prompt summary: 4x3 text-free pink cartoon UI sprite sheet on flat #00ff00 chroma-key background: nameplate, buttons, settlement ribbons/panel, dock, timer/multiplier/role badges.
 
+### `source/generated-v13/bottom-cards-dock-v13-source.png`
+
+Prompt summary: dedicated front-facing flat three-card back dock source on flat #00ff00 chroma-key background; generated after user rejected the prior dock as unclear; no perspective, no plaque/button treatment, no text.
+
 ### `source/generated-v13/cards-v13-source.png`
 
 Prompt summary: text-free pink cartoon card sprite sheet on flat #00ff00 chroma-key background: card template, back, suits, Joker skins.
@@ -40,6 +44,7 @@ Prompt summary: text-free pink cartoon card sprite sheet on flat #00ff00 chroma-
 ## Formal generated files
 
 - `source/generated-v13/avatars-v13-source.png` sha256 `c562ec6db7b0754f8aed6f11dfeee2412d116813bc4d5846a249cc48a793a6aa` size `1774x887` alpha `False` transparentCorners `False` userReview `waiting`
+- `source/generated-v13/bottom-cards-dock-v13-source.png` sha256 `ac28d51bc2d961f7126b49e2c2515f4bf112c3df68451cef56c490ce84305f22` size `1672x941` alpha `False` transparentCorners `False` userReview `waiting`
 - `source/generated-v13/cards-v13-source.png` sha256 `adfb127a6d433e1e0873fb36f8af7ddd13e4bec74e11e66e6cb023063414e221` size `1448x1086` alpha `False` transparentCorners `False` userReview `waiting`
 - `source/generated-v13/game-table-bg-v13-source.png` sha256 `5d25b99738156ef3f090308fd30668118f6383c20dae487f21c24c6245aa424b` size `1844x853` alpha `False` transparentCorners `False` userReview `waiting`
 - `source/generated-v13/ui-v13-source.png` sha256 `a94d2a26830bed8eff6be5cf7d17413a284e387835ff063c332133ab434b179c` size `1536x1024` alpha `False` transparentCorners `False` userReview `waiting`
@@ -50,7 +55,7 @@ Prompt summary: text-free pink cartoon card sprite sheet on flat #00ff00 chroma-
 - `ui/badge-multiplier-v13.png` sha256 `e31db64b06626c56be174ef353cdb2a6c67de1d75b6e686a658f3f2d4d108501` size `180x180` alpha `True` transparentCorners `True` userReview `waiting`
 - `ui/badge-role-v13.png` sha256 `256b5c4c6a05614c404dcd9577a29499bd33e5f01ffe1cc0fcd563f6fbf9d262` size `180x180` alpha `True` transparentCorners `True` userReview `waiting`
 - `ui/badge-timer-v13.png` sha256 `e4e3b36b27271b49946045b1ed9c8a356162297f7dc5d2c523c3131b852ab31d` size `180x180` alpha `True` transparentCorners `True` userReview `waiting`
-- `ui/bottom-cards-dock-v13.png` sha256 `ae5e9cf2e9a124331ea9f00948e44976380e81fb70096657d76e1447ea2d0a08` size `440x140` alpha `True` transparentCorners `True` userReview `waiting`
+- `ui/bottom-cards-dock-v13.png` sha256 `87932111eac3a59c3a60623ae2a72be034fc8006f65d635f2deeaebefa4b6bec` size `440x140` alpha `True` transparentCorners `True` userReview `waiting`
 - `ui/btn-disabled-v13.png` sha256 `ee859ef5bd84d724220093429480cf0c815ad6ec31036d77b366a2ea4f753342` size `480x160` alpha `True` transparentCorners `True` userReview `waiting`
 - `ui/btn-primary-v13.png` sha256 `5fd35d740d5e44d1130aec19d1ff3571cd60c2d394d373f107402b65b9c78952` size `480x160` alpha `True` transparentCorners `True` userReview `waiting`
 - `ui/btn-secondary-v13.png` sha256 `fd8e4989d0b3c7fc9d7497653db40fa4f28c71a8b9d5a166e69d5df10ca8c269` size `480x160` alpha `True` transparentCorners `True` userReview `waiting`
@@ -67,14 +72,14 @@ Prompt summary: text-free pink cartoon card sprite sheet on flat #00ff00 chroma-
 - `cards/suit-diamond-v13.png` sha256 `4df5921f0fc127f2578f1862791a7297a1513ed1539f8cdcba23f0233d259edb` size `128x128` alpha `True` transparentCorners `True` userReview `waiting`
 - `cards/suit-heart-v13.png` sha256 `0af62567b214f7621d511cb0afd351b303e891c72fb687706e9d2c4686f3bcd2` size `128x128` alpha `True` transparentCorners `True` userReview `waiting`
 - `cards/suit-spade-v13.png` sha256 `f1fb7153001e6ba63de04c3e0ada096aca722004ee25d04d5b6a722b2a167a53` size `128x128` alpha `True` transparentCorners `True` userReview `waiting`
-- `stretch-simulations/bottom-cards-dock-v13-stretch.png` sha256 `3bd292f40d06e8488e5a01fcc2ae9e34e5bbd19cbfafd6f059731f5a81c969c6` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
+- `stretch-simulations/bottom-cards-dock-v13-stretch.png` sha256 `26b90861d3338470edc0c9906f660629d43a41df63a1090b23ef2aeac9c4c3d3` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
 - `stretch-simulations/btn-disabled-v13-stretch.png` sha256 `fab09cc7651ed91f920735fe22e4cf32b8bc8416e312e779afe9780b8eb22450` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
 - `stretch-simulations/btn-primary-v13-stretch.png` sha256 `f855525526514105706aa0d0be5263f54cd76b9ebb61829fc38efc724edf5e35` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
 - `stretch-simulations/btn-secondary-v13-stretch.png` sha256 `d8c7e6e9188b5862dc94ee94c06ba2a343a67f4773ba72e3dd302909a7328e72` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
 - `stretch-simulations/btn-tertiary-v13-stretch.png` sha256 `ec216cb0bcbdb64345508596951fcf83f63b67dfbf66832d262e19b87bc8ad76` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
 - `stretch-simulations/seat-nameplate-v13-stretch.png` sha256 `365f5a37683585fb937a8726d9a430a7786e90b0758cc81f3ef781937921feaa` size `300x220` alpha `False` transparentCorners `False` userReview `waiting`
 - `stretch-simulations/settlement-panel-v13-stretch.png` sha256 `3a5e47dee7d2e67905938e5ec9f5d64c9fa7e3c432bb596221806070d82dd650` size `300x440` alpha `False` transparentCorners `False` userReview `waiting`
-- `composites/v13/composite-780x360-playing-v13.png` sha256 `735c2c5fc3562fe1072479133404e8ea4af6afdf11fef68dc7fe8b8ce803117f` size `780x360` alpha `False` transparentCorners `False` userReview `waiting`
-- `composites/v13/composite-844x390-bidding-v13.png` sha256 `a19a59f53ce25d76b13fc26d8cac625e7901d61f74f1e3087625fe0b4c2a4730` size `844x390` alpha `False` transparentCorners `False` userReview `waiting`
+- `composites/v13/composite-780x360-playing-v13.png` sha256 `bb6c02e5e248ca093b935a0c91329066e4e672a73d9be2409debd3fd4ab80583` size `780x360` alpha `False` transparentCorners `False` userReview `waiting`
+- `composites/v13/composite-844x390-bidding-v13.png` sha256 `0a6844153bcfca1f0398e1d345b010efdd5e56b7a59824f14bf196ccbea5146f` size `844x390` alpha `False` transparentCorners `False` userReview `waiting`
 - `composites/v13/composite-844x390-settlement-v13.png` sha256 `6c671bb01cb7c606de168082bf41c51c1dbd0063ac6b767b576343db05c7dd09` size `844x390` alpha `False` transparentCorners `False` userReview `waiting`
-- `review-sheet-v2.png` sha256 `fc5b4064a9ae1cdc3c952338f4cf864cef1195ad3008522f4909be1e77804bdd` size `1800x1320` alpha `False` transparentCorners `False` userReview `waiting`
+- `review-sheet-v2.png` sha256 `d5edeb9de81866ff4ed02d2ebf95bb535d2f223108c78f633e0f57939cf0ac3f` size `1800x1320` alpha `False` transparentCorners `False` userReview `waiting`

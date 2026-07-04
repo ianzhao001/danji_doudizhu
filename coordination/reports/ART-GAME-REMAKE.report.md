@@ -13,10 +13,11 @@
 
 ## 生成方式 / 管线证据
 
-- 使用内置 `image_gen` 生成 4 张正式源图，原样保存在 `asset-previews/v13-pink-game-remake/source/generated-v13/`：
+- 使用内置 `image_gen` 生成 5 张正式源图，原样保存在 `asset-previews/v13-pink-game-remake/source/generated-v13/`：
   - `game-table-bg-v13-source.png`
   - `avatars-v13-source.png`
   - `ui-v13-source.png`
+  - `bottom-cards-dock-v13-source.png`
   - `cards-v13-source.png`
 - 使用 `asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py` 做非创作后处理：
   - 裁切 image_gen 源图。
@@ -124,7 +125,7 @@ composites/v13/composite-844x390-settlement-v13.png 0d5f3809d9dffde0 844x390 alp
 - 验收面：图像 preview
 - 环境与版本：内置 `image_gen` + Python 3 + Pillow 后处理脚本
 - 操作步骤：
-  1. 生成 4 张内置 `image_gen` 源图。
+  1. 生成 5 张内置 `image_gen` 源图。
   2. 复制源图到 `source/generated-v13/`，保留原 `$CODEX_HOME/generated_images/...` 源路径。
   3. 运行 `python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py`。
   4. 目检 `review-sheet-v2.png`、三张 v13 合成图与 `btn-primary-v13-stretch.png`。
@@ -188,7 +189,7 @@ git status --short --untracked-files=all
 
 ## 与 spec 的偏差 / 关键决策
 
-- 使用 4 张 image_gen 源图承载多件 sprite，再逐件裁切为正式 `-v13` preview。每个正式件均来自内置 `image_gen` 源图，Pillow 只做非创作后处理。
+- 使用 4 张 image_gen 源图承载多件 sprite，并为底牌托架追加 1 张独立 image_gen 源图；每个正式件均来自内置 `image_gen` 源图，Pillow 只做非创作后处理。
 - `settlement-banner-win-v13` / `settlement-banner-lose-v13` 为无字装饰底图；合成预览中的「地主胜利」是 composite 上的代码字效果示意，不是正式资产内文字。
 - Joker 使用原创小丑/皇冠图案区分大小王，无 `JOKER` 文字，避免 image_gen 文字瑕疵。
 - `ui/badge-role-v13.png` 是 UI sheet 附加裁切件，不在本轮必选 import 清单内。
@@ -358,7 +359,7 @@ settlementShowcase: {"x":172,"y":32,"width":437,"height":180}
 
 ### 全量清单收口
 
-- 正式 image_gen 源图：4 张，均在 `source/generated-v13/`。
+- 正式 image_gen 源图：5 张，均在 `source/generated-v13/`。
 - 正式分项 preview：背景 1、三名立绘 3、UI 12、卡牌 8。
 - 卡牌 8 件齐：`card-template-v13`、`card-back-v13`、`suit-spade-v13`、`suit-heart-v13`、`suit-club-v13`、`suit-diamond-v13`、`joker-small-v13`、`joker-big-v13`。
 - 九宫格模拟 7 件齐：`btn-primary`、`btn-secondary`、`btn-tertiary`、`btn-disabled`、`settlement-panel`、`seat-nameplate`、`bottom-cards-dock`；每张模拟图含 64px / 176px 两档水平拉伸。
@@ -408,6 +409,59 @@ passed
 | 卡牌 8 件 | `cards/*-v13.png` | waiting |
 | 九宫格模拟 7 件 | `stretch-simulations/*-v13-stretch.png` | waiting |
 | pink 风格一致性 / 整体布局 / 名字牌对比度 / 手牌可读性 / 按钮易点性 / 结算观感 | 用户主观终审项 | waiting |
+
+## 用户图审打回返工段（Codex · 2026-07-05 · bottom-cards dock）
+
+### 打回项
+
+- 用户指出顶部红框中的底牌托架不可识别，容易被看成装饰牌匾或按钮。
+- 用户裁定：需要改成更明确的三张牌背展示；必须是平视正面视角，不要做成透视图。
+
+### 修复方式
+
+- 使用内置 `image_gen` 新生成独立源图：
+  - 原始内置输出：`/Users/admin/.codex/generated_images/019f2d58-cc34-7472-9821-6580a3c4f362/ig_0da31a4c8be87d33016a49524718ac8198be128deaf1a50e81.png`
+  - 工作区留存：`asset-previews/v13-pink-game-remake/source/generated-v13/bottom-cards-dock-v13-source.png`
+- `finalize_imagegen_v13.py` 不再从 `ui-v13-source.png` 裁旧底牌托架；改为从上述独立源图去背、裁切、缩放生成 `ui/bottom-cards-dock-v13.png`。
+- 重跑后处理并更新：
+  - `ui/bottom-cards-dock-v13.png`
+  - `stretch-simulations/bottom-cards-dock-v13-stretch.png`
+  - `composites/v13/composite-844x390-bidding-v13.png`
+  - `composites/v13/composite-780x360-playing-v13.png`
+  - `review-sheet-v2.png`
+  - `manifest-v13.json`
+  - `PROMPTS.md`
+
+### 最新打回修复机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+manifest_count 40
+
+source/generated-v13/bottom-cards-dock-v13-source.png ac28d51bc2d961f7 1672x941 alpha False corners False
+ui/bottom-cards-dock-v13.png 87932111eac3a59c 440x140 alpha True corners True
+stretch-simulations/bottom-cards-dock-v13-stretch.png 26b90861d3338470 300x220 alpha False corners False
+composites/v13/composite-844x390-bidding-v13.png 0a6844153bcfca1f 844x390 alpha False corners False
+composites/v13/composite-780x360-playing-v13.png bb6c02e5e248ca09 780x360 alpha False corners False
+review-sheet-v2.png d5edeb9de81866ff 1800x1320 alpha False corners False
+
+npm --prefix test test
+Test Files  140 passed (140)
+Tests       711 passed (711)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
 
 ## 疑问 / 需规划者裁定
 

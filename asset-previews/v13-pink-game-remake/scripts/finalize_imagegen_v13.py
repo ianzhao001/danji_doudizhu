@@ -47,7 +47,6 @@ UI_SPECS = [
   CropSpec("ui-v13-source.png", (375, 405, 775, 635), "ui/settlement-banner-win-v13.png", (640, 180), 8),
   CropSpec("ui-v13-source.png", (760, 405, 1130, 635), "ui/settlement-banner-lose-v13.png", (640, 180), 8),
   CropSpec("ui-v13-source.png", (1115, 350, 1515, 670), "ui/settlement-panel-v13.png", (760, 380), 10),
-  CropSpec("ui-v13-source.png", (35, 710, 485, 940), "ui/bottom-cards-dock-v13.png", (440, 140), 8),
   CropSpec("ui-v13-source.png", (525, 680, 795, 990), "ui/badge-multiplier-v13.png", (180, 180), 6),
   CropSpec("ui-v13-source.png", (835, 685, 1110, 970), "ui/badge-timer-v13.png", (180, 180), 6),
   CropSpec("ui-v13-source.png", (1190, 675, 1465, 990), "ui/badge-role-v13.png", (180, 180), 6),
@@ -97,6 +96,7 @@ def main() -> None:
   build_background()
   for spec in AVATAR_SPECS + UI_SPECS + CARD_SPECS:
     build_cutout(spec)
+  build_bottom_cards_dock()
   build_stretch_simulations()
   build_composites()
   write_manifest()
@@ -120,6 +120,17 @@ def build_cutout(spec: CropSpec) -> None:
   out = ROOT / spec.out
   out.parent.mkdir(parents=True, exist_ok=True)
   final.save(out)
+
+
+def build_bottom_cards_dock() -> None:
+  src = Image.open(SOURCE / "bottom-cards-dock-v13-source.png").convert("RGBA")
+  cut = remove_green(src)
+  bbox = cut.getbbox()
+  if bbox is not None:
+    cut = cut.crop(bbox)
+  final = contain(cut, (440, 140), 4)
+  (OUT_UI / "bottom-cards-dock-v13.png").parent.mkdir(parents=True, exist_ok=True)
+  final.save(OUT_UI / "bottom-cards-dock-v13.png")
 
 
 def remove_green(image: Image.Image) -> Image.Image:
@@ -457,7 +468,7 @@ def write_prompts() -> None:
     "",
     "## Review package checklist",
     "",
-    "- Formal source sheets: 4 built-in image_gen sources under `source/generated-v13/`.",
+    "- Formal source images: 5 built-in image_gen sources under `source/generated-v13/` (4 sheets plus one dedicated bottom-cards dock source).",
     "- Formal item previews: background 1, body avatars 3, UI sprites 12, card sprites 8.",
     "- Card sprite coverage: template, back, spade, heart, club, diamond, small Joker, big Joker.",
     "- Stretch simulations: 7 sheets; each sheet shows 64px and 176px horizontal 9-slice candidates.",
@@ -477,6 +488,10 @@ def write_prompts() -> None:
     "### `source/generated-v13/ui-v13-source.png`",
     "",
     "Prompt summary: 4x3 text-free pink cartoon UI sprite sheet on flat #00ff00 chroma-key background: nameplate, buttons, settlement ribbons/panel, dock, timer/multiplier/role badges.",
+    "",
+    "### `source/generated-v13/bottom-cards-dock-v13-source.png`",
+    "",
+    "Prompt summary: dedicated front-facing flat three-card back dock source on flat #00ff00 chroma-key background; generated after user rejected the prior dock as unclear; no perspective, no plaque/button treatment, no text.",
     "",
     "### `source/generated-v13/cards-v13-source.png`",
     "",

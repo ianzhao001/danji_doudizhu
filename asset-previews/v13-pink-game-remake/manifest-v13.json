@@ -11,6 +11,17 @@
     "transparentCorners": false
   },
   {
+    "path": "source/generated-v13/bottom-cards-dock-v13-source.png",
+    "sha256": "ac28d51bc2d961f7126b49e2c2515f4bf112c3df68451cef56c490ce84305f22",
+    "size": [
+      1672,
+      941
+    ],
+    "mode": "RGBA",
+    "hasAlpha": false,
+    "transparentCorners": false
+  },
+  {
     "path": "source/generated-v13/cards-v13-source.png",
     "sha256": "adfb127a6d433e1e0873fb36f8af7ddd13e4bec74e11e66e6cb023063414e221",
     "size": [
@@ -122,7 +133,7 @@
   },
   {
     "path": "ui/bottom-cards-dock-v13.png",
-    "sha256": "ae5e9cf2e9a124331ea9f00948e44976380e81fb70096657d76e1447ea2d0a08",
+    "sha256": "87932111eac3a59c3a60623ae2a72be034fc8006f65d635f2deeaebefa4b6bec",
     "size": [
       440,
       140
@@ -309,7 +320,7 @@
   },
   {
     "path": "stretch-simulations/bottom-cards-dock-v13-stretch.png",
-    "sha256": "3bd292f40d06e8488e5a01fcc2ae9e34e5bbd19cbfafd6f059731f5a81c969c6",
+    "sha256": "26b90861d3338470edc0c9906f660629d43a41df63a1090b23ef2aeac9c4c3d3",
     "size": [
       300,
       220
@@ -386,7 +397,7 @@
   },
   {
     "path": "composites/v13/composite-780x360-playing-v13.png",
-    "sha256": "735c2c5fc3562fe1072479133404e8ea4af6afdf11fef68dc7fe8b8ce803117f",
+    "sha256": "bb6c02e5e248ca093b935a0c91329066e4e672a73d9be2409debd3fd4ab80583",
     "size": [
       780,
       360
@@ -397,7 +408,7 @@
   },
   {
     "path": "composites/v13/composite-844x390-bidding-v13.png",
-    "sha256": "a19a59f53ce25d76b13fc26d8cac625e7901d61f74f1e3087625fe0b4c2a4730",
+    "sha256": "0a6844153bcfca1f0398e1d345b010efdd5e56b7a59824f14bf196ccbea5146f",
     "size": [
       844,
       390
@@ -419,7 +430,7 @@
   },
   {
     "path": "review-sheet-v2.png",
-    "sha256": "fc5b4064a9ae1cdc3c952338f4cf864cef1195ad3008522f4909be1e77804bdd",
+    "sha256": "d5edeb9de81866ff4ed02d2ebf95bb535d2f223108c78f633e0f57939cf0ac3f",
     "size": [
       1800,
       1320
