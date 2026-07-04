@@ -1,4 +1,4 @@
-import { director, Sprite } from 'cc';
+import { BlockInputEvents, director, Sprite } from 'cc';
 import { RESOURCE_PATHS } from '../../asset-keys';
 import { deriveScreenVM } from '../../screen-view';
 import { addUiTransform, loadSprite } from '../ui-helpers';
@@ -21,7 +21,13 @@ export function renderResult(
   canvas: { width: number; height: number },
 ): void {
   if (!result) return;
-  const panel = ctx.ensureNode('settlement-panel-runtime', ctx.uiRoot);
+  const overlay = ctx.ensureNode('settlement-overlay-runtime', ctx.uiRoot);
+  overlay.setPosition(0, 0, 0);
+  addUiTransform(overlay, canvas.width, canvas.height);
+  ctx.drawDimOverlay(overlay, canvas.width, canvas.height);
+  if (!overlay.getComponent(BlockInputEvents)) overlay.addComponent(BlockInputEvents);
+
+  const panel = ctx.ensureNode('settlement-panel-runtime', overlay);
   panel.setPosition(0, Math.round(canvas.height * 0.005), 0);
   panel.setScale(1, 1, 1);
   const landscape = ctx.isLandscape(canvas);

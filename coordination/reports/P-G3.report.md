@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/P-G3`
-- 状态：阶段① in-review；阶段②待阶段①审查基线后继续
+- 状态：阶段①已提交 `fef74c7`；阶段②已实现待审；阶段③待 ART-IMPORT-UIKIT 落 main 后继续；阶段④未开始
 
 ## 阶段①改动文件
 
@@ -66,9 +66,103 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
   - `/tmp/doudizhu-wave2-p-g3-phase1/P-G-844x390-card-pressed.png`
   - `/tmp/doudizhu-wave2-p-g3-phase1/P-G-844x390-card-released-selected.png`
 
-## 阶段②状态
+## 阶段②改动文件
 
-- 阶段②尚未开始。本提交只建立 renderer 拆分基线，便于审查者先确认视觉等价与文件搬移。
+- `assets/scripts/ui/components/game-scene-skeleton.ts`
+- `assets/scripts/ui/components/game-scene/seats-renderer.ts`
+- `assets/scripts/ui/components/game-scene/bid-actions-renderer.ts`
+- `assets/scripts/ui/components/game-scene/hud-renderer.ts`
+- `assets/scripts/ui/components/game-scene/result-overlay-renderer.ts`
+
+## 阶段②实现摘要
+
+- `render()` 改走 `tableZones(canvas.width, canvas.height)`；顶部信息条、状态行、actionBar、强度条、计时、记牌器、建议、三家落牌区、底牌托架均消费命名 zone。
+- 叫抢相消费 `runtime.biddingDeal()`，经 `deriveScreenVM({ biddingHand })` 渲染 17 张可见手牌；顶部手牌数和三家计数用 `[17,17,17]`。
+- 新增发牌动画锁：首帧发牌期间 `bid-*` 按钮渲染为 disabled，锁结束后再启用；计时器在锁内冻结。
+- actionBar 相位互斥：bidding 只渲染 `bid-*`，playing 只渲染 `action-*`。
+- 消费 `bottomRevealed`：叫抢期底牌托架显示 3 张牌背，进入 playing 后展示 3 张明牌；地主手牌数变为 20。
+- `snapshot.top.seat` 按座位落到 `dropZoneLeft` / `dropZoneRight` / `dropZoneHero`。
+- 结算面板改为 `settlement-overlay-runtime` 子树，先 dim + `BlockInputEvents` 再挂 panel，避免底层 HUD 继续吃输入。
+- 音效/动效/震动 chips 从牌桌中央迁入暂停菜单。
+- 支持 URL `?seed=...` 覆写开局 seed，供 V2 固定种子复现。
+
+## 阶段② 17 对重叠核销
+
+以下按 P-G3/T-LAYOUT2/R-WAVE2 的重叠来源逐项核销，四横屏截图见下一节。
+
+1. `top-landlord` ↔ 左家座位：`top-landlord` 进入 `infoStrip`。
+2. `top-hand-count` ↔ 右家座位：`top-hand-count` 进入 `infoStrip`。
+3. `top-multiplier` ↔ 顶部相位标题：三项徽标收敛到 `infoStrip`。
+4. `bottom-card-back-*` ↔ 左/右家座位：底牌托架走 `bottomCardsDock`。
+5. `bottom-card-*` ↔ 中央落牌区：底牌托架与 `dropZoneHero` 分行。
+6. `bidding-prompt` ↔ 出牌区标题：提示走 `statusLine`。
+7. `status-label` ↔ 叫抢按钮：状态走 `statusLine`，按钮走 `actionBar`。
+8. `status-label` ↔ 出牌按钮：同上，状态与动作行分离。
+9. `bid-call` ↔ `action-play`：bidding 相不渲染出牌键组。
+10. `bid-pass` ↔ `action-pass`：bidding 相不渲染出牌键组。
+11. `bid-grab` ↔ `action-hint`：bidding 相不渲染出牌键组。
+12. `action-play` ↔ `bid-call`：playing 相不渲染叫抢键组。
+13. `hud-strength-meter` ↔ actionBar：强度条走 `strengthMeter` 左翼。
+14. `turn-timer-runtime` ↔ actionBar：计时走 `turnTimer` 右翼；bidding 也复用该区。
+15. `hud-card-memory` ↔ 中央出牌区：记牌器走 `memoryDock` 左半屏。
+16. `advisor-toggle`/`advisor-panel` ↔ 中央出牌区：建议走 `advisorDock` 右半屏。
+17. `play-card-*` 共用中央落点：按 `top.seat` 分流到三处 dropZone。
+
+## 阶段②测试与类型检查
+
+```
+npm --prefix test test -- ui/table-zones.test.ts flow/bidding-visibility.test.ts ui/screen-view.test.ts ui/table-layout-landscape.test.ts ui/turn-timer.test.ts ui/card-memory-view.test.ts integration/save-resume-e2e.test.ts
+=> Test Files 7 passed (7)
+=> Tests 55 passed (55)
+
+npm --prefix test test
+=> Test Files 139 passed (139)
+=> Tests 703 passed (703)
+
+npm --prefix test run typecheck
+=> tsc --noEmit passed
+
+git diff --check
+=> passed
+```
+
+## 阶段② Creator / CDP 证据
+
+- Creator build：
+
+```
+env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/Contents/MacOS/CocosCreator \
+  --project /Users/admin/Documents/Cocos/斗地主.worktrees/P-G3 \
+  --build "platform=web-mobile;buildPath=project://build;outputName=web-mobile;debug=false;md5Cache=false;sourceMaps=false;mainBundleCompressionType=merge_dep;startScene=dc62324b-10d4-4870-9518-1a34ce682067"
+```
+
+- Creator 返回既有 metrics exit code `36`；日志记录 `build Task (web-mobile) Finished in (4 s)`，并生成 `build/web-mobile/`。
+- 标准 P-G smoke：`node /tmp/doudizhu-v11-visual-smoke.mjs P-G /Users/admin/Documents/Cocos/斗地主.worktrees/P-G3/build/web-mobile /tmp/doudizhu-wave2-p-g3-phase2-final`
+  - 输出：`/tmp/doudizhu-wave2-p-g3-phase2-final/summary.json`
+  - 结论：6 张截图，`productErrors=[]`。
+- Phase② flow probe：`/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/summary.json`
+  - 四横屏各 3 张截图：`bidding-locked` / `bidding-ready` / `playing`。
+  - locked：`biddingHand=17`、`handCounts=[17,17,17]`、`bid-call/bid-pass.interactable=false`、`action-play.exists=false`、`backs=3`、`shownBottom=0`、`topLabel="地主 待定"`、`productErrors=0`。
+  - bidding-ready：`lockMs=0`、`bid-call/bid-pass.interactable=true`、`action-play.exists=false`、`backs=3`。
+  - playing：`phase="playing"`、`handCount=20`、`handCounts=[20,17,17]`、`bid-*` 不存在、`action-play.exists=true`、`backs=0`、`shownBottom=3`、`topLabel="地主 你"`。
+  - 截图目录：
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-844x390-bidding-locked.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-844x390-bidding-ready.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-844x390-playing.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-812x375-bidding-locked.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-812x375-bidding-ready.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-812x375-playing.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-915x412-bidding-locked.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-915x412-bidding-ready.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-915x412-playing.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-780x360-bidding-locked.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-780x360-bidding-ready.png`
+    - `/tmp/doudizhu-wave2-p-g3-phase2-final-flow-probe/P-G3-780x360-playing.png`
+
+## 阶段③/④状态
+
+- 阶段③未开始：依赖 ART-IMPORT-UIKIT 落 main 后接线。
+- 阶段④未开始：待阶段③后做命名/文案收尾。
 
 ## 自检
 
@@ -78,3 +172,4 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
 - [x] 未手写 `.scene` / `.prefab` / `.meta`。
 - [x] 全量 vitest / typecheck / diff check 通过。
 - [x] Creator build + CDP smoke 通过。
+- [x] 阶段②四横屏 locked/ready/playing CDP probe 通过。

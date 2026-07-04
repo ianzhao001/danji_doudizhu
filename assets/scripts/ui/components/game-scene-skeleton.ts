@@ -42,6 +42,7 @@ import { emptyToasts, pushToast, tickToasts, type ToastQueue } from '../toast-qu
 import { deriveAiThinking } from '../ai-thinking-view';
 import { askQuit, cancelQuit, closeMenu, initialPause, openMenu, type PauseState } from '../pause-menu';
 import type { Rect, TableRegions } from '../table-layout';
+import { tableZones, type TableZones } from '../table-zones';
 import { toggleSetting, type ToggleKey } from '../settings-view';
 import {
   RESOURCE_PATHS,
@@ -173,9 +174,11 @@ export class GameSceneSkeleton extends Component {
   private toastClockMs = 0;
   private turnTimerKey: string | null = null;
   private turnTimerElapsedMs = 0;
+  private dealAnimationLockMs = 0;
   private uiTickRenderMs = 0;
   private memoryExpanded = false;
   private advisorEnabled = false;
+  private revealedBottomCards: Card[] | null = null;
   private pauseState: PauseState = initialPause;
   private renderedPauseStage: PauseState['stage'] = 'closed';
   private settings: Settings = defaultSettings();
@@ -211,8 +214,13 @@ export class GameSceneSkeleton extends Component {
     this.uiTickRenderMs += deltaMs;
 
     let shouldRender = this.tickToastState();
+    if (this.dealAnimationLockMs > 0) {
+      const nextLock = Math.max(0, this.dealAnimationLockMs - deltaMs);
+      if (nextLock === 0) shouldRender = true;
+      this.dealAnimationLockMs = nextLock;
+    }
     const timerActive = this.syncTurnTimerKey();
-    const timerFrozen = this.isTurnTimerFrozen();
+    const timerFrozen = this.isTurnTimerFrozen() || this.dealAnimationLockMs > 0;
     const thinkingAnimating = this.settings.animation && this.isAiThinkingActive();
     if (timerActive && !timerFrozen) this.turnTimerElapsedMs = Math.min(TURN_TIMER_MS, this.turnTimerElapsedMs + deltaMs);
     if (((timerActive && !timerFrozen) || thinkingAnimating) && this.uiTickRenderMs >= UI_TICK_RENDER_MS) {
@@ -234,8 +242,10 @@ export class GameSceneSkeleton extends Component {
     this.toastClockMs = 0;
     this.turnTimerKey = null;
     this.turnTimerElapsedMs = 0;
+    this.dealAnimationLockMs = 0;
     this.uiTickRenderMs = 0;
     this.advisorEnabled = false;
+    this.revealedBottomCards = null;
     this.pauseState = initialPause;
     this.renderedPauseStage = 'closed';
     this.submitting = false;
@@ -255,7 +265,7 @@ export class GameSceneSkeleton extends Component {
       this.settings.difficulty,
     ];
     const config = {
-      seed: Date.now() >>> 0,
+      seed: this.resolveSeed(),
       heroSeat: HERO_SEAT,
       levels,
       thinkingDelayMs,
@@ -280,6 +290,8 @@ export class GameSceneSkeleton extends Component {
     this.fullGameEvents = resume?.events.slice() ?? [];
     this.runtime = resume ? resumeRoundRuntime(resume, config) : startRoundRuntime(config);
     this.unsubscribe = this.runtime.onEvent((event) => {
+      if (event.type === 'deal' || event.type === 'redeal') this.revealedBottomCards = null;
+      if (event.type === 'bottomRevealed') this.revealedBottomCards = event.cards.slice();
       if (event.type === 'round') this.fullGameEvents.push(event.event);
       this.recentEvents.push(event);
       this.recentEvents = this.recentEvents.slice(-12);
@@ -295,6 +307,7 @@ export class GameSceneSkeleton extends Component {
 
     const snapshot = this.runtime.currentSnapshot() ?? undefined;
     const bidding = this.runtime.currentBidding() ?? undefined;
+    const biddingDeal = this.runtime.biddingDeal() ?? undefined;
     const settlement = this.runtime.settlement() ?? undefined;
     if (snapshot?.viewerHand) {
       this.selected = this.selected.filter((selected) => snapshot.viewerHand?.some((card) => sameCard(card, selected)));
@@ -302,6 +315,7 @@ export class GameSceneSkeleton extends Component {
 
     const canvas = this.canvasSize();
     this.renderPlaceholderBackground(canvas);
+    const layout = tableZones(canvas.width, canvas.height);
     const vm = deriveScreenVM({
       snapshot,
       bidding,
@@ -315,25 +329,30 @@ export class GameSceneSkeleton extends Component {
         liftOffset: HAND_LIFT,
       },
       settlement,
+      biddingHand: biddingDeal?.viewerHand,
     });
+    const phase = this.runtime.phase();
+    const handCounts = snapshot?.handCounts ?? biddingDeal?.handCounts ?? [0, 0, 0];
+    const handCount = snapshot?.viewerHand?.length ?? biddingDeal?.viewerHand.length ?? 0;
+    this.armDealAnimationLock(phase, vm.hand);
 
     this.beginRenderDiff();
-    this.renderTopBar(this.runtime.phase(), vm.topBar, snapshot?.viewerHand?.length ?? 0, vm.layout, canvas);
-    this.renderRuntimeSettings(vm.layout, canvas);
-    this.renderSeats(snapshot?.handCounts ?? [0, 0, 0], snapshot?.landlord ?? null, vm.layout, canvas);
-    this.renderSeatFeedback(vm.layout, canvas);
-    this.renderPlayArea(snapshot?.top ?? null, vm.layout, canvas);
-    this.renderHud(snapshot?.viewerHand ?? [], vm.layout, canvas);
-    this.renderAdvisor(snapshot, vm.layout, canvas);
-    this.renderBidding(bidding ? vm.bidding : undefined, vm.layout, canvas);
-    this.renderHand(vm.hand, vm.layout, canvas);
-    this.renderStatus(this.statusText, vm.layout, canvas);
-    this.renderTurnTimer(vm.layout, canvas);
-    this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, vm.layout, canvas);
-    this.renderToasts(vm.layout, canvas);
+    this.renderTopBar(phase, vm.topBar, handCount, layout, canvas);
+    this.renderSeats(handCounts, snapshot?.landlord ?? null, layout, canvas);
+    this.renderSeatFeedback(layout, canvas);
+    this.renderBottomCardsDock(phase === 'bidding' ? null : this.revealedBottomCards, layout, canvas);
+    this.renderPlayArea(snapshot?.top ?? null, layout, canvas);
+    this.renderHud(snapshot?.viewerHand ?? [], layout, canvas);
+    this.renderHand(vm.hand, layout, canvas);
+    this.renderAdvisor(snapshot, layout, canvas);
+    if (phase === 'bidding') this.renderBidding(vm.bidding, layout, canvas);
+    this.renderStatus(this.statusText || (phase === 'bidding' ? '叫抢阶段' : ''), layout, canvas);
+    this.renderTurnTimer(layout, canvas);
+    if (phase === 'playing') this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, layout, canvas);
+    this.renderToasts(layout, canvas);
     this.renderResult(vm.result, canvas);
     if (!vm.result) {
-      this.renderPauseControl(vm.layout, canvas);
+      this.renderPauseControl(layout, canvas);
       this.renderPauseOverlay(canvas);
     }
     this.endRenderDiff();
@@ -371,6 +390,7 @@ export class GameSceneSkeleton extends Component {
       aiThinkingView: this.aiThinkingView.bind(this),
       startGame: this.startGame.bind(this),
       animateScaleIn: this.animateScaleIn.bind(this),
+      drawDimOverlay: this.drawDimOverlay.bind(this),
     };
   }
 
@@ -378,20 +398,17 @@ export class GameSceneSkeleton extends Component {
     phase: string,
     topBar: { multiplier: number; bombs: number; landlordSeat: number | null },
     handCount: number,
-    layout: TableRegions,
+    layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
     const phasePos = this.rectPoint(layout.topBar, canvas, 0.5, 0.625);
-    const infoY = layout.topBar.y + layout.topBar.height + 8;
-    const landlordPos = this.screenPoint(canvas, canvas.width / 6, infoY);
-    const multiplierPos = this.screenPoint(canvas, canvas.width / 2, infoY);
-    const handPos = this.screenPoint(canvas, (canvas.width * 5) / 6, infoY);
+    const landlordPos = this.rectPoint(layout.infoStrip, canvas, 0.18, 0.55);
+    const multiplierPos = this.rectPoint(layout.infoStrip, canvas, 0.5, 0.55);
+    const handPos = this.rectPoint(layout.infoStrip, canvas, 0.82, 0.55);
     this.addLabel(phaseText(phase), phasePos.x, phasePos.y, 18, this.uiRoot!, 140, 30, 'top-phase');
-    if (topBar.landlordSeat !== null) {
-      this.addLabel(`地主：${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 16, this.uiRoot!, 120, 30, 'top-landlord');
-    }
-    this.addLabel(`倍数 ×${topBar.multiplier}`, multiplierPos.x, multiplierPos.y, 16, this.uiRoot!, 110, 30, 'top-multiplier');
-    this.addLabel(`手牌 ${handCount}`, handPos.x, handPos.y, 16, this.uiRoot!, 110, 30, 'top-hand-count');
+    this.addLabel(topBar.landlordSeat === null ? '地主 待定' : `地主 ${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 13, this.uiRoot!, 88, 22, 'top-landlord');
+    this.addLabel(`倍数 ×${topBar.multiplier}`, multiplierPos.x, multiplierPos.y, 13, this.uiRoot!, 88, 22, 'top-multiplier');
+    this.addLabel(`手牌 ${handCount}`, handPos.x, handPos.y, 13, this.uiRoot!, 88, 22, 'top-hand-count');
   }
 
   private renderRuntimeSettings(layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -440,17 +457,47 @@ export class GameSceneSkeleton extends Component {
     renderSeatFeedbackSection(this.rendererContext(), layout, canvas);
   }
 
-  private renderPlayArea(top: TopPlay | null, layout: TableRegions, canvas: { width: number; height: number }): void {
+  private renderBottomCardsDock(cards: Card[] | null, layout: TableZones, canvas: { width: number; height: number }): void {
+    const dock = this.ensureNode('bottom-cards-dock-runtime', this.uiRoot!);
+    const pos = this.rectPoint(layout.bottomCardsDock, canvas, 0.5, 0.5);
+    dock.setPosition(pos.x, pos.y, 0);
+    addUiTransform(dock, layout.bottomCardsDock.width, layout.bottomCardsDock.height);
+
+    const spacing = 28;
+    const startX = -spacing;
+    for (let index = 0; index < 3; index += 1) {
+      const x = startX + index * spacing;
+      if (cards?.[index]) {
+        const cardNode = this.addDisplayCard(cards[index], x, 0, dock, `bottom-card-${index}`, this.settings.animation);
+        cardNode.setScale(0.42, 0.42, 1);
+        continue;
+      }
+      const back = this.ensureNode(`bottom-card-back-${index}`, dock);
+      back.setPosition(x, 0, 0);
+      addUiTransform(back, 24, 34);
+      const sprite = back.getComponent(Sprite) ?? back.addComponent(Sprite);
+      sprite.type = Sprite.Type.SIMPLE;
+      sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+      loadSprite(RESOURCE_PATHS.cardBack, sprite, this.spriteFrames);
+    }
+  }
+
+  private renderPlayArea(top: TopPlay | null, layout: TableZones, canvas: { width: number; height: number }): void {
     const area = this.ensureNode('play-area-runtime', this.uiRoot!);
     this.playAreaRoot = area;
-    const pos = this.rectPoint(layout.playArea, canvas, 0.5, 0.78);
-    const width = Math.min(250, Math.max(170, layout.playArea.width - 42));
-    const height = Math.min(112, Math.max(86, layout.playArea.height * 0.62));
+    const dropZone = top?.seat === 1
+      ? layout.dropZoneLeft
+      : top?.seat === 2
+        ? layout.dropZoneRight
+        : layout.dropZoneHero;
+    const pos = this.rectPoint(dropZone, canvas, 0.5, top ? 0.5 : 0.78);
+    const width = Math.min(250, Math.max(108, dropZone.width));
+    const height = Math.min(112, Math.max(30, dropZone.height));
     area.setPosition(pos.x, pos.y, 0);
     addUiTransform(area, width, height);
 
     const labelText = top ? `${seatName(top.seat)}·已出牌` : '自由出牌';
-    const label = this.addLabel(labelText, 0, 34, 18, area, 170, 34, 'play-area-label');
+    const label = this.addLabel(labelText, 0, top ? height / 2 - 12 : 34, top ? 13 : 18, area, Math.min(170, width), top ? 22 : 34, 'play-area-label');
     label.lineHeight = 24;
     if (!top) {
       this.lastPlayAreaSignature = '';
@@ -461,12 +508,13 @@ export class GameSceneSkeleton extends Component {
     const signature = `${top.seat}:${cardsSignature(cards)}`;
     const animate = this.settings.animation && signature !== this.lastPlayAreaSignature;
     this.lastPlayAreaSignature = signature;
-    const maxWidth = Math.max(120, width - 26);
+    const maxWidth = Math.max(88, width - 26);
     const spacing = cards.length <= 1 ? 0 : Math.min(34, (maxWidth - CARD_SIZE.width) / (cards.length - 1));
     const startX = -((cards.length - 1) * spacing) / 2;
     cards.forEach((card, index) => {
       const x = startX + index * spacing;
-      this.addDisplayCard(card, x, -22, area, `play-card-${index}`, animate);
+      const node = this.addDisplayCard(card, x, top ? -12 : -22, area, `play-card-${index}`, animate);
+      if (top?.seat !== HERO_SEAT) node.setScale(0.74, 0.74, 1);
     });
   }
 
@@ -480,15 +528,18 @@ export class GameSceneSkeleton extends Component {
 
   private renderBidding(
     bidding: ReturnType<typeof deriveScreenVM>['bidding'],
-    layout: TableRegions,
+    layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
-    renderBiddingSection(this.rendererContext(), bidding, layout, canvas);
+    const gated = this.dealAnimationLockMs > 0 && bidding
+      ? { ...bidding, buttons: bidding.buttons.map((button) => ({ ...button, enabled: false })) }
+      : bidding;
+    renderBiddingSection(this.rendererContext(), gated, layout, canvas);
   }
 
   private renderHand(
     hand: ReturnType<typeof deriveScreenVM>['hand'],
-    layout: TableRegions,
+    layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
     if (hand.length === 0) {
@@ -514,18 +565,25 @@ export class GameSceneSkeleton extends Component {
     play: boolean,
     pass: boolean,
     hint: boolean,
-    layout: TableRegions,
+    layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
     renderActionsSection(this.rendererContext(), play, pass, hint, layout, canvas);
   }
 
-  private renderStatus(text: string, layout: TableRegions, canvas: { width: number; height: number }): void {
+  private renderStatus(text: string, layout: TableZones, canvas: { width: number; height: number }): void {
     renderStatusSection(this.rendererContext(), text, layout, canvas);
   }
 
-  private renderTurnTimer(layout: TableRegions, canvas: { width: number; height: number }): void {
+  private renderTurnTimer(layout: TableZones, canvas: { width: number; height: number }): void {
     renderTurnTimerSection(this.rendererContext(), layout, canvas);
+  }
+
+  private armDealAnimationLock(phase: string, hand: ReturnType<typeof deriveScreenVM>['hand']): void {
+    if (!this.settings.animation || phase !== 'bidding' || hand.length === 0) return;
+    const handSignature = cardsSignature(hand.map((slot) => slot.card));
+    if (handSignature === this.lastHandSignature) return;
+    this.dealAnimationLockMs = Math.max(this.dealAnimationLockMs, dealCardDelay(hand.length - 1, hand.length) + 180);
   }
 
   private renderAdvisor(
@@ -591,7 +649,7 @@ export class GameSceneSkeleton extends Component {
     if (!root.getComponent(BlockInputEvents)) root.addComponent(BlockInputEvents);
 
     const panelWidth = Math.min(320, Math.max(286, canvas.width - 56));
-    const panelHeight = this.pauseState.stage === 'confirm-quit' ? 232 : 270;
+    const panelHeight = this.pauseState.stage === 'confirm-quit' ? 232 : 306;
     const panel = this.ensureNode('pause-panel', root);
     panel.setPosition(0, 12, 0);
     panel.setScale(1, 1, 1);
@@ -609,9 +667,12 @@ export class GameSceneSkeleton extends Component {
     this.addLabel('暂停', 0, panelHeight / 2 - 46, 26, panel, panelWidth - 48, 48, 'pause-title');
     const hint = this.addLabel('本局进度已保留', 0, panelHeight / 2 - 82, 14, panel, panelWidth - 58, 30, 'pause-hint');
     hint.color = new Color(225, 235, 255, 215);
-    this.addButton('继续', 0, 28, 176, 42, true, () => this.closePauseMenu(), panel, 'pause-continue');
-    this.addButton('重开', 0, -30, 176, 42, true, () => this.restartFromPause(), panel, 'pause-restart');
-    this.addButton('退出', 0, -88, 176, 42, true, () => this.askPauseQuit(), panel, 'pause-quit');
+    this.addButton(`音效${this.settings.sound ? '开' : '关'}`, -84, 38, 72, 30, true, () => this.toggleRuntimeSetting('sound'), panel, 'pause-setting-sound');
+    this.addButton(`动效${this.settings.animation ? '开' : '关'}`, 0, 38, 72, 30, true, () => this.toggleRuntimeSetting('animation'), panel, 'pause-setting-animation');
+    this.addButton(`震动${this.settings.vibration ? '开' : '关'}`, 84, 38, 72, 30, true, () => this.toggleRuntimeSetting('vibration'), panel, 'pause-setting-vibration');
+    this.addButton('继续', 0, -8, 176, 42, true, () => this.closePauseMenu(), panel, 'pause-continue');
+    this.addButton('重开', 0, -64, 176, 42, true, () => this.restartFromPause(), panel, 'pause-restart');
+    this.addButton('退出', 0, -120, 176, 42, true, () => this.askPauseQuit(), panel, 'pause-quit');
   }
 
   private renderPauseConfirm(panel: Node, panelWidth: number, panelHeight: number): void {
@@ -720,9 +781,10 @@ export class GameSceneSkeleton extends Component {
     }
   }
 
-  private addDisplayCard(card: Card, x: number, y: number, parent: Node, name: string, animate: boolean): void {
+  private addDisplayCard(card: Card, x: number, y: number, parent: Node, name: string, animate: boolean): Node {
     const node = this.addCardNode(card, x, y, parent, name, false);
     if (this.settings.animation && animate) this.animateCardPlay(node, x, y);
+    return node;
   }
 
   private addCardNode(card: Card, x: number, y: number, parent: Node, name: string, interactive: boolean): Node {
@@ -929,9 +991,36 @@ export class GameSceneSkeleton extends Component {
     return null;
   }
 
+  private resolveSeed(): number {
+    const fallback = Date.now() >>> 0;
+    try {
+      const search = (globalThis as { location?: { search?: string } }).location?.search ?? '';
+      const raw = new URLSearchParams(search).get('seed');
+      if (raw === null) return fallback;
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed >>> 0 : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
   private currentPlayerTurnKey(): string | null {
     if (!this.runtime?.isPlayerTurn()) return null;
     const phase = this.runtime.phase();
+    if (phase === 'bidding') {
+      const bidding = this.runtime.currentBidding();
+      if (!bidding) return null;
+      return [
+        'bidding',
+        bidding.phase,
+        bidding.turn,
+        bidding.provisional ?? 'none',
+        bidding.multiplier,
+        bidding.callingPasses,
+        bidding.grabQueue.join(','),
+        bidding.grabbed ? 'grabbed' : 'open',
+      ].join(':');
+    }
     if (phase === 'playing') {
       const snapshot = this.runtime.currentSnapshot();
       if (!snapshot) return null;

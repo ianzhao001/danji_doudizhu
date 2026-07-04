@@ -56,6 +56,7 @@ export interface GameSceneRendererContext {
   aiThinkingView(): ReturnType<typeof deriveAiThinking> | null;
   startGame(forceNew: boolean): void;
   animateScaleIn(node: Node, fromScale: number, durationMs: number): void;
+  drawDimOverlay(parent: Node, width: number, height: number): void;
 }
 
 const HERO_SEAT: SeatIndex = 0;
