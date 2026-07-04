@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/ART-GAME-REMAKE`
-- 状态：in-review（用户图审多轮打回已重排；等待用户复审；未进入 import）
+- 状态：in-review（v13 全量 preview 已收尾，等待用户单轮图审；未进入 import）
 
 ## 改了哪些文件
 
@@ -323,6 +323,91 @@ passed
 - `asset-previews/v13-pink-game-remake/composites/v13/composite-844x390-settlement-v13.png`
 - `asset-previews/v13-pink-game-remake/PROMPTS.md`
 - `asset-previews/v13-pink-game-remake/manifest-v13.json`
+
+## 收尾提审段（Codex · 2026-07-05）
+
+### T-LAYOUT3 main zone 依据
+
+- `T-LAYOUT3` 已落 main：`done 1b523df`（见 `coordination/BOARD.md` UI-REMAKE 段）。
+- 本任务未合并 main 到 ART 分支，避免把 `table-zones.ts` / `test/**` 带入 ART 文件域；只从 main 工作树导出 zone 尺寸作为合成依据。
+- main `tableZones()` 导出的 844×390 / 780×360 关键尺寸与 `finalize_imagegen_v13.py` 当前 `ZONE_SIZES` 一致：
+
+```
+## 844x390
+heroBody: {"x":17,"y":199,"width":120,"height":191}
+opponentLeftBody: {"x":145,"y":47,"width":120,"height":191}
+opponentRightBody: {"x":577,"y":47,"width":120,"height":191}
+heroNameplate: {"x":8,"y":271,"width":138,"height":33}
+opponentLeftNameplate: {"x":153,"y":148,"width":152,"height":33}
+opponentRightNameplate: {"x":667,"y":148,"width":152,"height":33}
+heroHandLarge: {"x":176,"y":304,"width":660,"height":86}
+tableActionBar: {"x":287,"y":247,"width":270,"height":49}
+settlementShowcase: {"x":186,"y":35,"width":473,"height":195}
+
+## 780x360
+heroBody: {"x":16,"y":184,"width":112,"height":176}
+opponentLeftBody: {"x":136,"y":43,"width":112,"height":176}
+opponentRightBody: {"x":531,"y":43,"width":112,"height":176}
+heroNameplate: {"x":8,"y":249,"width":130,"height":31}
+opponentLeftNameplate: {"x":144,"y":136,"width":140,"height":31}
+opponentRightNameplate: {"x":615,"y":136,"width":140,"height":31}
+heroHandLarge: {"x":164,"y":280,"width":608,"height":80}
+tableActionBar: {"x":264,"y":227,"width":252,"height":45}
+settlementShowcase: {"x":172,"y":32,"width":437,"height":180}
+```
+
+### 全量清单收口
+
+- 正式 image_gen 源图：4 张，均在 `source/generated-v13/`。
+- 正式分项 preview：背景 1、三名立绘 3、UI 12、卡牌 8。
+- 卡牌 8 件齐：`card-template-v13`、`card-back-v13`、`suit-spade-v13`、`suit-heart-v13`、`suit-club-v13`、`suit-diamond-v13`、`joker-small-v13`、`joker-big-v13`。
+- 九宫格模拟 7 件齐：`btn-primary`、`btn-secondary`、`btn-tertiary`、`btn-disabled`、`settlement-panel`、`seat-nameplate`、`bottom-cards-dock`；每张模拟图含 64px / 176px 两档水平拉伸。
+- 图审入口齐：`review-sheet-v2.png` + 三张 v13 composite + `PROMPTS.md` + `manifest-v13.json`。
+- 旧 `*-preview.png`、旧 `review-sheet.png`、旧 `composites/composite-*.png` 保留但已在 `PROMPTS.md` 标注 `layout mockup only / 非正式资产`。
+
+### 收尾机械校验
+
+```
+python3 asset-previews/v13-pink-game-remake/scripts/finalize_imagegen_v13.py
+completed
+
+manifest grouping check
+cards/ 8
+stretch-simulations/ 7
+ui/ 12
+avatars/ 3
+backgrounds/ 1
+composites/v13/ 3
+
+asset list check
+missing []
+not_manifest []
+old_entries []
+alpha_bad []
+manifest_count 39
+
+npm --prefix test test
+Test Files  140 passed (140)
+Tests       711 passed (711)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
+
+### 用户单轮图审记录表（待用户填写结论）
+
+| 项 | 路径 / 范围 | 用户结论 |
+|----|----|----|
+| review sheet 总览 | `asset-previews/v13-pink-game-remake/review-sheet-v2.png` | waiting |
+| 叫抢合成 | `composites/v13/composite-844x390-bidding-v13.png` | waiting |
+| 出牌合成 | `composites/v13/composite-780x360-playing-v13.png` | waiting |
+| 结算合成 | `composites/v13/composite-844x390-settlement-v13.png` | waiting |
+| 卡牌 8 件 | `cards/*-v13.png` | waiting |
+| 九宫格模拟 7 件 | `stretch-simulations/*-v13-stretch.png` | waiting |
+| pink 风格一致性 / 整体布局 / 名字牌对比度 / 手牌可读性 / 按钮易点性 / 结算观感 | 用户主观终审项 | waiting |
 
 ## 疑问 / 需规划者裁定
 

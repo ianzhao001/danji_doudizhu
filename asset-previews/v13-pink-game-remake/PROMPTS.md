@@ -8,7 +8,16 @@
 - Existing `*-preview.png`, `review-sheet.png`, and `composites/composite-*.png` are **layout mockup only / 非正式资产** from the older Pillow pass.
 - Formal `*-v13.png` assets in this package are derived from built-in `image_gen` source images under `source/generated-v13/`.
 - Pillow is used only for non-creative post-processing: crop, chroma-key removal, resize, 9-slice stretch simulation, review-sheet/composite layout, and sha256 calculation.
-- User feedback fix 2026-07-05: bidding/playing/settlement composites were rejected because characters overlapped, the three body sizes were inconsistent, and the hero appeared on the tabletop instead of beside the hand. Follow-up feedback required the upper-left and upper-right characters to move further left, all three characters to be smaller, and the table/background relationship to match the reference more closely. Composite zones now mirror T-LAYOUT3 fix `602c9b1`, use equal body rectangles, keep the hero left of `heroHandLarge`, and use a regenerated built-in image_gen table background with a lower pink tabletop. Avatar/UI/card source images were reused.
+- User feedback fix 2026-07-05: bidding/playing/settlement composites were rejected because characters overlapped, the three body sizes were inconsistent, and the hero appeared on the tabletop instead of beside the hand. Follow-up feedback required the upper-left and upper-right characters to move further left, all three characters to be smaller, and the table/background relationship to match the reference more closely. Composite zones match the T-LAYOUT3 main merge `1b523df`, use equal body rectangles, keep the hero left of `heroHandLarge`, and use a regenerated built-in image_gen table background with a lower pink tabletop. Avatar/UI/card source images were reused.
+
+## Review package checklist
+
+- Formal source sheets: 4 built-in image_gen sources under `source/generated-v13/`.
+- Formal item previews: background 1, body avatars 3, UI sprites 12, card sprites 8.
+- Card sprite coverage: template, back, spade, heart, club, diamond, small Joker, big Joker.
+- Stretch simulations: 7 sheets; each sheet shows 64px and 176px horizontal 9-slice candidates.
+- Composite previews: 844x390 bidding, 780x360 playing, 844x390 settlement.
+- User review entry: `review-sheet-v2.png`; per-file sha256 is listed below and in `manifest-v13.json`.
 
 ## Built-in image_gen source prompts
 
