@@ -90,3 +90,13 @@ diff `main..task/T-FIX-SETTLE`：4 文件——`game-scene-skeleton.ts`(+102/-21
 
 ### 测试基线（审查者独立复跑）
 worktree `b814ee6`：`npm --prefix test run typecheck` 净；`npm --prefix test test` **140 文件 / 711 用例全绿**（selfplay 质量门 Hard 组合率 0.993 / 压队友 0 / 胜率差 Hard−Normal +0.133 / Hard−Simple +0.633，与 V2 基线一致）。`git diff --check` 净。
+
+## 验收披露（审查者 GLM-5.2 · 2026-07-04 · approved 已合并）
+
+- **评审结论**：approved——域内致命清零、全量回扫已做且无未决阻断项。
+- **打回轮次与原因**：0 轮。
+- **全量回扫范围与分流结果**：回扫覆盖 `loadSprite` 全消费方（lobby-scene 仍用 ui-helpers 版本不受影响）、`spriteFrameResourcePath` import 合法性（asset-keys.ts:96 存在）、`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` 完整性（20 节点覆盖所有 playing 专属瞬时 HUD）、`GameSceneRendererContext` 接口变更（additive，加 loadSprite 签名，不破坏既有消费者）。无域外致命，无拿不准。
+- **合并 commit**：`6df0c88`（merge --no-ff task/T-FIX-SETTLE）。
+- **最终测试基线**：worktree `b814ee6` 跑 `npm --prefix test test` **140 文件 / 711 用例全绿** + `npm --prefix test run typecheck` 净 + `git diff --check` 净。合并后 main `de27d1d`：worktree+分支已清理，BOARD `done 6df0c88`。
+- **CDP 证据**：四横屏（844×390/812×375/915×412/780×360）`productErrors=[]`；firstSettlement transient 全 0 + tableStillVisible(seats=14/handCards=68/topBar=4) + overlayTop/panelTop=true；844x390 连续回归链 firstSettlement → restart(bidding,HUD 恢复) → playing(HUD 恢复) → secondSettlement(transient 全 0) → lobbyReturn → lobbyNewRound(bidding)。证据目录 `/tmp/doudizhu-fix-settle-evidence/`。
+- **v1.2 收口**：T-FIX-SETTLE done = V2-ISSUE-1 修复落地。v1.2 收口放行条件 = T-FIX-SETTLE done ✅ + 用户主观终审通过（待进行：名字牌对比度 + 修后结算画面 + 整体手感）→ handoff 回规划者做 v1.2 版本终局裁定 + 协调用户主观终审。
