@@ -69,3 +69,21 @@
 
 - 因当前 shell 带有 `ELECTRON_RUN_AS_NODE=1`，启动 Creator 时使用 `env -u ELECTRON_RUN_AS_NODE ... --project <worktree>`，避免 Creator 被当作 Node 运行。
 - 当前 worktree 仍有两份无关未跟踪 `.meta` 文件，未纳入本任务提交。
+
+## 审查者验收披露（2026-07-04）
+
+- **评审结论**：approved
+- **打回轮次**：0（首次通过）
+- **种子完整性**：种子提交 `a21fb4c`（规划者）与实现提交 `aabe287`（执行者）分离；执行者未碰测试文件。
+- **文件域**：仅 `assets/resources/art/ui/*.png`+`.meta` + `asset-keys.ts` 新 2 键 + 报告；未碰两巨组件（game-scene-skeleton / lobby-scene）。
+- **字节对比**：5 张导入 PNG（seat-nameplate/bottom-cards-dock/btn-primary/btn-secondary/btn-disabled）与 preview sha256 逐字节一致；panel-popup.png 未替换（sha256 与 main 相同）。
+- **Meta border**：6 张图（btn×3 + panel-popup + seat-nameplate + bottom-cards-dock）borderTop/Bottom/Left/Right 全 24；UUID 唯一；Creator 生成结构（@f9941 sprite-frame + @6c48a texture）。
+- **独立复跑**：139 files / 704 tests passed + typecheck 净 + 纯层零 cc。
+
+### 全量回扫（写 approved 前一次）
+- 回扫范围 / 方法：grep 跨模块 import / cc 泄漏 / asset key 消费者 / 交互面排查。
+- 逐行细读新提交：已做。asset-keys.ts 仅加 2 键（seatNameplate/bottomCardsDock），既有键未动；新 key 尚未被组件消费（预期，P-G3③/P-L3② 接线）。
+- 发现分流：
+  - 域内致命（→ changes-requested）：无
+  - 域外致命（→ 转规划者）：无
+  - 拿不准（→ 转规划者非阻断）：无
