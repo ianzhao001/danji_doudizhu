@@ -22,7 +22,7 @@ T-AI-1 强化普通档后，困难档的**跟牌仍是旧保守回退**（`conse
 2. **残局收割**（`hard-timing.test.ts`）：自己 ≤2 墩可清空时，跟牌**选控制牌**确保连出带走（`A A 2` 跟单 9 → 出 **2** 而非最小 A，2 只有王炸/炸弹能压，夺权后 AA 收官）。可泛化 `roughTurnCount`/`finishingFollow` 到跟牌路径。
 3. **不挥霍守卫**（回归断言）：非 pressing 且手牌 >6 时，有普通可压绝不拆炸弹/火箭（现行为保持）。
 4. **三档排序闭环**（`quality.test.ts` Hard 门）：
-   - 组合首出率 Hard ≥ 0.50 且 ≥ Normal + 0.05；
+   - 组合首出率 Hard ≥ 0.50 且 ≥ Normal − 0.05（同带不回落；Normal 实测 ≈0.985 近天花板，"+5pp" 不可达，2026-07-04 修正）；
    - 压队友率 Hard ≤ 0.08；
    - 胜率差（对称三席轮换）Hard−Normal ≥ +0.03、Hard−Simple ≥ +0.10。
 5. **文案对齐**（`difficulty-config.test.ts` 已锁定精确文案）：

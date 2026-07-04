@@ -28,3 +28,29 @@ describe('T-AI-1 自对弈质量门（确定性 seed 回归）', () => {
     expect(gap.diff).toBeGreaterThanOrEqual(0.05);
   }, 120_000);
 });
+
+// T-AI-2 门（规划者种入·不可改）：三档排序契约的正式家（自 hard-depth 小样本代理迁移而来，
+// 裁定 2026-07-04）。当前 Hard 跟牌仍是旧保守回退 → Hard−Normal 门应先红，T-AI-2 实现到绿。
+describe('T-AI-2 三档排序质量门（确定性 seed 回归）', () => {
+  it('Hard 组合首出率 ≥0.50 且 ≥ Normal−5pp（同带不回落）；压队友率 ≤0.08', async () => {
+    const normal = await measureLevelPlay(AiLevel.Normal, QUALITY_SEEDS);
+    const hardPlay = await measureLevelPlay(AiLevel.Hard, QUALITY_SEEDS);
+    console.log('[quality] hard levelPlay:', JSON.stringify({ normal, hard: hardPlay }));
+    expect(hardPlay.leadComboOps, '样本量 sanity').toBeGreaterThan(20);
+    expect(hardPlay.comboLeadRate ?? 0, 'Hard 组合首出率').toBeGreaterThanOrEqual(0.5);
+    // Normal 实测组合率 ≈0.985（近天花板），「+5pp」数学不可达；契约=同带不回落。
+    expect(hardPlay.comboLeadRate ?? 0, 'Hard ≥ Normal−5pp（同带不回落）').toBeGreaterThanOrEqual(
+      (normal.comboLeadRate ?? 0) - 0.05,
+    );
+    expect(hardPlay.teammateOverrideRate ?? 0, 'Hard 压队友率').toBeLessThanOrEqual(0.08);
+  }, 180_000);
+
+  it('胜率差：Hard−Normal ≥ +0.03、Hard−Simple ≥ +0.10（对称单席轮换·seeds 1..20）', async () => {
+    const gapSeeds = QUALITY_SEEDS.slice(0, 20);
+    const hardVsNormal = await measureWinRateGap(AiLevel.Hard, AiLevel.Normal, gapSeeds);
+    const hardVsSimple = await measureWinRateGap(AiLevel.Hard, AiLevel.Simple, gapSeeds);
+    console.log('[quality] hard gaps:', JSON.stringify({ hardVsNormal, hardVsSimple }));
+    expect(hardVsNormal.diff, 'Hard−Normal（关闭过渡态）').toBeGreaterThanOrEqual(0.03);
+    expect(hardVsSimple.diff, 'Hard−Simple').toBeGreaterThanOrEqual(0.1);
+  }, 180_000);
+});

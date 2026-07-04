@@ -102,21 +102,21 @@ function estimateMemoryPressure(hand: Card[]): MemoryPressure {
 function categoryShapingBonus(move: Move): number {
   switch (move.pattern.category) {
     case Category.Straight:
-      return 42;
+      return 90;
     case Category.Airplane:
     case Category.AirplaneSingles:
     case Category.AirplanePairs:
-      return 40;
+      return 100;
     case Category.ConsecutivePairs:
-      return 34;
+      return 94;
     case Category.TripsPair:
-      return 24;
+      return 70;
     case Category.TripsSingle:
-      return 18;
+      return 65;
     case Category.Trips:
-      return 14;
+      return 50;
     case Category.Pair:
-      return 6;
+      return 32;
     default:
       return 0;
   }
@@ -174,6 +174,36 @@ function chooseLeadMove(hand: Card[], moves: Move[]): Move {
   return chooseByLowestScore(shapingCandidates, (move) => scoreLeadMove(hand, move, pressure));
 }
 
+function isSafeNonBombMove(move: Move, hand: Card[]): boolean {
+  const protectedSet = protectedCards(hand);
+  return !isBombLike(move.pattern.category) && !usesProtectedCards(move, protectedSet);
+}
+
+function choosePressingLeadMove(hand: Card[], moves: Move[]): Move {
+  const safeMoves = moves.filter((move) => isSafeNonBombMove(move, hand));
+  const candidates = safeMoves.length > 0 ? safeMoves : moves;
+  const blockers = candidates.filter((move) => move.cards.length >= 2);
+  if (blockers.length > 0) {
+    return chooseByLowestScore(blockers, (move) => {
+      const remaining = removeMoveCards(hand, move);
+      return roughTurnCount(remaining) * 100 - move.cards.length * 18 - categoryShapingBonus(move);
+    });
+  }
+
+  return pickLargest(candidates);
+}
+
+function chooseControlFollow(hand: Card[], moves: Move[]): Move | null {
+  if (hand.length > 4) return null;
+  const controlCandidates = moves.filter((move) => {
+    if (isBombLike(move.pattern.category)) return false;
+    const remaining = removeMoveCards(hand, move);
+    return remaining.length > 0 && canFinishInOneMove(remaining);
+  });
+  if (controlCandidates.length === 0) return null;
+  return pickLargest(controlCandidates);
+}
+
 /** 积极控权策略桩：实现见 M4-03。 */
 export const hardStrategy: AiStrategy = (snapshot) => {
   const hand = requireHand(snapshot);
@@ -190,9 +220,13 @@ export const hardStrategy: AiStrategy = (snapshot) => {
     const bombs = bombLikeMoves(moves);
     if (bombs.length > 0) return toPlay(snapshot, pickSmallestBombLike(bombs));
     if (snapshot.top) return toPlay(snapshot, pickLargest(moves));
+    return toPlay(snapshot, choosePressingLeadMove(hand, moves));
   }
 
   if (!snapshot.top) return toPlay(snapshot, chooseLeadMove(hand, moves));
+
+  const controlFollow = chooseControlFollow(hand, moves);
+  if (controlFollow !== null) return toPlay(snapshot, controlFollow);
 
   return conservativeAction(snapshot, hand, moves);
 };
