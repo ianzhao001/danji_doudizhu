@@ -138,3 +138,46 @@ env -u ELECTRON_RUN_AS_NODE /Applications/Cocos/Creator/3.8.8/CocosCreator.app/C
 - [x] CDP 横屏、无档、有档、续局恢复证据齐全。
 - [x] 阶段② uikit 接线、按钮三态、面板九宫格、空态图与可读性返修完成。
 - [x] 阶段② Creator build + 25 张 CDP 截图 + 人工抽样通过。
+
+## 审查者评审（GLM-5.2 · 2026-07-04 · 阶段② + 整分支合并闸）
+
+### 评审范围
+覆盖 P-L3 阶段②增量（commit ffe0e25）及整分支（main..task/P-L3）全量回扫。①已 approved 不复审实现，但纳入全量回扫。
+
+### 检查单核销（R-WAVE2）
+**阶段②（美术接线）**
+- [x] 同 P-G3③ 口径：panel-popup 九宫格皮（drawPanelSkin 替代 drawPanel）；btn-primary/secondary/disabled 三态皮（Button.Transition.COLOR）。
+- [x] icon-back：返回按钮 name 以 -back-button 结尾（help-back-button/stats-back-button/records-back-button）→ iconBack。
+- [x] icon-settings：设置面板补 iconSettings。
+- [x] empty-records 空态：stats/records 空态贴图。
+- [x] toggle 开关态样式统一：toggle.on 作 selected → primary/secondary 区分（原恒 disabled 样式已替换）。
+- [x] home+6 子屏截图：4 横屏 × 6 屏 + 交互截图，productErrors=[]。
+
+### 红线
+- 未碰 test/**（git diff main..task/P-L3 -- test/ 为空）。
+- 未碰 game-scene/纯层（git diff --stat game-scene* 及纯层目录为空）。
+- .meta/.scene 未碰。
+
+### 测试与类型检查（审查者独立复跑）
+- main 基线：140 文件 / 711 用例全绿 + typecheck 净。
+- P-L3 worktree typecheck 净。
+- diff --check 净。
+
+### 可读性返修核查
+- 颜色常量均为深色系：PANEL_TEXT(108,46,76)/PANEL_MUTED(142,88,108)/PANEL_ACCENT(198,68,124)/PANEL_GOOD(77,126,88)/PANEL_BAD(176,72,88)/BUTTON_PRIMARY_TEXT(116,36,82)/BUTTON_SECONDARY_TEXT(34,78,132)/BUTTON_DISABLED_TEXT(118,108,114)。
+- addUiLabel 正确消费 color 参数；addLabel 默认色从 white 改为 PANEL_TEXT。
+- image skill 截图分析：home/records/help 文字在亮色背景上清晰可辨。
+- 执行者人工抽样确认深色文字可读。
+
+### 全量回扫
+- addUiButton/drawPanel 在 main 上只被本两巨组件引用——合并后改用本地实现。
+- RESOURCE_PATHS 引用键全部存在（buttonPrimary/Secondary/Disabled、iconBack/Settings、panelPopup、emptyRecords）。
+- 按钮名匹配 buttonSkinPath/buttonIconPath 判断（home-start-button/home-continue-button → primary；-back-button → iconBack；toggle-on → primary）。
+- 跨任务：P-L3 与 P-G3 文件域不相交，无交互点。
+- 纯逻辑层未受影响。
+
+### 拿不准（非阻断建议单 → 转规划者）
+1. addButton/addSprite/drawPanelSkin 与 P-G3 重复实现（文件域限制）。建议后续抽取共享。不阻断合并。
+
+### 结论
+域内致命清零。全量回扫无阻断项。阶段② approved。整分支（①②）可合并。
