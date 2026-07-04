@@ -414,3 +414,110 @@ tsc --noEmit passed
 git diff --check
 passed
 ```
+
+---
+
+## 执行者三次返工段（Codex · 2026-07-05 · round 3）
+
+### 用户新增图审意见
+
+- 左上角人物不能出现在牌桌上面。
+- 三名人物可以整体缩小。
+- 人物位置需严格参考用户上传示意图的人物与牌桌参考关系。
+- 可改变背景牌桌大小；左上、右上人物需要继续再往左相对移动一点点。
+
+### 修复摘要
+
+- 三名 body 继续保持同尺寸，但整体缩小到约屏高 49%、屏宽 14.2%，避免人物压到牌桌主舞台。
+- 玩家 body 固定在手牌左侧，底部贴屏；`heroHandLarge` 仍从玩家右侧开始。
+- 左上 AI 位于玩家右上方，并与玩家保持 8px 横向分离；在二次返工基础上继续左移。
+- 右上 AI 从右边缘向内并向左移动，名字牌也跟随人物向左，减少贴边感。
+- `heroHandLarge`、`tableActionBar`、`settlementShowcase` 语义未改；legacy 6 字段仍来自 `tableLayout(width,height)`。
+
+### 三次返工后关键 zone 证据
+
+```
+## 844x390
+heroBody: {"x":17,"y":199,"width":120,"height":191}
+opponentLeftBody: {"x":145,"y":47,"width":120,"height":191}
+opponentRightBody: {"x":577,"y":47,"width":120,"height":191}
+heroNameplate: {"x":8,"y":271,"width":138,"height":33}
+opponentLeftNameplate: {"x":153,"y":148,"width":152,"height":33}
+opponentRightNameplate: {"x":667,"y":148,"width":152,"height":33}
+heroHandLarge: {"x":176,"y":304,"width":660,"height":86}
+tableActionBar: {"x":287,"y":247,"width":270,"height":49}
+settlementShowcase: {"x":186,"y":35,"width":473,"height":195}
+body sizes=120x191,120x191,120x191
+hero-hand gap=39
+heroBody x opponentLeftBody intersection=0 gap=8
+opponentLeftBody x opponentRightBody intersection=0 gap=312
+
+## 812x375
+heroBody: {"x":16,"y":191,"width":115,"height":184}
+opponentLeftBody: {"x":139,"y":45,"width":115,"height":184}
+opponentRightBody: {"x":555,"y":45,"width":115,"height":184}
+heroNameplate: {"x":8,"y":260,"width":133,"height":32}
+opponentLeftNameplate: {"x":147,"y":143,"width":146,"height":32}
+opponentRightNameplate: {"x":641,"y":143,"width":146,"height":32}
+heroHandLarge: {"x":171,"y":292,"width":633,"height":83}
+tableActionBar: {"x":276,"y":237,"width":260,"height":47}
+settlementShowcase: {"x":179,"y":34,"width":455,"height":188}
+body sizes=115x184,115x184,115x184
+hero-hand gap=40
+heroBody x opponentLeftBody intersection=0 gap=8
+opponentLeftBody x opponentRightBody intersection=0 gap=301
+
+## 915x412
+heroBody: {"x":18,"y":214,"width":124,"height":198}
+opponentLeftBody: {"x":150,"y":49,"width":124,"height":198}
+opponentRightBody: {"x":631,"y":49,"width":124,"height":198}
+heroNameplate: {"x":8,"y":286,"width":142,"height":35}
+opponentLeftNameplate: {"x":158,"y":154,"width":164,"height":35}
+opponentRightNameplate: {"x":724,"y":154,"width":164,"height":35}
+heroHandLarge: {"x":176,"y":321,"width":731,"height":91}
+tableActionBar: {"x":311,"y":261,"width":293,"height":52}
+settlementShowcase: {"x":202,"y":37,"width":512,"height":206}
+body sizes=124x198,124x198,124x198
+hero-hand gap=34
+heroBody x opponentLeftBody intersection=0 gap=8
+opponentLeftBody x opponentRightBody intersection=0 gap=357
+
+## 780x360
+heroBody: {"x":16,"y":184,"width":112,"height":176}
+opponentLeftBody: {"x":136,"y":43,"width":112,"height":176}
+opponentRightBody: {"x":531,"y":43,"width":112,"height":176}
+heroNameplate: {"x":8,"y":249,"width":130,"height":31}
+opponentLeftNameplate: {"x":144,"y":136,"width":140,"height":31}
+opponentRightNameplate: {"x":615,"y":136,"width":140,"height":31}
+heroHandLarge: {"x":164,"y":280,"width":608,"height":80}
+tableActionBar: {"x":264,"y":227,"width":252,"height":45}
+settlementShowcase: {"x":172,"y":32,"width":437,"height":180}
+body sizes=112x176,112x176,112x176
+hero-hand gap=36
+heroBody x opponentLeftBody intersection=0 gap=8
+opponentLeftBody x opponentRightBody intersection=0 gap=283
+```
+
+### 三次返工局部测试输出
+
+```
+npm --prefix test exec -- vitest run ui/table-zones-v13.test.ts ui/table-zones.test.ts
+Test Files  2 passed (2)
+Tests       44 passed (44)
+
+npm --prefix test exec -- tsx -e "<body pairwise intersection check>"
+四横屏 hero/opponentLeft/opponentRight pairwise intersection=0
+
+npm --prefix test test
+Test Files  141 passed (141)
+Tests       727 passed (727)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+
+rg -n "from 'cc'|from \"cc\"|import .*cc" assets/scripts/ui/table-zones.ts || true
+仅命中源码注释中的 `import cc` 禁止说明；无实际 `cc` import。
+```

@@ -170,11 +170,13 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
   );
 
   const topBodyY = clamp(Math.round(height * 0.12), 42, 56);
-  const bodyWidth = clamp(Math.round(width * 0.18), 140, 156);
-  const bodyHeight = clamp(Math.round(height * 0.6), 204, 247);
+  const bodyWidth = clamp(Math.round(width * 0.142), 112, 124);
+  const bodyHeight = clamp(Math.round(height * 0.49), 172, 198);
+  const heroBodyX = clamp(Math.round(width * 0.02), 16, 20);
+  const rightBodyInset = clamp(Math.round(width * 0.12), 88, 112);
   const heroBodyY = Math.max(0, height - bodyHeight);
   const heroBody = {
-    x: gap,
+    x: heroBodyX,
     y: heroBodyY,
     width: bodyWidth,
     height: bodyHeight,
@@ -186,7 +188,7 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
     height: bodyHeight,
   };
   const opponentRightBody = {
-    x: width - gap - bodyWidth,
+    x: width - rightBodyInset - bodyWidth - Math.round(width * 0.055),
     y: topBodyY,
     width: bodyWidth,
     height: bodyHeight,
@@ -207,7 +209,7 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
     height: nameplateHeight,
   };
   const opponentRightNameplate = {
-    x: width - gap - nameplateWidth,
+    x: clamp(opponentRightBody.x + Math.round(opponentRightBody.width * 0.75), gap, width - gap - nameplateWidth),
     y: opponentLeftNameplate.y,
     width: nameplateWidth,
     height: nameplateHeight,
