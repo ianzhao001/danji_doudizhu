@@ -790,7 +790,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 
 | ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
 |----|----|----|----|----|----|
-| ART-GAME-REMAKE | 0 | 美术 preview-only | `asset-previews/v13-pink-game-remake/` + report | T-FIX-SETTLE ✅`6df0c88` | approved |
+| ART-GAME-REMAKE | 0 | 美术 preview-only | `asset-previews/v13-pink-game-remake/` + report | T-FIX-SETTLE ✅`6df0c88` | merge-claimed:ART-GAME-REMAKE |
 | ART-IMPORT-GAME-REMAKE | 1 | 美术导入（**新文件`-v13`+纯增键·不同名覆盖**·spec 修订版） | `art/*/*-v13.png` + `.meta` + `asset-keys.ts` 纯增 v13 键 + report | ART-GAME-REMAKE 用户图审通过 | blocked |
 | T-LAYOUT3 | 1 | 纯 UI 布局（种子已验红 16/16·typecheck 净） | `table-zones.ts` + 新 `test/ui/table-zones-v13.test.ts` + report | — | done 1b523df |
 | P-G4-UI-REMAKE | 2 | 游戏内 UI 接线（spec 修订版） | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | ART-IMPORT-GAME-REMAKE + T-LAYOUT3 | blocked |
