@@ -592,3 +592,46 @@ rg -n "from 'cc'|from \"cc\"|import .*cc" assets/scripts/ui/table-zones.ts || tr
 
 打回轮次：1（round 1 changes-requested → round 3 复审 approved）
 非阻断建议：2 项转规划者（body/nameplate 间距豁免？settlementShowcase 相位互斥？——round 1 遗留，仍非阻断）
+
+---
+
+## 验收披露段（审查者 GLM-5.2 · 2026-07-05 · approved + merged）
+
+### 评审结论
+
+**approved** — round 1 changes-requested 域内致命（heroBody vs opponentLeftBody 四档重叠）在执行者三次返工后修复，复审五项重点逐项通过。
+
+### 打回轮次与原因
+
+- **round 1**（`93601e7`）：heroBody 与 opponentLeftBody 在四横屏 zone 本身重叠（gap -156 ~ -142），违反 spec "关键可见集不重叠，最小间距 8px"。打回执行者修 `gameRemakeZones()` 布局计算。
+- **round 1 复审**（本段）：三次返工后四档 pairwise gap ≥ 8px、intersection = 0。approved。
+
+### 全量回扫范围与分流结果
+
+- **回扫范围**：`table-zones.ts` 全仓消费方（`game-scene-skeleton.ts:349` + `game-scene/{bid-actions-renderer,hud-renderer,result-overlay-renderer,seats-renderer}.ts`）+ `table-layout` legacy 依赖链 + 分层不变量（cc import grep）+ 合并预检（`git merge-tree`）。
+- **域内致命**：无（round 1 已修复）。
+- **域外致命**：无。
+- **拿不准 → 转规划者非阻断**（2 项·round 1 遗留）：
+  1. body vs nameplate 间距：nameplate 设计上"贴近"body，gap 为负属 by-design；若规划者认为需独立 zone 间距 ≥ 8px，另拆微调任务。
+  2. settlementShowcase 相位互斥：与底层 body/nameplate 不同相位（结算覆盖区）；若需明确相位互斥契约，在 P-G4 spec 中补明。
+- **跨任务回归**：无。v13 zone 纯加法，legacy zone 数值不变，现有消费方不消费 v13 zone（P-G4 接线时才消费）。
+
+### 合并 commit
+
+- `1b523df` merge task/T-LAYOUT3（`--no-ff`，merge lane 单 lane）
+- 合并后 main：`57fe8b9`
+- worktree + 分支已清理（`agentctl.sh release` 删 `task/T-LAYOUT3` 分支 + 移除 worktree）
+
+### 最终测试基线
+
+- `npm --prefix test test` → **141 文件 / 727 用例全绿**（main 711 + T-LAYOUT3 16 新增）
+- `npm --prefix test run typecheck` → tsc --noEmit exit 0
+- `git diff --check` → exit 0
+- `grep "from 'cc'" assets/scripts/ui/table-zones.ts` → 无匹配
+
+### 下一步
+
+- 交规划者做 T-LAYOUT3 终局裁定（BOARD 记 `done 1b523df`）。
+- 视觉吻合度（相对用户参考图的人物位置/大小/间距）由用户终审判定，不代判。
+- 非阻断建议 2 项转规划者仲裁（body/nameplate 间距豁免？settlementShowcase 相位互斥？）。
+- P-G4-UI-REMAKE 仍 blocked（等 ART-IMPORT-GAME-REMAKE + T-LAYOUT3 done → T-LAYOUT3 已 done，P-G4 只差 ART-IMPORT）。
