@@ -756,7 +756,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-AI-2 | 1.5 | 纯逻辑(ai) | `hard.ts` + `endgame.ts` + difficultyConfig 文案（仅 description） | T-AI-1 ✅`9353f76` | **done `7476412`**：压制领出+残局收割+三档排序门全绿·过渡态关闭（裁定 2026-07-04） |
 | ART-UIKIT | 1 | 美术·文生图 | `asset-previews/v12-uikit/` + report（不碰 resources） | — | **done `7f71cf2`**：v12 preview 包齐（名字牌/底牌托架/btn×3/拉伸模拟/角部裁样）+ 用户视觉终审通过（2026-07-04）→ 139/703 绿+typecheck 净 |
 | ART-IMPORT-UIKIT | 1.5 | 美术·导入 | `assets/resources/art/ui/*.png`(+`.meta` Creator·panel-popup 仅配 border) + `asset-keys.ts` 新 2 键；**禁碰两巨组件** | ART-UIKIT ✅`7f71cf2` | **done `5ad2223`**：sha256 逐字节一致·border 四值>0·双键契约绿（裁定 2026-07-04） |
-| P-G3 | 2 | 巨组件流水线(四阶段) | `game-scene-skeleton.ts` + 新 `ui/components/game-scene/*.ts`(4 模块) | ①②✅approved；③依赖 ART-IMPORT-UIKIT ✅`5ad2223` | **approved**（①②③④全 approved·审查者 GLM-5.2 2026-07-04·整分支可合并·report `7f1d60f`·uikit 接线+可读性返修+语义命名+文案收尾·140/711 绿+typecheck 净·拿不准 2 项转规划者非阻断） |
+| P-G3 | 2 | 巨组件流水线(四阶段) | `game-scene-skeleton.ts` + 新 `ui/components/game-scene/*.ts`(4 模块) | ①②✅approved；③依赖 ART-IMPORT-UIKIT ✅`5ad2223` | merge-claimed:P-G3 |
 | P-L3 | 2 | 巨组件流水线(两阶段) | `lobby-scene.ts` | ①✅approved；②依赖 ART-IMPORT-UIKIT ✅`5ad2223` | **approved**（①②全 approved·审查者 GLM-5.2 2026-07-04·整分支可合并·report `d8ef82b`·uikit 接线+toggle 开关态+空态图+可读性返修·140/711 绿+typecheck 净·拿不准 1 项转规划者非阻断） |
 | V2 | 3 | 收口·验证 | `reports/V2.report.md`(verify-only) | P-G3+P-L3+T-AI-2 | blocked（spec 已预置 `tasks/V2.md`·审查单 `tasks/R-WAVE3.md`·待 P-G3+P-L3 落 main 即派）：四横屏固定 seed e2e + AI 观察指标表 + PLAYTEST |
 
