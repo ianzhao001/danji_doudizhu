@@ -61,3 +61,32 @@
 - `ui-helpers.ts` 不在任务文件域内，本任务没有改它；game scene 内的直接 sprite 加载已改走安全 wrapper。
 - CDP 脚本在稳定 lobby 后清空 setup 阶段错误计数，只统计正式开局验证窗口中的 `productErrors`；正式验证窗口结果为全空。
 - 未修改测试、纯逻辑层、根配置、`.meta`、scene/prefab。
+
+## 审查者评审段（GLM-5.2 · 2026-07-04 · approved · 0 打回轮次）
+
+### 文件域核验
+diff `main..task/T-FIX-SETTLE`：4 文件——`game-scene-skeleton.ts`(+102/-21)、`result-overlay-renderer.ts`(+19/-2)、`seats-renderer.ts`(+3/-1)、`T-FIX-SETTLE.report.md`(+63)。纯层/测试/根配置/scene/meta 零改动。符合任务书文件域（game-scene-skeleton + game-scene/* + report）。
+
+### diff 逐行审
+1. **settled 相位门控**：`showTransientHud = phase !== 'settled'`，settled 时 `hideSettledTransientHud()` 隐藏 20 个临时 HUD 节点（status/bidding-prompt/turn-timer/toast/hud×2/advisor×2/action×3/bid×3/last-action×3/ai-thinking×3），`renderSeatFeedback/renderHud/renderAdvisor/renderStatus/renderTurnTimer/renderToasts` 均门控跳过；`renderPlayArea` 传 `showLabel` 隐藏"已出牌/自由出牌"说明文字但保留牌面渲染。牌桌主体（topBar/seats/bottomCardsDock/playArea 牌面/hand）不受门控，暗幕下保留可见——口径两条都满足。
+2. **隐藏+保活策略**：`hideLiveSubtree` 设 `active=false` + `markLiveSubtree` 递归加入 `liveRenderNodes`，防止 `pruneInactiveChildren` 销毁。这避免了异步 `resources.load` 回调写入已销毁 Sprite 的崩溃风险——正确。
+3. **loadSprite 安全 wrapper**：新增实例方法 `this.loadSprite(path, sprite)`，`applySpriteFrame` 检查 `sprite.isValid && sprite.node?.isValid` 才赋值；try/catch 在 Sprite 仍 valid 时 throw（失效时吞掉异步回调）。替换 5 处调用（cardBack/cardAsset/suitAsset/addSprite/gameTableBg）。`result-overlay-renderer` 改用 `ctx.loadSprite`，`seats-renderer` 接口加 `loadSprite` 签名。`ui-helpers.loadSprite` 仍被 `lobby-scene.ts` 消费（不在文件域，不动）——无越域。
+4. **result overlay 置顶兜底**：`panel.setSiblingIndex(overlay.children.length-1)` + `overlay.setSiblingIndex(ctx.uiRoot.children.length-1)`——行为要求 2 满足。
+5. **面板内浅色底衬**：`settlement-panel-fill` 节点，`Graphics` 画 `Color(255,247,226,238)` 圆角矩形，`setSiblingIndex(0)` 置最底（不遮 badge/text/buttons）——确保面板内容区不透出底层牌桌。
+
+### 检查单逐项核销（R-WAVE3 R:T-FIX-SETTLE）
+- [x] 文件域仅 game-scene-skeleton + game-scene/* + report；纯层/测试零改动。
+- [x] diff 核：settled 相位跳过 statusLine/last-action 渲染 + result overlay 置顶兜底；无布局坐标/文案顺手改（renderPlayArea showLabel 是必要相位门控）。
+- [x] 四横屏结算截图：面板内无底层药丸/文本（transient 全 0）；暗幕下牌桌仍可见（tableStillVisible seats=14/handCards=68/topBar=4 四档一致）。
+- [x] 重开回归证据：844x390 restart(bidding) status=1/biddingPrompt=1/lastActions=3 + playing hud=2/lastActions=3/advisor=1 + secondSettlement transient 全 0 + lobbyReturn(lobby) + lobbyNewRound(bidding)。
+- [x] productErrors=[] 四档；vitest/typecheck 与 main 基线一致（140/711）。
+- [x] 常规任务双闸后直接合并；验收披露 + handoff 回规划者。
+
+### 全量回扫范围与分流
+回扫范围：`loadSprite` 全消费方（lobby-scene 仍用 ui-helpers 版本不受影响）、`spriteFrameResourcePath` import 合法性（asset-keys.ts:96 存在）、`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` 完整性（覆盖所有 playing 专属瞬时节点）、`GameSceneRendererContext` 接口变更（additive，加 loadSprite 签名，不破坏既有消费者）。无域外致命，无拿不准。
+
+### 打回轮次
+0 轮。
+
+### 测试基线（审查者独立复跑）
+worktree `b814ee6`：`npm --prefix test run typecheck` 净；`npm --prefix test test` **140 文件 / 711 用例全绿**（selfplay 质量门 Hard 组合率 0.993 / 压队友 0 / 胜率差 Hard−Normal +0.133 / Hard−Simple +0.633，与 V2 基线一致）。`git diff --check` 净。
