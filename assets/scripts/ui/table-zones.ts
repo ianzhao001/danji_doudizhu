@@ -36,6 +36,24 @@ export interface TableZones extends TableRegions {
   memoryDock: Rect;
   /** 建议开关/面板停靠：右半屏。 */
   advisorDock: Rect;
+  /** v13 玩家大立绘区：左下围桌，底边贴近但不压住底部大手牌。 */
+  heroBody: Rect;
+  /** v13 左侧 AI 大立绘区：左上围桌。 */
+  opponentLeftBody: Rect;
+  /** v13 右侧 AI 大立绘区：右上围桌。 */
+  opponentRightBody: Rect;
+  /** v13 玩家名字牌区：贴近玩家立绘下方。 */
+  heroNameplate: Rect;
+  /** v13 左侧 AI 名字牌区。 */
+  opponentLeftNameplate: Rect;
+  /** v13 右侧 AI 名字牌区。 */
+  opponentRightNameplate: Rect;
+  /** v13 底部横向大手牌区。 */
+  heroHandLarge: Rect;
+  /** v13 牌桌中部行动按钮区。 */
+  tableActionBar: Rect;
+  /** v13 结算展示覆盖区：暗幕牌桌上的胜负大字与三家分数面板。 */
+  settlementShowcase: Rect;
 }
 
 export function tableZones(width: number, height: number): TableZones {
@@ -55,6 +73,7 @@ export function tableZones(width: number, height: number): TableZones {
   const sideWidth = Math.min(118, Math.max(96, Math.round(width * 0.13)));
   const dockHeight = Math.min(32, Math.max(28, Math.round(height * 0.08)));
   const sideY = legacy.actionButtons.y + legacy.actionButtons.height + gap;
+  const v13 = gameRemakeZones(width, height, gap);
 
   return {
     ...legacy,
@@ -104,6 +123,7 @@ export function tableZones(width: number, height: number): TableZones {
       width: sideWidth,
       height: dockHeight,
     },
+    ...v13,
   };
 }
 
@@ -114,4 +134,99 @@ function centered(width: number, rectWidth: number, y: number, height: number): 
     width: rectWidth,
     height,
   };
+}
+
+function gameRemakeZones(width: number, height: number, gap: number): Pick<
+  TableZones,
+  | 'heroBody'
+  | 'opponentLeftBody'
+  | 'opponentRightBody'
+  | 'heroNameplate'
+  | 'opponentLeftNameplate'
+  | 'opponentRightNameplate'
+  | 'heroHandLarge'
+  | 'tableActionBar'
+  | 'settlementShowcase'
+> {
+  const heroHandHeight = clamp(Math.round(height * 0.22), 80, 96);
+  const heroHandReservedLeft = clamp(Math.round(width * 0.21), 132, 176);
+  const heroHandLarge = {
+    x: heroHandReservedLeft,
+    y: height - heroHandHeight,
+    width: width - heroHandReservedLeft - gap,
+    height: heroHandHeight,
+  };
+
+  const tableActionHeight = clamp(Math.round(height * 0.125), 44, 56);
+  const tableActionWidth = clamp(Math.round(width * 0.32), 252, 330);
+  const tableActionBar = centered(width, tableActionWidth, heroHandLarge.y - gap - tableActionHeight, tableActionHeight);
+
+  const settlementHeight = Math.round(height * 0.5);
+  const settlementShowcase = centered(
+    width,
+    clamp(Math.round(width * 0.56), 360, 520),
+    clamp(Math.round(height * 0.09), 32, 40),
+    settlementHeight,
+  );
+
+  const topBodyY = clamp(Math.round(height * 0.12), 42, 56);
+  const topBodyHeight = Math.max(1, heroHandLarge.y - gap - topBodyY);
+  const topBodyWidth = clamp(Math.round(width * 0.2), 140, 176);
+  const heroBodyWidth = clamp(Math.round(width * 0.18), 122, 156);
+  const heroBodyY = clamp(Math.round(height * 0.36), 128, heroHandLarge.y - 96);
+  const heroBody = {
+    x: gap,
+    y: heroBodyY,
+    width: heroBodyWidth,
+    height: heroHandLarge.y - heroBodyY,
+  };
+  const opponentLeftBody = {
+    x: gap,
+    y: topBodyY,
+    width: topBodyWidth,
+    height: topBodyHeight,
+  };
+  const opponentRightBody = {
+    x: width - gap - topBodyWidth,
+    y: topBodyY,
+    width: topBodyWidth,
+    height: topBodyHeight,
+  };
+
+  const nameplateWidth = clamp(Math.round(width * 0.18), 124, 164);
+  const nameplateHeight = clamp(Math.round(height * 0.085), 30, 36);
+  const heroNameplate = {
+    x: gap,
+    y: clamp(heroHandLarge.y - nameplateHeight, 0, height - nameplateHeight),
+    width: Math.min(nameplateWidth, heroBody.width + 18),
+    height: nameplateHeight,
+  };
+  const opponentLeftNameplate = {
+    x: opponentLeftBody.x + gap,
+    y: clamp(topBodyY + Math.round(topBodyHeight * 0.53), 0, height - nameplateHeight),
+    width: nameplateWidth,
+    height: nameplateHeight,
+  };
+  const opponentRightNameplate = {
+    x: width - gap - nameplateWidth,
+    y: opponentLeftNameplate.y,
+    width: nameplateWidth,
+    height: nameplateHeight,
+  };
+
+  return {
+    heroBody,
+    opponentLeftBody,
+    opponentRightBody,
+    heroNameplate,
+    opponentLeftNameplate,
+    opponentRightNameplate,
+    heroHandLarge,
+    tableActionBar,
+    settlementShowcase,
+  };
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
 }
