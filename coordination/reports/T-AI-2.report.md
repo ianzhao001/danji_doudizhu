@@ -59,3 +59,20 @@
 
 - 本任务没有改 `endgame.ts`；收割逻辑目前只在 Hard 策略内生效，符合文件域和最小改动原则。
 - 当前 worktree 仍有两份无关未跟踪 `.meta` 文件，未纳入本任务提交。
+
+## 审查者验收披露（2026-07-04）
+
+- **评审结论**：approved
+- **打回轮次**：0（首次通过）
+- **种子完整性**：种子提交 `9678b97`（规划者）与实现提交 `c562e45`（执行者）分离；执行者仅改 `hard.ts`+`difficultyConfig.ts`+报告，未碰测试文件。
+- **红线核查**：`simple.ts`/`normal.ts`/`lead-score.ts`/`_shared.ts` 零改动；无 `rng.` 新调用；`compareMoves`/`pickSmallest` 语义不动；`difficultyConfig` 仅 description 改动。
+- **独立复跑**：140 files / 710 tests passed + typecheck 净 + 纯层零 cc。
+- **质量门实测**：Hard 组合率 0.993≥0.50 且≥Normal(0.985)−0.05；压队友 0≤0.08；Hard−Normal +0.133≥+0.03；Hard−Simple +0.633≥+0.10。Normal>Hard 过渡态已关闭。
+
+### 全量回扫（写 approved 前一次）
+- 回扫范围 / 方法：grep 跨模块 import / cc 泄漏 / asset key 消费 / 交互面排查；不止本任务 diff。
+- 逐行细读新提交：已做。`choosePressingLeadMove` 过滤炸弹/保护牌后选多张或最大单（K 案例）；`chooseControlFollow` 限 hand≤4 且跟牌后 `canFinishInOneMove` 才选控制牌；组合权重按牌型递增（Pair 32 → Airplane 100），相对序保持。
+- 发现分流：
+  - 域内致命（→ changes-requested）：无
+  - 域外致命（→ 转规划者）：无
+  - 拿不准（→ 转规划者非阻断）：无
