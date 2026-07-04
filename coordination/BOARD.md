@@ -756,8 +756,8 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-AI-2 | 1.5 | 纯逻辑(ai) | `hard.ts` + `endgame.ts` + difficultyConfig 文案（仅 description） | T-AI-1 ✅`9353f76` | **done `7476412`** |
 | ART-UIKIT | 1 | 美术·文生图 | `asset-previews/v12-uikit/` + report（不碰 resources） | — | **done `7f71cf2`**：v12 preview 包齐（名字牌/底牌托架/btn×3/拉伸模拟/角部裁样）+ 用户视觉终审通过（2026-07-04）→ 139/703 绿+typecheck 净 |
 | ART-IMPORT-UIKIT | 1.5 | 美术·导入 | `assets/resources/art/ui/*.png`(+`.meta` Creator·panel-popup 仅配 border) + `asset-keys.ts` 新 2 键；**禁碰两巨组件** | ART-UIKIT ✅`7f71cf2` | **done `5ad2223`** |
-| P-G3 | 2 | 巨组件流水线(四阶段) | `game-scene-skeleton.ts` + 新 `ui/components/game-scene/*.ts`(4 模块) | ①②依赖已满足；③依赖 ART-IMPORT-UIKIT | **ready·已建分支**：spec `tasks/P-G3.md`；①move-only 拆 4 热区（拆前基线截图+color-moved 核）→②消费 zones/biddingDeal/bottomRevealed+actionBar 相位互斥+17 对检查单+per-seat 落点+结算清场+chips 迁暂停菜单+叫抢计时+seed URL 口 →③美术接线（等 ART-IMPORT）→④文案（③④可交换）；审查按 `tasks/R-WAVE2.md` |
-| P-L3 | 2 | 巨组件流水线(两阶段) | `lobby-scene.ts` | ①依赖已满足；②依赖 ART-IMPORT-UIKIT | **ready·已建分支**：spec `tasks/P-L3.md`；①「继续游戏」接真存档（savedSlot 硬编码 null → 真读档；逐手存档已让续局有实值）+布局微调 →②美术接线；审查按 `tasks/R-WAVE2.md` |
+| P-G3 | 2 | 巨组件流水线(四阶段) | `game-scene-skeleton.ts` + 新 `ui/components/game-scene/*.ts`(4 模块) | ①②✅approved；③依赖 ART-IMPORT-UIKIT ✅`5ad2223` | **approved①②**（未合并，③④ unblocked）：spec `tasks/P-G3.md`；①move-only 拆 4 热区（拆前基线截图+color-moved 核）→②消费 zones/biddingDeal/bottomRevealed+actionBar 相位互斥+17 对检查单+per-seat 落点+结算清场+chips 迁暂停菜单+叫抢计时+seed URL 口 →③美术接线（ART-IMPORT 已落 main）→④文案（③④可交换）；审查按 `tasks/R-WAVE2.md` |
+| P-L3 | 2 | 巨组件流水线(两阶段) | `lobby-scene.ts` | ①✅approved；②依赖 ART-IMPORT-UIKIT ✅`5ad2223` | **approved①**（未合并，② unblocked）：spec `tasks/P-L3.md`；①「继续游戏」接真存档（savedSlot 硬编码 null → 真读档；逐手存档已让续局有实值）+布局微调 →②美术接线（ART-IMPORT 已落 main）；审查按 `tasks/R-WAVE2.md` |
 | V2 | 3 | 收口·验证 | `reports/V2.report.md`(verify-only) | P-G3+P-L3+T-AI-2 | blocked：四横屏固定 seed 真实一局 e2e + AI 观察指标表 + PLAYTEST |
 
 > **延后项（设计债·带简报待派）**：记牌深度（GameSnapshot 需出牌历史，hard 现 `trackPlayed([],hand)` 传空=假记牌）；round-runtime(439 行) 拆分；save 双序列化与叫抢期存档**整并一次**升 v2（避免两次迁移税）；audio/卡面/tween 模块化。
