@@ -101,3 +101,14 @@ describe('asset keys', () => {
     );
   });
 });
+
+
+// ART-IMPORT-UIKIT 键契约（规划者种入·不可改）：v12 皮肤两新键。当前键不存在 → 应先红。
+// Record 宽化仅为让种子在键落地前可编译（typecheck 绿、运行时红）。
+describe('ART-IMPORT-UIKIT 新键', () => {
+  it('seatNameplate / bottomCardsDock 指向 v12 资源路径', () => {
+    const paths = RESOURCE_PATHS as unknown as Record<string, string>;
+    expect(paths['seatNameplate']).toBe('art/ui/seat-nameplate');
+    expect(paths['bottomCardsDock']).toBe('art/ui/bottom-cards-dock');
+  });
+});
