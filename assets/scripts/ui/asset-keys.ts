@@ -32,6 +32,8 @@ export const RESOURCE_PATHS = {
   buttonPrimary: 'art/ui/btn-primary',
   buttonSecondary: 'art/ui/btn-secondary',
   buttonDisabled: 'art/ui/btn-disabled',
+  seatNameplate: 'art/ui/seat-nameplate',
+  bottomCardsDock: 'art/ui/bottom-cards-dock',
   iconPlay: 'art/ui/icon-play',
   iconPass: 'art/ui/icon-pass',
   iconHint: 'art/ui/icon-hint',
