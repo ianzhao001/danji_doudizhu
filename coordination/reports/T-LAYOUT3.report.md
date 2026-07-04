@@ -312,3 +312,105 @@ tsc --noEmit passed
 git diff --check
 passed
 ```
+
+---
+
+## 执行者二次返工段（Codex · 2026-07-05 · round 2）
+
+### 用户新增图审意见
+
+- 三个人的大小需要一样。
+- 玩家角色是在自己手牌的左边，不能出现在牌桌上。
+
+### 修复摘要
+
+- 三名角色 body 改为共用同一组 `bodyWidth` / `bodyHeight`，四横屏下三人 zone 尺寸完全一致。
+- 玩家 body 仍锚定左下，但改为底部贴屏、横向与 `heroHandLarge` 分离：玩家位于手牌左侧保留区，不再进入手牌区或牌桌中央。
+- 左 AI 从玩家 body 右侧 `gap=8` 开始，右 AI 贴右侧，三名 body 均不相交。
+
+### 二次返工后四横屏 v13 zone 尺寸与人物交叉面积
+
+```
+## 844x390
+heroBody: {"x":8,"y":156,"width":152,"height":234}
+opponentLeftBody: {"x":168,"y":47,"width":152,"height":234}
+opponentRightBody: {"x":684,"y":47,"width":152,"height":234}
+heroNameplate: {"x":8,"y":271,"width":152,"height":33}
+opponentLeftNameplate: {"x":176,"y":171,"width":152,"height":33}
+opponentRightNameplate: {"x":684,"y":171,"width":152,"height":33}
+heroHandLarge: {"x":176,"y":304,"width":660,"height":86}
+tableActionBar: {"x":287,"y":247,"width":270,"height":49}
+settlementShowcase: {"x":186,"y":35,"width":473,"height":195}
+bottomCardsDock: {"x":321,"y":58,"width":203,"height":27}
+body sizes=152x234,152x234,152x234
+hero-hand gap=16
+heroBody x opponentLeftBody intersection=0 gap=8
+heroBody x opponentRightBody intersection=0 gap=524
+opponentLeftBody x opponentRightBody intersection=0 gap=364
+## 812x375
+heroBody: {"x":8,"y":150,"width":146,"height":225}
+opponentLeftBody: {"x":162,"y":45,"width":146,"height":225}
+opponentRightBody: {"x":658,"y":45,"width":146,"height":225}
+heroNameplate: {"x":8,"y":260,"width":146,"height":32}
+opponentLeftNameplate: {"x":170,"y":164,"width":146,"height":32}
+opponentRightNameplate: {"x":658,"y":164,"width":146,"height":32}
+heroHandLarge: {"x":171,"y":292,"width":633,"height":83}
+tableActionBar: {"x":276,"y":237,"width":260,"height":47}
+settlementShowcase: {"x":179,"y":34,"width":455,"height":188}
+bottomCardsDock: {"x":309,"y":57,"width":195,"height":26}
+body sizes=146x225,146x225,146x225
+hero-hand gap=17
+heroBody x opponentLeftBody intersection=0 gap=8
+heroBody x opponentRightBody intersection=0 gap=504
+opponentLeftBody x opponentRightBody intersection=0 gap=350
+## 915x412
+heroBody: {"x":8,"y":165,"width":156,"height":247}
+opponentLeftBody: {"x":172,"y":49,"width":156,"height":247}
+opponentRightBody: {"x":751,"y":49,"width":156,"height":247}
+heroNameplate: {"x":8,"y":286,"width":164,"height":35}
+opponentLeftNameplate: {"x":180,"y":180,"width":164,"height":35}
+opponentRightNameplate: {"x":743,"y":180,"width":164,"height":35}
+heroHandLarge: {"x":176,"y":321,"width":731,"height":91}
+tableActionBar: {"x":311,"y":261,"width":293,"height":52}
+settlementShowcase: {"x":202,"y":37,"width":512,"height":206}
+bottomCardsDock: {"x":348,"y":61,"width":220,"height":29}
+body sizes=156x247,156x247,156x247
+hero-hand gap=12
+heroBody x opponentLeftBody intersection=0 gap=8
+heroBody x opponentRightBody intersection=0 gap=587
+opponentLeftBody x opponentRightBody intersection=0 gap=423
+## 780x360
+heroBody: {"x":8,"y":144,"width":140,"height":216}
+opponentLeftBody: {"x":156,"y":43,"width":140,"height":216}
+opponentRightBody: {"x":632,"y":43,"width":140,"height":216}
+heroNameplate: {"x":8,"y":249,"width":140,"height":31}
+opponentLeftNameplate: {"x":164,"y":157,"width":140,"height":31}
+opponentRightNameplate: {"x":632,"y":157,"width":140,"height":31}
+heroHandLarge: {"x":164,"y":280,"width":608,"height":80}
+tableActionBar: {"x":264,"y":227,"width":252,"height":45}
+settlementShowcase: {"x":172,"y":32,"width":437,"height":180}
+bottomCardsDock: {"x":297,"y":55,"width":187,"height":25}
+body sizes=140x216,140x216,140x216
+hero-hand gap=16
+heroBody x opponentLeftBody intersection=0 gap=8
+heroBody x opponentRightBody intersection=0 gap=484
+opponentLeftBody x opponentRightBody intersection=0 gap=336
+```
+
+### 二次返工局部测试输出
+
+```
+npm --prefix test exec -- vitest run ui/table-zones-v13.test.ts ui/table-zones.test.ts
+Test Files  2 passed (2)
+Tests       44 passed (44)
+
+npm --prefix test test
+Test Files  141 passed (141)
+Tests       727 passed (727)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```

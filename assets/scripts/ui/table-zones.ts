@@ -170,27 +170,26 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
   );
 
   const topBodyY = clamp(Math.round(height * 0.12), 42, 56);
-  const topBodyHeight = Math.max(1, heroHandLarge.y - gap - topBodyY);
-  const topBodyWidth = clamp(Math.round(width * 0.2), 140, 176);
-  const heroBodyWidth = clamp(Math.round(width * 0.18), 122, 156);
-  const heroBodyY = clamp(Math.round(height * 0.36), 128, heroHandLarge.y - 96);
+  const bodyWidth = clamp(Math.round(width * 0.18), 140, 156);
+  const bodyHeight = clamp(Math.round(height * 0.6), 204, 247);
+  const heroBodyY = Math.max(0, height - bodyHeight);
   const heroBody = {
     x: gap,
     y: heroBodyY,
-    width: heroBodyWidth,
-    height: heroHandLarge.y - heroBodyY,
+    width: bodyWidth,
+    height: bodyHeight,
   };
   const opponentLeftBody = {
     x: heroBody.x + heroBody.width + gap,
     y: topBodyY,
-    width: topBodyWidth,
-    height: topBodyHeight,
+    width: bodyWidth,
+    height: bodyHeight,
   };
   const opponentRightBody = {
-    x: width - gap - topBodyWidth,
+    x: width - gap - bodyWidth,
     y: topBodyY,
-    width: topBodyWidth,
-    height: topBodyHeight,
+    width: bodyWidth,
+    height: bodyHeight,
   };
 
   const nameplateWidth = clamp(Math.round(width * 0.18), 124, 164);
@@ -203,7 +202,7 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
   };
   const opponentLeftNameplate = {
     x: opponentLeftBody.x + gap,
-    y: clamp(topBodyY + Math.round(topBodyHeight * 0.53), 0, height - nameplateHeight),
+    y: clamp(opponentLeftBody.y + Math.round(opponentLeftBody.height * 0.53), 0, height - nameplateHeight),
     width: nameplateWidth,
     height: nameplateHeight,
   };
