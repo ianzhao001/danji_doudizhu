@@ -181,7 +181,7 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
     height: heroHandLarge.y - heroBodyY,
   };
   const opponentLeftBody = {
-    x: gap,
+    x: heroBody.x + heroBody.width + gap,
     y: topBodyY,
     width: topBodyWidth,
     height: topBodyHeight,

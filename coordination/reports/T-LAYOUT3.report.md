@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex
 - 分支：`task/T-LAYOUT3`
-- 状态：in-review
+- 状态：in-review（round 1 返工已提交，待复审）
 
 ## 改了哪些文件
 
@@ -212,3 +212,103 @@ spec `tasks/T-LAYOUT3.md` 布局契约明确："关键可见集不重叠，最�
 
 打回轮次：1
 非阻断建议：3 项转规划者（body/nameplate 间距豁免？settlementShowcase 相位互斥？）
+
+---
+
+## 执行者返工段（Codex · 2026-07-05 · round 1）
+
+### 用户/审查者打回项
+
+- 用户图审反馈：`bidding`、`playing`、`settlement` 三张合成预览里三个人有两个人重叠，需参考用户示意图避免人物重叠。
+- 审查者打回项：`heroBody` 与 `opponentLeftBody` 在四横屏 zone 本身重叠，违反 v13 关键可见集不重叠契约。
+
+### 修复摘要
+
+- 只改 `assets/scripts/ui/table-zones.ts` 与本报告；未改种子测试。
+- 将 `opponentLeftBody.x` 从左屏边缘改为 `heroBody.x + heroBody.width + gap`，形成“左下玩家、左上偏中 AI、右上 AI”的围桌结构。
+- `heroHandLarge`、`tableActionBar`、`settlementShowcase` 的位置语义保持不变；legacy 6 字段仍来自 `tableLayout(width, height)`。
+
+### 返工后四横屏 v13 zone 尺寸与人物交叉面积
+
+导出命令：
+
+```
+npm --prefix test exec -- tsx -e "import { tableZones } from './assets/scripts/ui/table-zones.ts'; const sizes=[[844,390],[812,375],[915,412],[780,360]] as const; const names=['heroBody','opponentLeftBody','opponentRightBody'] as const; const full=['heroBody','opponentLeftBody','opponentRightBody','heroNameplate','opponentLeftNameplate','opponentRightNameplate','heroHandLarge','tableActionBar','settlementShowcase','bottomCardsDock'] as const; const area=(a:any,b:any)=>Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y)); for (const [w,h] of sizes) { const z=tableZones(w,h) as any; console.log('## '+w+'x'+h); for (const n of full) console.log(n+': '+JSON.stringify(z[n])); for (let i=0;i<names.length;i++) for (let j=i+1;j<names.length;j++) console.log(names[i]+' x '+names[j]+' intersection='+area(z[names[i]],z[names[j]])); }"
+```
+
+```
+## 844x390
+heroBody: {"x":8,"y":140,"width":152,"height":164}
+opponentLeftBody: {"x":168,"y":47,"width":169,"height":249}
+opponentRightBody: {"x":667,"y":47,"width":169,"height":249}
+heroNameplate: {"x":8,"y":271,"width":152,"height":33}
+opponentLeftNameplate: {"x":176,"y":179,"width":152,"height":33}
+opponentRightNameplate: {"x":684,"y":179,"width":152,"height":33}
+heroHandLarge: {"x":176,"y":304,"width":660,"height":86}
+tableActionBar: {"x":287,"y":247,"width":270,"height":49}
+settlementShowcase: {"x":186,"y":35,"width":473,"height":195}
+bottomCardsDock: {"x":321,"y":58,"width":203,"height":27}
+heroBody x opponentLeftBody intersection=0
+heroBody x opponentRightBody intersection=0
+opponentLeftBody x opponentRightBody intersection=0
+## 812x375
+heroBody: {"x":8,"y":135,"width":146,"height":157}
+opponentLeftBody: {"x":162,"y":45,"width":162,"height":239}
+opponentRightBody: {"x":642,"y":45,"width":162,"height":239}
+heroNameplate: {"x":8,"y":260,"width":146,"height":32}
+opponentLeftNameplate: {"x":170,"y":172,"width":146,"height":32}
+opponentRightNameplate: {"x":658,"y":172,"width":146,"height":32}
+heroHandLarge: {"x":171,"y":292,"width":633,"height":83}
+tableActionBar: {"x":276,"y":237,"width":260,"height":47}
+settlementShowcase: {"x":179,"y":34,"width":455,"height":188}
+bottomCardsDock: {"x":309,"y":57,"width":195,"height":26}
+heroBody x opponentLeftBody intersection=0
+heroBody x opponentRightBody intersection=0
+opponentLeftBody x opponentRightBody intersection=0
+## 915x412
+heroBody: {"x":8,"y":148,"width":156,"height":173}
+opponentLeftBody: {"x":172,"y":49,"width":176,"height":264}
+opponentRightBody: {"x":731,"y":49,"width":176,"height":264}
+heroNameplate: {"x":8,"y":286,"width":164,"height":35}
+opponentLeftNameplate: {"x":180,"y":189,"width":164,"height":35}
+opponentRightNameplate: {"x":743,"y":189,"width":164,"height":35}
+heroHandLarge: {"x":176,"y":321,"width":731,"height":91}
+tableActionBar: {"x":311,"y":261,"width":293,"height":52}
+settlementShowcase: {"x":202,"y":37,"width":512,"height":206}
+bottomCardsDock: {"x":348,"y":61,"width":220,"height":29}
+heroBody x opponentLeftBody intersection=0
+heroBody x opponentRightBody intersection=0
+opponentLeftBody x opponentRightBody intersection=0
+## 780x360
+heroBody: {"x":8,"y":130,"width":140,"height":150}
+opponentLeftBody: {"x":156,"y":43,"width":156,"height":229}
+opponentRightBody: {"x":616,"y":43,"width":156,"height":229}
+heroNameplate: {"x":8,"y":249,"width":140,"height":31}
+opponentLeftNameplate: {"x":164,"y":164,"width":140,"height":31}
+opponentRightNameplate: {"x":632,"y":164,"width":140,"height":31}
+heroHandLarge: {"x":164,"y":280,"width":608,"height":80}
+tableActionBar: {"x":264,"y":227,"width":252,"height":45}
+settlementShowcase: {"x":172,"y":32,"width":437,"height":180}
+bottomCardsDock: {"x":297,"y":55,"width":187,"height":25}
+heroBody x opponentLeftBody intersection=0
+heroBody x opponentRightBody intersection=0
+opponentLeftBody x opponentRightBody intersection=0
+```
+
+### 返工测试输出
+
+```
+npm --prefix test exec -- vitest run ui/table-zones-v13.test.ts ui/table-zones.test.ts
+Test Files  2 passed (2)
+Tests       44 passed (44)
+
+npm --prefix test test
+Test Files  141 passed (141)
+Tests       727 passed (727)
+
+npm --prefix test run typecheck
+tsc --noEmit passed
+
+git diff --check
+passed
+```
