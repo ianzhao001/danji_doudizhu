@@ -16,6 +16,7 @@
 - 玩家手牌改为底部横向大牌区（`heroHandLarge`）；保持现有选牌、提示、出牌、不要逻辑不变。
 - 叫抢/出牌按钮居中悬桌（`tableActionBar`）；**相位互斥不回归**（叫抢期无出牌键组节点）；只用现有功能按钮，不新增功能入口。
 - 三名角色立绘围桌（body×3）+ 名字牌 v13（nameplate×3），按 zone 取位（T-LAYOUT3 契约保证不叠手牌/按钮/落点）。
+- **T-LAYOUT3 仲裁口径（2026-07-05）**：①名字牌是**贴附件**——渲染于**宿主 body 上层**（z 序），与宿主免 8px 间距约束；与非宿主 zone（他人 body/手牌/按钮/dock）仍守间距。②`settlementShowcase` 属 **settled 相位专属可见集**——与 bidding/playing 集 zone（body/nameplate/dock 等）重叠合法，靠相位互斥 + 暗幕保证，接线时结算内容渲染于暗幕之上并继承 T-FIX-SETTLE settled 门控。
 - 卡面维持**混合渲染架构**（`card-template-v13` + 代码绘制点数 + `suit-*-v13` 贴图）；验证新模板上代码字可读性（角标色 vs 模板底色，附放大截图）。
 - 结算：暗幕牌桌 + `settlement-banner-v13` 大字 + `settlement-panel-v13`（三家分数/余牌）+ 再来一局/返回大厅；**T-FIX-SETTLE settled 门控与口径不回归**（transient HUD 全隐、面板内无底层浮入、暗幕下牌桌可见）。
 - per-seat 三区落点、`bottomRevealed` 亮底牌、叫抢计时等既有流程行为不回归。
