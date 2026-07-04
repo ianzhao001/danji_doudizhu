@@ -198,3 +198,62 @@ M  assets/scripts/ui/asset-keys.ts
 - [x] 全量测试通过
 - [x] typecheck 通过
 - [x] `git diff --check` 通过
+
+## 审查者评审段（GLM-5.2 · 2026-07-05）
+
+### 评审结论：approved
+
+### 检查单逐项核销
+
+1. **只导入用户图审 passed 件，sha256 逐字节一致** ✅
+   - 23 件正式件全部在 ART-GAME-REMAKE 用户图审通过清单内。
+   - 逐件 `git show task/ART-IMPORT-GAME-REMAKE:<path> | shasum -a 256` 与 `manifest-v13.json` 对照：23/23 OK。
+   - `badge-role-v13.png` 未导入：ART-GAME-REMAKE 报告明确将其列为「附加但不进入 import 必选清单」；P-G4 spec grep 无 `badge-role`/`badgeRoleV13` 引用；执行者报告已说明。决策合理，非缺失。
+
+2. **`.meta` Creator 3.8.8 生成、sprite-frame 类型** ✅
+   - 23/23 `.meta` ver=1.0.27、importer=image、userData.type=sprite-frame。
+   - 23/23 含真实 `@f9941` sprite-frame 子资源 + `@6c48a` texture 子资源。
+   - 抽查 trim/vertices/uv 几何真实（btn-primary trim=53,8/374×144/raw480×160；suit-spade trim=15,6/98×116/raw128×128；game-table-bg trim=0,0/full）——非手写。
+   - 23 base UUID 唯一；23 sprite-frame sub UUID 唯一；23 texture sub UUID 唯一；sub UUID 均从 base 派生。
+   - 与 main 既有 `assets/resources/art/**.png.meta` UUID 零跨文件碰撞。
+
+3. **九宫格件 border** ✅
+   - 7 件（btn-primary/secondary/tertiary/disabled + settlement-panel + seat-nameplate + bottom-cards-dock）borderTop/Bottom/Left/Right 均为 24（四值 >0）。
+   - 取值依据：v13 preview 提供 64px/176px 拉伸模拟，沿 v12 UIKIT 已审通过的安全口径 24px。
+   - 其余 16 件 border=0/0/0/0（正确，非九宫格件）。
+
+4. **asset-keys.ts 仅纯增 v13 键组** ✅
+   - diff 纯增 23 键，既有键零改动（diff 无任何 `-` 行涉及旧键）。
+   - 键名均为 `xxxV13`，值均以 `-v13` 结尾，与新文件路径一一对应。
+   - 新键未被消费（符合 import 任务不接线，P-G4 将消费）。
+
+5. **lobby 既有资源/键/文件零改动** ✅
+   - diff 仅含 23 PNG + 23 .meta + asset-keys.ts + report。
+   - 无 lobby-bg/lobby-scene/既有非-v13 PNG/.scene/test/根配置/纯层触碰。
+
+6. **测试与证据链** ✅
+   - 审查者独立复跑（worktree）：
+     - `npm --prefix test test` → 141 文件 / 727 用例全绿（26.64s）。
+     - `npm --prefix test run typecheck` → tsc --noEmit 通过。
+     - `git diff --check` → passed。
+
+### 全量回扫（写 approved 前）
+
+- **文件域纯净**：diff 仅 v13 新文件 + asset-keys.ts 纯增 + report；未触碰 test/、scene/、根配置、纯逻辑层、lobby 资源。
+- **新键消费**：23 个 V13 键仅出现在 asset-keys.ts，未被其他 .ts 引用——符合 import 任务不接线契约。
+- **UUID 跨文件碰撞**：新 23 base UUID 与 main 既有 art/ .meta UUID 零碰撞。
+- **.meta 真实性**：trim/vertices/uv 几何由 Creator 真实计算（非手写）；hasAlpha 字段与 manifest 的 1 处差异（game-table-bg-v13）是字段语义不同（Creator 检测 alpha 通道存在性，manifest 检测实际透明像素），sha256 逐字节一致是更强证据，非问题。
+- **跨模块回归**：本任务纯资源新增 + 键组纯增，无代码逻辑改动，无跨模块交互隐患。
+- **打回轮次**：0。
+
+### 分流
+
+- 域内致命：无。
+- 域外致命：无。
+- 拿不准（非阻断）：无。
+- 阻塞：无。
+
+### 合并执行
+
+常规任务（美术导入，未触共享契约/状态机/rules），双闸即可。审查者本人跑双闸全绿后执行 claim/merge/release。
+
