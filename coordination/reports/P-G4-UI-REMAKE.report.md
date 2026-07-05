@@ -263,3 +263,16 @@ A  coordination/reports/P-G4-UI-REMAKE.report.md
 - `npm --prefix test test`：141 文件 / 727 用例全绿（审查者 main 工作树复跑）。
 - `npm --prefix test run typecheck`：exit 0。
 - `git diff main..task/P-G4-UI-REMAKE --check`：净。
+
+---
+
+## 验收披露（审查者 GLM-5.2 · 2026-07-05）
+
+- 评审结论：**approved**（常规任务，双闸）
+- 打回轮次：0
+- 全量回扫范围：全仓代码库 + 本任务 diff（5 文件 / +440 −134）
+- 回扫分流结果：域内致命 0 / 域外致命 0 / 拿不准 0 / 非阻断观察 1 项（`renderPlayArea` 条件变更使 "自由出牌" 标签成为死代码，在 UI remake 范围内，不阻断）
+- 合并 commit：`3e6cc0f`（merge --no-ff task/P-G4-UI-REMAKE）
+- 最终测试基线：main `1dd0b29` — 141 文件 / 727 用例全绿 + typecheck 净 + diff --check 净
+- 合并证据：claim `d2df262` → merge `3e6cc0f` → release `1dd0b29`；分支 + worktree 已清理
+- V3 解锁：P-G4-UI-REMAKE done，V3 依赖已满足
