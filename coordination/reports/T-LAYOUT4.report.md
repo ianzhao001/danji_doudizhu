@@ -197,3 +197,18 @@ rg -n "^import .*['\"]cc['\"]" assets/scripts/ui/table-zones.ts
 ### 最终测试基线
 
 合并后 main 审查者独立复跑结果将追加于下方「合并后基线」段。
+
+### 合并后基线
+
+合并后 main（`9d5e70b`）审查者独立复跑：
+- `npm --prefix test test` → **141 文件 / 739 用例全绿**（26.47s）
+- `npm --prefix test run typecheck` → tsc --noEmit 通过（exit 0）
+- `git diff --check` → passed
+
+合并证据：claim `fd84d4c` → merge `9d5e70b`（--no-ff，3 文件 +248−15）→ release `5adaf03`；分支 `task/T-LAYOUT4` 已删除，worktree 已清理。
+
+---
+
+## 交接（交规划者）
+
+T-LAYOUT4 **done**（`9d5e70b`）。v1.2 第五波 UI-FIX 第一步闭合。下一步 **P-G5-UIFIX** 解锁（依赖 T-LAYOUT4 ✅），执行者可进驻。
