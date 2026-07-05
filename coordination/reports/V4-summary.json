@@ -1,0 +1,298 @@
+{
+  "task": "V4",
+  "sourceTaskField": "P-G4-UI-REMAKE",
+  "seed": 20260705,
+  "settings": {
+    "orientation": "auto",
+    "exactFitScreen": true,
+    "designResolution": {
+      "width": 844,
+      "height": 390,
+      "policy": 3
+    },
+    "launchScene": "db://assets/scene/lobby.scene"
+  },
+  "evidenceRoot": "coordination/reports/V4-evidence",
+  "viewports": [
+    {
+      "viewport": "844x390",
+      "captures": 11,
+      "productErrors": [],
+      "failedResponses": [],
+      "firstRoundFinal": "settled",
+      "secondRoundFinal": "settled",
+      "aiPlayCaptured": true,
+      "playerPlayCaptured": true,
+      "cardPressEvidence": {
+        "before": {
+          "name": "card-0-3:C",
+          "active": true,
+          "world": {
+            "x": 108,
+            "y": 40
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "after": {
+          "name": "card-0-3:C",
+          "active": true,
+          "world": {
+            "x": 108,
+            "y": 58
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      },
+      "keyCaptures": {
+        "round1-bidding": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-round1-bidding.png",
+        "round1-playing": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-round1-playing.png",
+        "round1-player-selected": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-round1-player-selected.png",
+        "round1-ai-play": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-round1-ai-play.png",
+        "round1-player-play": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-round1-player-play.png",
+        "round1-settlement": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-round1-settlement.png",
+        "restart-bidding": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-restart-bidding.png",
+        "round2-settlement": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-round2-settlement.png",
+        "return-lobby": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/844x390/P-G4-844x390-return-lobby.png"
+      },
+      "settlementTransientActive": [
+        0,
+        0
+      ]
+    },
+    {
+      "viewport": "812x375",
+      "captures": 11,
+      "productErrors": [],
+      "failedResponses": [],
+      "firstRoundFinal": "settled",
+      "secondRoundFinal": "settled",
+      "aiPlayCaptured": true,
+      "playerPlayCaptured": true,
+      "cardPressEvidence": {
+        "before": {
+          "name": "card-0-3:C",
+          "active": true,
+          "world": {
+            "x": 108.24000000000001,
+            "y": 40
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "after": {
+          "name": "card-0-3:C",
+          "active": true,
+          "world": {
+            "x": 108.24000000000001,
+            "y": 58
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      },
+      "keyCaptures": {
+        "round1-bidding": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-round1-bidding.png",
+        "round1-playing": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-round1-playing.png",
+        "round1-player-selected": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-round1-player-selected.png",
+        "round1-ai-play": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-round1-ai-play.png",
+        "round1-player-play": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-round1-player-play.png",
+        "round1-settlement": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-round1-settlement.png",
+        "restart-bidding": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-restart-bidding.png",
+        "round2-settlement": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-round2-settlement.png",
+        "return-lobby": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/812x375/P-G4-812x375-return-lobby.png"
+      },
+      "settlementTransientActive": [
+        0,
+        0
+      ]
+    },
+    {
+      "viewport": "915x412",
+      "captures": 11,
+      "productErrors": [],
+      "failedResponses": [],
+      "firstRoundFinal": "settled",
+      "secondRoundFinal": "settled",
+      "aiPlayCaptured": true,
+      "playerPlayCaptured": true,
+      "cardPressEvidence": {
+        "before": {
+          "name": "card-0-3:C",
+          "active": true,
+          "world": {
+            "x": 110.07038834951453,
+            "y": 40
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "after": {
+          "name": "card-0-3:C",
+          "active": true,
+          "world": {
+            "x": 110.07038834951453,
+            "y": 58
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      },
+      "keyCaptures": {
+        "round1-bidding": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-round1-bidding.png",
+        "round1-playing": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-round1-playing.png",
+        "round1-player-selected": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-round1-player-selected.png",
+        "round1-ai-play": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-round1-ai-play.png",
+        "round1-player-play": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-round1-player-play.png",
+        "round1-settlement": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-round1-settlement.png",
+        "restart-bidding": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-restart-bidding.png",
+        "round2-settlement": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-round2-settlement.png",
+        "return-lobby": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/915x412/P-G4-915x412-return-lobby.png"
+      },
+      "settlementTransientActive": [
+        0,
+        0
+      ]
+    },
+    {
+      "viewport": "780x360",
+      "captures": 11,
+      "productErrors": [],
+      "failedResponses": [],
+      "firstRoundFinal": "settled",
+      "secondRoundFinal": "settled",
+      "aiPlayCaptured": true,
+      "playerPlayCaptured": true,
+      "cardPressEvidence": {
+        "before": {
+          "name": "card-0-3:C",
+          "active": true,
+          "world": {
+            "x": 108.5,
+            "y": 40
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "after": {
+          "name": "card-0-3:C",
+          "active": true,
+          "world": {
+            "x": 108.5,
+            "y": 58
+          },
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      },
+      "keyCaptures": {
+        "round1-bidding": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-round1-bidding.png",
+        "round1-playing": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-round1-playing.png",
+        "round1-player-selected": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-round1-player-selected.png",
+        "round1-ai-play": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-round1-ai-play.png",
+        "round1-player-play": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-round1-player-play.png",
+        "round1-settlement": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-round1-settlement.png",
+        "restart-bidding": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-restart-bidding.png",
+        "round2-settlement": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-round2-settlement.png",
+        "return-lobby": "/Users/admin/Documents/Cocos/斗地主.worktrees/V4/coordination/reports/V4-evidence/780x360/P-G4-780x360-return-lobby.png"
+      },
+      "settlementTransientActive": [
+        0,
+        0
+      ]
+    }
+  ],
+  "contactSheets": [
+    "coordination/reports/V4-evidence/contact-sheets/V4-playing-bottom-left-zoom.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-restart-bidding.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-return-lobby.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-round1-ai-play.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-round1-bidding.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-round1-player-play.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-round1-player-selected.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-round1-playing.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-round1-settlement.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-round2-bidding.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-round2-settlement.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-settlement-dim-zoom.png",
+    "coordination/reports/V4-evidence/contact-sheets/V4-top-dock-zoom.png"
+  ],
+  "qualityRaw": {
+    "levelPlay": {
+      "simple": {
+        "comboLeadRate": 0,
+        "teammateOverrideRate": 1,
+        "leadComboOps": 166,
+        "teammateBeatOps": 358,
+        "rounds": 30
+      },
+      "normal": {
+        "comboLeadRate": 0.9846153846153847,
+        "teammateOverrideRate": 0,
+        "leadComboOps": 130,
+        "teammateBeatOps": 99,
+        "rounds": 30
+      }
+    },
+    "winRateGap": {
+      "targetA": 0.8,
+      "targetB": 0.18888888888888888,
+      "diff": 0.6111111111111112,
+      "roundsPerSide": 90
+    },
+    "hardLevelPlay": {
+      "normal": {
+        "comboLeadRate": 0.9846153846153847,
+        "teammateOverrideRate": 0,
+        "leadComboOps": 130,
+        "teammateBeatOps": 99,
+        "rounds": 30
+      },
+      "hard": {
+        "comboLeadRate": 0.9933774834437086,
+        "teammateOverrideRate": 0,
+        "leadComboOps": 151,
+        "teammateBeatOps": 67,
+        "rounds": 30
+      }
+    },
+    "hardGaps": {
+      "hardVsNormal": {
+        "targetA": 0.5166666666666667,
+        "targetB": 0.38333333333333336,
+        "diff": 0.13333333333333336,
+        "roundsPerSide": 60
+      },
+      "hardVsSimple": {
+        "targetA": 0.8333333333333334,
+        "targetB": 0.2,
+        "diff": 0.6333333333333333,
+        "roundsPerSide": 60
+      }
+    }
+  },
+  "testSummary": {
+    "vitest": "Test Files 141 passed (141); Tests 739 passed (739)",
+    "typecheck": "tsc --noEmit passed",
+    "vitestLog": "/tmp/doudizhu-v4-vitest.log",
+    "typecheckLog": "/tmp/doudizhu-v4-typecheck.log",
+    "buildLog": "/tmp/doudizhu-v4-build.log"
+  }
+}
