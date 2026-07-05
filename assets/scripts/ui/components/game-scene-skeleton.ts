@@ -1505,7 +1505,7 @@ export class GameSceneSkeleton extends Component {
   private drawDimOverlay(parent: Node, width: number, height: number): void {
     const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
     graphics.clear();
-    graphics.fillColor = new Color(0, 0, 0, 176);
+    graphics.fillColor = new Color(0, 0, 0, 218);
     graphics.rect(-width / 2, -height / 2, width, height);
     graphics.fill();
   }

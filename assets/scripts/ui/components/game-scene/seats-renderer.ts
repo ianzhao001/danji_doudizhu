@@ -83,12 +83,39 @@ export function renderSeats(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
-  renderSeatCard(ctx, 'seat-hero', layout.heroBody, canvas, RESOURCE_PATHS.heroBodyV13);
-  renderSeatCard(ctx, 'seat-left', layout.opponentLeftBody, canvas, RESOURCE_PATHS.leftAiBodyV13);
-  renderSeatCard(ctx, 'seat-right', layout.opponentRightBody, canvas, RESOURCE_PATHS.rightAiBodyV13);
-  renderSeatNameplate(ctx, 'seat-hero-nameplate', layout.heroNameplate, canvas, 0, handCounts[0], landlord);
-  renderSeatNameplate(ctx, 'seat-left-nameplate', layout.opponentLeftNameplate, canvas, 1, handCounts[1], landlord);
-  renderSeatNameplate(ctx, 'seat-right-nameplate', layout.opponentRightNameplate, canvas, 2, handCounts[2], landlord);
+  const heroBody = seatBodyVisualRect('seat-hero', layout.heroBody, canvas);
+  const leftBody = seatBodyVisualRect('seat-left', layout.opponentLeftBody, canvas);
+  const rightBody = seatBodyVisualRect('seat-right', layout.opponentRightBody, canvas);
+  renderSeatCard(ctx, 'seat-hero', heroBody, canvas, RESOURCE_PATHS.heroBodyV13);
+  renderSeatCard(ctx, 'seat-left', leftBody, canvas, RESOURCE_PATHS.leftAiBodyV13);
+  renderSeatCard(ctx, 'seat-right', rightBody, canvas, RESOURCE_PATHS.rightAiBodyV13);
+  renderSeatNameplate(
+    ctx,
+    'seat-hero-nameplate',
+    seatNameplateRect(0, layout.heroNameplate, heroBody, layout, canvas),
+    canvas,
+    0,
+    handCounts[0],
+    landlord,
+  );
+  renderSeatNameplate(
+    ctx,
+    'seat-left-nameplate',
+    seatNameplateRect(1, layout.opponentLeftNameplate, leftBody, layout, canvas),
+    canvas,
+    1,
+    handCounts[1],
+    landlord,
+  );
+  renderSeatNameplate(
+    ctx,
+    'seat-right-nameplate',
+    seatNameplateRect(2, layout.opponentRightNameplate, rightBody, layout, canvas),
+    canvas,
+    2,
+    handCounts[2],
+    landlord,
+  );
 }
 
 function renderSeatCard(
@@ -99,7 +126,7 @@ function renderSeatCard(
   bodyPath: ResourcePath,
 ): void {
   const root = ctx.ensureNode(name, ctx.uiRoot);
-  const center = seatBodyVisualCenter(ctx, name, body, canvas);
+  const center = ctx.rectPoint(body, canvas, 0.5, 0.5);
   root.setPosition(center.x, center.y, 0);
   addUiTransform(root, body.width, body.height);
 
@@ -107,20 +134,68 @@ function renderSeatCard(
   bodyNode.setSiblingIndex(0);
 }
 
-function seatBodyVisualCenter(
-  ctx: GameSceneRendererContext,
+function seatBodyVisualRect(
   name: string,
   body: Rect,
   canvas: { width: number; height: number },
-): { x: number; y: number } {
-  let screenX = body.x + body.width / 2;
-  let screenY = body.y + body.height / 2;
-  if (name === 'seat-left' || name === 'seat-right') {
-    const inward = Math.round(body.width * 0.22);
-    screenX += name === 'seat-left' ? inward : -inward;
-    screenY += Math.round(body.height * 0.045);
+): Rect {
+  let visualWidth = body.width;
+  let visualHeight = body.height;
+  let screenX = body.x + visualWidth / 2;
+  let screenY = body.y + visualHeight / 2;
+  if (name === 'seat-hero') {
+    visualWidth = Math.round(body.width * 0.92);
+    visualHeight = Math.round(body.height * 0.9);
+    screenX = body.x + visualWidth / 2;
+    screenY = body.y + body.height - visualHeight / 2;
   }
-  return ctx.screenPoint(canvas, screenX, screenY);
+  if (name === 'seat-left' || name === 'seat-right') {
+    visualWidth = Math.round(body.width * 0.95);
+    visualHeight = Math.round(body.height * 0.95);
+    const inward = Math.round(body.width * 0.42);
+    screenX += name === 'seat-left' ? inward : -inward;
+    screenY += Math.round(body.height * 0.06);
+  }
+  return {
+    x: clamp(Math.round(screenX - visualWidth / 2), 0, canvas.width - visualWidth),
+    y: clamp(Math.round(screenY - visualHeight / 2), 0, canvas.height - visualHeight),
+    width: visualWidth,
+    height: visualHeight,
+  };
+}
+
+function seatNameplateRect(
+  seat: SeatIndex,
+  nameplate: Rect,
+  body: Rect,
+  layout: TableZones,
+  canvas: { width: number; height: number },
+): Rect {
+  const gap = 8;
+  const width = nameplate.width;
+  const height = nameplate.height;
+  if (seat === 0) {
+    const x = clamp(body.x + body.width + gap, gap, canvas.width - gap - width);
+    const y = clamp(
+      Math.min(body.y + Math.round(body.height * 0.08), layout.heroHandLarge.y - gap - height - 12),
+      gap,
+      canvas.height - gap - height,
+    );
+    return { x, y, width, height };
+  }
+  if (seat === 1) {
+    const clearHeroX = layout.heroBody.x + layout.heroBody.width + gap;
+    const x = clamp(Math.max(body.x + Math.round(body.width * 0.64), clearHeroX), gap, canvas.width - gap - width);
+    const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
+    return { x, y, width, height };
+  }
+  const x = clamp(body.x + body.width - width, gap, canvas.width - gap - width);
+  const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
+  return { x, y, width, height };
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
 }
 
 function renderSeatNameplate(
