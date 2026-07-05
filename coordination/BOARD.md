@@ -802,7 +802,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 
 | ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
 |----|----|----|----|----|----|
-| T-LAYOUT4 | 5 | 纯 UI 布局（种子收紧·分离/不撞/外移上移） | `table-zones.ts` + `test/ui/table-zones-v13.test.ts` + report | — | ready |
+| T-LAYOUT4 | 5 | 纯 UI 布局（种子收紧·分离/不撞/外移上移） | `table-zones.ts` + `test/ui/table-zones-v13.test.ts` + report | — | approved |
 | P-G5-UIFIX | 5 | 游戏内 UI 硬伤整改（editor-evidence·双层视觉预审前置） | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | T-LAYOUT4 | blocked |
 | V4 | 5 | 收口·验证（verify-only·spec `tasks/V4.md`·审查单 R-WAVE5 R:V4） | `reports/V4.report.md` + `reports/V4-*.png` | P-G5-UIFIX | blocked |
 
