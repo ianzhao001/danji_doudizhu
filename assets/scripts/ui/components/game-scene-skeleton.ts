@@ -66,6 +66,7 @@ import {
   renderSeats as renderSeatsSection,
   type GameSceneRendererContext,
 } from './game-scene/seats-renderer';
+import { dropZoneForSeat, seatDisplayName, visualSideForSeat } from './game-scene/seat-display';
 
 const { ccclass, property } = _decorator;
 
@@ -86,6 +87,18 @@ const CARD_PRESS_SCALE = 0.96;
 const CARD_PRESS_OPACITY = 214;
 const TURN_TIMER_MS = 15_000;
 const UI_TICK_RENDER_MS = 180;
+
+interface PlayAreaLayout {
+  screenX: number;
+  screenY: number;
+  width: number;
+  height: number;
+  rows: number;
+  cardsPerRow: number;
+  cardScale: number;
+  spacing: number;
+  rowSpacing: number;
+}
 const SCAFFOLD_NODE_NAMES = [
   'phase-label',
   'landlord-label',
@@ -186,18 +199,15 @@ function suitText(suit: Suit | 'joker'): string {
   }
 }
 
-function seatName(seat: number): string {
-  if (seat === 0) return '你';
-  if (seat === 1) return '左家';
-  if (seat === 2) return '右家';
-  return `座位${seat + 1}`;
-}
-
 function phaseText(phase: string): string {
   if (phase === 'bidding') return '叫地主';
   if (phase === 'playing') return '对局中';
   if (phase === 'settled') return '本局结算';
   return phase;
+}
+
+function clampNumber(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
 }
 
 @ccclass('GameSceneSkeleton')
@@ -493,7 +503,7 @@ export class GameSceneSkeleton extends Component {
     this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, multiplierPos.x - 40, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
     this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 34, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
     this.addLabel(phaseText(phase), phasePos.x + 4, phasePos.y, 16, this.uiRoot!, 112, 24, 'top-phase', BRIGHT_PANEL_TEXT);
-    this.addLabel(topBar.landlordSeat === null ? '地主待定' : `地主${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
+    this.addLabel(topBar.landlordSeat === null ? '地主待定' : `地主${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
     this.addLabel(`倍数×${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, 11, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
     this.addLabel(`手牌${handCount}`, handPos.x + 2, handPos.y, 11, this.uiRoot!, 68, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
   }
@@ -578,14 +588,12 @@ export class GameSceneSkeleton extends Component {
   private renderPlayArea(top: TopPlay | null, layout: TableZones, canvas: { width: number; height: number }): void {
     const area = this.ensureNode('play-area-runtime', this.uiRoot!);
     this.playAreaRoot = area;
-    const dropZone = top?.seat === 1
-      ? layout.dropZoneLeft
-      : top?.seat === 2
-        ? layout.dropZoneRight
-        : layout.dropZoneHero;
-    const pos = this.rectPoint(dropZone, canvas, 0.5, top ? 0.5 : 0.78);
-    const width = Math.min(280, Math.max(128, dropZone.width + (top ? 34 : 0)));
-    const height = Math.min(118, Math.max(42, dropZone.height + (top ? 18 : 0)));
+    const dropZone = top ? dropZoneForSeat(layout, top.seat) : layout.dropZoneHero;
+    const cards = top?.pattern.cards ?? [];
+    const playLayout = this.playAreaLayout(top?.seat ?? HERO_SEAT, cards.length, dropZone, canvas);
+    const pos = this.screenPoint(canvas, playLayout.screenX, playLayout.screenY);
+    const width = playLayout.width;
+    const height = playLayout.height;
     area.setPosition(pos.x, pos.y, 0);
     addUiTransform(area, width, height);
 
@@ -594,18 +602,67 @@ export class GameSceneSkeleton extends Component {
       return;
     }
 
-    const cards = top.pattern.cards;
     const signature = `${top.seat}:${cardsSignature(cards)}`;
     const animate = this.settings.animation && signature !== this.lastPlayAreaSignature;
     this.lastPlayAreaSignature = signature;
-    const maxWidth = Math.max(88, width - 26);
-    const spacing = cards.length <= 1 ? 0 : Math.min(34, (maxWidth - CARD_SIZE.width) / (cards.length - 1));
-    const startX = -((cards.length - 1) * spacing) / 2;
     cards.forEach((card, index) => {
-      const x = startX + index * spacing;
-      const node = this.addDisplayCard(card, x, top ? -12 : -22, area, `play-card-${index}`, animate);
-      if (top?.seat !== HERO_SEAT) node.setScale(0.92, 0.92, 1);
+      const position = this.playCardPosition(index, cards.length, playLayout);
+      const node = this.addDisplayCard(card, position.x, position.y, area, `play-card-${index}`, animate);
+      node.setScale(playLayout.cardScale, playLayout.cardScale, 1);
     });
+  }
+
+  private playAreaLayout(
+    seat: SeatIndex,
+    cardCount: number,
+    dropZone: Rect,
+    canvas: { width: number; height: number },
+  ): PlayAreaLayout {
+    const isSideSeat = seat !== HERO_SEAT;
+    const rows = cardCount >= 8 ? 2 : 1;
+    const cardsPerRow = Math.max(1, Math.ceil(Math.max(1, cardCount) / rows));
+    const maxWidth = isSideSeat
+      ? Math.min(330, Math.max(248, Math.round(canvas.width * 0.37)))
+      : Math.min(360, Math.max(180, dropZone.width + 124));
+    const cardScale = clampNumber(
+      (maxWidth - Math.max(0, cardsPerRow - 1) * 2) / (CARD_SIZE.width * cardsPerRow),
+      rows > 1 ? 0.58 : 0.66,
+      isSideSeat ? 0.88 : 0.94,
+    );
+    const visualCardWidth = CARD_SIZE.width * cardScale;
+    const visualCardHeight = CARD_SIZE.height * cardScale;
+    const spacing = cardCount <= 1 ? 0 : visualCardWidth + 2;
+    const rowSpacing = visualCardHeight + 5;
+    const contentWidth = visualCardWidth * cardsPerRow + Math.max(0, cardsPerRow - 1) * 2;
+    const width = Math.ceil(contentWidth + 28);
+    const height = Math.ceil(visualCardHeight * rows + (rows - 1) * 5 + 34);
+    let screenX = dropZone.x + dropZone.width / 2;
+    if (isSideSeat) {
+      const side = visualSideForSeat(seat);
+      const portraitReserve = Math.max(140, Math.round(canvas.width * 0.18));
+      const safeLeft = side === 'left' ? portraitReserve : Math.round(canvas.width * 0.48);
+      const safeRight = side === 'left' ? Math.round(canvas.width * 0.52) : canvas.width - portraitReserve;
+      const minCenter = safeLeft + width / 2;
+      const maxCenter = safeRight - width / 2;
+      screenX = minCenter <= maxCenter ? clampNumber(screenX, minCenter, maxCenter) : (safeLeft + safeRight) / 2;
+    }
+    const screenY = dropZone.y + dropZone.height / 2 + (rows > 1 ? 8 : 0);
+    return { screenX, screenY, width, height, rows, cardsPerRow, cardScale, spacing, rowSpacing };
+  }
+
+  private playCardPosition(
+    index: number,
+    total: number,
+    layout: PlayAreaLayout,
+  ): { x: number; y: number } {
+    const fullTopRow = total > layout.cardsPerRow ? layout.cardsPerRow : total;
+    const row = index < fullTopRow ? 0 : 1;
+    const indexInRow = row === 0 ? index : index - fullTopRow;
+    const rowCount = row === 0 ? fullTopRow : total - fullTopRow;
+    const startX = -((rowCount - 1) * layout.spacing) / 2;
+    const x = startX + indexInRow * layout.spacing;
+    const y = layout.rows === 1 ? -8 : ((layout.rows - 1) / 2 - row) * layout.rowSpacing - 6;
+    return { x, y };
   }
 
   private renderHud(hand: Card[], layout: TableZones, canvas: { width: number; height: number }): void {
@@ -1225,9 +1282,9 @@ export class GameSceneSkeleton extends Component {
   private eventToastText(event: FlowEvent): string | null {
     if (event.type === 'round') {
       const round = event.event;
-      if (round.type === 'bomb') return `${seatName(round.seat)} 炸弹！`;
-      if (round.type === 'rocket') return `${seatName(round.seat)} 火箭！`;
-      if (round.type === 'pass') return `${seatName(round.seat)} 不要`;
+      if (round.type === 'bomb') return `${seatDisplayName(round.seat)} 炸弹！`;
+      if (round.type === 'rocket') return `${seatDisplayName(round.seat)} 火箭！`;
+      if (round.type === 'pass') return `${seatDisplayName(round.seat)} 不要`;
       return null;
     }
     if (event.type === 'settled') {

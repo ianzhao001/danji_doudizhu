@@ -5,16 +5,10 @@ import { deriveScreenVM } from '../../screen-view';
 import type { TableZones } from '../../table-zones';
 import { addUiTransform, drawPanel } from '../ui-helpers';
 import type { GameSceneRendererContext } from './seats-renderer';
-
-function seatName(seat: number): string {
-  if (seat === 0) return '你';
-  if (seat === 1) return '左家';
-  if (seat === 2) return '右家';
-  return `座位${seat + 1}`;
-}
+import { seatDisplayName } from './seat-display';
 
 function seatNameWithRole(seat: number, isLandlord: boolean): string {
-  return `${seatName(seat)}${isLandlord ? '（地主）' : ''}`;
+  return `${seatDisplayName(seat)}${isLandlord ? '（地主）' : ''}`;
 }
 
 const PANEL_TEXT = new Color(108, 46, 76, 255);
