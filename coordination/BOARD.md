@@ -804,7 +804,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 |----|----|----|----|----|----|
 | T-LAYOUT4 | 5 | 纯 UI 布局（种子收紧·分离/不撞/外移上移） | `table-zones.ts` + `test/ui/table-zones-v13.test.ts` + report | — | done 9d5e70b |
 | P-G5-UIFIX | 5 | 游戏内 UI 硬伤整改（editor-evidence·双层视觉预审前置） | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | T-LAYOUT4 ✅`9d5e70b` | done b13896c |
-| V4 | 5 | 收口·验证（verify-only·spec `tasks/V4.md`·审查单 R-WAVE5 R:V4） | `reports/V4.report.md` + `reports/V4-*.png` | P-G5-UIFIX ✅`b13896c` | merge-claimed:V4 |
+| V4 | 5 | 收口·验证（verify-only·spec `tasks/V4.md`·审查单 R-WAVE5 R:V4） | `reports/V4.report.md` + `reports/V4-*.png` | P-G5-UIFIX ✅`b13896c` | done 14b71f2 |
 
 > **派发顺序**：先做 `ART-GAME-REMAKE` preview 并等用户视觉终审；`T-LAYOUT3` 可并行做纯布局契约；资源导入必须等用户图审通过；`P-G4-UI-REMAKE` 等导入 + 布局均 done 后再做。审查单：`coordination/tasks/R-UI-REMAKE.md`。
 > **种子证据**：`ART-GAME-REMAKE` preview gate 已入 main `ff43262`；`task/T-LAYOUT3` 已建并种红测试 `eca5345`（`test/ui/table-zones-v13.test.ts` 16 红，typecheck 净）。
