@@ -796,6 +796,16 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-G4-UI-REMAKE | 2 | 游戏内 UI 接线（spec 修订版） | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | ART-IMPORT-GAME-REMAKE ✅`8437b85` + T-LAYOUT3 ✅`1b523df` | done 3e6cc0f |
 | V3 | 3 | 收口·验证（verify-only·spec `tasks/V3.md`·审查单 R-UI-REMAKE R:V3） | `reports/V3.report.md` + `reports/V3-*.png` | P-G4-UI-REMAKE ✅`3e6cc0f` | done 3ddfe9c |
 
+### v1.2 第五波 —— UI-FIX（v13 视觉硬伤整改 + 双层视觉预审补关 · 2026-07-05）
+
+> V3 技术门全绿 + `productErrors=[]` 却被**用户视觉终审 7 项全否**（`reports/V3-user-review.md`）。根因=流程漏洞：审查者 GLM 不能看图、执行者只截图不判美观、规划者末端才介入 → 无「长眼睛」角色在用户前把关。用户三裁决（2026-07-05）：①双层视觉预审（执行者自审→规划者审→双达标才交用户，写入 PROTOCOL 能力校准段·`c0-commit`）；②彻底整改；③名字牌**分离不重叠**（推翻规划者早先「贴附允许重叠」裁定）。规划者亲验 4 张 844×390 截图定位全部代码级根因（见 plan）。
+
+| ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
+|----|----|----|----|----|----|
+| T-LAYOUT4 | 5 | 纯 UI 布局（种子收紧·分离/不撞/外移上移） | `table-zones.ts` + `test/ui/table-zones-v13.test.ts` + report | — | ready |
+| P-G5-UIFIX | 5 | 游戏内 UI 硬伤整改（editor-evidence·双层视觉预审前置） | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | T-LAYOUT4 | blocked |
+| V4 | 5 | 收口·验证（verify-only·spec `tasks/V4.md`·审查单 R-WAVE5 R:V4） | `reports/V4.report.md` + `reports/V4-*.png` | P-G5-UIFIX | blocked |
+
 > **派发顺序**：先做 `ART-GAME-REMAKE` preview 并等用户视觉终审；`T-LAYOUT3` 可并行做纯布局契约；资源导入必须等用户图审通过；`P-G4-UI-REMAKE` 等导入 + 布局均 done 后再做。审查单：`coordination/tasks/R-UI-REMAKE.md`。
 > **种子证据**：`ART-GAME-REMAKE` preview gate 已入 main `ff43262`；`task/T-LAYOUT3` 已建并种红测试 `eca5345`（`test/ui/table-zones-v13.test.ts` 16 红，typecheck 净）。
 >
@@ -814,3 +824,5 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > **P-G4-UI-REMAKE 终局裁定 + V3 派发（规划者·2026-07-05）**：P-G4-UI-REMAKE **裁定：确认 done `3e6cc0f`**——审查者 0 打回（5 文件 / +440−134，v13 键/zone 消费全核、非阻断观察 1 项 renderPlayArea 死 label）；**规划者抽查佐证**：game-scene 源文件 27 处 v13/V13 键引用、lobby-scene.ts 零触碰、T-FIX-SETTLE settled 门控 5 处关键代码完整保留（`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES`/`showTransientHud`/相位判断/`event.type===settled`/`deriveAiThinking settled`）。main `29c6ebf` 基线 **141 文件/727 全绿 + typecheck 净**。**V3 正式派发**（spec/tasks/V3.md 已于第四波收编时预置；行翻 ready，分支 `task/V3` 由规划者自 main 建）。V3 是 fourth wave 最后一步——verify-only 固定 seed e2e + 皮肤覆盖 + AI 指标 + PLAYTEST + 待你主观终审。**V3 done + 你终审通过 = v1.2 终点**。
 >
 > **ART-IMPORT-GAME-REMAKE 终局裁定 + P-G4 派发（规划者·2026-07-05）**：ART-IMPORT-GAME-REMAKE **裁定：确认 done `8437b85`**——审查者 0 打回（sha256 逐字节/meta 结构真实性/border/键契约全过，48 文件 +3364 行，回扫无分流项）；**规划者独立抽查佐证**：`-v13` 文件 46 项落位、`asset-keys.ts` 23 处 V13 键**纯增零删行**、lobby-scene.ts 经合并**零触碰**（管线修正②执行到位）。main `d0ad9f3` 基线 **141 文件/727 全绿 + typecheck 净（规划者独立复跑确认）**。**P-G4-UI-REMAKE 正式派发**（两依赖均 done，行翻 `ready`，分支 `task/P-G4-UI-REMAKE` 由规划者自 main 建）：按修订版 spec 接线 v13 新键组 + v13 zone；审查重点（R:P-G4-UI-REMAKE）：相位互斥、per-seat 落点、bottomRevealed、**T-FIX-SETTLE settled 门控不回归**、名字牌贴附/settlementShowcase 相位口径（T-LAYOUT3 仲裁）、四横屏 GUI 证据 + `productErrors=[]` + 再来一局/返回大厅回归链。P-G4 done 后 V3 即解锁（spec 已预置）。
+>
+> **V3 终局裁定 + 第五波 UI-FIX 派发（规划者·2026-07-05）**：V3 **裁定：确认 done `3ddfe9c`**（verify-only 技术门全绿·四横屏 e2e `productErrors=[]`·AI 指标达门）——**但 v1.2 终局条件未满足**：用户视觉终审 7 项**全否**（元素重叠/文字盖文字/btn 背景不包裹文字+对比不足/底牌三张闪烁 bug/角色需外移上移/名字牌不可重叠/手牌中间不要数字/结算观感）。**流程根因裁定**：审查者 GLM 不感知图像、执行者只截图不判美观、规划者末端才看图 → 视觉硬伤穿过所有门。**PROTOCOL 补关（用户裁决①）**：新增「双层视觉预审关」——UI 任务交用户前必过 执行者自审四类硬伤（重叠/对比/包裹/闪烁）→ 规划者视觉审（Opus 逐张看图，不达标打回执行者），双达标才用户审美签收；GLM 仍只核结构不判美观（templates 加执行者自审勾销表）。**名字牌裁定更正**：推翻早先 T-LAYOUT3「名字牌贴附 body 允许重叠」，改为**分离不重叠**（用户裁决③·T-LAYOUT4 种子加 `rectGap≥8` 断言）。**第五波派发**：T-LAYOUT4（纯逻辑·收紧种子：名字牌 vs body 分离、3 HUD 区 vs body 不撞、opponent body 外移上移）→ P-G5-UIFIX（删卡面中心数字 890 行/按钮 9-slice 高度≥60 容 border 24/底牌幂等渲染消闪烁/HUD 消费新区/结算横幅不切叠+暗幕加深/叫抢字提对比/顶部信息条松绑·双层视觉预审前置）→ V4 收口。审查单 `tasks/R-WAVE5.md`。规划者亲验根因表见 plan。main 基线 **141 文件/727 全绿 + typecheck 净（规划者独立复跑确认）**。
