@@ -30,7 +30,7 @@ import { startRoundRuntime, resumeRoundRuntime, type RoundRuntime } from '../../
 import { realClock } from '../../flow/clock';
 import type { FlowEvent } from '../../flow/types';
 import type { GameEvent, ResumeSnapshot, RoundFinishInput, SeatIndex, TopPlay } from '../../game';
-import { type Card, Suit } from '../../rules';
+import { Rank, type Card, Suit } from '../../rules';
 import { cardKey } from '../../rules/guards';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { cardView } from '../card-view';
@@ -47,11 +47,9 @@ import { tableZones, type TableZones } from '../table-zones';
 import { toggleSetting, type ToggleKey } from '../settings-view';
 import {
   RESOURCE_PATHS,
-  cardAssetPath,
   cueAudioPath,
   spriteFrameResourcePath,
   type ResourcePath,
-  suitAssetPath,
 } from '../asset-keys';
 import { addLabel as addUiLabel, addUiTransform } from './ui-helpers';
 import {
@@ -79,11 +77,11 @@ const SESSION_KEYS: SessionKeys = {
   records: STORAGE_KEYS.records,
 };
 
-const CARD_SIZE = { width: 52, height: 74 };
-const CARD_SUIT_ICON_SIZE = 22;
+const CARD_SIZE = { width: 56, height: 82 };
+const CARD_SUIT_ICON_SIZE = 21;
 const HAND_LIFT = 18;
 const LANDSCAPE_CANVAS = { width: 844, height: 390 };
-const GAME_TABLE_BACKGROUND_ASPECT = 1844 / 853;
+const GAME_TABLE_BACKGROUND_ASPECT = 1688 / 780;
 const CARD_PRESS_SCALE = 0.96;
 const CARD_PRESS_OPACITY = 214;
 const TURN_TIMER_MS = 15_000;
@@ -131,6 +129,7 @@ const BRIGHT_PANEL_MUTED = new Color(142, 88, 108, 235);
 const TABLE_TEXT = new Color(74, 70, 72, 235);
 const BUTTON_PRIMARY_TEXT = new Color(116, 36, 82, 255);
 const BUTTON_SECONDARY_TEXT = new Color(34, 78, 132, 255);
+const BUTTON_TERTIARY_TEXT = new Color(118, 70, 38, 255);
 const BUTTON_DISABLED_TEXT = new Color(118, 108, 114, 180);
 
 function sameCard(a: Card, b: Card): boolean {
@@ -354,7 +353,7 @@ export class GameSceneSkeleton extends Component {
       selectedCards: this.selected,
       recentEvents: this.recentEvents,
       layoutOpts: {
-        containerWidth: canvas.width,
+        containerWidth: layout.heroHandLarge.width,
         containerHeight: canvas.height,
         cardWidth: CARD_SIZE.width,
         liftOffset: HAND_LIFT,
@@ -383,7 +382,7 @@ export class GameSceneSkeleton extends Component {
     if (showTransientHud) this.renderTurnTimer(layout, canvas);
     if (phase === 'playing') this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, layout, canvas);
     if (showTransientHud) this.renderToasts(layout, canvas);
-    this.renderResult(vm.result, canvas);
+    this.renderResult(vm.result, handCounts, layout, canvas);
     if (!vm.result) {
       this.renderPauseControl(layout, canvas);
       this.renderPauseOverlay(canvas);
@@ -441,10 +440,10 @@ export class GameSceneSkeleton extends Component {
     const landlordPos = this.rectPoint(layout.infoStrip, canvas, 0.13, 0.55);
     const multiplierPos = this.rectPoint(layout.infoStrip, canvas, 0.5, 0.55);
     const handPos = this.rectPoint(layout.infoStrip, canvas, 0.87, 0.55);
-    this.addSprite(RESOURCE_PATHS.badgeTurn, phasePos.x - 54, phasePos.y, 24, 24, this.uiRoot!, 'top-phase-badge');
-    this.addSprite(RESOURCE_PATHS.seatNameplate, landlordPos.x, landlordPos.y, 74, 24, this.uiRoot!, 'top-landlord-nameplate', true);
-    this.addSprite(RESOURCE_PATHS.badgeMultiplier, multiplierPos.x - 31, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
-    this.addSprite(RESOURCE_PATHS.badgeTurn, handPos.x - 28, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
+    this.addSprite(RESOURCE_PATHS.badgeTimerV13, phasePos.x - 54, phasePos.y, 24, 24, this.uiRoot!, 'top-phase-badge');
+    this.addSprite(RESOURCE_PATHS.seatNameplateV13, landlordPos.x, landlordPos.y, 74, 24, this.uiRoot!, 'top-landlord-nameplate', true);
+    this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, multiplierPos.x - 31, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
+    this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 28, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
     this.addLabel(phaseText(phase), phasePos.x, phasePos.y, 18, this.uiRoot!, 140, 30, 'top-phase', BRIGHT_PANEL_TEXT);
     this.addLabel(topBar.landlordSeat === null ? '地主待定' : `地主${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 70, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
     this.addLabel(`倍数×${topBar.multiplier}`, multiplierPos.x + 5, multiplierPos.y, 11, this.uiRoot!, 64, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
@@ -487,13 +486,13 @@ export class GameSceneSkeleton extends Component {
   private renderSeats(
     handCounts: [number, number, number],
     landlord: number | null,
-    layout: TableRegions,
+    layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
     renderSeatsSection(this.rendererContext(), handCounts, landlord, layout, canvas);
   }
 
-  private renderSeatFeedback(layout: TableRegions, canvas: { width: number; height: number }): void {
+  private renderSeatFeedback(layout: TableZones, canvas: { width: number; height: number }): void {
     renderSeatFeedbackSection(this.rendererContext(), layout, canvas);
   }
 
@@ -504,24 +503,24 @@ export class GameSceneSkeleton extends Component {
     addUiTransform(dock, layout.bottomCardsDock.width, layout.bottomCardsDock.height);
     const skinWidth = Math.max(150, Math.min(220, layout.bottomCardsDock.width + 18));
     const skinHeight = Math.max(48, layout.bottomCardsDock.height + 20);
-    this.addSprite(RESOURCE_PATHS.bottomCardsDock, 0, 0, skinWidth, skinHeight, dock, 'bottom-cards-dock-skin', true);
+    this.addSprite(RESOURCE_PATHS.bottomCardsDockV13, 0, 0, skinWidth, skinHeight, dock, 'bottom-cards-dock-skin', true);
 
-    const spacing = 28;
+    const spacing = 30;
     const startX = -spacing;
     for (let index = 0; index < 3; index += 1) {
       const x = startX + index * spacing;
       if (cards?.[index]) {
         const cardNode = this.addDisplayCard(cards[index], x, 0, dock, `bottom-card-${index}`, this.settings.animation);
-        cardNode.setScale(0.42, 0.42, 1);
+        cardNode.setScale(0.44, 0.44, 1);
         continue;
       }
       const back = this.ensureNode(`bottom-card-back-${index}`, dock);
       back.setPosition(x, 0, 0);
-      addUiTransform(back, 24, 34);
+      addUiTransform(back, 26, 38);
       const sprite = back.getComponent(Sprite) ?? back.addComponent(Sprite);
       sprite.type = Sprite.Type.SIMPLE;
       sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-      this.loadSprite(RESOURCE_PATHS.cardBack, sprite);
+      this.loadSprite(RESOURCE_PATHS.cardBackV13, sprite);
     }
   }
 
@@ -539,7 +538,7 @@ export class GameSceneSkeleton extends Component {
     area.setPosition(pos.x, pos.y, 0);
     addUiTransform(area, width, height);
 
-    if (showLabel) {
+    if (showLabel && top) {
       const labelText = top ? `${seatName(top.seat)}·已出牌` : '自由出牌';
       const label = this.addLabel(labelText, 0, top ? height / 2 - 12 : 34, top ? 13 : 18, area, Math.min(170, width), top ? 22 : 34, 'play-area-label', TABLE_TEXT);
       label.lineHeight = 24;
@@ -563,11 +562,11 @@ export class GameSceneSkeleton extends Component {
     });
   }
 
-  private renderHud(hand: Card[], layout: TableRegions, canvas: { width: number; height: number }): void {
+  private renderHud(hand: Card[], layout: TableZones, canvas: { width: number; height: number }): void {
     renderHudSection(this.rendererContext(), hand, layout, canvas);
   }
 
-  private renderCardMemory(hand: Card[], layout: TableRegions, canvas: { width: number; height: number }): void {
+  private renderCardMemory(hand: Card[], layout: TableZones, canvas: { width: number; height: number }): void {
     renderCardMemorySection(this.rendererContext(), hand, layout, canvas);
   }
 
@@ -588,15 +587,15 @@ export class GameSceneSkeleton extends Component {
     canvas: { width: number; height: number },
   ): void {
     if (hand.length === 0) {
-      const title = this.screenPoint(canvas, canvas.width / 2, layout.playerHand.y + Math.min(24, layout.playerHand.height * 0.15));
+      const title = this.screenPoint(canvas, layout.heroHandLarge.x + layout.heroHandLarge.width / 2, layout.heroHandLarge.y + Math.min(24, layout.heroHandLarge.height * 0.22));
       this.addLabel('玩家手牌', title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title', TABLE_TEXT);
     }
     const handSignature = cardsSignature(hand.map((slot) => slot.card));
     const animateDeal = this.settings.animation && handSignature !== this.lastHandSignature;
     const nextSelectedKeys = new Set<string>();
-    const handTopY = layout.playerHand.y + Math.min(52, layout.playerHand.height * 0.33);
+    const handTopY = layout.heroHandLarge.y + Math.round(layout.heroHandLarge.height * 0.54);
     hand.forEach((slot, index) => {
-      const screenX = layout.playerHand.x + slot.x + CARD_SIZE.width / 2;
+      const screenX = layout.heroHandLarge.x + slot.x + CARD_SIZE.width / 2;
       const screenY = handTopY + slot.y;
       const { x, y } = this.screenPoint(canvas, screenX, screenY);
       this.addCard(slot.card, x, y, slot.selected, index, hand.length, animateDeal);
@@ -633,7 +632,7 @@ export class GameSceneSkeleton extends Component {
 
   private renderAdvisor(
     snapshot: ReturnType<RoundRuntime['currentSnapshot']> | undefined,
-    layout: TableRegions,
+    layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
     renderAdvisorSection(this.rendererContext(), snapshot, layout, canvas);
@@ -659,8 +658,13 @@ export class GameSceneSkeleton extends Component {
     });
   }
 
-  private renderResult(result: ReturnType<typeof deriveScreenVM>['result'], canvas: { width: number; height: number }): void {
-    renderResultSection(this.rendererContext(), result, canvas);
+  private renderResult(
+    result: ReturnType<typeof deriveScreenVM>['result'],
+    handCounts: [number, number, number],
+    layout: TableZones,
+    canvas: { width: number; height: number },
+  ): void {
+    renderResultSection(this.rendererContext(), result, handCounts, layout, canvas);
   }
 
   private renderPauseControl(layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -854,7 +858,7 @@ export class GameSceneSkeleton extends Component {
     addUiTransform(bgNode, CARD_SIZE.width, CARD_SIZE.height);
     const sprite = bgNode.getComponent(Sprite) ?? bgNode.addComponent(Sprite);
     this.configureCardSprite(sprite);
-    this.loadSprite(cardAssetPath(view.assetKey) ?? RESOURCE_PATHS.cardTemplate, sprite);
+    this.loadSprite(this.cardSpritePath(card), sprite);
     node.off(Node.EventType.TOUCH_START);
     node.off(Node.EventType.TOUCH_END);
     node.off(Node.EventType.TOUCH_CANCEL);
@@ -885,7 +889,7 @@ export class GameSceneSkeleton extends Component {
       const rankLabel = this.addLabel(view.rankLabel, 0, 7, 18, node, CARD_SIZE.width - 12, 24, 'card-face-rank');
       rankLabel.lineHeight = 21;
       rankLabel.color = faceColor;
-      const suitPath = suitAssetPath(view.suitKey);
+      const suitPath = this.suitSpritePath(view.suitKey);
       if (suitPath) {
         const suitNode = this.ensureNode('card-suit-icon', node);
         suitNode.setPosition(0, -17, 0);
@@ -902,6 +906,27 @@ export class GameSceneSkeleton extends Component {
     return suit === Suit.Heart || suit === Suit.Diamond
       ? new Color(204, 65, 92, 255)
       : new Color(54, 55, 66, 255);
+  }
+
+  private cardSpritePath(card: Card): ResourcePath {
+    if (card.suit === Suit.Joker && card.rank === Rank.SmallJoker) return RESOURCE_PATHS.jokerSmallV13;
+    if (card.suit === Suit.Joker && card.rank === Rank.BigJoker) return RESOURCE_PATHS.jokerBigV13;
+    return RESOURCE_PATHS.cardTemplateV13;
+  }
+
+  private suitSpritePath(suit: Suit | 'joker'): ResourcePath | null {
+    switch (suit) {
+      case Suit.Spade:
+        return RESOURCE_PATHS.suitSpadeV13;
+      case Suit.Heart:
+        return RESOURCE_PATHS.suitHeartV13;
+      case Suit.Club:
+        return RESOURCE_PATHS.suitClubV13;
+      case Suit.Diamond:
+        return RESOURCE_PATHS.suitDiamondV13;
+      default:
+        return null;
+    }
   }
 
   private configureCardSprite(sprite: Sprite): void {
@@ -1005,7 +1030,8 @@ export class GameSceneSkeleton extends Component {
   }
 
   private buttonSkinPath(name: string, enabled: boolean): ResourcePath {
-    if (!enabled) return RESOURCE_PATHS.buttonDisabled;
+    if (!enabled) return RESOURCE_PATHS.btnDisabledV13;
+    if (name === 'action-hint' || name.startsWith('pause-setting-')) return RESOURCE_PATHS.btnTertiaryV13;
     if (
       name === 'action-play' ||
       name === 'bid-call' ||
@@ -1013,16 +1039,17 @@ export class GameSceneSkeleton extends Component {
       name === 'result-new' ||
       name === 'pause-continue'
     ) {
-      return RESOURCE_PATHS.buttonPrimary;
+      return RESOURCE_PATHS.btnPrimaryV13;
     }
-    return RESOURCE_PATHS.buttonSecondary;
+    return RESOURCE_PATHS.btnSecondaryV13;
   }
 
   private buttonTextColor(name: string, enabled: boolean): Color {
     if (!enabled) return BUTTON_DISABLED_TEXT;
-    return this.buttonSkinPath(name, enabled) === RESOURCE_PATHS.buttonPrimary
-      ? BUTTON_PRIMARY_TEXT
-      : BUTTON_SECONDARY_TEXT;
+    const skin = this.buttonSkinPath(name, enabled);
+    if (skin === RESOURCE_PATHS.btnPrimaryV13) return BUTTON_PRIMARY_TEXT;
+    if (skin === RESOURCE_PATHS.btnTertiaryV13) return BUTTON_TERTIARY_TEXT;
+    return BUTTON_SECONDARY_TEXT;
   }
 
   private buttonIconPath(name: string): ResourcePath | null {
@@ -1395,7 +1422,7 @@ export class GameSceneSkeleton extends Component {
     const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
     sprite.type = Sprite.Type.SIMPLE;
     sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-    this.loadSprite(RESOURCE_PATHS.gameTableBg, sprite);
+    this.loadSprite(RESOURCE_PATHS.gameTableBgV13, sprite);
   }
 
   private setCardPressed(node: Node, pressed: boolean): void {

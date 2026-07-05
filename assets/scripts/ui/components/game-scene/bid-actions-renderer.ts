@@ -19,11 +19,11 @@ export function renderBidding(
   const prompt = ctx.rectPoint(layout.statusLine, canvas, 0.5, 0.5);
   ctx.addLabel(bidding.prompt, prompt.x, prompt.y, 16, ctx.uiRoot, layout.statusLine.width, layout.statusLine.height, 'bidding-prompt');
   bidding.buttons.forEach((button, index) => {
-    const spacing = Math.min(118, layout.actionBar.width / Math.max(1, bidding.buttons.length));
-    const screenX = layout.actionBar.x + layout.actionBar.width / 2 + (index - (bidding.buttons.length - 1) / 2) * spacing;
-    const screenY = layout.actionBar.y + layout.actionBar.height * 0.5;
+    const spacing = Math.min(126, layout.tableActionBar.width / Math.max(1, bidding.buttons.length));
+    const screenX = layout.tableActionBar.x + layout.tableActionBar.width / 2 + (index - (bidding.buttons.length - 1) / 2) * spacing;
+    const screenY = layout.tableActionBar.y + layout.tableActionBar.height * 0.5;
     const pos = ctx.screenPoint(canvas, screenX, screenY);
-    ctx.addButton(button.label, pos.x, pos.y, 106, 36, button.enabled, () => {
+    ctx.addButton(button.label, pos.x, pos.y, 108, Math.min(46, layout.tableActionBar.height), button.enabled, () => {
       if (!button.enabled) return;
       void ctx.submitBid(button.id);
     }, ctx.uiRoot, `bid-${button.id}`);
@@ -38,13 +38,14 @@ export function renderActions(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
-  const y = layout.actionBar.y + layout.actionBar.height * 0.5;
-  const playPos = ctx.screenPoint(canvas, layout.actionBar.x + layout.actionBar.width * 0.1, y);
-  const passPos = ctx.screenPoint(canvas, layout.actionBar.x + layout.actionBar.width * 0.5, y);
-  const hintPos = ctx.screenPoint(canvas, layout.actionBar.x + layout.actionBar.width * 0.9, y);
-  ctx.addButton('出牌', playPos.x, playPos.y, 80, 34, play, () => void ctx.submitPlay(), ctx.uiRoot, 'action-play');
-  ctx.addButton('不要', passPos.x, passPos.y, 80, 34, pass, () => void ctx.submitPass(), ctx.uiRoot, 'action-pass');
-  ctx.addButton('提示', hintPos.x, hintPos.y, 80, 34, hint, () => ctx.applyHint(), ctx.uiRoot, 'action-hint');
+  const y = layout.tableActionBar.y + layout.tableActionBar.height * 0.5;
+  const playPos = ctx.screenPoint(canvas, layout.tableActionBar.x + layout.tableActionBar.width * 0.16, y);
+  const passPos = ctx.screenPoint(canvas, layout.tableActionBar.x + layout.tableActionBar.width * 0.5, y);
+  const hintPos = ctx.screenPoint(canvas, layout.tableActionBar.x + layout.tableActionBar.width * 0.84, y);
+  const buttonHeight = Math.min(46, layout.tableActionBar.height);
+  ctx.addButton('出牌', playPos.x, playPos.y, 86, buttonHeight, play, () => void ctx.submitPlay(), ctx.uiRoot, 'action-play');
+  ctx.addButton('不要', passPos.x, passPos.y, 86, buttonHeight, pass, () => void ctx.submitPass(), ctx.uiRoot, 'action-pass');
+  ctx.addButton('提示', hintPos.x, hintPos.y, 86, buttonHeight, hint, () => ctx.applyHint(), ctx.uiRoot, 'action-hint');
 }
 
 export function renderStatus(
@@ -72,7 +73,7 @@ export function renderTurnTimer(
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, width, height);
   drawPanel(root, width, height, new Color(34, 39, 52, 166));
-  ctx.addSprite(RESOURCE_PATHS.badgeCountdownRing, -width / 2 + 14, 0, 18, 18, root, 'turn-timer-badge');
+  ctx.addSprite(RESOURCE_PATHS.badgeTimerV13, -width / 2 + 14, 0, 20, 20, root, 'turn-timer-badge');
 
   const barWidth = width - 54;
   const barHeight = 4;
