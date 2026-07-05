@@ -83,39 +83,65 @@ export function renderSeats(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
-  renderSeatCard(ctx, 'seat-hero', layout.heroBody, layout.heroNameplate, canvas, 0, handCounts[0], landlord, RESOURCE_PATHS.heroBodyV13);
-  renderSeatCard(ctx, 'seat-left', layout.opponentLeftBody, layout.opponentLeftNameplate, canvas, 1, handCounts[1], landlord, RESOURCE_PATHS.leftAiBodyV13);
-  renderSeatCard(ctx, 'seat-right', layout.opponentRightBody, layout.opponentRightNameplate, canvas, 2, handCounts[2], landlord, RESOURCE_PATHS.rightAiBodyV13);
+  renderSeatCard(ctx, 'seat-hero', layout.heroBody, canvas, RESOURCE_PATHS.heroBodyV13);
+  renderSeatCard(ctx, 'seat-left', layout.opponentLeftBody, canvas, RESOURCE_PATHS.leftAiBodyV13);
+  renderSeatCard(ctx, 'seat-right', layout.opponentRightBody, canvas, RESOURCE_PATHS.rightAiBodyV13);
+  renderSeatNameplate(ctx, 'seat-hero-nameplate', layout.heroNameplate, canvas, 0, handCounts[0], landlord);
+  renderSeatNameplate(ctx, 'seat-left-nameplate', layout.opponentLeftNameplate, canvas, 1, handCounts[1], landlord);
+  renderSeatNameplate(ctx, 'seat-right-nameplate', layout.opponentRightNameplate, canvas, 2, handCounts[2], landlord);
 }
 
 function renderSeatCard(
   ctx: GameSceneRendererContext,
   name: string,
   body: Rect,
-  nameplate: Rect,
   canvas: { width: number; height: number },
-  seat: SeatIndex,
-  handCount: number,
-  landlord: number | null,
   bodyPath: ResourcePath,
 ): void {
   const root = ctx.ensureNode(name, ctx.uiRoot);
-  const center = ctx.rectPoint(body, canvas, 0.5, 0.5);
+  const center = seatBodyVisualCenter(ctx, name, body, canvas);
   root.setPosition(center.x, center.y, 0);
   addUiTransform(root, body.width, body.height);
 
   const bodyNode = ctx.addSprite(bodyPath, 0, 0, body.width, body.height, root, 'seat-body');
   bodyNode.setSiblingIndex(0);
+}
 
+function seatBodyVisualCenter(
+  ctx: GameSceneRendererContext,
+  name: string,
+  body: Rect,
+  canvas: { width: number; height: number },
+): { x: number; y: number } {
+  let screenX = body.x + body.width / 2;
+  let screenY = body.y + body.height / 2;
+  if (name === 'seat-left' || name === 'seat-right') {
+    const inward = Math.round(body.width * 0.22);
+    screenX += name === 'seat-left' ? inward : -inward;
+    screenY += Math.round(body.height * 0.045);
+  }
+  return ctx.screenPoint(canvas, screenX, screenY);
+}
+
+function renderSeatNameplate(
+  ctx: GameSceneRendererContext,
+  name: string,
+  nameplate: Rect,
+  canvas: { width: number; height: number },
+  seat: SeatIndex,
+  handCount: number,
+  landlord: number | null,
+): void {
   const roleKnown = landlord !== null;
   const isLandlord = landlord === seat;
   const nameplateCenter = ctx.rectPoint(nameplate, canvas, 0.5, 0.5);
-  const nameplateX = nameplateCenter.x - center.x;
-  const nameplateY = nameplateCenter.y - center.y;
+  const root = ctx.ensureNode(name, ctx.uiRoot);
+  root.setPosition(nameplateCenter.x, nameplateCenter.y, 0);
+  addUiTransform(root, nameplate.width, nameplate.height);
   const plate = ctx.addSprite(
     RESOURCE_PATHS.seatNameplateV13,
-    nameplateX,
-    nameplateY,
+    0,
+    0,
     nameplate.width,
     nameplate.height,
     root,
@@ -126,9 +152,9 @@ function renderSeatCard(
 
   const roleText = roleKnown ? (isLandlord ? '地主' : '农民') : '待定';
   const labelWidth = Math.max(82, nameplate.width - 22);
-  const label = ctx.addLabel(`${seatName(seat)}  ${handCount}张`, nameplateX, nameplateY + 4, 13, root, labelWidth, 18, 'seat-name-label', NAMEPLATE_TEXT);
+  const label = ctx.addLabel(`${seatName(seat)}  ${handCount}张`, 0, 4, 13, root, labelWidth, 18, 'seat-name-label', NAMEPLATE_TEXT);
   label.lineHeight = 16;
-  const role = ctx.addLabel(roleText, nameplateX, nameplateY - 10, 11, root, labelWidth, 16, 'seat-role-label', NAMEPLATE_MUTED);
+  const role = ctx.addLabel(roleText, 0, -10, 11, root, labelWidth, 16, 'seat-role-label', NAMEPLATE_MUTED);
   role.lineHeight = 14;
 }
 
@@ -157,7 +183,7 @@ function renderLastActions(
 
 function renderAiThinking(
   ctx: GameSceneRendererContext,
-  layout: TableRegions,
+  layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
   const thinking = ctx.aiThinkingView();
@@ -195,8 +221,8 @@ export function lastActionPosition(
     const pos = ctx.screenPoint(canvas, canvas.width / 2, Math.max(layout.tableActionBar.y - 18, layout.heroHandLarge.y - 42));
     return { ...pos, width: 146 };
   }
-  const rect = seat === 1 ? layout.opponentLeftBody : layout.opponentRightBody;
-  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, rect.y + rect.height * 0.12);
+  const rect = seat === 1 ? layout.dropZoneLeft : layout.dropZoneRight;
+  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(22, rect.y - 12));
   return { ...pos, width: 124 };
 }
 
@@ -206,7 +232,7 @@ export function aiThinkingPosition(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): { x: number; y: number; width: number } {
-  const rect = seat === 1 ? layout.opponentLeftBody : layout.opponentRightBody;
-  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, rect.y + rect.height * 0.24);
+  const rect = seat === 1 ? layout.dropZoneLeft : layout.dropZoneRight;
+  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(24, rect.y - 16));
   return { ...pos, width: 126 };
 }

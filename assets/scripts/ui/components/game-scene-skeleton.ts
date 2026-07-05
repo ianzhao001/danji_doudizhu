@@ -128,9 +128,40 @@ const BRIGHT_PANEL_TEXT = new Color(108, 46, 76, 255);
 const BRIGHT_PANEL_MUTED = new Color(142, 88, 108, 235);
 const TABLE_TEXT = new Color(74, 70, 72, 235);
 const BUTTON_PRIMARY_TEXT = new Color(116, 36, 82, 255);
-const BUTTON_SECONDARY_TEXT = new Color(34, 78, 132, 255);
-const BUTTON_TERTIARY_TEXT = new Color(118, 70, 38, 255);
-const BUTTON_DISABLED_TEXT = new Color(118, 108, 114, 180);
+const BUTTON_SECONDARY_TEXT = new Color(255, 255, 255, 255);
+const BUTTON_TERTIARY_TEXT = new Color(116, 68, 28, 255);
+const BUTTON_DISABLED_TEXT = new Color(86, 72, 82, 220);
+const RUNTIME_PRELOAD_SPRITES: readonly ResourcePath[] = [
+  RESOURCE_PATHS.gameTableBgV13,
+  RESOURCE_PATHS.heroBodyV13,
+  RESOURCE_PATHS.leftAiBodyV13,
+  RESOURCE_PATHS.rightAiBodyV13,
+  RESOURCE_PATHS.cardTemplateV13,
+  RESOURCE_PATHS.cardBackV13,
+  RESOURCE_PATHS.suitSpadeV13,
+  RESOURCE_PATHS.suitHeartV13,
+  RESOURCE_PATHS.suitClubV13,
+  RESOURCE_PATHS.suitDiamondV13,
+  RESOURCE_PATHS.jokerSmallV13,
+  RESOURCE_PATHS.jokerBigV13,
+  RESOURCE_PATHS.btnPrimaryV13,
+  RESOURCE_PATHS.btnSecondaryV13,
+  RESOURCE_PATHS.btnTertiaryV13,
+  RESOURCE_PATHS.btnDisabledV13,
+  RESOURCE_PATHS.seatNameplateV13,
+  RESOURCE_PATHS.bottomCardsDockV13,
+  RESOURCE_PATHS.settlementBannerWinV13,
+  RESOURCE_PATHS.settlementBannerLoseV13,
+  RESOURCE_PATHS.settlementPanelV13,
+  RESOURCE_PATHS.badgeMultiplierV13,
+  RESOURCE_PATHS.badgeTimerV13,
+  RESOURCE_PATHS.iconPlay,
+  RESOURCE_PATHS.iconPass,
+  RESOURCE_PATHS.iconHint,
+  RESOURCE_PATHS.iconBid,
+  RESOURCE_PATHS.iconBack,
+  RESOURCE_PATHS.iconSettings,
+];
 
 function sameCard(a: Card, b: Card): boolean {
   return a.rank === b.rank && a.suit === b.suit;
@@ -217,6 +248,7 @@ export class GameSceneSkeleton extends Component {
   private readonly spriteFrames = new Map<string, SpriteFrame>();
   private lastHandSignature = '';
   private lastPlayAreaSignature = '';
+  private lastBottomCardsSignature = '';
   private renderedSelectedCardKeys = new Set<string>();
   private animatedToastIds = new Set<number>();
   private liveRenderNodes: Set<Node> | null = null;
@@ -227,6 +259,7 @@ export class GameSceneSkeleton extends Component {
     this.hideSceneScaffold();
     this.audioSource = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
     this.uiRoot = this.ensureNode('runtime-ui', this.node);
+    this.preloadRuntimeSprites();
     this.startGame(false);
   }
 
@@ -235,6 +268,16 @@ export class GameSceneSkeleton extends Component {
     this.runtime?.dispose();
     this.unsubscribe = null;
     this.runtime = null;
+  }
+
+  private preloadRuntimeSprites(): void {
+    for (const path of RUNTIME_PRELOAD_SPRITES) {
+      if (this.spriteFrames.has(path)) continue;
+      resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
+        if (error || !frame) return;
+        this.spriteFrames.set(path, frame);
+      });
+    }
   }
 
   update(dt: number): void {
@@ -283,6 +326,7 @@ export class GameSceneSkeleton extends Component {
     this.statusText = '';
     this.lastHandSignature = '';
     this.lastPlayAreaSignature = '';
+    this.lastBottomCardsSignature = '';
     this.renderedSelectedCardKeys.clear();
 
     const storage = cocosStorage();
@@ -320,7 +364,10 @@ export class GameSceneSkeleton extends Component {
     this.fullGameEvents = resume?.events.slice() ?? [];
     this.runtime = resume ? resumeRoundRuntime(resume, config) : startRoundRuntime(config);
     this.unsubscribe = this.runtime.onEvent((event) => {
-      if (event.type === 'deal' || event.type === 'redeal') this.revealedBottomCards = null;
+      if (event.type === 'deal' || event.type === 'redeal') {
+        this.revealedBottomCards = null;
+        this.lastBottomCardsSignature = '';
+      }
       if (event.type === 'bottomRevealed') this.revealedBottomCards = event.cards.slice();
       if (event.type === 'round') this.fullGameEvents.push(event.event);
       this.recentEvents.push(event);
@@ -353,7 +400,7 @@ export class GameSceneSkeleton extends Component {
       selectedCards: this.selected,
       recentEvents: this.recentEvents,
       layoutOpts: {
-        containerWidth: layout.heroHandLarge.width,
+        containerWidth: this.handLayoutFrame(canvas).width,
         containerHeight: canvas.height,
         cardWidth: CARD_SIZE.width,
         liftOffset: HAND_LIFT,
@@ -373,12 +420,12 @@ export class GameSceneSkeleton extends Component {
     this.renderSeats(handCounts, snapshot?.landlord ?? null, layout, canvas);
     if (showTransientHud) this.renderSeatFeedback(layout, canvas);
     this.renderBottomCardsDock(phase === 'bidding' ? null : this.revealedBottomCards, layout, canvas);
-    this.renderPlayArea(snapshot?.top ?? null, layout, canvas, showTransientHud);
+    this.renderPlayArea(snapshot?.top ?? null, layout, canvas);
     if (showTransientHud) this.renderHud(snapshot?.viewerHand ?? [], layout, canvas);
     this.renderHand(vm.hand, layout, canvas);
     if (showTransientHud) this.renderAdvisor(snapshot, layout, canvas);
     if (phase === 'bidding') this.renderBidding(vm.bidding, layout, canvas);
-    if (showTransientHud) this.renderStatus(this.statusText || (phase === 'bidding' ? '叫抢阶段' : ''), layout, canvas);
+    if (showTransientHud && phase !== 'bidding') this.renderStatus(this.statusText, layout, canvas);
     if (showTransientHud) this.renderTurnTimer(layout, canvas);
     if (phase === 'playing') this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, layout, canvas);
     if (showTransientHud) this.renderToasts(layout, canvas);
@@ -436,18 +483,19 @@ export class GameSceneSkeleton extends Component {
     layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
-    const phasePos = this.rectPoint(layout.topBar, canvas, 0.5, 0.625);
-    const landlordPos = this.rectPoint(layout.infoStrip, canvas, 0.13, 0.55);
-    const multiplierPos = this.rectPoint(layout.infoStrip, canvas, 0.5, 0.55);
-    const handPos = this.rectPoint(layout.infoStrip, canvas, 0.87, 0.55);
-    this.addSprite(RESOURCE_PATHS.badgeTimerV13, phasePos.x - 54, phasePos.y, 24, 24, this.uiRoot!, 'top-phase-badge');
-    this.addSprite(RESOURCE_PATHS.seatNameplateV13, landlordPos.x, landlordPos.y, 74, 24, this.uiRoot!, 'top-landlord-nameplate', true);
-    this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, multiplierPos.x - 31, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
-    this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 28, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
-    this.addLabel(phaseText(phase), phasePos.x, phasePos.y, 18, this.uiRoot!, 140, 30, 'top-phase', BRIGHT_PANEL_TEXT);
-    this.addLabel(topBar.landlordSeat === null ? '地主待定' : `地主${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 70, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
-    this.addLabel(`倍数×${topBar.multiplier}`, multiplierPos.x + 5, multiplierPos.y, 11, this.uiRoot!, 64, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
-    this.addLabel(`手牌${handCount}`, handPos.x + 4, handPos.y, 11, this.uiRoot!, 62, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
+    const topY = Math.max(14, layout.topBar.y + layout.topBar.height * 0.52);
+    const phasePos = this.screenPoint(canvas, 70, topY);
+    const landlordPos = this.screenPoint(canvas, 178, topY);
+    const multiplierPos = this.screenPoint(canvas, canvas.width - 182, topY);
+    const handPos = this.screenPoint(canvas, canvas.width - 82, topY);
+    this.addSprite(RESOURCE_PATHS.badgeTimerV13, phasePos.x - 45, phasePos.y, 22, 22, this.uiRoot!, 'top-phase-badge');
+    this.addSprite(RESOURCE_PATHS.seatNameplateV13, landlordPos.x, landlordPos.y, 92, 24, this.uiRoot!, 'top-landlord-nameplate', true);
+    this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, multiplierPos.x - 40, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
+    this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 34, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
+    this.addLabel(phaseText(phase), phasePos.x + 4, phasePos.y, 16, this.uiRoot!, 112, 24, 'top-phase', BRIGHT_PANEL_TEXT);
+    this.addLabel(topBar.landlordSeat === null ? '地主待定' : `地主${seatName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
+    this.addLabel(`倍数×${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, 11, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
+    this.addLabel(`手牌${handCount}`, handPos.x + 2, handPos.y, 11, this.uiRoot!, 68, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
   }
 
   private renderRuntimeSettings(layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -507,10 +555,13 @@ export class GameSceneSkeleton extends Component {
 
     const spacing = 30;
     const startX = -spacing;
+    const signature = cards ? cardsSignature(cards) : 'backs';
+    const animateReveal = Boolean(cards) && this.settings.animation && signature !== this.lastBottomCardsSignature;
+    this.lastBottomCardsSignature = signature;
     for (let index = 0; index < 3; index += 1) {
       const x = startX + index * spacing;
       if (cards?.[index]) {
-        const cardNode = this.addDisplayCard(cards[index], x, 0, dock, `bottom-card-${index}`, this.settings.animation);
+        const cardNode = this.addDisplayCard(cards[index], x, 0, dock, `bottom-card-${index}`, animateReveal);
         cardNode.setScale(0.44, 0.44, 1);
         continue;
       }
@@ -524,7 +575,7 @@ export class GameSceneSkeleton extends Component {
     }
   }
 
-  private renderPlayArea(top: TopPlay | null, layout: TableZones, canvas: { width: number; height: number }, showLabel = true): void {
+  private renderPlayArea(top: TopPlay | null, layout: TableZones, canvas: { width: number; height: number }): void {
     const area = this.ensureNode('play-area-runtime', this.uiRoot!);
     this.playAreaRoot = area;
     const dropZone = top?.seat === 1
@@ -538,11 +589,6 @@ export class GameSceneSkeleton extends Component {
     area.setPosition(pos.x, pos.y, 0);
     addUiTransform(area, width, height);
 
-    if (showLabel && top) {
-      const labelText = top ? `${seatName(top.seat)}·已出牌` : '自由出牌';
-      const label = this.addLabel(labelText, 0, top ? height / 2 - 12 : 34, top ? 13 : 18, area, Math.min(170, width), top ? 22 : 34, 'play-area-label', TABLE_TEXT);
-      label.lineHeight = 24;
-    }
     if (!top) {
       this.lastPlayAreaSignature = '';
       return;
@@ -586,8 +632,9 @@ export class GameSceneSkeleton extends Component {
     layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
+    const handFrame = this.handLayoutFrame(canvas);
     if (hand.length === 0) {
-      const title = this.screenPoint(canvas, layout.heroHandLarge.x + layout.heroHandLarge.width / 2, layout.heroHandLarge.y + Math.min(24, layout.heroHandLarge.height * 0.22));
+      const title = this.screenPoint(canvas, handFrame.x + handFrame.width / 2, layout.heroHandLarge.y + Math.min(24, layout.heroHandLarge.height * 0.22));
       this.addLabel('玩家手牌', title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title', TABLE_TEXT);
     }
     const handSignature = cardsSignature(hand.map((slot) => slot.card));
@@ -595,7 +642,7 @@ export class GameSceneSkeleton extends Component {
     const nextSelectedKeys = new Set<string>();
     const handTopY = layout.heroHandLarge.y + Math.round(layout.heroHandLarge.height * 0.54);
     hand.forEach((slot, index) => {
-      const screenX = layout.heroHandLarge.x + slot.x + CARD_SIZE.width / 2;
+      const screenX = handFrame.x + slot.x + CARD_SIZE.width / 2;
       const screenY = handTopY + slot.y;
       const { x, y } = this.screenPoint(canvas, screenX, screenY);
       this.addCard(slot.card, x, y, slot.selected, index, hand.length, animateDeal);
@@ -665,6 +712,14 @@ export class GameSceneSkeleton extends Component {
     canvas: { width: number; height: number },
   ): void {
     renderResultSection(this.rendererContext(), result, handCounts, layout, canvas);
+  }
+
+  private handLayoutFrame(canvas: { width: number; height: number }): { x: number; width: number } {
+    const inset = Math.round(Math.min(96, Math.max(64, canvas.width * 0.095)));
+    return {
+      x: inset,
+      width: Math.max(CARD_SIZE.width, canvas.width - inset * 2),
+    };
   }
 
   private renderPauseControl(layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -886,13 +941,10 @@ export class GameSceneSkeleton extends Component {
     cornerLabel.color = faceColor;
 
     if (view.suitKey !== 'joker') {
-      const rankLabel = this.addLabel(view.rankLabel, 0, 7, 18, node, CARD_SIZE.width - 12, 24, 'card-face-rank');
-      rankLabel.lineHeight = 21;
-      rankLabel.color = faceColor;
       const suitPath = this.suitSpritePath(view.suitKey);
       if (suitPath) {
         const suitNode = this.ensureNode('card-suit-icon', node);
-        suitNode.setPosition(0, -17, 0);
+        suitNode.setPosition(0, -7, 0);
         addUiTransform(suitNode, CARD_SUIT_ICON_SIZE, CARD_SUIT_ICON_SIZE);
         const suitSprite = suitNode.getComponent(Sprite) ?? suitNode.addComponent(Sprite);
         this.configureCardSprite(suitSprite);
@@ -990,10 +1042,12 @@ export class GameSceneSkeleton extends Component {
   ): Label {
     const nodeName = name ?? `button-${text}-${x}-${y}`;
     const node = this.ensureNode(nodeName, parent);
+    const decorated = this.isDecoratedButton(nodeName);
+    const renderHeight = decorated ? Math.max(height, 60) : height;
     node.setPosition(x, y, 0);
-    addUiTransform(node, width, height);
+    addUiTransform(node, width, renderHeight);
     const button = node.getComponent(Button) ?? node.addComponent(Button);
-    const bg = this.addSprite(this.buttonSkinPath(nodeName, enabled), 0, 0, width, height, node, 'button-bg', true);
+    const bg = this.addSprite(this.buttonSkinPath(nodeName, enabled), 0, 0, width, renderHeight, node, 'button-bg', true);
     bg.setSiblingIndex(0);
     button.target = bg;
     button.transition = Button.Transition.COLOR;
@@ -1006,27 +1060,39 @@ export class GameSceneSkeleton extends Component {
     node.on(Button.EventType.CLICK, cb, this);
 
     const iconPath = this.buttonIconPath(nodeName);
-    const iconSize = Math.min(22, Math.max(16, height - 14));
-    const labelX = iconPath && width >= 70 ? 8 : 0;
-    const labelWidth = iconPath && width >= 70 ? width - 34 : width;
-    if (iconPath && width >= 70) {
-      this.addSprite(iconPath, -width / 2 + 21, 0, iconSize, iconSize, node, 'button-icon');
+    const showIcon = Boolean(iconPath) && width >= 104;
+    const iconSize = Math.min(22, Math.max(16, renderHeight - 38));
+    const labelX = showIcon ? 9 : 0;
+    const labelY = decorated ? -7 : 0;
+    const labelWidth = showIcon ? width - 36 : width - (decorated ? 12 : 0);
+    const labelHeight = decorated ? 34 : renderHeight;
+    if (iconPath && showIcon) {
+      this.addSprite(iconPath, -width / 2 + 23, labelY, iconSize, iconSize, node, 'button-icon');
     }
 
     const label = addUiLabel(this.ensureNode.bind(this), {
       text,
       x: labelX,
-      y: 0,
-      fontSize: 20,
+      y: labelY,
+      fontSize: decorated ? 18 : 20,
       parent: node,
       width: labelWidth,
-      height,
+      height: labelHeight,
       name: 'button-label',
       color: this.buttonTextColor(nodeName, enabled),
       lineHeightOffset: 4,
     });
-    label.lineHeight = 24;
+    label.lineHeight = decorated ? 22 : 24;
     return label;
+  }
+
+  private isDecoratedButton(name: string): boolean {
+    return (
+      name.startsWith('action-') ||
+      name.startsWith('bid-') ||
+      name.startsWith('result-') ||
+      name === 'advisor-toggle'
+    );
   }
 
   private buttonSkinPath(name: string, enabled: boolean): ResourcePath {
@@ -1439,7 +1505,7 @@ export class GameSceneSkeleton extends Component {
   private drawDimOverlay(parent: Node, width: number, height: number): void {
     const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
     graphics.clear();
-    graphics.fillColor = new Color(0, 0, 0, 132);
+    graphics.fillColor = new Color(0, 0, 0, 176);
     graphics.rect(-width / 2, -height / 2, width, height);
     graphics.fill();
   }

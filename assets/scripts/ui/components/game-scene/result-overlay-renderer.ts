@@ -44,44 +44,47 @@ export function renderResult(
   const opacity = panel.getComponent(UIOpacity) ?? panel.addComponent(UIOpacity);
   opacity.opacity = 255;
   const panelWidth = layout.settlementShowcase.width;
-  const panelHeight = Math.max(layout.settlementShowcase.height, Math.min(230, Math.round(canvas.height * 0.6)));
+  const panelHeight = Math.max(layout.settlementShowcase.height, Math.min(270, Math.max(244, Math.round(canvas.height * 0.7))));
   addUiTransform(panel, panelWidth, panelHeight);
   drawPanel(panel, panelWidth, panelHeight, PANEL_FALLBACK);
 
   const skin = ctx.addSprite(RESOURCE_PATHS.settlementPanelV13, 0, 0, panelWidth, panelHeight, panel, 'settlement-panel-skin', true);
   skin.setSiblingIndex(0);
-  const bannerWidth = Math.min(panelWidth * 0.68, 300);
-  const bannerHeight = Math.min(panelHeight * 0.22, 76);
+  const titleY = panelHeight / 2 - 24;
+  const bannerY = panelHeight / 2 - 78;
+  const bannerWidth = Math.min(panelWidth * 0.7, 320);
+  const bannerHeight = Math.min(panelHeight * 0.22, 62);
   const banner = ctx.addSprite(
     result.resultText === '胜利' ? RESOURCE_PATHS.settlementBannerWinV13 : RESOURCE_PATHS.settlementBannerLoseV13,
     0,
-    panelHeight * 0.26,
+    bannerY,
     bannerWidth,
     bannerHeight,
     panel,
     'result-banner',
   );
   banner.setSiblingIndex(1);
-  ctx.addLabel(result.resultText, 0, panelHeight * 0.26, 30, panel, bannerWidth, bannerHeight, 'result-title', PANEL_TEXT);
-  ctx.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, panelHeight * 0.105, 18, panel, panelWidth - 60, 34, 'result-multiplier', PANEL_ACCENT);
-  ctx.addLabel(result.springText || '本局结算', 0, panelHeight * 0.025, 16, panel, panelWidth - 80, 28, 'result-spring', PANEL_MUTED);
+  ctx.addLabel('本局结算', 0, titleY, 20, panel, panelWidth - 80, 30, 'result-heading', PANEL_TEXT);
+  ctx.addLabel(result.resultText, 0, bannerY - 2, 30, panel, bannerWidth, bannerHeight - 4, 'result-title', PANEL_TEXT);
+  ctx.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}`, 0, bannerY - bannerHeight / 2 - 18, 17, panel, panelWidth - 60, 30, 'result-multiplier', PANEL_ACCENT);
+  ctx.addLabel(result.springText || '继续加油', 0, bannerY - bannerHeight / 2 - 44, 15, panel, panelWidth - 80, 26, 'result-spring', PANEL_MUTED);
   if (result.springText) {
-    ctx.addSprite(RESOURCE_PATHS.emphasisSpring, 100, panelHeight * 0.025, 30, 30, panel, 'result-spring-badge');
+    ctx.addSprite(RESOURCE_PATHS.emphasisSpring, 100, bannerY - bannerHeight / 2 - 44, 28, 28, panel, 'result-spring-badge');
   }
   const scoreText = result.scores
     .map((row) => `${seatNameWithRole(row.seat, row.isLandlord)}  ${formatScore(row.score)}  余牌 ${handCounts[row.seat as SeatIndex] ?? 0}`)
     .join('\n');
   const scorePanel = ctx.ensureNode('result-score-panel', panel);
-  scorePanel.setPosition(0, -panelHeight * 0.18, 0);
+  scorePanel.setPosition(0, -26, 0);
   const scorePanelWidth = panelWidth - 74;
-  const scorePanelHeight = Math.min(54, panelHeight * 0.25);
+  const scorePanelHeight = 56;
   addUiTransform(scorePanel, scorePanelWidth, scorePanelHeight);
   drawPanel(scorePanel, scorePanelWidth, scorePanelHeight, SCORE_FALLBACK);
-  ctx.addLabel(scoreText, 0, 0, 17, scorePanel, scorePanelWidth - 16, scorePanelHeight - 6, 'result-scores', PANEL_TEXT);
+  ctx.addLabel(scoreText, 0, 0, 15, scorePanel, scorePanelWidth - 16, scorePanelHeight - 6, 'result-scores', PANEL_TEXT);
 
-  const buttonY = -panelHeight * 0.41;
-  ctx.addButton('再来一局', -70, buttonY, 112, 44, true, () => ctx.startGame(true), panel, 'result-new');
-  ctx.addButton('返回大厅', 70, buttonY, 112, 44, true, () => director.loadScene('lobby'), panel, 'result-lobby');
+  const buttonY = -panelHeight / 2 + 34;
+  ctx.addButton('再来一局', -68, buttonY, 124, 60, true, () => ctx.startGame(true), panel, 'result-new');
+  ctx.addButton('返回大厅', 68, buttonY, 124, 60, true, () => director.loadScene('lobby'), panel, 'result-lobby');
   panel.setSiblingIndex(overlay.children.length - 1);
   overlay.setSiblingIndex(ctx.uiRoot.children.length - 1);
 }
