@@ -169,11 +169,10 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
     settlementHeight,
   );
 
-  const topBodyY = clamp(Math.round(height * 0.12), 42, 56);
-  const bodyWidth = clamp(Math.round(width * 0.142), 112, 124);
-  const bodyHeight = clamp(Math.round(height * 0.49), 172, 198);
-  const heroBodyX = clamp(Math.round(width * 0.02), 16, 20);
-  const rightBodyInset = clamp(Math.round(width * 0.12), 88, 112);
+  const topBodyY = clamp(Math.round(height * 0.075), 26, 32);
+  const bodyWidth = clamp(Math.round(width * 0.125), 96, 112);
+  const bodyHeight = clamp(Math.round(height * 0.41), 148, 170);
+  const heroBodyX = gap;
   const heroBodyY = Math.max(0, height - bodyHeight);
   const heroBody = {
     x: heroBodyX,
@@ -182,35 +181,35 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
     height: bodyHeight,
   };
   const opponentLeftBody = {
-    x: heroBody.x + heroBody.width + gap,
+    x: gap,
     y: topBodyY,
     width: bodyWidth,
     height: bodyHeight,
   };
   const opponentRightBody = {
-    x: width - rightBodyInset - bodyWidth - Math.round(width * 0.055),
+    x: width - gap - bodyWidth,
     y: topBodyY,
     width: bodyWidth,
     height: bodyHeight,
   };
 
-  const nameplateWidth = clamp(Math.round(width * 0.18), 124, 164);
+  const nameplateWidth = clamp(Math.round(width * 0.17), 132, 156);
   const nameplateHeight = clamp(Math.round(height * 0.085), 30, 36);
   const heroNameplate = {
-    x: gap,
-    y: clamp(heroHandLarge.y - nameplateHeight, 0, height - nameplateHeight),
-    width: Math.min(nameplateWidth, heroBody.width + 18),
+    x: heroBody.x,
+    y: clamp(heroBody.y - gap - nameplateHeight, 0, height - nameplateHeight),
+    width: Math.min(nameplateWidth, heroBody.width + 24),
     height: nameplateHeight,
   };
   const opponentLeftNameplate = {
-    x: opponentLeftBody.x + gap,
-    y: clamp(opponentLeftBody.y + Math.round(opponentLeftBody.height * 0.53), 0, height - nameplateHeight),
+    x: opponentLeftBody.x,
+    y: clamp(opponentLeftBody.y + opponentLeftBody.height + gap, 0, height - nameplateHeight),
     width: nameplateWidth,
     height: nameplateHeight,
   };
   const opponentRightNameplate = {
-    x: clamp(opponentRightBody.x + Math.round(opponentRightBody.width * 0.75), gap, width - gap - nameplateWidth),
-    y: opponentLeftNameplate.y,
+    x: clamp(opponentRightBody.x + opponentRightBody.width - nameplateWidth, gap, width - gap - nameplateWidth),
+    y: clamp(opponentRightBody.y + opponentRightBody.height + gap, 0, height - nameplateHeight),
     width: nameplateWidth,
     height: nameplateHeight,
   };

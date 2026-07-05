@@ -91,3 +91,38 @@ describe('T-LAYOUT3 v13 pink game-scene remake zones', () => {
     });
   }
 });
+
+// T-LAYOUT4 收紧（规划者种入·不可改）：用户视觉终审「元素不可重叠」硬约束。
+// 早先 T-LAYOUT3「名字牌贴附 body 允许重叠」裁定被推翻（用户 2026-07-05）；遗留 HUD 停靠点
+// (strengthMeter/memoryDock/advisorDock) 用 T-LAYOUT2 旧坐标撞上 v13 大立绘。现应先红，
+// T-LAYOUT4 把名字牌与 HUD 移到与立绘不重叠的落点（角色外移腾出空间）后转绿。
+// 不改既有 16 断言、不改 T-LAYOUT2 语义（强度左于 actionBar / 记牌左半 / 建议右半）。
+describe('T-LAYOUT4 v13 无重叠硬约束（名字牌 + HUD 停靠点 vs 立绘）', () => {
+  for (const [width, height] of LANDSCAPE_RESOLUTIONS) {
+    describe(`${width}x${height}`, () => {
+      function zones(): ReturnType<typeof tableZones> & V13ZoneMap {
+        return tableZones(width, height) as ReturnType<typeof tableZones> & V13ZoneMap;
+      }
+
+      it('名字牌与各自宿主立绘分离（rectGap ≥ 8·不再贴附重叠）', () => {
+        const z = zones();
+        expect(rectGap(z.heroNameplate, z.heroBody), 'hero nameplate vs hero body').toBeGreaterThanOrEqual(8);
+        expect(rectGap(z.opponentLeftNameplate, z.opponentLeftBody), 'left nameplate vs left body').toBeGreaterThanOrEqual(8);
+        expect(rectGap(z.opponentRightNameplate, z.opponentRightBody), 'right nameplate vs right body').toBeGreaterThanOrEqual(8);
+      });
+
+      it('名字牌不压手牌区/桌面行动区', () => {
+        const z = zones();
+        expect(rectGap(z.heroNameplate, z.heroHandLarge), 'hero nameplate vs large hand').toBeGreaterThanOrEqual(0);
+        expect(rectGap(z.heroNameplate, z.tableActionBar), 'hero nameplate vs action bar').toBeGreaterThanOrEqual(0);
+      });
+
+      it('HUD 停靠点（强度/剩牌/建议）不撞对家立绘（rectGap ≥ 8）', () => {
+        const z = zones();
+        expect(rectGap(z.strengthMeter, z.opponentLeftBody), 'strength vs left body').toBeGreaterThanOrEqual(8);
+        expect(rectGap(z.memoryDock, z.opponentLeftBody), 'memory vs left body').toBeGreaterThanOrEqual(8);
+        expect(rectGap(z.advisorDock, z.opponentRightBody), 'advisor vs right body').toBeGreaterThanOrEqual(8);
+      });
+    });
+  }
+});
