@@ -794,7 +794,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ART-IMPORT-GAME-REMAKE | 1 | 美术导入（**新文件`-v13`+纯增键·不同名覆盖**·spec 修订版） | `art/*/*-v13.png` + `.meta` + `asset-keys.ts` 纯增 v13 键 + report | ART-GAME-REMAKE ✅`a629ef3` 用户图审 passed | done 8437b85 |
 | T-LAYOUT3 | 1 | 纯 UI 布局（种子已验红 16/16·typecheck 净） | `table-zones.ts` + 新 `test/ui/table-zones-v13.test.ts` + report | — | done 1b523df |
 | P-G4-UI-REMAKE | 2 | 游戏内 UI 接线（spec 修订版） | `game-scene-skeleton.ts` + `ui/components/game-scene/*.ts` + report | ART-IMPORT-GAME-REMAKE ✅`8437b85` + T-LAYOUT3 ✅`1b523df` | done 3e6cc0f |
-| V3 | 3 | 收口·验证（verify-only·spec `tasks/V3.md`·审查单 R-UI-REMAKE R:V3） | `reports/V3.report.md` + `reports/V3-*.png` | P-G4-UI-REMAKE ✅`3e6cc0f` | ready |
+| V3 | 3 | 收口·验证（verify-only·spec `tasks/V3.md`·审查单 R-UI-REMAKE R:V3） | `reports/V3.report.md` + `reports/V3-*.png` | P-G4-UI-REMAKE ✅`3e6cc0f` | approved |
 
 > **派发顺序**：先做 `ART-GAME-REMAKE` preview 并等用户视觉终审；`T-LAYOUT3` 可并行做纯布局契约；资源导入必须等用户图审通过；`P-G4-UI-REMAKE` 等导入 + 布局均 done 后再做。审查单：`coordination/tasks/R-UI-REMAKE.md`。
 > **种子证据**：`ART-GAME-REMAKE` preview gate 已入 main `ff43262`；`task/T-LAYOUT3` 已建并种红测试 `eca5345`（`test/ui/table-zones-v13.test.ts` 16 红，typecheck 净）。
