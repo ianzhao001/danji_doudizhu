@@ -175,13 +175,17 @@ function seatNameplateRect(
   const width = nameplate.width;
   const height = nameplate.height;
   if (seat === 0) {
-    const x = clamp(body.x + body.width + gap, gap, canvas.width - gap - width);
+    const leftHudX = Math.min(layout.strengthMeter.x, layout.memoryDock.x);
+    const outsideBodyX = body.x + body.width + gap;
+    const availableWidth = Math.max(46, Math.min(width, leftHudX - gap - outsideBodyX));
+    const compactWidth = Math.min(width, availableWidth);
+    const x = clamp(outsideBodyX, gap, leftHudX - gap - compactWidth);
     const y = clamp(
       Math.min(body.y + Math.round(body.height * 0.08), layout.heroHandLarge.y - gap - height - 12),
       gap,
       canvas.height - gap - height,
     );
-    return { x, y, width, height };
+    return { x, y, width: compactWidth, height };
   }
   if (seat === 1) {
     const clearHeroX = layout.heroBody.x + layout.heroBody.width + gap;
@@ -226,11 +230,24 @@ function renderSeatNameplate(
   plate.setSiblingIndex(root.children.length - 1);
 
   const roleText = roleKnown ? (isLandlord ? '地主' : '农民') : '待定';
+  const compactHero = seat === HERO_SEAT && nameplate.width < 80;
   const labelWidth = Math.max(82, nameplate.width - 22);
-  const label = ctx.addLabel(`${seatName(seat)}  ${handCount}张`, 0, 4, 13, root, labelWidth, 18, 'seat-name-label', NAMEPLATE_TEXT);
-  label.lineHeight = 16;
-  const role = ctx.addLabel(roleText, 0, -10, 11, root, labelWidth, 16, 'seat-role-label', NAMEPLATE_MUTED);
-  role.lineHeight = 14;
+  const label = ctx.addLabel(
+    compactHero ? seatName(seat) : `${seatName(seat)}  ${handCount}张`,
+    0,
+    compactHero ? 0 : 4,
+    compactHero ? 14 : 13,
+    root,
+    compactHero ? Math.max(36, nameplate.width - 10) : labelWidth,
+    compactHero ? 22 : 18,
+    'seat-name-label',
+    NAMEPLATE_TEXT,
+  );
+  label.lineHeight = compactHero ? 20 : 16;
+  if (!compactHero) {
+    const role = ctx.addLabel(roleText, 0, -10, 11, root, labelWidth, 16, 'seat-role-label', NAMEPLATE_MUTED);
+    role.lineHeight = 14;
+  }
 }
 
 export function renderSeatFeedback(

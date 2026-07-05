@@ -2,8 +2,8 @@
 
 - 实现方标识：GPT-5.5 执行者
 - 分支：`task/P-G5-UIFIX`
-- 状态：ready-for-planner-visual-review-r1
-- 记录时间：2026-07-05 18:45 CST
+- 状态：ready-for-planner-visual-review-r3
+- 记录时间：2026-07-05 19:10 CST
 
 ## 改了哪些文件
 
@@ -31,6 +31,7 @@
   - 左上/右上人物在接线层轻微向桌心和桌面方向偏移，贴近参考关系。
   - AI 出牌反馈/思考条改停靠到 drop zone 附近，避免压人物。
   - R1 返工：按实际可视立绘矩形重新计算名字牌落点；hero 名字牌移到玩家外侧且让开手牌，左家名字牌强制清出底左 hero 区，右家名字牌跟随右侧立绘下方。
+  - R2 返工：hero 名字牌压缩为小“你”牌，落在玩家立绘右侧外部、强度/记牌 HUD 左侧，四横屏几何 gap 均为 8px。
 
 未改：`test/`、纯层、lobby、scene、`.meta`、`assets/resources/**`。
 
@@ -74,20 +75,47 @@
 - 结算暗幕：
   - `drawDimOverlay` alpha 由 176 加深到 218；R1 截图中底部手牌仍可辨但明显压暗，符合“牌桌可见但压暗、面板内无浮入”。
 
+## 规划者视觉复审 R2 打回记录
+
+来源：`coordination/BOARD.md` UI-REMAKE 段「P-G5-UIFIX 规划者视觉复审 R2」。
+
+- 结论：`changes-requested`，仅 1 项残留重叠，仍不上交用户。
+- R1 已清项（勿回退）：名字牌已移出立绘 sprite；结算暗幕已加深且底部手牌被压暗；立绘向桌心靠拢与缩放已接受。
+- 唯一必修：playing 相位四档底左 hero「你 N张」名字牌压住「剩牌 大王...」记牌文本；要求清出记牌文本列，hero 名字牌 vs（记牌文本 + 强度条）实测 gap >= 8。
+- 可选项：hero「你 N张」与顶部「手牌N」重复，允许简化。
+
+## R2 返工实现
+
+- hero 名字牌：
+  - 不再渲染全宽「你 N张 / 角色」两行牌。
+  - 在 `seatNameplateRect(0)` 中计算强度条与记牌器左边界，并把 hero 名字牌限制在该 HUD 列左侧。
+  - 名字牌宽度按可用空间压缩，文案简化为单字「你」，清出 memoryDock 文本列。
+  - 保持与 hero 可视立绘右边界 gap = 8，避免回退 R1 的“不压人物”结论。
+- 未动项：
+  - AI 名字牌、三家立绘、结算暗幕、按钮、卡面、顶部条、HUD 本身均未回退。
+
+R2 几何核验（同渲染公式）：
+
+| 横屏档 | hero 名字牌 | strength/memory 左边界 | vs HUD gap | vs hero body gap |
+|---|---|---:|---:|---:|
+| 844x390 | x=114,w=51 | 173 | 8 | 8 |
+| 812x375 | x=110,w=48 | 166 | 8 | 8 |
+| 915x412 | x=119,w=70 | 197 | 8 | 8 |
+| 780x360 | x=106,w=46 | 160 | 8 | 8 |
+
 ## 执行者视觉自审勾销表
 
 证据目录：
-- 全量截图：`/tmp/doudizhu-pg5-uifix-evidence-r1-fix/`
-- 汇总：`/tmp/doudizhu-pg5-uifix-evidence-r1-fix/summary.json`
+- 全量截图：`/tmp/doudizhu-pg5-uifix-evidence-r2-fix/`
+- 汇总：`/tmp/doudizhu-pg5-uifix-evidence-r2-fix/summary.json`
 - contact sheets：
-  - `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/contact-sheets/round1-bidding.jpg`
-  - `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/contact-sheets/round1-playing.jpg`
-  - `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/contact-sheets/round1-player-selected.jpg`
-  - `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/contact-sheets/round1-ai-play.jpg`
-  - `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/contact-sheets/round1-settlement.jpg`
-  - `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/contact-sheets/round2-settlement.jpg`
-  - `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/contact-sheets/r1-nameplates-zoom.jpg`
-  - `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/contact-sheets/r1-settlement-dim-zoom.jpg`
+  - `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/contact-sheets/round1-bidding.jpg`
+  - `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/contact-sheets/round1-playing.jpg`
+  - `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/contact-sheets/round1-player-selected.jpg`
+  - `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/contact-sheets/round1-ai-play.jpg`
+  - `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/contact-sheets/round1-settlement.jpg`
+  - `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/contact-sheets/round2-settlement.jpg`
+  - `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/contact-sheets/r2-playing-bottom-left-zoom.jpg`
 
 | 横屏档 | 叫抢 | 出牌 | 选牌 | AI 出牌 | 结算 | 自审结论 |
 |---|---|---|---|---|---|---|
@@ -97,15 +125,15 @@
 | 780x360 | 重叠/对比/包裹/闪烁已核 | 已核 | 已核 | 已核 | 已核 | 通过执行者自审 |
 
 自审要点：
-- 重叠：叫抢不再出现多层状态字；AI 出牌态移除 `已出牌` 文本压牌，思考条不压右侧人物；R1 后三名字牌均在各自立绘外侧/下方，不压 hero/left/right 立绘。
+- 重叠：叫抢不再出现多层状态字；AI 出牌态移除 `已出牌` 文本压牌，思考条不压右侧人物；R1 后三名字牌均在各自立绘外侧/下方，不压 hero/left/right 立绘；R2 后 playing 底左 hero 小“你”牌与强度/记牌 HUD 左边界四档均保持 8px gap。
 - 对比：叫抢提示有深色底；按钮文字与按钮底色形成反差。
 - 包裹：叫抢/出牌/结算按钮均由 v13 背景完整包裹文字。
 - 闪烁：底牌托架以签名门控动画，v13 贴图预加载后首局/第二局结算面板一致；结算暗幕全屏覆盖并压暗底部手牌。
-- 手牌：四档均保持居中牌列，不再贴右；R1 后 hero 名字牌不压选中/未选手牌。
+- 手牌：四档均保持居中牌列，不再贴右；R1/R2 后 hero 名字牌不压选中/未选手牌。
 
 ## CDP 截图链汇总
 
-固定 seed：`20260705`。脚本文件名仍带 `P-G4` 前缀，这是沿用既有 v13 e2e 脚本的命名，不代表任务号。R1 返工后证据目录为 `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/`。
+固定 seed：`20260705`。脚本文件名仍带 `P-G4` 前缀，这是沿用既有 v13 e2e 脚本的命名，不代表任务号。R2 返工后证据目录为 `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/`。
 
 | 分辨率 | 截图数 | productErrors | failedResponses | 首局 | 第二局 | AI 出牌捕获 | 玩家出牌捕获 |
 |---|---:|---|---|---|---|---|---|
@@ -148,10 +176,9 @@ COCOS_EXIT=36
 
 ## 工作树状态
 
-R1 提交前（相对上一提交 `c70e58a`）：
+R2 提交前（相对上一提交 `3dfa09c`）：
 
 ```text
- M assets/scripts/ui/components/game-scene-skeleton.ts
  M assets/scripts/ui/components/game-scene/seats-renderer.ts
  M coordination/reports/P-G5-UIFIX.report.md
 ```
@@ -166,7 +193,7 @@ git status --short --untracked-files=all
 
 ## 规划者视觉审结论
 
-- 状态：R1 返工后待规划者（Opus）逐张视觉复审。
+- 状态：R2 返工后待规划者（Opus）R3 逐张视觉复审。
 - 执行者不替规划者/用户做最终主观判断。
 - 规划者视觉审通过后，再交审查者 `R-WAVE5 R:P-G5-UIFIX` 做结构/证据审；不直接交用户、不直接交审查者。
 
@@ -174,7 +201,7 @@ git status --short --untracked-files=all
 
 - 无越域代码改动。
 - 未重做任何美术资源；只消费既有 v13 资源。
-- 截图证据暂存 `/tmp/doudizhu-pg5-uifix-evidence-r1-fix/`，未纳入 git。
+- 截图证据暂存 `/tmp/doudizhu-pg5-uifix-evidence-r2-fix/`，未纳入 git。
 - `P-G4` 文件名前缀为脚本历史命名偏差，报告已披露。
 
 ## 下一步
@@ -187,7 +214,7 @@ git status --short --untracked-files=all
 ```text
 你是本仓库 斗地主 的规划者（Opus）。本任务：P-G5-UIFIX 规划者视觉审。
 先读：coordination/PROTOCOL.md（双层视觉预审关）、coordination/tasks/P-G5-UIFIX.md、coordination/reports/P-G5-UIFIX.report.md、coordination/BOARD.md UI-REMAKE 段最新裁定。
-请逐张查看报告中的 /tmp/doudizhu-pg5-uifix-evidence-r1-fix/ 四横屏截图与 contact sheets，重点核 R1 两个必修硬伤是否已清：名字牌不再压任何立绘/左家名字牌不再错位到底左、结算暗幕全屏压暗底部手牌；同时复核软项：左上/右上人物更靠牌桌中心、玩家手牌居中且不压牌、按钮无明显硬伤。
+请逐张查看报告中的 /tmp/doudizhu-pg5-uifix-evidence-r2-fix/ 四横屏截图、contact sheets 和 r2-playing-bottom-left-zoom，重点核 R2 唯一必修项是否已清：playing 相位底左 hero 小“你”名字牌不再压「剩牌/展开/大王...」记牌文本列，且与 strength/memory HUD 左边界四档 gap 均为 8px。请同时确认 R1 已 accepted 项未回退：名字牌不压立绘、结算暗幕全屏压暗底部手牌、立绘靠拢、按钮/卡面/顶部条稳定。
 若达标，请在报告「规划者视觉审结论」段追加结论并转审查者 R-WAVE5 R:P-G5-UIFIX；若不达标，请列出具体截图/问题打回执行者返工。
 ```
 
