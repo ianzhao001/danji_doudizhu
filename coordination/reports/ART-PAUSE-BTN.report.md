@@ -1,8 +1,8 @@
 # ART-PAUSE-BTN Report
 
-任务：ART-PAUSE-BTN  
-分支：task/ART-PAUSE-BTN  
-日期：2026-07-06  
+任务：ART-PAUSE-BTN
+分支：task/ART-PAUSE-BTN
+日期：2026-07-06
 状态：待用户图审
 
 ## 范围

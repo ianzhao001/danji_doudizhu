@@ -1,8 +1,8 @@
 # ART-PAUSE-BTN Prompts
 
-任务：ART-PAUSE-BTN  
-状态：preview-only，等待用户图审  
-生成日期：2026-07-06  
+任务：ART-PAUSE-BTN
+状态：preview-only，等待用户图审
+生成日期：2026-07-06
 
 ## 约束
 
@@ -44,4 +44,3 @@ Sweet pink cartoon mobile game UI action button skin, front-facing orthographic 
 - `pause-btn-action`: 64px and 176px for `继续` / `重开` / `退出`
 
 These are Cocos text-rendering simulations only. The approved import should use the clean skin PNGs and Cocos labels.
-
