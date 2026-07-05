@@ -67,7 +67,7 @@ export interface GameSceneRendererContext {
 
 const HERO_SEAT: SeatIndex = 0;
 const NAMEPLATE_TEXT = new Color(108, 46, 76, 255);
-const NAMEPLATE_MUTED = new Color(142, 88, 108, 235);
+const NAMEPLATE_MUTED = new Color(96, 48, 74, 248);
 
 function seatName(seat: number): string {
   if (seat === 0) return '你';
@@ -150,11 +150,11 @@ function seatBodyVisualRect(
     screenY = body.y + body.height - visualHeight / 2;
   }
   if (name === 'seat-left' || name === 'seat-right') {
-    visualWidth = Math.round(body.width * 0.95);
-    visualHeight = Math.round(body.height * 0.95);
-    const inward = Math.round(body.width * 0.42);
-    screenX += name === 'seat-left' ? inward : -inward;
-    screenY += Math.round(body.height * 0.06);
+    visualWidth = Math.round(body.width * 0.9);
+    visualHeight = Math.round(body.height * 0.92);
+    const outward = Math.round(body.width * 0.03);
+    screenX += name === 'seat-left' ? -outward : outward;
+    screenY -= Math.round(body.height * 0.08);
   }
   return {
     x: clamp(Math.round(screenX - visualWidth / 2), 0, canvas.width - visualWidth),
@@ -188,12 +188,11 @@ function seatNameplateRect(
     return { x, y, width: compactWidth, height };
   }
   if (seat === 1) {
-    const clearHeroX = layout.heroBody.x + layout.heroBody.width + gap;
-    const x = clamp(Math.max(body.x + Math.round(body.width * 0.64), clearHeroX), gap, canvas.width - gap - width);
+    const x = clamp(body.x + Math.round(body.width * 0.04), gap, canvas.width - gap - width);
     const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
     return { x, y, width, height };
   }
-  const x = clamp(body.x + body.width - width, gap, canvas.width - gap - width);
+  const x = clamp(body.x + body.width - width - Math.round(body.width * 0.04), gap, canvas.width - gap - width);
   const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
   return { x, y, width, height };
 }
@@ -231,23 +230,21 @@ function renderSeatNameplate(
 
   const roleText = roleKnown ? (isLandlord ? '地主' : '农民') : '待定';
   const compactHero = seat === HERO_SEAT && nameplate.width < 80;
-  const labelWidth = Math.max(82, nameplate.width - 22);
+  const labelWidth = Math.max(40, nameplate.width - 16);
   const label = ctx.addLabel(
     compactHero ? seatName(seat) : `${seatName(seat)}  ${handCount}张`,
     0,
-    compactHero ? 0 : 4,
-    compactHero ? 14 : 13,
+    compactHero ? 6 : 5,
+    compactHero ? 13 : 13,
     root,
-    compactHero ? Math.max(36, nameplate.width - 10) : labelWidth,
-    compactHero ? 22 : 18,
+    labelWidth,
+    compactHero ? 17 : 17,
     'seat-name-label',
     NAMEPLATE_TEXT,
   );
-  label.lineHeight = compactHero ? 20 : 16;
-  if (!compactHero) {
-    const role = ctx.addLabel(roleText, 0, -10, 11, root, labelWidth, 16, 'seat-role-label', NAMEPLATE_MUTED);
-    role.lineHeight = 14;
-  }
+  label.lineHeight = 16;
+  const role = ctx.addLabel(roleText, 0, compactHero ? -8 : -10, compactHero ? 10 : 12, root, labelWidth, 15, 'seat-role-label', NAMEPLATE_MUTED);
+  role.lineHeight = compactHero ? 12 : 14;
 }
 
 export function renderSeatFeedback(

@@ -584,8 +584,8 @@ export class GameSceneSkeleton extends Component {
         ? layout.dropZoneRight
         : layout.dropZoneHero;
     const pos = this.rectPoint(dropZone, canvas, 0.5, top ? 0.5 : 0.78);
-    const width = Math.min(250, Math.max(108, dropZone.width));
-    const height = Math.min(112, Math.max(30, dropZone.height));
+    const width = Math.min(280, Math.max(128, dropZone.width + (top ? 34 : 0)));
+    const height = Math.min(118, Math.max(42, dropZone.height + (top ? 18 : 0)));
     area.setPosition(pos.x, pos.y, 0);
     addUiTransform(area, width, height);
 
@@ -604,7 +604,7 @@ export class GameSceneSkeleton extends Component {
     cards.forEach((card, index) => {
       const x = startX + index * spacing;
       const node = this.addDisplayCard(card, x, top ? -12 : -22, area, `play-card-${index}`, animate);
-      if (top?.seat !== HERO_SEAT) node.setScale(0.74, 0.74, 1);
+      if (top?.seat !== HERO_SEAT) node.setScale(0.92, 0.92, 1);
     });
   }
 
@@ -929,15 +929,15 @@ export class GameSceneSkeleton extends Component {
     const faceColor = this.cardFaceColor(view.suitKey);
     const cornerLabel = this.addLabel(
       `${view.rankLabel}${suitText(view.suitKey)}`,
-      -14,
+      -13,
       24,
-      view.suitKey === 'joker' ? 9 : 11,
+      view.suitKey === 'joker' ? 11 : 13,
       node,
-      34,
-      18,
+      38,
+      22,
       'card-rank-label',
     );
-    cornerLabel.lineHeight = view.suitKey === 'joker' ? 12 : 14;
+    cornerLabel.lineHeight = view.suitKey === 'joker' ? 13 : 16;
     cornerLabel.color = faceColor;
 
     if (view.suitKey !== 'joker') {
@@ -1043,7 +1043,7 @@ export class GameSceneSkeleton extends Component {
     const nodeName = name ?? `button-${text}-${x}-${y}`;
     const node = this.ensureNode(nodeName, parent);
     const decorated = this.isDecoratedButton(nodeName);
-    const renderHeight = decorated ? Math.max(height, 60) : height;
+    const renderHeight = decorated ? Math.max(height, 62) : height;
     node.setPosition(x, y, 0);
     addUiTransform(node, width, renderHeight);
     const button = node.getComponent(Button) ?? node.addComponent(Button);
@@ -1060,12 +1060,12 @@ export class GameSceneSkeleton extends Component {
     node.on(Button.EventType.CLICK, cb, this);
 
     const iconPath = this.buttonIconPath(nodeName);
-    const showIcon = Boolean(iconPath) && width >= 104;
-    const iconSize = Math.min(22, Math.max(16, renderHeight - 38));
-    const labelX = showIcon ? 9 : 0;
-    const labelY = decorated ? -7 : 0;
-    const labelWidth = showIcon ? width - 36 : width - (decorated ? 12 : 0);
-    const labelHeight = decorated ? 34 : renderHeight;
+    const showIcon = Boolean(iconPath) && width >= 136;
+    const iconSize = Math.min(22, Math.max(16, renderHeight - 40));
+    const labelX = showIcon ? 10 : 0;
+    const labelY = decorated ? -8 : 0;
+    const labelWidth = showIcon ? width - 38 : width - (decorated ? 14 : 0);
+    const labelHeight = decorated ? Math.max(30, renderHeight - 26) : renderHeight;
     if (iconPath && showIcon) {
       this.addSprite(iconPath, -width / 2 + 23, labelY, iconSize, iconSize, node, 'button-icon');
     }
@@ -1074,7 +1074,7 @@ export class GameSceneSkeleton extends Component {
       text,
       x: labelX,
       y: labelY,
-      fontSize: decorated ? 18 : 20,
+      fontSize: decorated ? 17 : 20,
       parent: node,
       width: labelWidth,
       height: labelHeight,
@@ -1082,7 +1082,7 @@ export class GameSceneSkeleton extends Component {
       color: this.buttonTextColor(nodeName, enabled),
       lineHeightOffset: 4,
     });
-    label.lineHeight = decorated ? 22 : 24;
+    label.lineHeight = decorated ? 21 : 24;
     return label;
   }
 
@@ -1103,6 +1103,7 @@ export class GameSceneSkeleton extends Component {
       name === 'bid-call' ||
       name === 'bid-grab' ||
       name === 'result-new' ||
+      name === 'result-lobby' ||
       name === 'pause-continue'
     ) {
       return RESOURCE_PATHS.btnPrimaryV13;
@@ -1124,7 +1125,7 @@ export class GameSceneSkeleton extends Component {
     if (name === 'action-hint') return RESOURCE_PATHS.iconHint;
     if (name === 'bid-call' || name === 'bid-grab') return RESOURCE_PATHS.iconBid;
     if (name === 'pause-open-button') return RESOURCE_PATHS.iconSettings;
-    if (name === 'result-lobby' || name === 'pause-confirm' || name === 'pause-quit') return RESOURCE_PATHS.iconBack;
+    if (name === 'pause-confirm' || name === 'pause-quit') return RESOURCE_PATHS.iconBack;
     return null;
   }
 

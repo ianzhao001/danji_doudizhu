@@ -88,11 +88,6 @@ export function renderCardMemory(
     const item = ctx.addLabel(text, x, y, 12, root, cellWidth, 22, `hud-memory-${index}`);
     item.color = row.exhausted ? new Color(255, 255, 255, 112) : new Color(255, 250, 228, 255);
   });
-
-  if (!ctx.memoryExpanded) {
-    const more = memory.rows.length - rows.length;
-    ctx.addLabel(`+${more}`, panelWidth / 2 - 22, -8, 12, root, 34, 22, 'hud-memory-more');
-  }
 }
 
 function addCompactHudButton(
