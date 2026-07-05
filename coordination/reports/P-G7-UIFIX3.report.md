@@ -120,3 +120,62 @@ exit 0
 4. 本阶段未做暂停面板按钮接线，#1 仍走 ART-PAUSE-BTN → ART-IMPORT-PAUSE-BTN → P-G7 阶段②。
 
 规划者视觉审通过后，再交 `R-WAVE7 R:P-G7-UIFIX3` 做结构/证据审查。
+
+---
+
+## 审查者结论（R-WAVE7 R:P-G7-UIFIX3 阶段① · GLM-5.2 · 2026-07-06）
+
+**结论：approved**，打回 0 轮。
+
+### 文件域核查
+
+分支 `task/P-G7-UIFIX3`（`acadcc1` + 报告格式修复 `4eed53d`），真正改动（`f3f182e..4eed53d`）仅 6 文件 +257−55：
+
+1. `assets/scripts/ui/components/game-scene-skeleton.ts`（+109/-...：renderPlayArea dropZone 翻转 + playAreaLayout/playCardPosition 多牌布局 + seatName→seatDisplayName）
+2. `assets/scripts/ui/components/game-scene/bid-actions-renderer.ts`（+3：swapLegacySideText 翻转 bidding.prompt）
+3. `assets/scripts/ui/components/game-scene/result-overlay-renderer.ts`（+10：seatName→seatDisplayName）
+4. `assets/scripts/ui/components/game-scene/seat-display.ts`（新文件 31 行：seatDisplayName/visualSideForSeat/dropZoneForSeat/swapLegacySideText）
+5. `assets/scripts/ui/components/game-scene/seats-renderer.ts`（+37：leftSeat=2/rightSeat=1 翻转 + seatName→seatDisplayName + dropZoneForSeat + y 上移避让）
+6. `coordination/reports/P-G7-UIFIX3.report.md`（新报告 122 行）
+
+**零改动域**：`assets/scripts/game/`（**nextSeat 不动·独立核验 exit=0**）、`test/`、纯层（rules/game/ai/flow/data）、lobby、scene、meta、resources、asset-keys.ts、table-zones.ts。
+
+### 检查单逐项核销
+
+| 检查项 | 结论 | 证据 |
+|---|---|---|
+| 文件域仅 game-scene-skeleton+game-scene/*+report | ✅ | f3f182e..4eed53d diff --stat 6 文件 |
+| game 层 nextSeat/出牌轮转零改动 | ✅ | `git diff f3f182e..acadcc1 -- assets/scripts/game/` exit=0；`nextSeat` 仍在 `game/seat.ts:8` |
+| test/纯层/lobby/meta/resources 零改动 | ✅ | 各域 diff exit=0 |
+| #3 座位映射翻转一致 | ✅ | seat-display.ts seat1→right/seat2→left；seats-renderer leftSeat=2/rightSeat=1 名字牌翻转；renderPlayArea dropZoneForSeat 落点翻转；lastActionPosition/aiThinkingPosition 同步翻转；seatNameplateRect 用 visualSideForSeat；eventToastText/landlord 标签用 seatDisplayName |
+| #2 多牌不重叠 | ✅ | playAreaLayout 动态缩放(0.58-0.94)+8张分2行+safe area 避让人物；lastAction/aiThinking y 上移 20px 避让牌面 |
+| #4 左右家文字/btn | ✅（带保留） | swapLegacySideText 翻转纯层 bidding.prompt 文字；seatDisplayName 统一左右文案；#4 红框截图未入仓库→留 V6 用户签收（同规划者 R1 结论） |
+| T-FIX-SETTLE settled 门控 | ✅ | `SETTLEMENT_TRANSIENT_HUD_NODE_NAMES`/`showTransientHud` 10 处命中 |
+| 相位互斥 | ✅ | 未触相关逻辑 |
+| T-LAYOUT4 无重叠 | ✅ | table-zones.ts 零改动 |
+| 卡面无中心数字 | ✅ | 未触 card-face 相关 |
+| productErrors=[] | ✅ | 四档（844x390/812x375/915x412/780x360）全 `[]`/`failedResponses=[]`/settled=1/restart=True |
+| vitest 141/739 | ✅ | 141 passed (141) / 739 passed (739) 26.74s |
+| typecheck | ✅ | tsc --noEmit 净 |
+| diff --check | ✅ | 报告 trailing whitespace/EOF 已修复（commit 4eed53d），exit=0 |
+| 报告含自审勾销表+规划者视觉审结论 | ✅ | 报告 6 项自审表 + BOARD 规划者 R1=PASS（668a610） |
+
+### 全量回扫
+
+- **域内致命**：0
+- **域外致命**：0
+- **拿不准（非阻断·转规划者建议单）**：1 项——`assets/scripts/ui/ai-thinking-view.ts:13` 的 `deriveAiThinking` label 仍用旧映射（offset===1→'AI 左家'/offset===2→'AI 右家'），与新 UI 映射不一致。但 UI 的 `renderAiThinking` 不消费 `thinking.label`，而是用 `seatDisplayName(thinking.seat)` 生成文字，不影响渲染。纯层测试 `ai-thinking-view.test.ts` 仍用旧映射期望且全绿（纯层不改）。建议规划者后续统一该映射（另拆任务，不阻断本轮）。
+
+### 合并提示处理
+
+分支建于 `f3f182e`（早于 `V5-user-review.md` 提交 `0993fd0` 和 BOARD 规划者 R1 提交 `668a610`）。`git diff main..task/P-G7-UIFIX3` 显示 `V5-user-review.md -43` 和 `BOARD.md -1` 系分支落后 main、非执行者删除。3-way merge 自动保留 main 版本，无冲突。
+
+### 合并证据
+
+claim `ef41043` → merge `93cc7c2`（`--no-ff`，6 文件 +257−55）→ release 待提交。
+
+合并后 main `93cc7c2`：**141 文件/739 用例全绿（28.74s）+ typecheck 净 + diff --check 净**。
+
+### 下一步
+
+P-G7-UIFIX3 阶段① done。阶段②（暂停面板 6 按钮）待 ART-IMPORT-PAUSE-BTN 落 main 后开工。V6 收口在阶段②合并后。**V6 done + 用户签收 = v1.2 终点**。用户主观终审不可由 AI 代判。
