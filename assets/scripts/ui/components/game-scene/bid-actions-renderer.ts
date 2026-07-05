@@ -9,6 +9,9 @@ import { deriveTurnTimer } from '../../turn-timer';
 import { addUiTransform, drawPanel } from '../ui-helpers';
 import type { GameSceneRendererContext } from './seats-renderer';
 
+const STATUS_TEXT = new Color(255, 247, 226, 255);
+const STATUS_BACKDROP = new Color(64, 38, 60, 186);
+
 export function renderBidding(
   ctx: GameSceneRendererContext,
   bidding: ReturnType<typeof deriveScreenVM>['bidding'],
@@ -17,13 +20,15 @@ export function renderBidding(
 ): void {
   if (!bidding) return;
   const prompt = ctx.rectPoint(layout.statusLine, canvas, 0.5, 0.5);
-  ctx.addLabel(bidding.prompt, prompt.x, prompt.y, 16, ctx.uiRoot, layout.statusLine.width, layout.statusLine.height, 'bidding-prompt');
+  renderStatusPill(ctx, 'bidding-prompt', bidding.prompt, prompt.x, prompt.y, Math.min(230, layout.statusLine.width), 32, 16);
+  const buttonHeight = 60;
+  const buttonWidth = Math.min(118, Math.max(96, (layout.tableActionBar.width - 12) / Math.max(1, bidding.buttons.length)));
+  const step = buttonWidth + 10;
   bidding.buttons.forEach((button, index) => {
-    const spacing = Math.min(126, layout.tableActionBar.width / Math.max(1, bidding.buttons.length));
-    const screenX = layout.tableActionBar.x + layout.tableActionBar.width / 2 + (index - (bidding.buttons.length - 1) / 2) * spacing;
+    const screenX = layout.tableActionBar.x + layout.tableActionBar.width / 2 + (index - (bidding.buttons.length - 1) / 2) * step;
     const screenY = layout.tableActionBar.y + layout.tableActionBar.height * 0.5;
     const pos = ctx.screenPoint(canvas, screenX, screenY);
-    ctx.addButton(button.label, pos.x, pos.y, 108, Math.min(46, layout.tableActionBar.height), button.enabled, () => {
+    ctx.addButton(button.label, pos.x, pos.y, buttonWidth, buttonHeight, button.enabled, () => {
       if (!button.enabled) return;
       void ctx.submitBid(button.id);
     }, ctx.uiRoot, `bid-${button.id}`);
@@ -39,13 +44,16 @@ export function renderActions(
   canvas: { width: number; height: number },
 ): void {
   const y = layout.tableActionBar.y + layout.tableActionBar.height * 0.5;
-  const playPos = ctx.screenPoint(canvas, layout.tableActionBar.x + layout.tableActionBar.width * 0.16, y);
-  const passPos = ctx.screenPoint(canvas, layout.tableActionBar.x + layout.tableActionBar.width * 0.5, y);
-  const hintPos = ctx.screenPoint(canvas, layout.tableActionBar.x + layout.tableActionBar.width * 0.84, y);
-  const buttonHeight = Math.min(46, layout.tableActionBar.height);
-  ctx.addButton('出牌', playPos.x, playPos.y, 86, buttonHeight, play, () => void ctx.submitPlay(), ctx.uiRoot, 'action-play');
-  ctx.addButton('不要', passPos.x, passPos.y, 86, buttonHeight, pass, () => void ctx.submitPass(), ctx.uiRoot, 'action-pass');
-  ctx.addButton('提示', hintPos.x, hintPos.y, 86, buttonHeight, hint, () => ctx.applyHint(), ctx.uiRoot, 'action-hint');
+  const buttonHeight = 60;
+  const buttonWidth = Math.min(94, Math.max(78, (layout.tableActionBar.width - 20) / 3));
+  const step = buttonWidth + 8;
+  const center = layout.tableActionBar.x + layout.tableActionBar.width / 2;
+  const playPos = ctx.screenPoint(canvas, center - step, y);
+  const passPos = ctx.screenPoint(canvas, center, y);
+  const hintPos = ctx.screenPoint(canvas, center + step, y);
+  ctx.addButton('出牌', playPos.x, playPos.y, buttonWidth, buttonHeight, play, () => void ctx.submitPlay(), ctx.uiRoot, 'action-play');
+  ctx.addButton('不要', passPos.x, passPos.y, buttonWidth, buttonHeight, pass, () => void ctx.submitPass(), ctx.uiRoot, 'action-pass');
+  ctx.addButton('提示', hintPos.x, hintPos.y, buttonWidth, buttonHeight, hint, () => ctx.applyHint(), ctx.uiRoot, 'action-hint');
 }
 
 export function renderStatus(
@@ -56,7 +64,7 @@ export function renderStatus(
 ): void {
   if (!text) return;
   const pos = ctx.rectPoint(layout.statusLine, canvas, 0.5, 0.5);
-  ctx.addLabel(text, pos.x, pos.y, 15, ctx.uiRoot, layout.statusLine.width, layout.statusLine.height, 'status-label');
+  renderStatusPill(ctx, 'status-label', text, pos.x, pos.y, Math.min(230, layout.statusLine.width), 30, 15);
 }
 
 export function renderTurnTimer(
@@ -105,8 +113,8 @@ export function renderAdvisor(
     ctx.advisorEnabled ? '建议开' : '建议关',
     togglePos.x,
     togglePos.y,
-    Math.min(70, layout.advisorDock.width),
-    26,
+    Math.min(92, layout.advisorDock.width),
+    60,
     true,
     () => ctx.toggleAdvisor(),
     ctx.uiRoot,
@@ -132,4 +140,22 @@ export function renderAdvisor(
 
   const label = ctx.addLabel(insight.text, 0, 1, 12, root, width - 18, height - 4, 'advisor-label');
   label.color = insight.emphasize ? new Color(221, 255, 224, 255) : new Color(255, 248, 226, 255);
+}
+
+function renderStatusPill(
+  ctx: GameSceneRendererContext,
+  name: string,
+  text: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  fontSize: number,
+): void {
+  const root = ctx.ensureNode(name, ctx.uiRoot);
+  root.setPosition(x, y, 0);
+  addUiTransform(root, width, height);
+  drawPanel(root, width, height, STATUS_BACKDROP);
+  const label = ctx.addLabel(text, 0, 1, fontSize, root, width - 18, height - 4, `${name}-text`);
+  label.color = STATUS_TEXT;
 }

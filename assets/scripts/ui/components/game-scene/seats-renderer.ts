@@ -83,20 +83,46 @@ export function renderSeats(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
-  renderSeatCard(ctx, 'seat-hero', layout.heroBody, layout.heroNameplate, canvas, 0, handCounts[0], landlord, RESOURCE_PATHS.heroBodyV13);
-  renderSeatCard(ctx, 'seat-left', layout.opponentLeftBody, layout.opponentLeftNameplate, canvas, 1, handCounts[1], landlord, RESOURCE_PATHS.leftAiBodyV13);
-  renderSeatCard(ctx, 'seat-right', layout.opponentRightBody, layout.opponentRightNameplate, canvas, 2, handCounts[2], landlord, RESOURCE_PATHS.rightAiBodyV13);
+  const heroBody = seatBodyVisualRect('seat-hero', layout.heroBody, canvas);
+  const leftBody = seatBodyVisualRect('seat-left', layout.opponentLeftBody, canvas);
+  const rightBody = seatBodyVisualRect('seat-right', layout.opponentRightBody, canvas);
+  renderSeatCard(ctx, 'seat-hero', heroBody, canvas, RESOURCE_PATHS.heroBodyV13);
+  renderSeatCard(ctx, 'seat-left', leftBody, canvas, RESOURCE_PATHS.leftAiBodyV13);
+  renderSeatCard(ctx, 'seat-right', rightBody, canvas, RESOURCE_PATHS.rightAiBodyV13);
+  renderSeatNameplate(
+    ctx,
+    'seat-hero-nameplate',
+    seatNameplateRect(0, layout.heroNameplate, heroBody, layout, canvas),
+    canvas,
+    0,
+    handCounts[0],
+    landlord,
+  );
+  renderSeatNameplate(
+    ctx,
+    'seat-left-nameplate',
+    seatNameplateRect(1, layout.opponentLeftNameplate, leftBody, layout, canvas),
+    canvas,
+    1,
+    handCounts[1],
+    landlord,
+  );
+  renderSeatNameplate(
+    ctx,
+    'seat-right-nameplate',
+    seatNameplateRect(2, layout.opponentRightNameplate, rightBody, layout, canvas),
+    canvas,
+    2,
+    handCounts[2],
+    landlord,
+  );
 }
 
 function renderSeatCard(
   ctx: GameSceneRendererContext,
   name: string,
   body: Rect,
-  nameplate: Rect,
   canvas: { width: number; height: number },
-  seat: SeatIndex,
-  handCount: number,
-  landlord: number | null,
   bodyPath: ResourcePath,
 ): void {
   const root = ctx.ensureNode(name, ctx.uiRoot);
@@ -106,16 +132,95 @@ function renderSeatCard(
 
   const bodyNode = ctx.addSprite(bodyPath, 0, 0, body.width, body.height, root, 'seat-body');
   bodyNode.setSiblingIndex(0);
+}
 
+function seatBodyVisualRect(
+  name: string,
+  body: Rect,
+  canvas: { width: number; height: number },
+): Rect {
+  let visualWidth = body.width;
+  let visualHeight = body.height;
+  let screenX = body.x + visualWidth / 2;
+  let screenY = body.y + visualHeight / 2;
+  if (name === 'seat-hero') {
+    visualWidth = Math.round(body.width * 0.92);
+    visualHeight = Math.round(body.height * 0.9);
+    screenX = body.x + visualWidth / 2;
+    screenY = body.y + body.height - visualHeight / 2;
+  }
+  if (name === 'seat-left' || name === 'seat-right') {
+    visualWidth = Math.round(body.width * 0.95);
+    visualHeight = Math.round(body.height * 0.95);
+    const inward = Math.round(body.width * 0.42);
+    screenX += name === 'seat-left' ? inward : -inward;
+    screenY += Math.round(body.height * 0.06);
+  }
+  return {
+    x: clamp(Math.round(screenX - visualWidth / 2), 0, canvas.width - visualWidth),
+    y: clamp(Math.round(screenY - visualHeight / 2), 0, canvas.height - visualHeight),
+    width: visualWidth,
+    height: visualHeight,
+  };
+}
+
+function seatNameplateRect(
+  seat: SeatIndex,
+  nameplate: Rect,
+  body: Rect,
+  layout: TableZones,
+  canvas: { width: number; height: number },
+): Rect {
+  const gap = 8;
+  const width = nameplate.width;
+  const height = nameplate.height;
+  if (seat === 0) {
+    const leftHudX = Math.min(layout.strengthMeter.x, layout.memoryDock.x);
+    const outsideBodyX = body.x + body.width + gap;
+    const availableWidth = Math.max(46, Math.min(width, leftHudX - gap - outsideBodyX));
+    const compactWidth = Math.min(width, availableWidth);
+    const x = clamp(outsideBodyX, gap, leftHudX - gap - compactWidth);
+    const y = clamp(
+      Math.min(body.y + Math.round(body.height * 0.08), layout.heroHandLarge.y - gap - height - 12),
+      gap,
+      canvas.height - gap - height,
+    );
+    return { x, y, width: compactWidth, height };
+  }
+  if (seat === 1) {
+    const clearHeroX = layout.heroBody.x + layout.heroBody.width + gap;
+    const x = clamp(Math.max(body.x + Math.round(body.width * 0.64), clearHeroX), gap, canvas.width - gap - width);
+    const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
+    return { x, y, width, height };
+  }
+  const x = clamp(body.x + body.width - width, gap, canvas.width - gap - width);
+  const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
+  return { x, y, width, height };
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function renderSeatNameplate(
+  ctx: GameSceneRendererContext,
+  name: string,
+  nameplate: Rect,
+  canvas: { width: number; height: number },
+  seat: SeatIndex,
+  handCount: number,
+  landlord: number | null,
+): void {
   const roleKnown = landlord !== null;
   const isLandlord = landlord === seat;
   const nameplateCenter = ctx.rectPoint(nameplate, canvas, 0.5, 0.5);
-  const nameplateX = nameplateCenter.x - center.x;
-  const nameplateY = nameplateCenter.y - center.y;
+  const root = ctx.ensureNode(name, ctx.uiRoot);
+  root.setPosition(nameplateCenter.x, nameplateCenter.y, 0);
+  addUiTransform(root, nameplate.width, nameplate.height);
   const plate = ctx.addSprite(
     RESOURCE_PATHS.seatNameplateV13,
-    nameplateX,
-    nameplateY,
+    0,
+    0,
     nameplate.width,
     nameplate.height,
     root,
@@ -125,11 +230,24 @@ function renderSeatCard(
   plate.setSiblingIndex(root.children.length - 1);
 
   const roleText = roleKnown ? (isLandlord ? '地主' : '农民') : '待定';
+  const compactHero = seat === HERO_SEAT && nameplate.width < 80;
   const labelWidth = Math.max(82, nameplate.width - 22);
-  const label = ctx.addLabel(`${seatName(seat)}  ${handCount}张`, nameplateX, nameplateY + 4, 13, root, labelWidth, 18, 'seat-name-label', NAMEPLATE_TEXT);
-  label.lineHeight = 16;
-  const role = ctx.addLabel(roleText, nameplateX, nameplateY - 10, 11, root, labelWidth, 16, 'seat-role-label', NAMEPLATE_MUTED);
-  role.lineHeight = 14;
+  const label = ctx.addLabel(
+    compactHero ? seatName(seat) : `${seatName(seat)}  ${handCount}张`,
+    0,
+    compactHero ? 0 : 4,
+    compactHero ? 14 : 13,
+    root,
+    compactHero ? Math.max(36, nameplate.width - 10) : labelWidth,
+    compactHero ? 22 : 18,
+    'seat-name-label',
+    NAMEPLATE_TEXT,
+  );
+  label.lineHeight = compactHero ? 20 : 16;
+  if (!compactHero) {
+    const role = ctx.addLabel(roleText, 0, -10, 11, root, labelWidth, 16, 'seat-role-label', NAMEPLATE_MUTED);
+    role.lineHeight = 14;
+  }
 }
 
 export function renderSeatFeedback(
@@ -157,7 +275,7 @@ function renderLastActions(
 
 function renderAiThinking(
   ctx: GameSceneRendererContext,
-  layout: TableRegions,
+  layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
   const thinking = ctx.aiThinkingView();
@@ -195,8 +313,8 @@ export function lastActionPosition(
     const pos = ctx.screenPoint(canvas, canvas.width / 2, Math.max(layout.tableActionBar.y - 18, layout.heroHandLarge.y - 42));
     return { ...pos, width: 146 };
   }
-  const rect = seat === 1 ? layout.opponentLeftBody : layout.opponentRightBody;
-  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, rect.y + rect.height * 0.12);
+  const rect = seat === 1 ? layout.dropZoneLeft : layout.dropZoneRight;
+  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(22, rect.y - 12));
   return { ...pos, width: 124 };
 }
 
@@ -206,7 +324,7 @@ export function aiThinkingPosition(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): { x: number; y: number; width: number } {
-  const rect = seat === 1 ? layout.opponentLeftBody : layout.opponentRightBody;
-  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, rect.y + rect.height * 0.24);
+  const rect = seat === 1 ? layout.dropZoneLeft : layout.dropZoneRight;
+  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(24, rect.y - 16));
   return { ...pos, width: 126 };
 }
