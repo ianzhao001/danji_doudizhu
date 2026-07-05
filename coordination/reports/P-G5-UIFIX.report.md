@@ -228,3 +228,73 @@ git status --short --untracked-files=all
 - [x] per-seat 落点保留并避开人物
 - [x] 执行者视觉自审已填
 - [ ] 规划者视觉审待填
+
+## 审查者验收披露（GLM-5.2 · 2026-07-05）
+
+### 评审结论
+
+**approved** — 打回轮次 0（执行者三轮视觉返工由规划者视觉审 R1/R2/R3 拦截，审查者不重复视觉判断）。
+
+### 文件域核验
+
+- 改动文件（`git diff --name-only main..task/P-G5-UIFIX`）：
+  - `assets/scripts/ui/components/game-scene-skeleton.ts`（+154−34）
+  - `assets/scripts/ui/components/game-scene/bid-actions-renderer.ts`（+36−18）
+  - `assets/scripts/ui/components/game-scene/hud-renderer.ts`（+29−16）
+  - `assets/scripts/ui/components/game-scene/result-overlay-renderer.ts`（+18−13）
+  - `assets/scripts/ui/components/game-scene/seats-renderer.ts`（+103−55）
+  - `coordination/reports/P-G5-UIFIX.report.md`（新增）
+- 红线核：`test/` 零改动；纯层（`rules/game/ai/flow/data`）零改动；`ui/` 纯岛（非 `components/`）零改动；`lobby-scene.ts` 零改动；`.meta`/`.scene`/`assets/resources/` 零改动；`asset-keys.ts` 零改动；无新美术资源；无新 `.meta`。
+- `coordination/BOARD.md` 在 `git diff main..task` 显示 6 行差，系规划者在 main 上追加的 R1/R2/R3 视觉审 note（task 分支早于这些 note 创建）——执行者未触 BOARD，合并将干净保留 main 的 R1/R2/R3 段（dry-run 验证无冲突）。
+
+### spec 8 项逐条对应
+
+1. **卡面中心数字删** ✅：`game-scene-skeleton.ts` 删 `card-face-rank` label 块（原 889-891），保留角标 `card-rank-label` + 中心花色 `card-suit-icon`（位置 -17→-7 居中）。
+2. **按钮盒高≥60+标签包裹+对比** ✅：`addButton` 新增 `isDecoratedButton` 判定（`action-`/`bid-`/`result-`/`advisor-toggle`），`renderHeight = Math.max(height, 60)`；标签 `labelY = decorated ? -7 : 0` 落药体中心；`BUTTON_SECONDARY_TEXT` 改白色 (255,255,255) 提对比。
+3. **底牌幂等消闪烁** ✅：`renderBottomCardsDock` 新增 `lastBottomCardsSignature` 字段 + `cardsSignature(cards)` 签名比对；`animateReveal = Boolean(cards) && settings.animation && signature !== lastBottomCardsSignature`；`deal`/`redeal` 事件重置签名为 ''；稳定态周期 render 不再重触发 tween。
+4. **HUD 消费 T-LAYOUT4 新区** ✅：`hud-renderer.ts` strengthMeter `barWidth = Math.max(24, width-92)`、`barX=24` 适配窄宽；memoryDock toggle 改 `addCompactHudButton`（不用九宫格 btn 避免 28px 压坏）；`seats-renderer.ts` `lastActionPosition`/`aiThinkingPosition` 从 `opponentLeftBody`/`opponentRightBody` 改用 `dropZoneLeft`/`dropZoneRight`（不再压对家立绘）。
+5. **名字牌分离渲染** ✅：`seats-renderer.ts` 拆 `renderSeatCard`（只画 body）与 `renderSeatNameplate`（独立节点）；三名字牌按 `seatNameplateRect` 落点：hero 在 body 右侧 + HUD 左侧（gap=8，compactWidth）；left 在 body 下方 + 清出 hero 区；right 在 body 下方；R2 返工后 hero 压缩为单字「你」牌。
+6. **结算横幅不切叠+暗幕加深** ✅：`result-overlay-renderer.ts` 重排——`titleY = panelHeight/2-24`（标题）、`bannerY = panelHeight/2-78`（横幅）、multiplier/spring 在横幅下方分层；按钮 `buttonY = -panelHeight/2+34`、高 60、宽 124；`drawDimOverlay` alpha 132→218 全屏压暗。
+7. **叫抢字底衬** ✅：`bid-actions-renderer.ts` 新增 `renderStatusPill`——`STATUS_BACKDROP = Color(64,38,60,186)` 深色半透明底衬 + `STATUS_TEXT = Color(255,247,226,255)` 浅色字；bidding prompt 与 status 均走 pill。
+8. **顶部信息条松绑** ✅：`renderTopBar` 改左右停靠——`phasePos = screenPoint(canvas, 70, topY)`、`landlordPos = screenPoint(canvas, 178, topY)`、`multiplierPos = screenPoint(canvas, canvas.width-182, topY)`、`handPos = screenPoint(canvas, canvas.width-82, topY)`；不再拥挤居中。
+
+### T-FIX-SETTLE settled 门控 + 相位互斥 + per-seat 落点核验
+
+- `SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` 数组保留（line 105）。
+- `showTransientHud = phase !== 'settled'`（line 415）保留。
+- `if (!showTransientHud) this.hideSettledTransientHud()`（line 418）保留。
+- `if (event.type === 'settled')`（line 1232）保留。
+- `if (phase === 'settled') return deriveAiThinking(HERO_SEAT, HERO_SEAT, 'settled', 0)`（line 1295）保留。
+- `hideLiveSubtree` 遍历 `SETTLEMENT_TRANSIENT_HUD_NODE_NAMES`（line 1438）保留。
+- 相位互斥：`if (phase === 'bidding') renderBidding` / `if (phase === 'playing') renderActions` / `if (showTransientHud && phase !== 'bidding') renderStatus`——叫抢期无出牌键组节点、出牌期无叫抢按钮。
+- per-seat 落点：`dropZone = top?.seat === 1 ? layout.dropZoneLeft : top?.seat === 2 ? layout.dropZoneRight : layout.dropZoneHero`（line 581-585）保留；`lastActionPosition`/`aiThinkingPosition` 按 `seat === 1 ? dropZoneLeft : dropZoneRight` 落点。
+- `bottomRevealed` 事件处理：`if (event.type === 'bottomRevealed') this.revealedBottomCards = event.cards.slice()`（line 371）保留；`renderBottomCardsDock(phase === 'bidding' ? null : this.revealedBottomCards, ...)` 保留。
+- 再来一局/返回大厅：`result-overlay-renderer.ts` 按钮 `ctx.startGame(true)` / `director.loadScene('lobby')` 保留。
+
+### 双层视觉预审核验
+
+- **执行者视觉自审勾销表**：报告含四横屏×四类硬伤（重叠/对比/包裹/闪烁）勾销表，逐横屏勾销 + 自审结论「通过执行者自审」。
+- **规划者视觉审结论**：BOARD.md UI-REMAKE 段记 R1（2 硬伤打回）→ R2（1 残留打回）→ **R3 = 达标·PASS**（`36c5703`），双层预审三轮拦下全部硬伤才放行——这正是双层预审关的设计目的（防第三次用户翻车）。
+- 审查者 GLM 不感知图像，不替用户下主观结论；只核结构/契约/证据链/可复现。视觉达标由双层预审担保，用户做最终审美签收。
+
+### 客观门
+
+- **vitest**：`npm --prefix test test` → 141 文件 / 739 用例全绿（26.76s）。
+- **typecheck**：`npm --prefix test run typecheck` → 通过（tsc --noEmit 净）。
+- **git diff --check**：净（exit 0）。
+- **CDP 截图链**：`/tmp/doudizhu-pg5-uifix-evidence-r2-fix/summary.json` → 4 横屏（844×390/812×375/915×412/780×360）× 11 captures，全部 `productErrors=[]`、`failedResponses=[]`；覆盖 lobby/bidding/playing/selected/ai-play/player-play/settlement/round2-bidding/round2-settlement/after-new-game/return-lobby；contact sheets 含 `r2-playing-bottom-left-zoom.jpg`（R2 必修项证据）。
+- **构建**：Cocos Creator 3.8.8 web-mobile build，COCOS_EXIT=36（已知 SIGTERM 调试行），日志含 `build Task (web-mobile) Finished`。
+
+### 全量回扫范围与分流结果
+
+- **回扫范围**：本任务 diff 5 源文件 + report；跨模块检查所有 callers（`renderPlayArea`/`renderSeats`/`lastActionPosition`/`aiThinkingPosition`/`handLayoutFrame`/`seatBodyVisualRect`/`seatNameplateRect`）——均为文件域内私有/同模块调用，无外部消费者；纯层 grep `cc` 零命中；`asset-keys.ts`/`lobby-scene.ts`/`.meta`/`.scene`/`resources/` 零改动。
+- **域内致命**：0。
+- **域外致命**：0。
+- **拿不准（非阻断）**：0（双层视觉预审已由规划者三轮把关，审查者不重复视觉判断）。
+- **签名变化风险**：`renderPlayArea` 去掉 `showLabel` 参数——caller 仅 skeleton 内 `this.renderPlayArea(...)`（已同步去参）；`renderSeatCard` 签名重构——caller 仅 `renderSeats` 内部（已同步）。无外部 breakage。
+
+### 合并
+
+- merge base：`0f74067`（task 自此分叉）。
+- dry-run `git merge --no-commit --no-ff task/P-G5-UIFIX`：Automatic merge went well，无冲突（BOARD.md 保留 main 的 R1/R2/R3 note）。
+- `cocos.config.json` 工作树噪声（Cocos 编辑器 gizmo 设置）已 `git checkout` 恢复，不入库。
