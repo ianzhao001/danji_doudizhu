@@ -298,3 +298,21 @@ git status --short --untracked-files=all
 - merge base：`0f74067`（task 自此分叉）。
 - dry-run `git merge --no-commit --no-ff task/P-G5-UIFIX`：Automatic merge went well，无冲突（BOARD.md 保留 main 的 R1/R2/R3 note）。
 - `cocos.config.json` 工作树噪声（Cocos 编辑器 gizmo 设置）已 `git checkout` 恢复，不入库。
+
+### 合并后基线
+
+- merge commit: `b13896c`（`--no-ff`，6 文件 +641−101）。
+- claim `7dd89bf` → merge `b13896c` → release `b5d73cb`；分支 `task/P-G5-UIFIX` 已删，worktree 已清。
+- 合并后 main `b5d73cb`：**141 文件 / 739 用例全绿（27.15s）+ typecheck 净 + diff --check 净**。
+- BOARD.md 保留规划者 R1/R2/R3 视觉审 note（task 未触 BOARD，合并无冲突）。
+
+## 下一步找谁
+
+- ✅ **规划者（Opus）**　☐ 执行者　☐ 审查者
+- 原因：P-G5-UIFIX done（`b13896c`），v1.2 第五波 UI-FIX 第二步闭合；V4 依赖已满足（P-G5-UIFIX ✅），需规划者派发 V4（verify-only 收口：固定 seed 四横屏 e2e + 双层视觉预审通过记录 + AI 指标 + PLAYTEST + 用户审美签收项）。V4 done + 用户审美签收通过 = v1.2 终点。
+
+## 给下一窗口（规划者）的可粘贴提示词
+
+```text
+你是本仓库 斗地主 的规划者。P-G5-UIFIX 已由审查者批准并合并入 main（b13896c，141/739 绿+typecheck 净+diff --check 净）。v1.2 第五波 UI-FIX 第二步闭合，双层视觉预审关三轮拦下全部硬伤（R1 2 硬伤→R2 1 残留→R3 达标 PASS）。先读：coordination/PROTOCOL.md、coordination/tasks/V4.md、coordination/tasks/R-WAVE5.md 的 R:V4、coordination/reports/P-G5-UIFIX.report.md 的验收披露段、coordination/BOARD.md 的 UI-REMAKE 段。下一步：派发 V4（依赖 P-G5-UIFIX ✅ 已满足）——verify-only 固定 seed 四横屏 e2e（v13 整改后布局·叫抢/出牌/选牌/AI出牌/结算/再来一局/返回大厅）+ 双层视觉预审通过记录在案 + AI 指标不低于 T-AI-1/T-AI-2 门 + PLAYTEST + 用户审美签收项明确列出（整体观感对照方向稿/名字牌/手牌/按钮/结算/手感），不代判。V4 done + 用户审美签收通过 = v1.2 终点。分支 task/V4 需自 main 建。
+```
