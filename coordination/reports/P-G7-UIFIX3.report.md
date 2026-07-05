@@ -1,8 +1,8 @@
 # P-G7-UIFIX3 Report
 
-任务：P-G7-UIFIX3 阶段①（#2 出牌区多牌 / #3 逆时针座位映射 / #4 左右家异常）  
-分支：task/P-G7-UIFIX3  
-日期：2026-07-06  
+任务：P-G7-UIFIX3 阶段①（#2 出牌区多牌 / #3 逆时针座位映射 / #4 左右家异常）
+分支：task/P-G7-UIFIX3
+日期：2026-07-06
 状态：ready-for-planner-visual-review
 
 ## 范围与红线
@@ -120,4 +120,3 @@ exit 0
 4. 本阶段未做暂停面板按钮接线，#1 仍走 ART-PAUSE-BTN → ART-IMPORT-PAUSE-BTN → P-G7 阶段②。
 
 规划者视觉审通过后，再交 `R-WAVE7 R:P-G7-UIFIX3` 做结构/证据审查。
-
