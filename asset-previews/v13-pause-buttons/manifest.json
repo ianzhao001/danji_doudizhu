@@ -1,0 +1,60 @@
+{
+  "assets": [
+    {
+      "name": "pause-btn-toggle",
+      "source": "source/pause-btn-toggle-source.png",
+      "output": "ui/pause-btn-toggle.png",
+      "size": [
+        360,
+        96
+      ],
+      "sha256": "dfc59c31cf9bae527c0fafbca9f0610360d88711577e4d3ba0f8d9c041c17a3e",
+      "source_sha256": "d00d6d1ee5137cec6981a07bec814bc762bb2e2a829df006be3f0978e2d7ad02",
+      "alpha": true,
+      "suggestedBorder": 24,
+      "suggestedTextColor": "#6C2E4C",
+      "samples": [
+        {
+          "slug": "audio-on",
+          "text": "音效开"
+        },
+        {
+          "slug": "motion-on",
+          "text": "动效开"
+        },
+        {
+          "slug": "haptic-on",
+          "text": "震动开"
+        }
+      ]
+    },
+    {
+      "name": "pause-btn-action",
+      "source": "source/pause-btn-action-source.png",
+      "output": "ui/pause-btn-action.png",
+      "size": [
+        360,
+        96
+      ],
+      "sha256": "3ff4a24015bad8b45b3898a45b4d0a0b7611bece6ff780f2853650300be97675",
+      "source_sha256": "38ba98aa373f166c150579016c0b8be686e518a63a20f3b051a4cede6e04ea21",
+      "alpha": true,
+      "suggestedBorder": 24,
+      "suggestedTextColor": "#6C2E4C",
+      "samples": [
+        {
+          "slug": "continue",
+          "text": "继续"
+        },
+        {
+          "slug": "restart",
+          "text": "重开"
+        },
+        {
+          "slug": "exit",
+          "text": "退出"
+        }
+      ]
+    }
+  ]
+}
