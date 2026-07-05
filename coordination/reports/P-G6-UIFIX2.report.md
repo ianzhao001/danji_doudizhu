@@ -128,3 +128,35 @@ Tests  56 passed (56)
 
 - 本轮按协议先交规划者做视觉审，不直接交用户或审查者。
 - 规划者视觉审通过后，再转 `R-WAVE6 R:P-G6-UIFIX2` 做结构/证据审查。
+
+## 审查段（审查者 GLM-5.2 · 2026-07-05）
+
+- 结论：**approved**（0 打回）
+- 审查任务书：`tasks/R-WAVE6.md` R:P-G6-UIFIX2
+- 审查分支：`task/P-G6-UIFIX2` `7d869ef`
+
+### 检查单逐项核销
+
+1. **文件域** ✅：执行者提交 `7d869ef` 仅 5 文件——`game-scene-skeleton.ts`(+37−18)、`hud-renderer.ts`(−5)、`result-overlay-renderer.ts`(+14−17)、`seats-renderer.ts`(+18−17)、`P-G6-UIFIX2.report.md`(+130)；全部在声明域（skeleton + game-scene/* + report）。test/纯层(rules/game/ai/flow/data)/lobby/scene/meta/resources/asset-keys/table-zones 零改动；未重做美术（无 PNG/meta 改动）。diff `main..task` 的 BOARD.md 2 行删为 main 后加 R1=PASS note 的分叉（非执行者改动，已核 `git show 7d869ef --stat`）。
+2. **diff 逐条对应 6 项** ✅：
+   - ① 人物外移上移：`seats-renderer.ts:153-158` `seatBodyVisualRect` 左右立绘 `inward 0.42`→`outward 0.03`（反向·外推屏缘）+ `screenY +=0.06`→`-=0.08`（上移）+ 视觉占位缩 0.95→0.9/0.92；
+   - ② 名字牌角色清晰+不深 felt：`seats-renderer.ts:191-197` 左座 `body.x+body.width*0.64`→`body.x+body.width*0.04`（从 64% 深处移到 4% 屏缘）、右座同理；`NAMEPLATE_MUTED` `142,88,108,235`→`96,48,74,248`（加深加不透明）；`renderSeatNameplate` compactHero 现也显角色行（`if(!compactHero)`→无条件显）；
+   - ③ 出牌区点数可见+手牌角标增大：`game-scene-skeleton.ts:607` AI 出牌缩放 `0.74`→`0.92`；`addDisplayCard:932-938` 角标字号 `joker?9:11`→`joker?11:13`、label 框 `34×18`→`38×22`、行高 `12/14`→`13/16`；
+   - ④ 按钮包裹+对比：`addButton:1046` 装饰按钮最小高 60→62；`showIcon` 阈值 `104`→`136`（窄按钮不显图标避挤字）；`labelHeight` `decorated?34`→`Math.max(30,renderHeight-26)`（约束不溢出）；`fontSize` `18`→`17`；`buttonSkinPath:1106` 加 `result-lobby`→primary（结算两键同肤）；`buttonIconPath:1127` 删 `result-lobby`→iconBack（去冗余箭头）；
+   - ⑤ 结算 5 子项：`result-overlay-renderer.ts` 标题加 `HEADING_BACKDROP(80,38,70,196)` 深底 + `HEADING_TEXT(255,248,253)` 浅字（c 项对比）；banner 高 `62`→`54`+胜败字 `30`→`24`+`bannerWidth-42,bannerHeight-12` 约束（b 项不溢出）；去「继续加油」fallback + spring 合入倍率行（a 项去重叠）；删 `result-lobby` iconBack（d 项）；两键 primary 同肤（e 项）；
+   - ⑥ 零重叠：`hud-renderer.ts:88-92` 删 `+N` more 指示（r1 自审抓修的「展开9」叠字）；四横屏 sweep 零重叠。
+3. **T-FIX-SETTLE + 相位互斥 + per-seat + T-LAYOUT4 不回归** ✅：`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES`/`showTransientHud = phase !== 'settled'` 仍在（skeleton:105/415-431/1439）；bidding/playing/settled 相位互斥分支保留（427-430）；per-seat `top?.seat===1`→`dropZoneLeft`、`===2`→`dropZoneRight`、hero→`dropZoneHero` 保留（581-585）；`table-zones.ts` 零改动（T-LAYOUT4 zone gap≥8 不回归）。
+4. **报告含自审勾销表+规划者视觉审结论(BOARD)** ✅：报告含 7 项自审勾销表（重叠/对比/包裹/闪烁/出牌点数可见/结算5子项/按钮逐颗包裹）+ r1→r2 修复记录；BOARD line 851 规划者视觉审 R1=PASS note（commit `a270843`，逐项对照 5 否点+针对性 zoom 证据路径齐全）。
+5. **四横屏 productErrors=[] + vitest/typecheck 不回归** ✅：`summary.json` 四档(844×390/812×375/915×412/780×360)×11 captures 全 `productErrors=[]`/`failedResponses=[]`；每档 2 settled 且 `transientActive=0`；`aiPlayCaptured`/`playerPlayCaptured`=true；vitest 141 文件/739 用例全绿（26.54s）；typecheck 净；`git diff --check` exit 0。
+
+### 全量回扫
+
+范围：全仓 `assets/scripts/` + `test/` + diff 逐行。结果：**0 域内致命 / 0 域外致命 / 0 拿不准**。
+- 无测试引用被删的 `hud-memory-more`/`+N` 节点（安全删）；
+- 无测试引用 `result-lobby` 按钮皮肤或 `card-rank-label` 缩放值（安全改）；
+- 无跨模块引用改动的节点名（`seat-name-label`/`seat-role-label`/`result-heading*`/`result-multiplier`/`result-spring`/`result-scores`/`result-score-panel`/`result-heading-backdrop` 仅在 game-scene 域内）；
+- 纯层无 import cc（4 改动文件均 UI 层，import cc 正常）。
+
+### 合并
+
+常规任务双闸：审查者 approved + 合并前 test/typecheck 全绿。即将 `claim/merge/release`。
