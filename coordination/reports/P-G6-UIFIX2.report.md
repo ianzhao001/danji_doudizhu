@@ -160,3 +160,12 @@ Tests  56 passed (56)
 ### 合并
 
 常规任务双闸：审查者 approved + 合并前 test/typecheck 全绿。即将 `claim/merge/release`。
+
+## 验收披露（审查者 GLM-5.2 · 2026-07-05）
+
+- 评审结论：**approved**，打回 0 轮。
+- 全量回扫范围：全仓 `assets/scripts/` + `test/` + diff 逐行；结果 0 域内致命 / 0 域外致命 / 0 拿不准。
+- 合并证据：claim `b261e8d` → merge `1951f88`（`--no-ff`，5 文件 +215−55）→ release `5264864`；worktree+分支已清理。
+- 合并后 main `5264864` 基线：**141 文件/739 用例全绿（27.64s）+ typecheck 净 + diff --check 净**。
+- 规划者视觉审 R1=PASS（BOARD line 851，commit `a270843`）已作为双层视觉预审第二层结论核销；审查者不重复视觉判断，只核结构/契约/证据链。
+- **下一步**：V5 收口（verify-only·固定 seed 四横屏全相位 e2e + 双层视觉预审通过记录复述 + AI 指标 + 用户审美签收项含 V4 5 否点逐项复核证据），审查按 R-WAVE6 R:V5。V5 done + 用户审美签收 → 规划者做 v1.2 版本终局裁定。
