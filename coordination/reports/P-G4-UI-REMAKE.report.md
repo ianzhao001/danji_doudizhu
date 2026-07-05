@@ -204,3 +204,62 @@ A  coordination/reports/P-G4-UI-REMAKE.report.md
 - [x] 全量测试通过
 - [x] typecheck 通过
 - [x] `git diff --check` 通过
+
+---
+
+## 审查段（审查者 GLM-5.2 · 2026-07-05）
+
+- 审查者标识：GLM-5.2（审查型 AI）
+- 审查结论：**approved**
+- 打回轮次：0
+- 审查任务书：`coordination/tasks/R-UI-REMAKE.md` R:P-G4-UI-REMAKE（修订版）
+
+### 检查单逐项核销
+
+1. **文件域仅 game-scene-skeleton + game-scene/* + report；lobby/纯层零触碰** ✅
+   - `git diff --name-only` 确认 5 文件：`game-scene-skeleton.ts` + `game-scene/{bid-actions-renderer,result-overlay-renderer,seats-renderer}.ts` + 本报告。
+   - grep `lobby|asset-keys|resources|\.meta|scene|rules|ai/|flow/|data/|save` 零越域命中（命中的 4 行均为 game-scene 路径内文件名匹配，非实际越域）。
+
+2. **消费 v13 新键组与 v13 zone；键覆盖清单与 import 报告对照** ✅
+   - diff 中 `RESOURCE_PATHS.*V13` 引用 23 个唯一键，与 `ART-IMPORT-GAME-REMAKE.report.md` 的 23 键清单逐键对照全覆盖。
+   - v13 zone 消费：`heroBody`/`opponentLeftBody`/`opponentRightBody`/`heroNameplate`/`opponentLeftNameplate`/`opponentRightNameplate`/`heroHandLarge`/`tableActionBar`/`settlementShowcase`。
+   - 旧键残留仅 `emphasisSpring`（非 v13 集合、既有资源、合规）。
+
+3. **相位互斥、per-seat 落点、bottomRevealed、T-FIX-SETTLE settled 门控不回归** ✅
+   - `showTransientHud = phase !== 'settled'`；playing actions 仅 `phase === 'playing'` 渲染；bidding 仅 bidding 相位渲染——相位互斥。
+   - `lastActionPosition`/`aiThinkingPosition` 改用 `opponentLeftBody`/`opponentRightBody`/`tableActionBar`/`heroHandLarge`——per-seat 落点对齐 v13 zone。
+   - 底牌托架 `cards?.[index]` → 卡面 / 无 → `cardBackV13` 牌背——bottomRevealed 逻辑保留。
+   - 四横屏结算截图 `transientActive=0`；`hideSettledTransientHud()` 在非 settled 态调用——T-FIX-SETTLE 门控不回归。
+
+4. **卡面混合渲染架构保持** ✅
+   - `cardSpritePath(card)`：小王→`jokerSmallV13`、大王→`jokerBigV13`、其余→`cardTemplateV13`。
+   - `suitSpritePath(suit)`：Spade/Heart/Club/Diamond → 对应 `suit*V13`，joker → null。
+   - 代码绘制点数 label 保留（`view.rankLabel` + `faceColor`）。
+
+5. **四横屏 GUI 证据齐 + productErrors=[] + 再来一局/返回大厅回归链** ✅
+   - `/tmp/doudizhu-pg4-v13-evidence-r5/summary.json`：4 横屏（844×390/812×375/915×412/780×360）× 11 captures，全部 `productErrors=[]` `failedResponses=[]`。
+   - 叫抢期 `handCards=17 seatBodies=3 seatNameplates=3`；结算 `transientActive=0`；返回大厅 `scene=lobby`。
+   - 再来一局回归链：round1 settled → restart-bidding → round2 settled → return-lobby。
+
+6. **无新增功能入口；用户主观终审不代下结论（转 V3）** ✅
+   - 仅 re-skin 既有按钮（btn 四态 v13），无新功能入口。
+   - 用户主观项（名字牌对比度/手牌可读性/结算观感/手感）转 V3。
+
+### 全量回扫（写 approved 前）
+
+- **回扫范围**：全仓代码库 + 本任务 diff（5 文件 / +381 −134）。
+- **类型兼容**：`TableZones extends TableRegions`（`table-zones.ts:16`），`renderSeats`/`renderSeatFeedback`/`renderHud`/`renderCardMemory`/`renderAdvisor` 签名 `TableRegions`→`TableZones` 安全；`renderPauseControl` 保留 `TableRegions` 签名但接收 `TableZones` 实参，结构类型兼容（typecheck 验证）。
+- **import 变更**：`cardAssetPath`/`suitAssetPath` 移除，由内联 `cardSpritePath`/`suitSpritePath` 替代；`Rank` 新增 import（rules/card.ts 导出，`SmallJoker=16/BigJoker=17`）。`cardView.suitKey: Suit | 'joker'` 与 `suitSpritePath` 签名匹配。
+- **跨模块回归**：无其他文件 import `game-scene/` 子模块（grep 确认），`GameSceneRendererContext` 接口未改。
+- **名字牌贴附口径**（T-LAYOUT3 仲裁）：nameplate 作为 seat root 子节点，body `setSiblingIndex(0)`、nameplate `setSiblingIndex(children.length-1)`——渲染于宿主 body 上层 z 序。✅
+- **settlementShowcase 相位口径**（T-LAYOUT3 仲裁）：结算面板定位至 `layout.settlementShowcase`，靠 `showTransientHud` 门控 + 暗幕 + `BlockInputEvents` 保证相位互斥。✅
+- **域内致命**：0
+- **域外致命**：0
+- **拿不准**：0
+- **非阻断观察**：1 项——`renderPlayArea` 条件从 `if (showLabel)` 改为 `if (showLabel && top)`，使 "自由出牌" 标签成为死代码（轻微 UI 行为变更，在 UI remake 范围内，不阻断）。
+
+### 客观门
+
+- `npm --prefix test test`：141 文件 / 727 用例全绿（审查者 main 工作树复跑）。
+- `npm --prefix test run typecheck`：exit 0。
+- `git diff main..task/P-G4-UI-REMAKE --check`：净。
