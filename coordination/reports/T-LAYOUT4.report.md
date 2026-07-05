@@ -146,3 +146,54 @@ rg -n "^import .*['\"]cc['\"]" assets/scripts/ui/table-zones.ts
 - [x] 未改测试、未碰他人模块
 - [x] 未获精确机器态 `approved` 前未合并 main
 - [x] 未 import cc
+
+## 审查者验收披露段（GLM-5.2 · 2026-07-05 17:08）
+
+### 评审结论
+
+**approved** — T-LAYOUT4 纯逻辑布局整改审查通过。名字牌分离、HUD 让位、角色外移上移均落地；种子三组断言全绿；既有 T-LAYOUT3 16 断言 + T-LAYOUT2 全部断言零改动全绿。
+
+### 打回轮次
+
+0 轮。
+
+### 检查单核销（R-WAVE5 R:T-LAYOUT4）
+
+- [x] **种子未被改动**：executor commit `aae324c` 不触 `test/`；`git diff main..task/T-LAYOUT4 -- test/` 仅含规划者种子提交 `99dd541`（T-LAYOUT4 describe 块新增 12 断言）。既有 16 断言逐字未动。
+- [x] **名字牌 vs 宿主 body rectGap ≥ 8**（三对×四横屏=12）：独立复算 844×390 全三对 rectGap=8（=gap，名字牌在 body 正上/正下方 gap 像素分离）；报告表四档全 8，与种子断言一致。
+- [x] **名字牌 vs heroHandLarge/tableActionBar ≥ 0**：报告表 844×390 heroNameplate-hand=82、heroNameplate-actionBar=149（四档全 ≥0）。
+- [x] **HUD vs 对家 body ≥ 8**：strength/memory vs leftBody 59/56/77/54；advisor vs rightBody 59/56/76/54（四档全 ≥8）。根因=opponent body 外移到屏缘（x=gap / x=width-gap-bodyWidth）+ 缩窄 bodyWidth（96-112），HUD 坐标（legacy actionButtons 相对）未改 → 自然分离。
+- [x] **零改动全绿**：`table-zones-v13.test.ts` 28/28 + `table-zones.test.ts` 28/28 = 56/56 全绿；T-LAYOUT2 语义（strength 左于 actionBar / memory 左半 / advisor 右半）由 `table-zones.test.ts` 锁定且通过。
+- [x] **legacy 6 字段深相等**：executor 仅改 `gameRemakeZones` 函数体；`tableZones` 函数体零改动（`{ ...legacy, ... }` spread 不变），`tableLayout` 零改动。
+- [x] **纯层无 cc import**：`rg -n "^import .*['\"]cc['\"]" assets/scripts/ui/table-zones.ts` 零命中。
+- [x] **全量 vitest/typecheck/diff-check**：141 文件/739 用例全绿（26.74s）+ typecheck 净 + `git diff --check` 净。
+- [x] **报告四横屏 rectGap 表**：zone 数值表 + rectGap 证据表齐全（4 档 × 9 zone + 11 gap 对）。
+
+### 逐行细读 gameRemakeZones 变更
+
+- **body 尺寸缩减 + 位置外移**：topBodyY 0.12→0.075（上移）、bodyWidth 0.142→0.125（缩窄）、bodyHeight 0.49→0.41（缩矮）；heroBodyX 改 `gap`（贴左缘）；rightBodyInset 删除，opponentRightBody 改 `width-gap-bodyWidth`（贴右缘）。三 body 形成左下(hero)/左上(opponentLeft)/右上(opponentRight)围桌，中部腾出给 HUD + 牌桌。
+- **名字牌分离**：heroNameplate 移到 heroBody 正上方（y=body.y-gap-nameplateHeight，rectGap=gap=8）；opponentLeftNameplate/opponentRightNameplate 移到各自 body 正下方（y=body.y+body.height+gap，rectGap=gap=8）。旧 T-LAYOUT3「贴附 body 允许重叠」裁定被推翻，新布局满足用户「元素不可重叠」硬约束。
+- **nameplateWidth clamp** 124-164→132-156（略缩）；heroNameplate width 上限 `heroBody.width+24`（原 +18，适应更窄 body）。数值合理，无魔法数。
+- **return 对象**：9 zone 全部返回，结构与 TableZones 接口一致。
+
+### 全量回扫（写 approved 前）
+
+- **文件域纯净**：executor commit 仅 `table-zones.ts`(+14/-15) + `T-LAYOUT4.report.md`(+148)，零越界。
+- **跨模块回归**：`table-zones.ts` 被 `game-scene-skeleton.ts` + `screen-view.ts` 消费，但 P-G5-UIFIX 尚未做（zone 值变化将在 P-G5 接线时生效）；纯逻辑层改动，无运行时副作用。
+- **证据链**：报告 zone 数值表 + rectGap 表完整；种子 8 红→绿可复现（红测基线段记录 8 断言失败）。
+- **打回轮次**：0。
+
+### 分流
+
+- 域内致命：无。
+- 域外致命：无。
+- 拿不准（非阻断）：无。
+- 阻塞：无。
+
+### 合并执行
+
+纯逻辑任务（随到随合 lane），审查者本人跑双闸全绿后执行 claim/merge/release。
+
+### 最终测试基线
+
+合并后 main 审查者独立复跑结果将追加于下方「合并后基线」段。
