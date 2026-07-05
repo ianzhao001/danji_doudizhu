@@ -9,6 +9,7 @@ import { RESOURCE_PATHS, type ResourcePath } from '../../asset-keys';
 import type { Rect } from '../../table-layout';
 import type { TableZones } from '../../table-zones';
 import { addUiTransform, drawPanel } from '../ui-helpers';
+import { dropZoneForSeat, seatDisplayName, visualSideForSeat } from './seat-display';
 
 export interface GameSceneRendererContext {
   uiRoot: Node;
@@ -69,13 +70,6 @@ const HERO_SEAT: SeatIndex = 0;
 const NAMEPLATE_TEXT = new Color(108, 46, 76, 255);
 const NAMEPLATE_MUTED = new Color(96, 48, 74, 248);
 
-function seatName(seat: number): string {
-  if (seat === 0) return '你';
-  if (seat === 1) return '左家';
-  if (seat === 2) return '右家';
-  return `座位${seat + 1}`;
-}
-
 export function renderSeats(
   ctx: GameSceneRendererContext,
   handCounts: [number, number, number],
@@ -86,6 +80,8 @@ export function renderSeats(
   const heroBody = seatBodyVisualRect('seat-hero', layout.heroBody, canvas);
   const leftBody = seatBodyVisualRect('seat-left', layout.opponentLeftBody, canvas);
   const rightBody = seatBodyVisualRect('seat-right', layout.opponentRightBody, canvas);
+  const leftSeat: SeatIndex = 2;
+  const rightSeat: SeatIndex = 1;
   renderSeatCard(ctx, 'seat-hero', heroBody, canvas, RESOURCE_PATHS.heroBodyV13);
   renderSeatCard(ctx, 'seat-left', leftBody, canvas, RESOURCE_PATHS.leftAiBodyV13);
   renderSeatCard(ctx, 'seat-right', rightBody, canvas, RESOURCE_PATHS.rightAiBodyV13);
@@ -101,19 +97,19 @@ export function renderSeats(
   renderSeatNameplate(
     ctx,
     'seat-left-nameplate',
-    seatNameplateRect(1, layout.opponentLeftNameplate, leftBody, layout, canvas),
+    seatNameplateRect(leftSeat, layout.opponentLeftNameplate, leftBody, layout, canvas),
     canvas,
-    1,
-    handCounts[1],
+    leftSeat,
+    handCounts[leftSeat],
     landlord,
   );
   renderSeatNameplate(
     ctx,
     'seat-right-nameplate',
-    seatNameplateRect(2, layout.opponentRightNameplate, rightBody, layout, canvas),
+    seatNameplateRect(rightSeat, layout.opponentRightNameplate, rightBody, layout, canvas),
     canvas,
-    2,
-    handCounts[2],
+    rightSeat,
+    handCounts[rightSeat],
     landlord,
   );
 }
@@ -187,7 +183,8 @@ function seatNameplateRect(
     );
     return { x, y, width: compactWidth, height };
   }
-  if (seat === 1) {
+  const side = visualSideForSeat(seat);
+  if (side === 'left') {
     const x = clamp(body.x + Math.round(body.width * 0.04), gap, canvas.width - gap - width);
     const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
     return { x, y, width, height };
@@ -232,7 +229,7 @@ function renderSeatNameplate(
   const compactHero = seat === HERO_SEAT && nameplate.width < 80;
   const labelWidth = Math.max(40, nameplate.width - 16);
   const label = ctx.addLabel(
-    compactHero ? seatName(seat) : `${seatName(seat)}  ${handCount}张`,
+    compactHero ? seatDisplayName(seat) : `${seatDisplayName(seat)}  ${handCount}张`,
     0,
     compactHero ? 6 : 5,
     compactHero ? 13 : 13,
@@ -287,7 +284,7 @@ function renderAiThinking(
   drawPanel(root, pos.width, 28, new Color(37, 42, 58, 176));
 
   const dots = ctx.settings.animation ? '.'.repeat(thinking.dots) : '';
-  const label = ctx.addLabel(`${seatName(thinking.seat)}思考中${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
+  const label = ctx.addLabel(`${seatDisplayName(thinking.seat)}思考中${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
   label.color = new Color(221, 242, 255, 255);
 }
 
@@ -310,8 +307,8 @@ export function lastActionPosition(
     const pos = ctx.screenPoint(canvas, canvas.width / 2, Math.max(layout.tableActionBar.y - 18, layout.heroHandLarge.y - 42));
     return { ...pos, width: 146 };
   }
-  const rect = seat === 1 ? layout.dropZoneLeft : layout.dropZoneRight;
-  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(22, rect.y - 12));
+  const rect = dropZoneForSeat(layout, seat);
+  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(22, rect.y - 32));
   return { ...pos, width: 124 };
 }
 
@@ -321,7 +318,7 @@ export function aiThinkingPosition(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): { x: number; y: number; width: number } {
-  const rect = seat === 1 ? layout.dropZoneLeft : layout.dropZoneRight;
-  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(24, rect.y - 16));
+  const rect = dropZoneForSeat(layout, seat);
+  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(24, rect.y - 36));
   return { ...pos, width: 126 };
 }

@@ -8,6 +8,7 @@ import type { TableZones } from '../../table-zones';
 import { deriveTurnTimer } from '../../turn-timer';
 import { addUiTransform, drawPanel } from '../ui-helpers';
 import type { GameSceneRendererContext } from './seats-renderer';
+import { swapLegacySideText } from './seat-display';
 
 const STATUS_TEXT = new Color(255, 247, 226, 255);
 const STATUS_BACKDROP = new Color(64, 38, 60, 186);
@@ -20,7 +21,7 @@ export function renderBidding(
 ): void {
   if (!bidding) return;
   const prompt = ctx.rectPoint(layout.statusLine, canvas, 0.5, 0.5);
-  renderStatusPill(ctx, 'bidding-prompt', bidding.prompt, prompt.x, prompt.y, Math.min(230, layout.statusLine.width), 32, 16);
+  renderStatusPill(ctx, 'bidding-prompt', swapLegacySideText(bidding.prompt), prompt.x, prompt.y, Math.min(230, layout.statusLine.width), 32, 16);
   const buttonHeight = 60;
   const buttonWidth = Math.min(118, Math.max(96, (layout.tableActionBar.width - 12) / Math.max(1, bidding.buttons.length)));
   const step = buttonWidth + 10;
