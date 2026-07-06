@@ -925,7 +925,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 
 | ID | 波 | 类型 | 文件域 | 依赖 | 分支 | 状态 |
 |----|----|----|----|----|----|----|
-| T-MEMORY-REAL | A | 高风险(改产品码·flow+ai) | `flow/{types,driver,round-runtime,policies}.ts` + `ai/levels/hard.ts` + report | —（A 波首任务） | `task/T-MEMORY-REAL` | approved-pending-planner |
+| T-MEMORY-REAL | A | 高风险(改产品码·flow+ai) | `flow/{types,driver,round-runtime,policies}.ts` + `ai/levels/hard.ts` + report | —（A 波首任务） | `task/T-MEMORY-REAL` | approved |
 | T-RUNTIME-SPLIT | A | move-only 强化 | `flow/round-runtime.ts` + 新 `flow/runtime/*.ts` + report | T-MEMORY-REAL | `task/T-RUNTIME-SPLIT`（届时自 main 建） | blocked |
 | T-VIEW-SEAT | A | 常规 | `ui/ai-thinking-view.ts` + report（+规划者改种 `test/ui/ai-thinking-view.test.ts`） | — | `task/T-VIEW-SEAT` | **ready·种子 `7afd853`**（2 红/3 绿·typecheck 净） |
 | T-PROFILE-FOLLOWS | A | 零风险(不改产品) | `test/bench/*`（新）+ report | — | `task/T-PROFILE-FOLLOWS` | ready（无种子·bench 不入默认套件） |
@@ -944,3 +944,5 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > - **红线**：不加新功能入口（叫抢建议=接既有能力·面板默认低打扰）；不动 `game/`、`rules/` 语义；save/lobby 皮肤/叫抢存档不碰；settled 门控/相位互斥/逆时针映射/卡面无中心数字/暂停按钮等 v1.2 成果全不回归（各 R 单列不变量清单）。
 > - 审查单：`tasks/R-WAVE8.md`（9 任务 R 检查单·T-MEMORY-REAL 标三闸）。
 > - 终点：V7 done + 用户轻签收 → 规划者 v1.3 版本终局裁定。
+
+> **三闸把关记录（T-MEMORY-REAL·规划者·2026-07-07）**：结构性把关 **5/5 全过**，状态改 `approved`（分支 `69f3ae4`·基 main `de1cc8c`·打回 0 轮·审查回扫 0/0/0）。①接口宽化全为可选加法——`PlayPolicy.history?` + `AiStrategy` 第三参 `history? = []`（`hardStrategy` 空历史短路走原路径），既有两参直调 10 文件 46 用例零改动全绿；②`trackPlayed` 本体零 diff（`cardMemory.ts` wc=0），仅调用点 `[]`→真历史；③`game/`、`rules/` 零触碰（wc=0），`_shared`/`simple`/`normal`/`lead-score` 冻结件零 diff，`hard.ts` 仅增 type-only `GameEvent` import（ai→game 类型依赖既有，无新方向）；④质量门 `selfplay/quality` 4/4 绿，九项指标与 v1.2 基线（V4/V5 披露段数值）逐字一致——**口径发现**：`quality.ts statsPolicy` 两参直调不喂 history（规划者原测试设计），该门证明旧路径零回退；真历史链路已由 `difficulty.ts`（T-DEDUP 复用生产 `levelPolicies`，本次起自动喂真历史）覆盖于 746 绿内，真记牌整局新基线归 V7 取数（V7 卡与 R-WAVE8 已加口径注记）；⑤接管规则与 spec 钉死逐项一致——位置=`chooseControlFollow` 后 `conservativeAction` 前，守卫=跟牌+非 pressing+非队友顶+history 非空+仅 Single，判定=`trackPlayed(history,hand).remainingByRank` 上位 rank 全 0，选择=`pickSmallest` 最小者，`_rng` 零消费、评分常数零改动。附核：种子自 `3548ae8` 零改动；分支自 merge-base `f96e0c8` 零触 BOARD（合并无冲突面）；spec 文件域漏列 `flow/policies.ts` 属规划者笔误（BOARD 行与 R-WAVE8 均含·1 行必要透传），审查者裁量正确。**下一步**：审查者双闸（全量 test+typecheck）→ `claim/merge/release`；合并时在报告回填「规划者批量结构性把关」行（引本记录）；合并后回规划者建 `task/T-RUNTIME-SPLIT` 分支派发（依赖满足）。
