@@ -293,3 +293,69 @@ exit 0
 4. 四横屏暂停 menu+confirm 是否无重叠、无透底、无闪烁。
 
 规划者视觉审通过后，再交 `R-WAVE7 R:P-G7-UIFIX3` 做结构/证据审查。
+
+---
+
+## 审查者结论（R-WAVE7 R:P-G7-UIFIX3 阶段② · GLM-5.2 · 2026-07-06）
+
+**结论：approved**，打回 0 轮。
+
+### 文件域核查
+
+分支 `task/P-G7-UIFIX3`（`0a0a801`），diff `main..task/P-G7-UIFIX3` 仅 3 文件 +43−13（真实代码改动）：
+
+1. `assets/scripts/ui/components/game-scene-skeleton.ts`（+43/-13：renderPauseMenu 6 按钮重构+renderPauseConfirm 2 按钮重构+buttonSkinPath/buttonTextColor 消费新键+isPauseToggleButton/isPauseActionButton 辅助+2 色彩常量）
+2. `coordination/reports/P-G7-UIFIX3.report.md`（阶段②报告追加）
+3. `coordination/BOARD.md`（分支落后 main——main 有规划者视觉审 PASS note `650b5cd`，分支建于 `3af025a` 未含该 note；3-way merge 自动保留 main 版本）
+
+**零改动域**（逐域 `git diff --name-only` exit=0 核验）：`asset-keys.ts`（键上轮 ART-IMPORT-PAUSE-BTN 已就位）、`assets/scripts/game/`（nextSeat 不动）、`test/`、纯层（rules/game/ai/flow/data）、lobby、scene、meta、resources、`table-zones.ts`、`game-scene/` 子目录（阶段① 的 seat-display.ts/seats-renderer.ts/bid-actions-renderer.ts/result-overlay-renderer.ts 均零改动）。
+
+### 检查单逐项核销
+
+| 检查项 | 结论 | 证据 |
+|---|---|---|
+| 文件域仅 game-scene-skeleton+report | ✅ | diff 3 文件，代码仅 game-scene-skeleton.ts；asset-keys/game/test/纯层/lobby/meta/resources/game-scene/* 逐域 exit=0 |
+| asset-keys 零改动（键上轮已就位） | ✅ | `git diff --name-only -- asset-keys.ts` exit=0；main 上 `pauseBtnToggle`/`pauseBtnAction` 在 asset-keys.ts:53-54 |
+| 消费 ART-IMPORT-PAUSE-BTN 新键 | ✅ | `buttonSkinPath` 调 `RESOURCE_PATHS.pauseBtnToggle`（toggle 组）/`RESOURCE_PATHS.pauseBtnAction`（action 组）；`isPauseToggleButton`=`pause-setting-*`；`isPauseActionButton`=`pause-continue/restart/quit/confirm/cancel` |
+| 暂停 6 btn 背景包裹文字 | ✅ | 按钮高度 30/42→60（容 border 24+24=48）；宽度动态 82-88（`Math.min(88, Math.max(82, floor((panelWidth-56)/3)))`）；confirm 按钮 100×42→112×60 |
+| 两组各同色高对比 | ✅ | toggle 组=`pauseBtnToggle` 浅奶油底+`BUTTON_PAUSE_TOGGLE_TEXT`(116,54,72) 深粉棕字；action 组=`pauseBtnAction` 金黄底+`BUTTON_PAUSE_ACTION_TEXT`(98,54,24) 深棕字 |
+| 四横屏暂停面板 menu+confirm 截图 | ✅ | 4 档×2 captures=8 图 + contact-sheet；menu=True/confirm=True 全档 |
+| 双层视觉预审通过记录 | ✅ | 执行者自审勾销表 6 项 + BOARD 规划者视觉审 PASS（`650b5cd`） |
+| settled 门控不回归 | ✅ | `SETTLEMENT_TRANSIENT_HUD_NODE_NAMES`/`showTransientHud` 10 处命中（未触） |
+| 相位互斥不回归 | ✅ | 未触相关逻辑 |
+| #3 座位映射不回归 | ✅ | seat-display.ts/seats-renderer.ts 零改动；`seatDisplayName`/`visualSideForSeat`/`dropZoneForSeat` 7 处命中（阶段① 代码 intact） |
+| T-LAYOUT4 无重叠不回归 | ✅ | table-zones.ts exit=0 |
+| productErrors=[] | ✅ | 四档（844×390/812×375/915×412/780×360）全 `[]`/`failedResponses=[]`/menu=True/confirm=True |
+| vitest 141/739 | ✅ | 141 passed (141) / 739 passed (739) 26.85s |
+| typecheck | ✅ | tsc --noEmit 净 |
+| diff --check | ✅ | exit=0 |
+
+### 代码逐行细读
+
+1. **色彩常量**（+2 行）：`BUTTON_PAUSE_TOGGLE_TEXT`(116,54,72,255) 深粉棕 / `BUTTON_PAUSE_ACTION_TEXT`(98,54,24,255) 深棕——与各自浅奶油底/金黄底高对比，正确。
+2. **renderPauseMenu**（+13/-8）：`buttonWidth=Math.min(88,Math.max(82,floor((panelWidth-56)/3)))` 动态宽度适应面板；`buttonStep=buttonWidth+8` 间距；`buttonHeight=60` 容 border24；3 toggle 一行（leftX/0/rightX @y=20）+3 action 一行（leftX/0/rightX @y=-58）——两行三列布局清晰，间距充足。
+3. **renderPauseConfirm**（+2/-2）：`112×60`（原 100×42）+x=±64（原 ±58）——加高加宽容 border、文字居中。
+4. **buttonSkinPath**（+2/-1）：`isPauseToggleButton`→`pauseBtnToggle` 在前；`isPauseActionButton`→`pauseBtnAction` 次之；`action-hint`→`btnTertiaryV13` 保留。旧 `pause-setting-*`→`btnTertiaryV13` 分支被新键替代。注意 `pause-continue` 仍在 `btnPrimaryV13` 条件列表中但已成死代码（`isPauseActionButton` 先拦截）——非阻断、不影响正确性。
+5. **buttonTextColor**（+2 行）：同样先判 toggle/action，再走 skin 映射。正确。
+6. **isPauseToggleButton/isPauseActionButton**（+14 行）：纯粹 name 前缀/精确匹配判断，无副作用。覆盖 `pause-setting-*`（3 按钮）/`pause-continue`+`pause-restart`+`pause-quit`+`pause-confirm`+`pause-cancel`（5 按钮）= 8 按钮，与 `renderPauseMenu`(6)+`renderPauseConfirm`(2) 一致。
+
+### 全量回扫
+
+- **域内致命**：0
+- **域外致命**：0
+- **拿不准（非阻断·转规划者建议单）**：1 项——`buttonSkinPath` 的 `btnPrimaryV13` 条件列表中 `pause-continue` 已成死代码（`isPauseActionButton` 先拦截）。不影响正确性，建议后续清理（另拆任务，不阻断本轮）。
+- 回归验证：settled 门控 10 命中（intact）、seat mapping 7 命中（intact）、nextSeat 在 `game/seat.ts:8`（不动）、table-zones exit=0、`pauseBtn` 键仅 asset-keys(2)+skeleton(消费) 两处命中（无意外消费者）。
+
+### 合并提示处理
+
+分支建于 `3af025a`（早于 main 规划者视觉审 PASS note `650b5cd`）。`git diff main..task/P-G7-UIFIX3 -- BOARD.md` 显示该 note -1 是分支落后 main、非执行者删除。3-way merge 自动保留 main 版本，无冲突。
+
+### 合并证据
+
+claim → merge → release（见下文提交）。
+
+合并后 main：**141 文件/739 用例全绿 + typecheck 净 + diff --check 净**。
+
+### 下一步
+
+P-G7-UIFIX3 阶段② done。V6 收口（verify-only·固定 seed 四横屏全相位 + V5 四否点逐项复核[#4 重点] + 用户审美签收）→ **v1.2 终点**。用户主观终审不可由 AI 代判。
