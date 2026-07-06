@@ -31,5 +31,12 @@
 - [ ] AI 指标不低于门；PLAYTEST；双层视觉预审记录；**用户审美签收项**明确列出（含 V5 四否点复核），不代判。
 - [ ] 合并后披露：V6 done + 用户签收 → 规划者 v1.2 版本终局裁定。
 
+## R:T-FIX-DROP-HUD（scoped-fix·结构+证据·不判美观）
+- [ ] 文件域仅 game-scene-skeleton+game-scene/*+report；test/纯层/lobby/scene/meta/resources/asset-keys 零改动；game 层出牌轮转/#3 座位映射 diff 零改动；未重做美术。
+- [ ] diff 核：side-seat 多牌安全区扩展避让 strength/memory HUD（及右侧 timer/advisor）；#2 既有（牌间不互压/牌型标签不压牌）不回归。
+- [ ] settled 门控/相位/T-LAYOUT4 无重叠/卡面无中心数字/暂停面板/逆时针映射 不回归。
+- [ ] 报告含执行者自审勾销表（左家多牌×HUD 净空四档）+ 规划者视觉审结论（BOARD）。
+- [ ] 四横屏 productErrors=[]；vitest/typecheck 不回归（141/739）。
+
 ---
 格式沿用 R-WAVE1 尾部 + `templates/handoff.md`。

@@ -1,0 +1,1269 @@
+{
+  "task": "T-FIX-DROP-HUD",
+  "seed": 20260705,
+  "url": "http://127.0.0.1:18182/?seed=20260705",
+  "method": "runtime visual injection after entering real Cocos playing scene; no product code mutation",
+  "generatedAt": "2026-07-06T09:29:25.081Z",
+  "results": [
+    {
+      "viewport": {
+        "name": "844x390",
+        "width": 844,
+        "height": 390
+      },
+      "productErrors": [],
+      "failedResponses": [],
+      "captures": [
+        {
+          "name": "left-single",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-left-single.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 0,
+                "mainRank": 8,
+                "length": 1,
+                "cards": [
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 1
+          }
+        },
+        {
+          "name": "left-pair",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-left-pair.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 1,
+                "mainRank": 10,
+                "length": 2,
+                "cards": [
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 2
+          }
+        },
+        {
+          "name": "left-straight8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-left-straight8.png",
+          "zoomFile": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-left-straight8-zoom.png",
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 15,
+                "mainRank": 13,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 6,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 7,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 9,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 11,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 12,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 13,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "left-airplane8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-left-airplane8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 18,
+                "mainRank": 4,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 3,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 5,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 6,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "right-single",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-right-single.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 0,
+                "mainRank": 8,
+                "length": 1,
+                "cards": [
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 1
+          }
+        },
+        {
+          "name": "right-pair",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-right-pair.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 1,
+                "mainRank": 10,
+                "length": 2,
+                "cards": [
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 2
+          }
+        },
+        {
+          "name": "right-straight8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-right-straight8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 15,
+                "mainRank": 13,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 6,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 7,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 9,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 11,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 12,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 13,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "right-airplane8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/844x390/T-FIX-DROP-HUD-844x390-right-airplane8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 18,
+                "mainRank": 4,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 3,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 5,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 6,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        }
+      ]
+    },
+    {
+      "viewport": {
+        "name": "812x375",
+        "width": 812,
+        "height": 375
+      },
+      "productErrors": [],
+      "failedResponses": [],
+      "captures": [
+        {
+          "name": "left-single",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-left-single.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 0,
+                "mainRank": 8,
+                "length": 1,
+                "cards": [
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 1
+          }
+        },
+        {
+          "name": "left-pair",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-left-pair.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 1,
+                "mainRank": 10,
+                "length": 2,
+                "cards": [
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 2
+          }
+        },
+        {
+          "name": "left-straight8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-left-straight8.png",
+          "zoomFile": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-left-straight8-zoom.png",
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 15,
+                "mainRank": 13,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 6,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 7,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 9,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 11,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 12,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 13,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "left-airplane8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-left-airplane8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 18,
+                "mainRank": 4,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 3,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 5,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 6,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "right-single",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-right-single.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 0,
+                "mainRank": 8,
+                "length": 1,
+                "cards": [
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 1
+          }
+        },
+        {
+          "name": "right-pair",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-right-pair.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 1,
+                "mainRank": 10,
+                "length": 2,
+                "cards": [
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 2
+          }
+        },
+        {
+          "name": "right-straight8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-right-straight8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 15,
+                "mainRank": 13,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 6,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 7,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 9,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 11,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 12,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 13,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "right-airplane8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/812x375/T-FIX-DROP-HUD-812x375-right-airplane8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 18,
+                "mainRank": 4,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 3,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 5,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 6,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        }
+      ]
+    },
+    {
+      "viewport": {
+        "name": "915x412",
+        "width": 915,
+        "height": 412
+      },
+      "productErrors": [],
+      "failedResponses": [],
+      "captures": [
+        {
+          "name": "left-single",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-left-single.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 0,
+                "mainRank": 8,
+                "length": 1,
+                "cards": [
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 1
+          }
+        },
+        {
+          "name": "left-pair",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-left-pair.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 1,
+                "mainRank": 10,
+                "length": 2,
+                "cards": [
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 2
+          }
+        },
+        {
+          "name": "left-straight8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-left-straight8.png",
+          "zoomFile": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-left-straight8-zoom.png",
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 15,
+                "mainRank": 13,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 6,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 7,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 9,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 11,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 12,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 13,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "left-airplane8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-left-airplane8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 18,
+                "mainRank": 4,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 3,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 5,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 6,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "right-single",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-right-single.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 0,
+                "mainRank": 8,
+                "length": 1,
+                "cards": [
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 1
+          }
+        },
+        {
+          "name": "right-pair",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-right-pair.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 1,
+                "mainRank": 10,
+                "length": 2,
+                "cards": [
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 2
+          }
+        },
+        {
+          "name": "right-straight8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-right-straight8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 15,
+                "mainRank": 13,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 6,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 7,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 9,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 11,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 12,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 13,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "right-airplane8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/915x412/T-FIX-DROP-HUD-915x412-right-airplane8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 18,
+                "mainRank": 4,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 3,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 5,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 6,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        }
+      ]
+    },
+    {
+      "viewport": {
+        "name": "780x360",
+        "width": 780,
+        "height": 360
+      },
+      "productErrors": [],
+      "failedResponses": [],
+      "captures": [
+        {
+          "name": "left-single",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-left-single.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 0,
+                "mainRank": 8,
+                "length": 1,
+                "cards": [
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 1
+          }
+        },
+        {
+          "name": "left-pair",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-left-pair.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 1,
+                "mainRank": 10,
+                "length": 2,
+                "cards": [
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 2
+          }
+        },
+        {
+          "name": "left-straight8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-left-straight8.png",
+          "zoomFile": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-left-straight8-zoom.png",
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 15,
+                "mainRank": 13,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 6,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 7,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 9,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 11,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 12,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 13,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "left-airplane8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-left-airplane8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 2,
+              "pattern": {
+                "category": 18,
+                "mainRank": 4,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 3,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 5,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 6,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "right-single",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-right-single.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 0,
+                "mainRank": 8,
+                "length": 1,
+                "cards": [
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 1
+          }
+        },
+        {
+          "name": "right-pair",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-right-pair.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 1,
+                "mainRank": 10,
+                "length": 2,
+                "cards": [
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 2
+          }
+        },
+        {
+          "name": "right-straight8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-right-straight8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 15,
+                "mainRank": 13,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 6,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 7,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 8,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 9,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 10,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 11,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 12,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 13,
+                    "suit": "S"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        },
+        {
+          "name": "right-airplane8",
+          "file": "coordination/reports/T-FIX-DROP-HUD-evidence/780x360/T-FIX-DROP-HUD-780x360-right-airplane8.png",
+          "zoomFile": null,
+          "top": {
+            "phase": "playing",
+            "top": {
+              "seat": 1,
+              "pattern": {
+                "category": 18,
+                "mainRank": 4,
+                "length": 8,
+                "cards": [
+                  {
+                    "rank": 3,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 3,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "H"
+                  },
+                  {
+                    "rank": 4,
+                    "suit": "C"
+                  },
+                  {
+                    "rank": 5,
+                    "suit": "S"
+                  },
+                  {
+                    "rank": 6,
+                    "suit": "H"
+                  }
+                ]
+              }
+            },
+            "scenarioCards": 8
+          }
+        }
+      ]
+    }
+  ]
+}
