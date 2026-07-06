@@ -21,9 +21,12 @@ describe('selfplay AI vs AI 稳定性（回归护栏）', () => {
     }
   });
 
+  // 显式预算（规划者种入 2026-07-06·V6 审查裁定的非阻断建议单落地）：本用例跑两遍 runSeeds
+  // （≈2× 成本），默认 5s 预算实测仅剩 ~5% 余量（4735ms），机器并发构建/e2e 时会负载翻车——
+  // 与同套件 quality 门（120s/180s）对齐给出显式预算，消除负载敏感 flake。非性能门。
   it('可复现：同一组 seeds 跑两次，SeedSummary[] 深相等', async () => {
     const first = await runSeeds(SEEDS);
     const second = await runSeeds(SEEDS);
     expect(second).toEqual(first);
-  });
+  }, 30_000);
 });
