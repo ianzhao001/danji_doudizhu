@@ -144,6 +144,8 @@ const BUTTON_PRIMARY_TEXT = new Color(116, 36, 82, 255);
 const BUTTON_SECONDARY_TEXT = new Color(255, 255, 255, 255);
 const BUTTON_TERTIARY_TEXT = new Color(116, 68, 28, 255);
 const BUTTON_DISABLED_TEXT = new Color(86, 72, 82, 220);
+const BUTTON_PAUSE_TOGGLE_TEXT = new Color(116, 54, 72, 255);
+const BUTTON_PAUSE_ACTION_TEXT = new Color(98, 54, 24, 255);
 const RUNTIME_PRELOAD_SPRITES: readonly ResourcePath[] = [
   RESOURCE_PATHS.gameTableBgV13,
   RESOURCE_PATHS.heroBodyV13,
@@ -828,20 +830,25 @@ export class GameSceneSkeleton extends Component {
     this.addLabel('暂停', 0, panelHeight / 2 - 46, 26, panel, panelWidth - 48, 48, 'pause-title', BRIGHT_PANEL_TEXT);
     const hint = this.addLabel('本局进度已保留', 0, panelHeight / 2 - 82, 14, panel, panelWidth - 58, 30, 'pause-hint', BRIGHT_PANEL_MUTED);
     hint.color = BRIGHT_PANEL_MUTED;
-    this.addButton(`音效${this.settings.sound ? '开' : '关'}`, -84, 38, 72, 30, true, () => this.toggleRuntimeSetting('sound'), panel, 'pause-setting-sound');
-    this.addButton(`动效${this.settings.animation ? '开' : '关'}`, 0, 38, 72, 30, true, () => this.toggleRuntimeSetting('animation'), panel, 'pause-setting-animation');
-    this.addButton(`震动${this.settings.vibration ? '开' : '关'}`, 84, 38, 72, 30, true, () => this.toggleRuntimeSetting('vibration'), panel, 'pause-setting-vibration');
-    this.addButton('继续', 0, -8, 176, 42, true, () => this.closePauseMenu(), panel, 'pause-continue');
-    this.addButton('重开', 0, -64, 176, 42, true, () => this.restartFromPause(), panel, 'pause-restart');
-    this.addButton('退出', 0, -120, 176, 42, true, () => this.askPauseQuit(), panel, 'pause-quit');
+    const buttonWidth = Math.min(88, Math.max(82, Math.floor((panelWidth - 56) / 3)));
+    const buttonStep = buttonWidth + 8;
+    const buttonHeight = 60;
+    const leftX = -buttonStep;
+    const rightX = buttonStep;
+    this.addButton(`音效${this.settings.sound ? '开' : '关'}`, leftX, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('sound'), panel, 'pause-setting-sound');
+    this.addButton(`动效${this.settings.animation ? '开' : '关'}`, 0, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('animation'), panel, 'pause-setting-animation');
+    this.addButton(`震动${this.settings.vibration ? '开' : '关'}`, rightX, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('vibration'), panel, 'pause-setting-vibration');
+    this.addButton('继续', leftX, -58, buttonWidth, buttonHeight, true, () => this.closePauseMenu(), panel, 'pause-continue');
+    this.addButton('重开', 0, -58, buttonWidth, buttonHeight, true, () => this.restartFromPause(), panel, 'pause-restart');
+    this.addButton('退出', rightX, -58, buttonWidth, buttonHeight, true, () => this.askPauseQuit(), panel, 'pause-quit');
   }
 
   private renderPauseConfirm(panel: Node, panelWidth: number, panelHeight: number): void {
     this.addLabel('退出对局？', 0, panelHeight / 2 - 48, 24, panel, panelWidth - 48, 48, 'pause-confirm-title', BRIGHT_PANEL_TEXT);
     const hint = this.addLabel('确认后返回大厅', 0, 14, 16, panel, panelWidth - 58, 36, 'pause-confirm-hint', BRIGHT_PANEL_MUTED);
     hint.color = BRIGHT_PANEL_MUTED;
-    this.addButton('确认', -58, -64, 100, 42, true, () => director.loadScene('lobby'), panel, 'pause-confirm');
-    this.addButton('取消', 58, -64, 100, 42, true, () => this.cancelPauseQuit(), panel, 'pause-cancel');
+    this.addButton('确认', -64, -64, 112, 60, true, () => director.loadScene('lobby'), panel, 'pause-confirm');
+    this.addButton('取消', 64, -64, 112, 60, true, () => this.cancelPauseQuit(), panel, 'pause-cancel');
   }
 
   private openPauseMenu(): void {
@@ -1154,7 +1161,9 @@ export class GameSceneSkeleton extends Component {
 
   private buttonSkinPath(name: string, enabled: boolean): ResourcePath {
     if (!enabled) return RESOURCE_PATHS.btnDisabledV13;
-    if (name === 'action-hint' || name.startsWith('pause-setting-')) return RESOURCE_PATHS.btnTertiaryV13;
+    if (this.isPauseToggleButton(name)) return RESOURCE_PATHS.pauseBtnToggle;
+    if (this.isPauseActionButton(name)) return RESOURCE_PATHS.pauseBtnAction;
+    if (name === 'action-hint') return RESOURCE_PATHS.btnTertiaryV13;
     if (
       name === 'action-play' ||
       name === 'bid-call' ||
@@ -1170,10 +1179,26 @@ export class GameSceneSkeleton extends Component {
 
   private buttonTextColor(name: string, enabled: boolean): Color {
     if (!enabled) return BUTTON_DISABLED_TEXT;
+    if (this.isPauseToggleButton(name)) return BUTTON_PAUSE_TOGGLE_TEXT;
+    if (this.isPauseActionButton(name)) return BUTTON_PAUSE_ACTION_TEXT;
     const skin = this.buttonSkinPath(name, enabled);
     if (skin === RESOURCE_PATHS.btnPrimaryV13) return BUTTON_PRIMARY_TEXT;
     if (skin === RESOURCE_PATHS.btnTertiaryV13) return BUTTON_TERTIARY_TEXT;
     return BUTTON_SECONDARY_TEXT;
+  }
+
+  private isPauseToggleButton(name: string): boolean {
+    return name.startsWith('pause-setting-');
+  }
+
+  private isPauseActionButton(name: string): boolean {
+    return (
+      name === 'pause-continue' ||
+      name === 'pause-restart' ||
+      name === 'pause-quit' ||
+      name === 'pause-confirm' ||
+      name === 'pause-cancel'
+    );
   }
 
   private buttonIconPath(name: string): ResourcePath | null {
