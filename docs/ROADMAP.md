@@ -2,9 +2,9 @@
 
 ## 项目定位
 
-本项目是基于 Cocos Creator 3.8.8 的单机斗地主游戏。首版目标是完整单机版：手机竖屏、经典三人斗地主、多难度 AI、本地设置与战绩。
+本项目是基于 Cocos Creator 3.8.8 的单机斗地主游戏。首版目标是完整单机版：手机横屏、经典三人斗地主、多难度 AI、本地设置与战绩。
 
-当前 M0、M1、M2、M3、M4、M5 纯逻辑层 + 交互层均已完成并并 main；**M6 发布前打磨、代码、测试、文档与发布打包 gate 均已闭合，首版可发布**。发布收口已闭合：M6-C2/C3a/C3b/C4 编辑器与构建验证、M3 后续 UI 屏、M4-42 困难 AI 纵深、ART-IMPORT-02/03/04/05 美术导入、M6-D4 已知限制登记、M6-D5 冒烟脚本与本次发布烟测均已落证。main 当前口径为 **133 测试文件 / 653 用例全绿、typecheck 净、纯层零 cc**。发布构建已按核心循环改为 `launchScene=lobby.scene`，并完成三档大厅构建态烟测与 390×844 大厅→对局→暂停退出→大厅链路复验。
+当前 M0-M6 与 v1.1/v1.2 发布收口均已完成。v1.2 收版基线为 **141 测试文件 / 739 用例全绿、typecheck 净**，发布包由 Creator 3.8.8 CLI `web-mobile` 构建，`launchScene=lobby.scene`、`designResolution=844×390`、`orientation=landscape`，四横屏 V6 全链冒烟 `productErrors=[]`。v1.3 技术债清偿版已开 A/B 波：A 波处理真历史记牌、runtime 拆分、座位视图/性能数据/文档同步，B 波处理 UI helper 与 game-scene 模块化；以 `coordination/BOARD.md` 为当前执行真相源。
 
 ## 迭代阶段
 
@@ -65,9 +65,9 @@
 - 自对弈 N 局无非法状态、无死循环、无无限等待。
 - 存档序列化往返后状态一致。
 
-### M3 手机竖屏 UI
+### M3 手机界面（历史竖屏基线，后续已横屏化）
 
-目标：完成移动端竖屏可玩界面。
+目标：完成移动端可玩界面。M3 初始目标为 390×844 竖屏；v1.1/v1.2 已将当前发布形态迁移到 844×390 横屏。
 
 交付：
 
@@ -80,7 +80,7 @@
 
 验收：
 
-- 390x844 竖屏下核心按钮不遮挡手牌。
+- 当前发布横屏下核心按钮不遮挡手牌；历史 390×844 竖屏证据保留为早期阶段记录。
 - 操作反馈清晰，玩家能（对阵基线 AI）完成一整局。
 
 ### M4 多难度 AI
@@ -124,12 +124,12 @@
 
 - 已完成的纯逻辑与运行时护栏：音效/震动/动效门控（M6-L1）、基础动画参数（M6-L2）、移动端布局参数化（M6-L3）、运行时异常兜底（M6-L4）、selfplay 1..50 长回归（M6-L5）、CueId 字面量收紧与一致性护栏（M6-L6）。
 - 已完成的编辑器接线：音效开关写侧接线 + 热重载（M6-C1）、基础动画接线（M6-C2）、移动端 SafeArea / 多分辨率回归与 render 差分（M6-C3a/C3b）、HUD / 教程 / 帮助 / 暂停 / 难度 / 战绩历史等运行时 UI 屏。
-- 已完成的构建验证：Cocos Creator 3.8.8 `web-mobile` 构建通过，当前发布收口复测生成 `build/web-mobile/`（47M / 202 文件），`src/settings.json` 记录 `CocosEngine: 3.8.8`、`engine.platform: web-mobile`、`launch.launchScene: db://assets/scene/lobby.scene`、390×844 设计分辨率。
+- 已完成的构建验证：Cocos Creator 3.8.8 `web-mobile` 构建通过。v1.2 发布包记录 `launchScene=lobby.scene`、`designResolution=844×390`、`orientation=landscape`，归档 `build/doudizhu-v1.2-web-mobile.zip`（不入库）。
 - 已完成的文档与美术收口：QA 清单 / 路线图校准（M6-D2/D3）、已知限制登记（M6-D4）、手动冒烟脚本（M6-D5）、ART-IMPORT-02/03/04/05 用户视觉终审后导入并通过 sprite-frame 返工复审。
 
 验收：
 
-- Cocos Editor 打开无编译错误：C1-C4 与后续编辑器 UI 屏均有 Creator 3.8.8 / 390×844 或三档截图证据，运行时 CDP errors `[]`。
-- 目标平台构建通过：`web-mobile` 构建成功；本次 D1 复测三档视口 `390×844`、`412×915`、`360×780` 均启动到大厅并截图，390×844 额外验证大厅→对局→暂停退出→大厅链路。
-- Vitest 纯逻辑测试全部通过：当前 main 为 133 文件 / 653 用例全绿，typecheck 净。
+- Cocos Editor 打开无编译错误：C1-C4、v13 UI 重造与后续视觉修复均有 Creator 3.8.8 / 横屏截图证据，运行时 CDP errors `[]` 或 `productErrors=[]`。
+- 目标平台构建通过：v1.2 `web-mobile` 横屏发布包已完成四横屏冒烟，两局 settled、逆时针链与暂停链均通过。
+- Vitest 纯逻辑测试全部通过：v1.2 收版基线为 141 文件 / 739 用例全绿，typecheck 净；v1.3 A 波合入后以 BOARD 最新口径为准。
 - 自对弈冒烟无阻塞：M6-L5 / M6-G15 / M4-42 已覆盖长回归、难度平衡与 Hard>Normal 验收。
