@@ -592,7 +592,7 @@ export class GameSceneSkeleton extends Component {
     this.playAreaRoot = area;
     const dropZone = top ? dropZoneForSeat(layout, top.seat) : layout.dropZoneHero;
     const cards = top?.pattern.cards ?? [];
-    const playLayout = this.playAreaLayout(top?.seat ?? HERO_SEAT, cards.length, dropZone, canvas);
+    const playLayout = this.playAreaLayout(top?.seat ?? HERO_SEAT, cards.length, dropZone, layout, canvas);
     const pos = this.screenPoint(canvas, playLayout.screenX, playLayout.screenY);
     const width = playLayout.width;
     const height = playLayout.height;
@@ -618,6 +618,7 @@ export class GameSceneSkeleton extends Component {
     seat: SeatIndex,
     cardCount: number,
     dropZone: Rect,
+    layout: TableZones,
     canvas: { width: number; height: number },
   ): PlayAreaLayout {
     const isSideSeat = seat !== HERO_SEAT;
@@ -626,11 +627,19 @@ export class GameSceneSkeleton extends Component {
     const maxWidth = isSideSeat
       ? Math.min(330, Math.max(248, Math.round(canvas.width * 0.37)))
       : Math.min(360, Math.max(180, dropZone.width + 124));
-    const cardScale = clampNumber(
+    const baseCardScale = clampNumber(
       (maxWidth - Math.max(0, cardsPerRow - 1) * 2) / (CARD_SIZE.width * cardsPerRow),
       rows > 1 ? 0.58 : 0.66,
       isSideSeat ? 0.88 : 0.94,
     );
+    const hudBand = isSideSeat ? this.sideSeatPlaySafeBand(seat, layout, canvas) : null;
+    const bandHeight = hudBand ? Math.max(1, hudBand.bottom - hudBand.top) : Infinity;
+    const verticalScaleCap = rows > 1
+      ? (bandHeight - 5) / (CARD_SIZE.height * rows)
+      : bandHeight / CARD_SIZE.height;
+    const cardScale = hudBand
+      ? clampNumber(Math.min(baseCardScale, verticalScaleCap), rows > 1 ? 0.58 : 0.66, baseCardScale)
+      : baseCardScale;
     const visualCardWidth = CARD_SIZE.width * cardScale;
     const visualCardHeight = CARD_SIZE.height * cardScale;
     const spacing = cardCount <= 1 ? 0 : visualCardWidth + 2;
@@ -648,8 +657,48 @@ export class GameSceneSkeleton extends Component {
       const maxCenter = safeRight - width / 2;
       screenX = minCenter <= maxCenter ? clampNumber(screenX, minCenter, maxCenter) : (safeLeft + safeRight) / 2;
     }
-    const screenY = dropZone.y + dropZone.height / 2 + (rows > 1 ? 8 : 0);
+    let screenY = dropZone.y + dropZone.height / 2 + (rows > 1 ? 8 : 0);
+    if (hudBand) {
+      const verticalBounds = this.playAreaCardVerticalBounds(rows, visualCardHeight, rowSpacing);
+      const minCenterY = hudBand.top - verticalBounds.top;
+      const maxCenterY = hudBand.bottom - verticalBounds.bottom;
+      screenY = minCenterY <= maxCenterY
+        ? clampNumber(screenY, minCenterY, maxCenterY)
+        : (hudBand.top + hudBand.bottom - verticalBounds.top - verticalBounds.bottom) / 2;
+    }
     return { screenX, screenY, width, height, rows, cardsPerRow, cardScale, spacing, rowSpacing };
+  }
+
+  private sideSeatPlaySafeBand(
+    seat: SeatIndex,
+    layout: TableZones,
+    canvas: { width: number; height: number },
+  ): { top: number; bottom: number } {
+    const side = visualSideForSeat(seat);
+    const hudTop = side === 'left'
+      ? Math.min(layout.strengthMeter.y, layout.memoryDock.y)
+      : Math.min(layout.turnTimer.y, layout.advisorDock.y);
+    return {
+      top: Math.max(layout.topBar.y + layout.topBar.height + 8, Math.round(canvas.height * 0.12)),
+      bottom: Math.max(1, hudTop - 8),
+    };
+  }
+
+  private playAreaCardVerticalBounds(
+    rows: number,
+    visualCardHeight: number,
+    rowSpacing: number,
+  ): { top: number; bottom: number } {
+    if (rows <= 1) {
+      return {
+        top: 8 - visualCardHeight / 2,
+        bottom: 8 + visualCardHeight / 2,
+      };
+    }
+    return {
+      top: 6 - rowSpacing / 2 - visualCardHeight / 2,
+      bottom: rowSpacing / 2 + 6 + visualCardHeight / 2,
+    };
   }
 
   private playCardPosition(
