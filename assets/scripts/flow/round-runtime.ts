@@ -1,45 +1,29 @@
 import type { AiLevel } from '../ai';
-import {
-  GamePhase,
-  IllegalActionError,
-  Side,
-  snapshot,
-  type BidAction,
-  type BiddingState,
-  type GameEvent,
-  type GameSnapshot,
-  type ResumeSnapshot,
-  type RoundAction,
-  type RoundFinishInput,
-  type RoundState,
-  type SeatIndex,
-  type Settlement,
-} from '../game';
-import { createRng, enumerateMoves, legalFollows, type Deal, type Rng } from '../rules';
+import { GamePhase, type BidAction, type BiddingState, type GameEvent, type GameSnapshot, type ResumeSnapshot, type RoundAction, type RoundFinishInput, type RoundState, type SeatIndex, type Settlement } from '../game';
+import { createRng, type Deal, type Rng } from '../rules';
 import { realClock, type Clock } from './clock';
-import {
-  applyBiddingStep,
-  applyPlayStep,
-  biddingEvent,
-  createPlayingState,
-  createRoundDeal,
-  decideBidAction,
-  decidePlayAction,
-  defaultPlayPolicy,
-  pushRoundEvents,
-  settleFromGameEvents,
-  winEventFrom,
-} from './driver';
+import { defaultPlayPolicy } from './driver';
 import { levelPolicies } from './policies';
 import { defaultBidPolicy, type BidPolicy, type BiddingDealView, type FlowEvent, type PlayPolicy } from './types';
-import { createBidding } from '../game';
+import {
+  runtimeBidding,
+  runtimeBiddingDeal,
+  runtimeIsPlayerTurn,
+  runtimeLegalInputs,
+  runtimeSnapshot,
+  advanceRuntimeUntilPause,
+  scheduleRuntimeAdvance,
+  startRuntimeDeal,
+  submitRuntimePlayerAction,
+  type RuntimeDriverContext,
+} from './runtime/bidding-driver';
+import { emitRuntimeEvent, subscribeRuntimeEvent, type RuntimeEventReplayContext } from './runtime/event-replay';
+import { finishRuntimeIfSettled, type RuntimePersistenceContext } from './runtime/persistence';
 
 const DEFAULT_BASE_SCORE = 1;
 const DEFAULT_THINKING_DELAY_MS = 0;
-const DEFAULT_START_SEAT: SeatIndex = 0;
 const DEFAULT_MAX_REDEALS = 10;
 const DEFAULT_MAX_TURNS = 300;
-const INTERNAL_ERROR_REASON = 'INTERNAL_ERROR';
 
 export type RuntimeTerminationReason = 'settled' | 'redealExhausted' | 'error';
 
@@ -88,12 +72,6 @@ export interface RoundRuntime {
 
 type RuntimePhase = ReturnType<RoundRuntime['phase']>;
 
-function readonlyBidding(state: BiddingState): BiddingState {
-  const clone = { ...state, grabQueue: state.grabQueue.slice() };
-  Object.freeze(clone.grabQueue);
-  return Object.freeze(clone) as BiddingState;
-}
-
 class RoundRuntimeImpl implements RoundRuntime {
   private readonly rng: Rng;
   private readonly baseScore: number;
@@ -141,327 +119,62 @@ class RoundRuntimeImpl implements RoundRuntime {
     if (resume) {
       this.state = resume.state;
       this.currentPhase = resume.state.phase === GamePhase.Settled ? 'settled' : 'playing';
-      this.finishIfSettled();
+      finishRuntimeIfSettled(this.persistenceContext());
     } else {
-      this.startDeal();
+      startRuntimeDeal(this.driverContext());
     }
 
-    this.scheduleAdvance();
+    scheduleRuntimeAdvance(this.driverContext());
   }
 
-  phase(): RuntimePhase {
-    return this.currentPhase;
-  }
+  phase(): RuntimePhase { return this.currentPhase; }
 
-  currentSnapshot(): GameSnapshot | null {
-    return this.state ? snapshot(this.state, this.heroSeat) : null;
-  }
+  currentSnapshot(): GameSnapshot | null { return runtimeSnapshot(this.driverContext()); }
 
-  currentBidding(): BiddingState | null {
-    return this.currentPhase === 'bidding' && this.bidding ? readonlyBidding(this.bidding) : null;
-  }
+  currentBidding(): BiddingState | null { return runtimeBidding(this.driverContext()); }
 
-  biddingDeal(): BiddingDealView | null {
-    if (this.currentPhase !== 'bidding' || !this.currentDeal) return null;
-    return {
-      viewerHand: this.currentDeal.hands[this.heroSeat].slice(),
-      handCounts: [
-        this.currentDeal.hands[0].length,
-        this.currentDeal.hands[1].length,
-        this.currentDeal.hands[2].length,
-      ],
-    };
-  }
+  biddingDeal(): BiddingDealView | null { return runtimeBiddingDeal(this.driverContext()); }
 
-  isPlayerTurn(): boolean {
-    if (this.currentPhase === 'bidding') return this.bidding?.turn === this.heroSeat;
-    if (this.currentPhase === 'playing') return this.state?.turn === this.heroSeat;
-    return false;
-  }
+  isPlayerTurn(): boolean { return runtimeIsPlayerTurn(this.driverContext()); }
 
-  legalInputs(): PlayerInput[] | null {
-    if (!this.isPlayerTurn()) return null;
+  legalInputs(): PlayerInput[] | null { return runtimeLegalInputs(this.driverContext()); }
 
-    if (this.currentPhase === 'bidding' && this.bidding) {
-      const pass: PlayerInput = { kind: 'bid', action: { type: 'pass', seat: this.heroSeat } };
-      const positive: PlayerInput =
-        this.bidding.phase === 'calling'
-          ? { kind: 'bid', action: { type: 'call', seat: this.heroSeat } }
-          : { kind: 'bid', action: { type: 'grab', seat: this.heroSeat } };
-      return [positive, pass];
-    }
+  async submitPlayerAction(input: PlayerInput): Promise<SubmitResult> { return submitRuntimePlayerAction(this.driverContext(), input); }
 
-    if (this.currentPhase === 'playing' && this.state) {
-      const snap = snapshot(this.state, this.heroSeat);
-      const hand = snap.viewerHand ?? [];
-      const moves = this.state.top === null ? enumerateMoves(hand) : legalFollows(hand, this.state.top.pattern);
-      const inputs: PlayerInput[] = moves.map((move) => ({
-        kind: 'play',
-        action: { type: 'play', seat: this.heroSeat, cards: move.cards.slice() },
-      }));
-      if (this.state.top !== null) inputs.push({ kind: 'play', action: { type: 'pass', seat: this.heroSeat } });
-      return inputs;
-    }
+  onEvent(cb: (e: FlowEvent) => void): () => void { return subscribeRuntimeEvent(this.eventReplayContext(), cb); }
 
-    return null;
-  }
+  settlement(): Settlement | null { return this.currentSettlement; }
 
-  async submitPlayerAction(input: PlayerInput): Promise<SubmitResult> {
-    if (!this.isPlayerTurn()) return { ok: false, error: { reason: 'NOT_PLAYER_TURN' } };
+  terminationReason(): RuntimeTerminationReason | null { return this.currentTerminationReason; }
 
-    const events: FlowEvent[] = [];
-    try {
-      if (this.currentPhase === 'bidding') {
-        if (input.kind !== 'bid' || !this.bidding) return { ok: false, error: { reason: 'INVALID_INPUT_PHASE' } };
-        this.bidding = applyBiddingStep(this.bidding, input.action);
-        this.emit(biddingEvent(input.action, this.bidding), events);
-      } else if (this.currentPhase === 'playing') {
-        if (input.kind !== 'play' || !this.state) return { ok: false, error: { reason: 'INVALID_INPUT_PHASE' } };
-        const result = applyPlayStep(this.state, input.action);
-        this.state = result.state;
-        this.pushApplyResult(result, events);
-        this.finishIfSettled(events);
-      }
-    } catch (error) {
-      if (error instanceof IllegalActionError) return { ok: false, error: { reason: error.reason } };
-      this.terminateWithError(error);
-      return { ok: false, events, error: { reason: INTERNAL_ERROR_REASON } };
-    }
-
-    await this.advanceUntilPause(events);
-    if (this.currentTerminationReason === 'error') {
-      return { ok: false, events, error: { reason: INTERNAL_ERROR_REASON } };
-    }
-    return {
-      ok: true,
-      snapshot: this.currentSnapshot() ?? undefined,
-      bidding: this.currentBidding() ?? undefined,
-      events,
-    };
-  }
-
-  onEvent(cb: (e: FlowEvent) => void): () => void {
-    this.subscribers.add(cb);
-    if (!this.replayClosed) for (const event of this.pendingReplayEvents) this.deliver(cb, event);
-    return () => void this.subscribers.delete(cb);
-  }
-
-  settlement(): Settlement | null {
-    return this.currentSettlement;
-  }
-
-  terminationReason(): RuntimeTerminationReason | null {
-    return this.currentTerminationReason;
-  }
-
-  terminationDetail(): unknown {
-    return this.currentTerminationDetail;
-  }
+  terminationDetail(): unknown { return this.currentTerminationDetail; }
 
   dispose(): void {
     this.currentPhase = 'disposed';
     this.subscribers.clear();
   }
 
-  private startDeal(): void {
-    this.gameEvents = [];
-    this.currentDeal = createRoundDeal(this.rng);
-    this.bidding = createBidding(DEFAULT_START_SEAT);
-    this.currentPhase = 'bidding';
-    this.emit({ type: 'deal' });
-  }
+  private isDisposed(): boolean { return this.currentPhase === 'disposed'; }
 
-  private scheduleAdvance(): void {
-    void this.advanceUntilPause().catch((error) => this.terminateWithError(error));
-  }
-
-  private async advanceUntilPause(bucket?: FlowEvent[]): Promise<void> {
-    try {
-      let steps = 0;
-      while (this.currentPhase !== 'disposed') {
-        if (steps >= this.maxTurns) {
-          this.terminateWithError(new Error('ROUND_RUNTIME_MAX_TURNS'));
-          return;
-        }
-        steps++;
-
-        if (this.currentPhase === 'bidding') {
-          if (!this.bidding || !this.currentDeal) {
-            this.terminateWithError(new Error('BIDDING_STATE_MISSING'));
-            return;
-          }
-          if (this.bidding.phase === 'done') {
-            this.enterPlaying(bucket);
-            continue;
-          }
-          if (this.bidding.phase === 'redeal') {
-            this.redeal(bucket);
-            continue;
-          }
-          if (this.bidding.turn === this.heroSeat) return;
-
-          await this.sleepForAi();
-          if (this.isDisposed()) return;
-          const action = decideBidAction({ bidding: this.bidding, deal: this.currentDeal, bidPolicy: this.bidPolicy });
-          this.bidding = applyBiddingStep(this.bidding, action);
-          this.emit(biddingEvent(action, this.bidding), bucket);
-          continue;
-        }
-
-        if (this.currentPhase === 'playing') {
-          if (!this.state || this.state.phase === GamePhase.Settled) {
-            this.finishIfSettled(bucket);
-            return;
-          }
-          if (this.state.turn === this.heroSeat) return;
-
-          await this.sleepForAi();
-          if (this.isDisposed()) return;
-          const action = decidePlayAction({
-            state: this.state,
-            playPolicy: this.playPolicy,
-            rng: this.rng,
-            history: this.gameEvents,
-          });
-          const result = applyPlayStep(this.state, action);
-          this.state = result.state;
-          this.pushApplyResult(result, bucket);
-          this.finishIfSettled(bucket);
-          continue;
-        }
-
-        return;
-      }
-    } catch (error) {
-      this.terminateWithError(error);
-    }
-  }
-
-  private async sleepForAi(): Promise<void> {
-    await this.clock.sleep(this.thinkingDelayMs);
-  }
-
-  private isDisposed(): boolean {
-    return this.currentPhase === 'disposed';
-  }
+  private async advanceUntilPause(bucket?: FlowEvent[]): Promise<void> { return advanceRuntimeUntilPause(this.driverContext(), bucket); }
 
   private emit(event: FlowEvent, bucket?: FlowEvent[]): void {
-    if (this.currentPhase === 'disposed') return;
-    bucket?.push(event);
-    if (
-      !this.replayClosed &&
-      this.subscribers.size === 0 &&
-      this.pendingReplayEvents.length === 0 &&
-      this.isReplayableStartupEvent(event)
-    ) {
-      this.pendingReplayEvents.push(event);
-    }
-    const closeReplayAfterDelivery = this.subscribers.size > 0 && this.pendingReplayEvents.length > 0;
-    for (const subscriber of this.subscribers) this.deliver(subscriber, event);
-    if (closeReplayAfterDelivery) {
-      this.replayClosed = true;
-      this.pendingReplayEvents.length = 0;
-    }
+    emitRuntimeEvent(this.eventReplayContext(), event, bucket);
   }
 
-  private isReplayableStartupEvent(event: FlowEvent): boolean {
-    return event.type === 'deal';
+  private driverContext(): RuntimeDriverContext {
+    return this as unknown as RuntimeDriverContext;
   }
 
-  private deliver(subscriber: (event: FlowEvent) => void, event: FlowEvent): void {
-    try {
-      subscriber(event);
-    } catch {
-      // Subscriber failures must not break runtime advancement or other subscribers.
-    }
+  private eventReplayContext(): RuntimeEventReplayContext {
+    return this as unknown as RuntimeEventReplayContext;
   }
 
-  private pushApplyResult(result: { events: GameEvent[] }, bucket?: FlowEvent[]): void {
-    if (!this.state) return;
-    const flowEvents: FlowEvent[] = [];
-    pushRoundEvents(flowEvents, this.gameEvents, { state: this.state, events: result.events });
-    for (const event of flowEvents) this.emit(event, bucket);
-    if (bucket?.some((event) => event.type === 'landlordDecided')) return;
-    this.persist?.({
-      round: this.state,
-      heroSeat: this.heroSeat,
-      bidMultiplier: this.bidMultiplier,
-      events: this.gameEvents.slice(),
-    });
-  }
-
-  private enterPlaying(bucket?: FlowEvent[]): void {
-    if (!this.bidding || this.bidding.landlord === null || !this.currentDeal) {
-      this.terminateWithError(new Error('BIDDING_DONE_WITHOUT_LANDLORD'));
-      return;
-    }
-    this.bidMultiplier = this.bidding.multiplier;
-    this.emit(
-      { type: 'landlordDecided', landlord: this.bidding.landlord, bidMultiplier: this.bidding.multiplier },
-      bucket,
-    );
-    if (this.isDisposed()) return;
-    this.emit({ type: 'bottomRevealed', cards: this.currentDeal.bottom.slice() }, bucket);
-    if (this.isDisposed()) return;
-    this.state = createPlayingState(this.currentDeal, this.bidding.landlord);
-    if (this.isDisposed()) return;
-    this.persist?.({
-      round: this.state,
-      heroSeat: this.heroSeat,
-      bidMultiplier: this.bidMultiplier,
-      events: this.gameEvents.slice(),
-    });
-    this.bidding = null;
-    this.currentPhase = 'playing';
-  }
-
-  private redeal(bucket?: FlowEvent[]): void {
-    this.redeals++;
-    this.emit({ type: 'redeal', attempt: this.redeals }, bucket);
-    if (this.isDisposed()) return;
-    if (this.redeals > this.maxRedeals) {
-      this.currentTerminationReason = 'redealExhausted';
-      this.currentPhase = 'disposed';
-      return;
-    }
-    this.startDeal();
-  }
-
-  private finishIfSettled(bucket?: FlowEvent[]): void {
-    if (!this.state || this.state.phase !== GamePhase.Settled || this.settledNotified) return;
-    const win = winEventFrom(this.gameEvents);
-    if (!win) return;
-    this.currentSettlement = settleFromGameEvents({
-      landlord: this.state.landlord,
-      winner: win.side,
-      bidMultiplier: this.bidMultiplier,
-      events: this.gameEvents,
-      baseScore: this.baseScore,
-    });
-    this.currentPhase = 'settled';
-    this.currentTerminationReason = 'settled';
-    this.settledNotified = true;
-    this.emit({ type: 'settled', settlement: this.currentSettlement }, bucket);
-    if (this.isDisposed()) return;
-    this.onSettled?.({
-      landlord: this.state.landlord,
-      winner: win.side,
-      settlement: this.currentSettlement,
-    });
-  }
-
-  private terminateWithError(error: unknown): void {
-    if (this.currentTerminationReason === 'settled') return;
-    this.currentTerminationReason = 'error';
-    this.currentTerminationDetail = error;
-    this.currentPhase = 'disposed';
+  private persistenceContext(): RuntimePersistenceContext {
+    return this as unknown as RuntimePersistenceContext;
   }
 }
 
-export function startRoundRuntime(config: RuntimeConfig): RoundRuntime {
-  return new RoundRuntimeImpl(config);
-}
+export function startRoundRuntime(config: RuntimeConfig): RoundRuntime { return new RoundRuntimeImpl(config); }
 
-export function resumeRoundRuntime(resume: ResumeSnapshot, config: RuntimeConfig): RoundRuntime {
-  return new RoundRuntimeImpl(config, resume);
-}
+export function resumeRoundRuntime(resume: ResumeSnapshot, config: RuntimeConfig): RoundRuntime { return new RoundRuntimeImpl(config, resume); }
