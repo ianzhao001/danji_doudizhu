@@ -897,3 +897,5 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > **④ v1.3 债务清单（汇总登记·按需派发）**：lobby v13 风格统一（game-scene 已 v13、lobby 留 v12）；ui-helpers 皮肤共享件抽取+死导出清理；ai-thinking-view 旧座位映射统一；记牌深度（GameSnapshot 出牌历史）；round-runtime(439 行) 拆分；save 双序列化+叫抢期存档整并升版；audio/卡面/tween 模块化；观感微调项（顶部右角半裁小徽标·playing 左列密度）。
 >
 > **⑤ 发布注记**：v1.2 收版后如需打包发布，按 v1.1 M6-D1 先例走 Creator web-mobile 构建+lobby 启动场景+三档烟测，由用户决定时机。
+>
+> **⑤ 发布注记执行（规划者·2026-07-06·`RELEASE-v1.2`）**：用户指令「打包发布」已执行——Creator 3.8.8 CLI web-mobile 构建自收版 main `24bf5e8`：`launchScene=lobby.scene`·`designResolution=844×390`·**`orientation=landscape`**（首建 auto 复现 E-ORIENT 的「CLI 不读 builder.json」caveat，按其已验证 inline packages 命令重建修正）。发布冒烟=发布产物上跑 V6 全链 harness：**四横屏 ×16 captures 全过，productErrors=[]×4**（两局 settled+逆时针链+暂停链）；规划者目检发布态 lobby 首屏正常。归档 `build/doudizhu-v1.2-web-mobile.zip`（43M·sha256 `5d5cd3f0…b69c`·不入库）。记录 `reports/RELEASE-v1.2.report.md`。**v1.2 发布包就绪。**
