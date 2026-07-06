@@ -86,16 +86,20 @@ M  assets/scripts/flow/types.ts
 ## 执行者视觉自审勾销表（UI/场景任务·双层视觉预审第一层·交规划者前必填）
 - 不适用：本任务无 UI/场景/截图产出。
 
-## 合并证据（approved 后由审查者回填）
-- 合并前回归：
-  - `npm --prefix test test`：待审查者回填
-  - `npm --prefix test run typecheck`：待审查者回填
-- merge commit：待审查者回填
-- BOARD 状态：待审查者回填
-- 规划者批量结构性把关（仅高风险任务）：待审查者置 `approved-pending-planner` 后由规划者回填
+## 合并证据（审查者回填 · 2026-07-07）
+- 规划者批量结构性把关（高风险三闸·BOARD 第八批「三闸把关记录」段·main `a756b24`）：结构性把关 **5/5 全过**，BOARD 状态改 `approved`。把关要点逐项：①接口宽化全为可选加法（`PlayPolicy.history?` + `AiStrategy` 第三参 `history? = []`·既有两参直调 10 文件 46 用例零改动全绿）；②`trackPlayed` 本体零 diff（`cardMemory.ts` wc=0）；③`game/`/`rules/` 零触碰（wc=0）；④质量门 `selfplay/quality` 4/4 绿·九项指标与 v1.2 基线逐字一致；⑤接管规则与 spec 钉死逐项一致（位置/守卫/判定/选择）。口径发现：`quality.ts statsPolicy` 两参直调不喂 history（规划者原测试设计），真历史链路由 `difficulty.ts` 覆盖于 746 绿内。
+- 合并前回归（审查者在 task worktree 预合并 + main 合并后双跑）：
+  - `npm --prefix test test`（task worktree `69f3ae4`）：143 files / 746 tests passed（26.81s）
+  - `npm --prefix test run typecheck`（task worktree）：exit 0
+  - `npm --prefix test test`（main 合并后 `408a2ea`）：143 files / 746 tests passed（26.65s）
+  - `npm --prefix test run typecheck`（main 合并后）：exit 0
+  - `git diff --check main..task/T-MEMORY-REAL`：exit 0
+- merge commit：`408a2ea`（`--no-ff`·message: "merge task/T-MEMORY-REAL / approved-by reviewer / test/typecheck 绿"）
+- BOARD 状态：`done 408a2ea`（main `e2fe43e`）
+- 分支 `task/T-MEMORY-REAL` 已删除；worktree 已移除
 
 ## 全量回扫（审查者·写 approved 前一次）
-- 待审查者填写。
+- 见下方「审查者裁定」段的「全量回扫（覆盖全仓）」子段（lines 165-170）。
 
 ## 与 spec 的偏差 / 关键决策
 - `PlayPolicy.history` 在类型层保留为可选，以兼容既有测试和手写直调；driver/runtime 两条真实驱动路径每次都传数组，满足种子 probe 和运行时契约。
@@ -123,7 +127,7 @@ M  assets/scripts/flow/types.ts
 - 不适用。
 
 ## 回扫升级（转规划者，全量回扫的域外致命 / 拿不准，由审查者填写）
-- 待审查者填写。
+- 无。全量回扫分流：0 域内致命 / 0 域外致命 / 0 拿不准（详见审查者裁定段）。
 
 ## 批次交接记录 / 下一步（种档，供下一窗口自助读；配合 templates/handoff.md）
 - 所属批次 / 任务号：第八批 v1.3 / `T-MEMORY-REAL`
@@ -174,5 +178,37 @@ M  assets/scripts/flow/types.ts
 - `quality.test.ts` 的 `statsPolicy` 不解构 `history`、不向 `strategyFor` 传第三参——这是规划者测试设计（测策略隔离行为），执行者正确未改测试；指标不回退即满足 spec。
 
 ### 合并状态
-- 高风险三闸：置 `approved-pending-planner` 排队，**不合并**。
-- 待规划者结构性把关认可后改 `approved`，再由审查者合并。
+- 高风险三闸流程完整闭环：
+  1. 审查者置 `approved-pending-planner`（`69f3ae4`·main `de1cc8c`）→ 排队不合并。
+  2. 规划者结构性把关 5/5 全过，BOARD 改 `approved`（main `a756b24`）。
+  3. 审查者双闸（task worktree + main 合并后双跑 test/typecheck 全绿）→ `claim/merge/release` 合并入 main。
+- **已合并**：merge commit `408a2ea`·BOARD `done 408a2ea`（main `e2fe43e`）·分支已删除·worktree 已移除。
+
+## 验收披露（审查者·合并后回填 · 2026-07-07）
+
+### 评审结论
+- 任务 `T-MEMORY-REAL`（高风险三闸）审查通过，已合并入 main。
+- 审查者结论：`approved-pending-planner` → 规划者认可 → `approved` → 合并 `done 408a2ea`。
+- 打回轮次：0 轮（执行者一次提交即通过审查 + 规划者把关）。
+
+### 全量回扫范围与分流结果
+- 回扫范围：覆盖全仓 `assets/scripts/`（flow/ai/game/rules/ui/data）+ `test/` + `selfplay/`。
+- 分流结果：**0 域内致命 / 0 域外致命 / 0 拿不准**。
+- 关键回扫面：`decidePlayAction` 调用面（全仓仅 2 点·均在文件域内已更新）、`PlayPolicy` 调用面（test/ 全 optional 兼容）、`strategyFor` 调用面（全仓两参直调·第三参可选不破坏）、跨模块回归（flow→ai 仅加法透传·game/rules 零触碰·UI 层不消费）。
+
+### 合并证据
+- 规划者三闸把关记录：BOARD 第八批「三闸把关记录」段（main `a756b24`）·5/5 全过。
+- 合并前 test：task worktree 143/746 绿（26.81s）+ main 合并后 143/746 绿（26.65s）。
+- 合并前 typecheck：task worktree exit 0 + main 合并后 exit 0。
+- `git diff --check`：exit 0。
+- merge commit：`408a2ea`（`--no-ff`）。
+- BOARD 状态：`done 408a2ea`（main `e2fe43e`）。
+
+### 最终测试基线
+- Vitest：143 files / 746 tests passed（26.65s·main `408a2ea`）。
+- typecheck：`tsc --noEmit` exit 0。
+- 质量门：`selfplay/quality` 4/4 绿·三档九项指标与 v1.2 基线逐字一致（不回退）。
+
+### 下一步
+- `T-RUNTIME-SPLIT` 依赖满足（BOARD 行已 `blocked` → 待规划者建分支派发）。
+- `T-DOCS-SYNC` 的 KNOWN_LIMITATIONS 记牌条目可在本任务合并后收尾。
