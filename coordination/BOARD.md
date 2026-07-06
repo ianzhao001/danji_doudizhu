@@ -929,7 +929,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-RUNTIME-SPLIT | A | move-only 强化 | `flow/round-runtime.ts` + 新 `flow/runtime/*.ts` + report | T-MEMORY-REAL（done） | `task/T-RUNTIME-SPLIT`（已建自 main `93d5fff`） | done 6cc314f |
 | T-VIEW-SEAT | A | 常规 | `ui/ai-thinking-view.ts` + report（+规划者改种 `test/ui/ai-thinking-view.test.ts`） | — | `task/T-VIEW-SEAT` | **ready·种子 `7afd853`**（2 红/3 绿·typecheck 净） |
 | T-PROFILE-FOLLOWS | A | 零风险(不改产品) | `test/bench/*`（新）+ report | — | `task/T-PROFILE-FOLLOWS` | ready（无种子·bench 不入默认套件） |
-| T-DOCS-SYNC | A | 常规(不虚标) | `docs/*.md` + `CLAUDE.md` + report | —（KNOWN_LIMITATIONS 记牌条目在 T-MEMORY-REAL 合并后收尾） | `task/T-DOCS-SYNC` | ready |
+| T-DOCS-SYNC | A | 常规(不虚标) | `docs/*.md` + `CLAUDE.md` + report | —（KNOWN_LIMITATIONS 记牌条目在 T-MEMORY-REAL 合并后收尾） | `task/T-DOCS-SYNC` | approved |
 | T-UIHELPERS | B | editor-evidence(机械重构) | `ui/components/ui-helpers.ts` + `game-scene-skeleton.ts` + `lobby-scene.ts` + `ui/strings.ts` + report | —（B 波首任务） | `task/T-UIHELPERS` | ready |
 | P-GS-SPLIT2 | B | move-only 强化(editor-evidence) | `game-scene-skeleton.ts` + 新 `game-scene/*.ts` + `ui/strings.ts`(rider) + report | T-UIHELPERS | `task/P-GS-SPLIT2`（届时自 main 建） | blocked |
 | P-BID-POLISH | B | editor-evidence(双层视觉预审从严) | `game-scene-skeleton.ts` + `game-scene/*.ts` + report | P-GS-SPLIT2 | `task/P-BID-POLISH`（届时自 main 建） | blocked |
