@@ -140,3 +140,39 @@ M  assets/scripts/flow/types.ts
 - [x] 未改测试、未碰他人模块
 - [x] 未获精确机器态 `approved` 前未合并 main；高风险 `approved-pending-planner` 未直接合并；获批后仅由审查者通过 `agentctl.sh claim/merge/release` 合并
 - [x] 未 import cc
+
+## 审查者裁定（GLM-5.2 · 2026-07-06）
+
+**结论：approved-pending-planner**（高风险三闸·排队待规划者结构性把关），打回 0 轮。
+
+### R-WAVE8 R:T-MEMORY-REAL 检查单逐项
+
+1. **种子未改** ✅：`git diff 3548ae8 task/T-MEMORY-REAL -- test/` = 0 行（种子逐字未动）；7 用例全绿（hard-memory 5 + policy-history 2，含 2 红转绿）。
+2. **文件域** ✅：产品码仅 `flow/{types,driver,round-runtime,policies}.ts` + `ai/{strategy,levels/hard}.ts` + report；BOARD 文件域列亦含 `policies`（R-WAVE8 检查单同），spec 文件域列未列 policies 但 BOARD/R-WAVE8 均含——policies 改动为 1 行透传 `history ?? []`，必要且最小。`game/`、`rules/` 零 diff（wc=0）；`_shared.ts`/`simple.ts`/`normal.ts`/`lead-score.ts`/`cardMemory.ts` 零 diff（wc=0）。
+3. **AiStrategy 第三参可选** ✅：`(snapshot: GameSnapshot, rng: Rng, history?: GameEvent[])`——既有两参直调测试（hard/hardening/hard-timing/hard-depth/normal/normal-combo/simple/hint/hint-rank/conservative-action-paths 共 10 文件 46 用例）零改动全绿，逐一确认未被重跑豁免。`simpleStrategy`/`normalStrategy` 签名 `(snapshot) =>` 不消费第三参，TypeScript 协变合法。
+4. **接管规则实现** ✅：
+   - 条件：跟牌（`!snapshot.top` 分支前返回）、非 pressing（`isPressing` 分支前返回）、非队友顶（`isTeammateTop` 分支前返回）、history 非空（`history.length === 0 → null`）、仅 `Category.Single`（`snapshot.top?.pattern.category !== Single → null`）——全部满足。
+   - 判断：`trackPlayed(history, hand)` → `remainingByRank`；`isAbsoluteTopSingle` 核该单牌之上所有 rank 计数全为 0（`ALL_RANKS.every(candidate => candidate <= rank || remaining[candidate] === 0)`）——逻辑正确。
+   - 选择：`pickSmallest(candidates)` 取最小绝对最大单——符合 spec。
+   - 插入位置：`chooseControlFollow` 之后、`conservativeAction` 之前——精确匹配 spec 钉死位置。
+   - 空历史不触发（`history.length === 0 → null`）——回归锚覆盖。
+5. **评分常数逐字未动** ✅：`scoreLeadMove`/`highCardSpendPenalty`/`categoryShapingBonus` diff 核数字零改动；`estimateMemoryPressure` 评分公式不变（仅 `trackPlayed([], hand)` → `trackPlayed(history, hand)`）。
+6. **runtime 调用点** ✅：`driver.ts:177` `decidePlayAction({ state, playPolicy, rng, history: gameEvents })`（`gameEvents` 为主循环累积数组，`pushRoundEvents` 已在 main 存在填充）；`round-runtime.ts:324` `decidePlayAction({ ..., history: this.gameEvents })`（`this.gameEvents` 为 runtime 累积事件，`pushRoundEvents` 填充）。`policies.ts:19` `strategyFor(...)(snapshot, rng, history ?? [])` 透传。
+7. **trackPlayed 本体未改** ✅：`cardMemory.ts` diff=0；`trackPlayed(events, ownHand)` 签名与体不变，仅调用点从 `[]` 改为真实 `history`。
+8. **质量门重验** ✅：`selfplay/quality.test.ts` 4/4 绿；三档指标（组合率/压队友/胜率差）与 v1.2 基线逐项完全一致（不回退）；确定性无 rng 新消费（`_rng` 未用）。
+9. **全量 vitest/typecheck/diff --check** ✅：分支 worktree 实跑 143/746 绿（26.74s）+ typecheck 净 + diff --check exit=0。
+
+### 全量回扫（覆盖全仓）
+- **decidePlayAction 调用面**：全仓仅 2 个调用点（driver + round-runtime），均在文件域内且已更新传 `history`；无外部调用者被破坏。`decidePlayAction` 签名 `history` 为必填（内部函数），`PlayPolicy.history` 为可选（公共类型）——设计合理。
+- **PlayPolicy 调用面**：全仓 test/ 中 `save-resume-e2e`/`runtime-resume-phases`/`quality`/`difficulty`/`policies` 等均用 `({ snapshot, rng })` 或 `({ seat, snapshot })` 不解构 `history`——optional 兼容，typecheck 绿确认。
+- **strategyFor 调用面**：全仓 test/ + selfplay/ 均两参直调——第三参可选，行为不变（`history = []` 默认，绝对最大单不触发）。
+- **跨模块回归**：flow→ai 链路仅加法透传，无语义变更；`game/`/`rules/` 零触碰；UI 层不消费 `PlayPolicy`/`AiStrategy`（无 `cc` import）。
+- 回扫分流：**0 域内致命 / 0 域外致命 / 0 拿不准**。
+
+### 补充说明
+- `driver.ts` `runHeadlessRound` 从直调 `playPolicy({ seat, snapshot: snap, rng })` 改为 `decidePlayAction({ state, playPolicy, rng, history: gameEvents })`——`snap` 变量移除（仅此处使用），`decidePlayAction` 内部调用 `snapshot(state, turn)` 等价，行为保持。
+- `quality.test.ts` 的 `statsPolicy` 不解构 `history`、不向 `strategyFor` 传第三参——这是规划者测试设计（测策略隔离行为），执行者正确未改测试；指标不回退即满足 spec。
+
+### 合并状态
+- 高风险三闸：置 `approved-pending-planner` 排队，**不合并**。
+- 待规划者结构性把关认可后改 `approved`，再由审查者合并。
