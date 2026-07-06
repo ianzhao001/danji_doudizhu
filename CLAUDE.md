@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目简介
 
-单机斗地主游戏，基于 **Cocos Creator 3.8.8**（3D 工程类型，TypeScript）。一名真人玩家对战两个 AI，面向**手机竖屏**（参考分辨率 390×844）。首版完全单机——无联网、账号、支付、广告或匹配。
+单机斗地主游戏，基于 **Cocos Creator 3.8.8**（3D 工程类型，TypeScript）。一名真人玩家对战两个 AI，当前发布形态面向**手机横屏**（主基线 844×390）。首版完全单机——无联网、账号、支付、广告或匹配。
 
 ## 当前状态——动手写代码前必读
 
-M0（文档）与 M1（纯 `rules` 层 + Vitest 测试）已完成。**M2 单局状态机进行中**，采用**多 AI 协作 + git worktree**：架构（本窗口）出方案与失败测试，其他 AI 在各自 worktree 分支实现——见 [coordination/PROTOCOL.md](coordination/PROTOCOL.md)。**git 已初始化**用于该协作（取代此前 M0/M1「不 git init」的约束）。
+M0-M6、v1.1 横屏化与 v1.2 七波 UI/流程/AI 打磨均已完成；v1.2 发布包已就绪（Creator 3.8.8 `web-mobile`，`launchScene=lobby.scene`，`designResolution=844×390`，`orientation=landscape`）。当前进入 v1.3 技术债清偿版，采用**多 AI 协作 + git worktree**：规划者派发任务，执行者在独立 worktree 实现，审查者按协议评审与合并——见 [coordination/PROTOCOL.md](coordination/PROTOCOL.md)。
 
 - 最新的任务/里程碑与派发状态以 [docs/TASKS.md](docs/TASKS.md) 和 [coordination/BOARD.md](coordination/BOARD.md) 为准，**动手前先看**。
 - 仍然：不修改根 `package.json` / `tsconfig.json` / `cocos.config.json`；不手写 `.meta`（交给 Cocos 编辑器）；不手建 `.scene` / `.prefab`（属 M3）。
@@ -18,7 +18,7 @@ M0（文档）与 M1（纯 `rules` 层 + Vitest 测试）已完成。**M2 单局
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — 分层、模块契约与依赖方向（下方有摘要）
 - [docs/RULES.md](docs/RULES.md) — 斗地主规则边界（牌组、牌型、比较、叫抢、计分）
-- [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) — 范围、核心循环、竖屏布局原则
+- [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) — 范围、核心循环、横屏布局原则
 - [docs/ROADMAP.md](docs/ROADMAP.md) — 里程碑 M0→M6 及验收标准
 - [docs/TASKS.md](docs/TASKS.md) — 各里程碑任务清单（当前进度）
 - [docs/QA_CHECKLIST.md](docs/QA_CHECKLIST.md) — 规则/流程/AI/UI 验收检查
@@ -32,7 +32,7 @@ M0（文档）与 M1（纯 `rules` 层 + Vitest 测试）已完成。**M2 单局
 - **game** — 单局状态机：座位、发牌、叫/抢地主、回合流转、当前最大出牌、过牌处理、胜负、结算。每应用一个动作产出新的 `GameSnapshot`（当前态）与 `GameEvent` 序列（发生了什么）。关键类型：`PlayerSeat`、`RoundState`（必须可序列化、作存档）、`GameSnapshot`、`GameEvent`、`RoundAction`、`Settlement`。状态机用 `rules` 校验每个动作并拒绝非法出牌。
 - **ai** — 仅依据 `rules` 的着法枚举和只读的 `GameSnapshot` 选择动作；M2 先有基线随机 AI，M4 再分简单/普通/困难三档。关键类型：`AiLevel`、`AiDecision`、`AiContext`、`AiStrategy`。AI 不得修改隐藏状态，也不得输出非法动作。
 - **flow** — 薄回合驱动器：编排发牌→叫抢→出牌轮转→结算，并在 AI 座位插入思考时延后再提交动作（AI 异步驱动，不在 `game` 内同步内联）。只做编排，不做规则判断。
-- **ui** — 只负责展示、输入与动画，不重新判断复杂规则；消费 `GameEvent` 播动画/音效，“提示”复用 `rules` 的 `legalFollows`。竖屏布局：玩家手牌固定底部（最高优先级交互区），操作按钮紧贴手牌上方，两个 AI 座位置于上半屏左右，当前出牌区居中，底牌与倍数在顶部。
+- **ui** — 只负责展示、输入与动画，不重新判断复杂规则；消费 `GameEvent` 播动画/音效，“提示”复用 `rules` 的 `legalFollows`。横屏布局：玩家手牌固定底部（最高优先级交互区），三立绘围桌，左/右家按逆时针视觉映射出牌，当前出牌区居中，底牌与倍数在顶部或牌桌上缘；UI/场景任务交用户前必须走执行者自审 + 规划者视觉审的双层视觉预审关。
 - **data** — 本地设置、战绩统计、难度配置、存档/断局恢复数据（序列化的 `RoundState`）。
 
 ### 数据流

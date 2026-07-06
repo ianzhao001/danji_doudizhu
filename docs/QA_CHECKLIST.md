@@ -1,15 +1,17 @@
 # QA 检查清单
 
-## 当前 M1 验收
+## 当前发布验收基线
 
 - [x] M0 文档基线已完成，M0 资源导入例外已记录在 `docs/ASSET_LIST.md`。
-- [x] 当前只完成 M1 规则层与独立测试，不包含 M2 状态机、AI、flow 或 UI。
-- [x] 未新增 Cocos 场景或预制体。
+- [x] v1.2 已收版并打包发布：Creator 3.8.8 `web-mobile`，`launchScene=lobby.scene`，`designResolution=844×390`，`orientation=landscape`，发布包归档但不入库。
+- [x] v1.2 收版基线为 141 测试文件 / 739 用例全绿，typecheck 净；v1.3 A 波后以 BOARD 最新基线为准。
+- [x] 当前发布 UI 为手机横屏；早期 M3 竖屏证据保留为历史阶段记录。
+- [x] 新增 Cocos 场景、预制体、`.meta` 仍必须由 Cocos Creator 维护，不能手写。
 - [x] 未修改根 `package.json`、`tsconfig.json`、`cocos.config.json`。
 - [x] M1 期间未执行 Git 初始化；M2 起按用户决定启用 git + 多 AI worktree 协作（见 `coordination/`）。
 - [x] `rules` 层未 import `cc`。
 - [x] Vitest 测试工程隔离在 `test/` 下。
-- [x] `cd test && npm test` 通过（6 个测试文件，25 个用例）。
+- [x] `npm --prefix test test` 按当前分支全量通过。
 - [x] 规则源码可用 `tsc --noEmit` 单独类型检查通过。
 - [x] 已记录 Vite 对根 `package.json` 中 Cocos `"type": "3d"` 字段的非阻塞警告。
 
@@ -73,21 +75,21 @@
 
 ## UI 验收
 
-- [x] 390x844 竖屏下手牌不遮挡主要按钮。← `test/ui/hand-layout.test.ts`; `test/ui/table-layout.test.ts`; `coordination/reports/M3-33-action-buttons-hint.report.md`; `coordination/reports/M3-36-portrait-adaptation.report.md`
-- [x] 当前出牌区域清晰。← `coordination/reports/M6-C2-bomb-effect-390x844.png`; `coordination/reports/M6-C3a-game-390x844.png`; `coordination/reports/M6-C3a-game-412x915.png`; `coordination/reports/M6-C3a-game-360x780.png`
+- [x] 844×390 横屏下手牌不遮挡主要按钮；side-seat 多牌避让 HUD。← `coordination/BOARD.md` v1.2 终局裁定、T-FIX-DROP-HUD、V6 记录
+- [x] 当前出牌区域清晰，逆时针座位映射与出牌落点一致。← `coordination/BOARD.md` P-G7/V6/T-FIX-DROP-HUD 记录
 - [x] 地主、农民身份可辨认。← `test/ui/screen-view.test.ts`; `coordination/reports/M3-31-game-scene-skeleton.report.md`
 - [x] 叫地主/抢地主流程提示明确。← `test/ui/bidding-view.test.ts`; `coordination/reports/M3-34-bidding-settlement-popups.report.md`
 - [x] 出牌、提示、不要按钮状态正确。← `test/ui/action-buttons.test.ts`; `test/ui/action-buttons-edges.test.ts`; `coordination/reports/M3-33-action-buttons-hint.report.md`
-- [x] 结算弹窗不溢出屏幕。← `test/ui/result-view.test.ts`; `coordination/reports/M3-34-bidding-settlement-popups.report.md`
-- [x] 设置 / 难度控件不溢出屏幕。← `coordination/reports/M6-C3a-lobby-390x844.png`; `coordination/reports/M6-C3a-lobby-412x915.png`; `coordination/reports/M6-C3a-lobby-360x780.png`; `coordination/reports/M3-59-difficulty-picker-390x844.png`; `coordination/reports/M3-65-home-density-390x844.png`; `coordination/reports/M3-65-subscreen-opaque-390x844.png`
+- [x] 结算弹窗不溢出屏幕，暗幕覆盖全屏且面板内无底层 HUD 浮入。← `coordination/BOARD.md` T-FIX-SETTLE、V6 记录
+- [x] 设置 / 难度控件不溢出屏幕。← 早期三档竖屏截图记录 + v1.2 发布四横屏冒烟记录
 
 ## 发布前检查
 
 - [x] Cocos Editor 打开项目无错误。← `coordination/reports/M3-29-resource-baseline-import.report.md`; `coordination/reports/M3-30-lobby-scene.report.md`; `coordination/reports/M3-31-game-scene-skeleton.report.md`; M6-C1 用户 Creator 验证记录见 `docs/TASKS.md`
-- [x] 脚本编译无错误。← `docs/TASKS.md`（M6-C1 用户 Creator 验证编译零报错）; `coordination/BOARD.md`（main 133 文件 / 653 用例，typecheck 净）
-- [x] Vitest 纯逻辑测试（规则 / 状态机 / AI）全部通过。← `coordination/BOARD.md`（main 133 文件 / 653 用例全绿）
+- [x] 脚本编译无错误。← `coordination/BOARD.md`（v1.2 收版 141 文件 / 739 用例，typecheck 净）
+- [x] Vitest 纯逻辑测试（规则 / 状态机 / AI）全部通过。← `coordination/BOARD.md`（v1.2 收版 141 文件 / 739 用例全绿；v1.3 A 波后以最新 BOARD 为准）
 - [x] 自对弈冒烟（N 局）无阻塞。← `test/selfplay/selfplay.test.ts`; `test/selfplay/selfplay-long.test.ts`
-- [x] 目标平台构建通过。← `coordination/reports/M6-02-build-verification.report.md`; `coordination/reports/M6-D1-lobby-launch-rebuild.report.md`; D1 复测 `build/web-mobile/`（47M / 202 文件，CocosEngine 3.8.8，platform web-mobile，`launchScene=lobby.scene`）；`/tmp/doudizhu-d1-lobby-launch-smoke/summary.json`
-- [x] 发布构建首屏进入大厅，且可从大厅进入对局并返回大厅。← `/tmp/doudizhu-d1-lobby-launch-smoke/summary.json`（390×844 / 412×915 / 360×780 均 `sceneName="lobby"` 且 `errorEvents=[]`；390×844 验证 `lobby → game → pause quit → lobby`）
+- [x] 目标平台构建通过。← `coordination/BOARD.md` RELEASE-v1.2：Creator 3.8.8 CLI `web-mobile`，`launchScene=lobby.scene`，`designResolution=844×390`，`orientation=landscape`
+- [x] 发布构建首屏进入大厅，且可从大厅进入对局并返回大厅。← RELEASE-v1.2 四横屏 V6 全链 harness：两局 settled、逆时针链、暂停链，`productErrors=[]×4`
 - [x] 完成多局冒烟测试。← `test/selfplay/selfplay-long.test.ts`（seeds 1..50）
 - [x] 本地设置和战绩可保存。← `test/data/settings-storage.test.ts`; `test/data/session.test.ts`; `test/data/session-atomicity.test.ts`; `assets/scripts/ui/components/game-scene-skeleton.ts`
