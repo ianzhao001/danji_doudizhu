@@ -858,7 +858,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > | ID | Wave | 类型 | 文件域 | 依赖 | 状态 |
 > |----|----|----|----|----|----|
 > | ART-PAUSE-BTN | 7 | 美术 preview（用户图审·文生图） | `asset-previews/v13-pause-buttons/` + report | — | done 69d02fe |
-> | ART-IMPORT-PAUSE-BTN | 7 | 美术导入（新文件+纯增键） | `art/ui/pause-btn-*.png`+`.meta`+`asset-keys.ts` 纯增+report | ART-PAUSE-BTN 用户图审通过 | approved |
+> | ART-IMPORT-PAUSE-BTN | 7 | 美术导入（新文件+纯增键） | `art/ui/pause-btn-*.png`+`.meta`+`asset-keys.ts` 纯增+report | ART-PAUSE-BTN 用户图审通过 | merge-claimed:ART-IMPORT-PAUSE-BTN |
 > | P-G7-UIFIX3 | 7 | 游戏内三轮整改（两阶段·双层视觉预审从严） | `game-scene-skeleton.ts`+`ui/components/game-scene/*.ts`+report | ①P-G6 ✅`1951f88`；②ART-IMPORT-PAUSE-BTN | done 6de93df |
 > | V6 | 7 | 收口·验证（verify-only·spec `tasks/V6.md`·审查单 R-WAVE7 R:V6） | `reports/V6.report.md`+`reports/V6-*.png` | P-G7-UIFIX3 | blocked |
 >
