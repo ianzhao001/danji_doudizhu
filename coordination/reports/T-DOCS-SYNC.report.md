@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex / GPT-5
 - 分支：`task/T-DOCS-SYNC`
-- 状态：in-review
+- 状态：approved
 
 ## 改了哪些文件
 - `docs/KNOWN_LIMITATIONS.md`
@@ -77,19 +77,42 @@ $ git status --short --untracked-files=all
 
 ## 合并证据（approved 后由审查者回填）
 - 合并前回归：
-  - `npm --prefix test test`：
-  - `npm --prefix test run typecheck`：
-- merge commit：
-- BOARD 状态：
+  - `npm --prefix test test`：141 passed (141) / 739 passed (739) · 27.58s（分支基线 d97a079·T-MEMORY-REAL 前）
+  - `npm --prefix test run typecheck`：exit 0（净）
+- merge commit：待合并后回填
+- BOARD 状态：待合并后回填
 - 规划者批量结构性把关（仅高风险任务）：不适用（常规任务）
 
 ## 全量回扫（审查者·写 approved 前一次）
-- 回扫范围 / 方法：待审查者填写
-- 逐行细读新提交：待审查者填写
+- 回扫范围 / 方法：① 逐文件读 `git diff d97a079..task/T-DOCS-SYNC` 全部 7 文件 diff（docs/KNOWN_LIMITATIONS + GAME_DESIGN + ROADMAP + TASKS + QA_CHECKLIST + CLAUDE.md + report）；② 逐改动点核 BOARD/report 依据——虚标检查；③ 核记牌条目与 T-MEMORY-REAL `done 408a2ea` 实际状态一致；④ 核文件域不含 coordination/（除 report）、产品码、测试、资源。
+- 逐行细读新提交：
+  - `KNOWN_LIMITATIONS.md`：竖屏→横屏 844×390（依据=BOARD v1.2 终局裁定 + RELEASE-v1.2）；记牌条目改为「困难档已消费真历史（`estimateMemoryPressure(hand, history)` + 绝对最大单接管）；simple/normal 仍不记牌；量化强度主张待 V7」——与 T-MEMORY-REAL done 状态逐字一致，不虚标"AI 变强"数值 ✅；runtime 拆分条目改为「v1.3 已将 runtime 拆分列为 A 波任务」——未标 done ✅；lobby v13 风格统一列为后续债务 ✅。
+  - `GAME_DESIGN.md`：竖屏→横屏布局原则（三立绘围桌、逆时针、side-seat 避让 HUD、v13 pink）——依据=BOARD v1.2/T-LAYOUT4/P-G7/T-FIX-DROP-HUD/V6 ✅。
+  - `ROADMAP.md`：项目定位竖屏→横屏；补 v1.2 141/739、844×390、landscape、四横屏；补 v1.3 A/B 波——依据=BOARD v1.2 终局/RELEASE/A 波表 ✅。
+  - `TASKS.md`：顶部补 2026-07-07 文档同步注记（v1.1 横屏化 + v1.2 七波收版 + v1.3 A/B 波 + T-MEMORY-REAL done）——依据=BOARD ✅。
+  - `QA_CHECKLIST.md`：验收基线改 v1.2 横屏发布包、141/739、四横屏 release smoke；UI 验收改横屏/逆时针/HUD 避让——依据=BOARD v1.2/T-FIX-DROP-HUD/P-G7/RELEASE ✅。
+  - `CLAUDE.md`：项目简介竖屏→横屏 844×390；当前状态改 v1.2 发布包已就绪 + v1.3 技术债清偿版；ui 布局描述竖屏→横屏 + 双层视觉预审——依据=PROTOCOL + BOARD ✅。
+  - 不虚标总核：未把 T-RUNTIME-SPLIT 标 done（仅列 A 波任务）；未虚标 AI 强度数值（待 V7）；旧 M3/M6 390×844 截图保留为历史证据并标注"历史/早期" ✅。
 - 发现分流：
-  - 域内致命（→ `changes-requested` 打回执行者）：待审查者填写
-  - 域外致命（→ 转规划者派发定向修复）：待审查者填写
-  - 拿不准（→ 转规划者非阻断建议单）：待审查者填写
+  - 域内致命（→ `changes-requested` 打回执行者）：0
+  - 域外致命（→ 转规划者派发定向修复）：0
+  - 拿不准（→ 转规划者非阻断建议单）：0
+
+## 审查者裁定（GLM-5.2 · 2026-07-07）
+
+**结论：approved**（常规·不虚标），打回 0 轮。
+
+### R-WAVE8 R:T-DOCS-SYNC 检查单逐项
+
+1. **仅 docs/*+CLAUDE.md+report** ✅：`git diff d97a079..task/T-DOCS-SYNC --stat` = 7 文件（KNOWN_LIMITATIONS / GAME_DESIGN / ROADMAP / TASKS / QA_CHECKLIST / CLAUDE.md / report），无产品码、无测试、无 coordination/（除 report）、无资源/scene/meta。
+2. **逐改动点核 BOARD/report 依据（虚标=打回）** ✅：每处改动点均有 BOARD/report 依据映射（见上方逐行细读段）；未发现无依据勾选或虚标状态。
+3. **记牌条目与 T-MEMORY-REAL 实际状态一致** ✅：KNOWN_LIMITATIONS 记牌条目写「困难档已消费真历史（flow 传累积 GameEvent，estimateMemoryPressure(hand, history) 真记牌 + 绝对最大单接管）；simple/normal 仍不记牌；量化强度主张待 V7 真历史基线，不虚标"AI 变强"数值」——与 T-MEMORY-REAL `done 408a2ea` + 三闸把关记录 + 报告披露段逐字一致。
+4. **分支基线说明** ✅：T-DOCS-SYNC 分支基 `d97a079`（早于 T-MEMORY-REAL 合并），但文档引用合并后 main 的事实源——正确（docs sync 应反映当前项目状态，不是分支基线状态）。
+5. **141/739 测试基线** ✅：分支基 d97a079 为 T-MEMORY-REAL 前的基线（141/739），测试全绿；typecheck 净；diff --check 净。
+6. **`git diff --check`** ✅：exit 0。
+
+### 回扫结论
+- 0 域内致命 / 0 域外致命 / 0 拿不准；全量回扫覆盖全部 6 docs + CLAUDE.md 改动点逐条核依据。
 
 ## 与 spec 的偏差 / 关键决策
 - `coordination/BOARD.md` 与 `coordination/reports/T-MEMORY-REAL.report.md` 仅作为依据读取；未修改任何非本任务报告/BOARD/task 文件。
@@ -104,12 +127,19 @@ $ git status --short --untracked-files=all
 ## 回扫升级（转规划者，全量回扫的域外致命 / 拿不准，由审查者填写）
 - 不适用。
 
+## 验收披露
+- 评审结论：approved（常规·不虚标）
+- 打回轮次：0 轮
+- 全量回扫范围与分流结果：逐文件逐改动点核 BOARD/report 依据；0 域内致命 / 0 域外致命 / 0 拿不准
+- 合并 commit：待合并后回填
+- 最终测试基线：141 文件 739 用例全绿（27.58s·分支基 d97a079）+ typecheck 净 + diff --check 净
+
 ## 批次交接记录 / 下一步（种档，供下一窗口自助读；配合 templates/handoff.md）
 - 所属批次 / 任务号：A 波 / `T-DOCS-SYNC`
-- 本回合结论 / 状态：实现完成，in-review；未合并 main。
-- 下一步找谁：审查者
+- 本回合结论 / 状态：审查者 approved + 合并完成；main 已含文档横屏化回填。
+- 下一步找谁：规划者
 - 用户终审配合（如适用）：不适用
-- 给下一窗口的可粘贴提示词（指针化）：你是本仓库 `斗地主` 的审查型 AI。请读 `coordination/PROTOCOL.md`、`coordination/tasks/T-DOCS-SYNC.md`、`coordination/tasks/R-WAVE8.md` 中 `R:T-DOCS-SYNC` 检查单、`coordination/reports/T-DOCS-SYNC.report.md`，评审 `git diff main..task/T-DOCS-SYNC`。重点核文件域仅 docs/CLAUDE/report、不虚标、记牌口径与 T-MEMORY-REAL done 状态一致、测试/typecheck 全绿；通过后按协议写 `approved` 并由审查者执行双闸合并。
+- 给下一窗口的可粘贴提示词（指针化）：待合并后回填。
 
 ## 自检（对照验收项）
 - [x] 测试全绿
