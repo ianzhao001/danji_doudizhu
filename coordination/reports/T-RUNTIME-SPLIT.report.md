@@ -86,8 +86,8 @@ $ git diff --stat
 - 合并前回归：
   - `npm --prefix test test`：143 passed (143) / 746 passed (746) · 27.10s
   - `npm --prefix test run typecheck`：exit 0（净）
-- merge commit：待合并后回填
-- BOARD 状态：待合并后回填
+- merge commit：`6cc314f`（`--no-ff` 合并 · main 合并后 143/746 绿 + typecheck 净）
+- BOARD 状态：done 6cc314f
 - 规划者批量结构性把关（仅高风险任务）：不适用（常规任务）
 
 ## 全量回扫（审查者·写 approved 前一次）
@@ -141,15 +141,15 @@ $ git diff --stat
 - 评审结论：approved（常规·move-only 强化）
 - 打回轮次：0 轮
 - 全量回扫范围与分流结果：全仓跨模块引用核 + hardening test 探针桥兼容性 + color-moved=zebra 纯搬移；0 域内致命 / 0 域外致命 / 0 拿不准
-- 合并 commit：待合并后回填
-- 最终测试基线：143 文件 746 用例全绿（27.10s）+ typecheck 净 + diff --check 净
+- 合并 commit：`6cc314f`
+- 最终测试基线：main 合并后 143 文件 746 用例全绿（27.04s）+ typecheck 净 + diff --check 净
 
 ## 批次交接记录 / 下一步（种档，供下一窗口自助读；配合 templates/handoff.md）
 - 所属批次 / 任务号：A 波 / `T-RUNTIME-SPLIT`
-- 本回合结论 / 状态：审查者 approved + 合并完成；main 已含 round-runtime 拆分。
+- 本回合结论 / 状态：审查者 approved + 合并完成（`6cc314f`）；main 已含 round-runtime 拆分（180 行壳 + 3 新内部模块）。
 - 下一步找谁：规划者
 - 用户终审配合（如适用）：不适用
-- 给下一窗口的可粘贴提示词（指针化）：待合并后回填。
+- 给下一窗口的可粘贴提示词（指针化）：你是本仓库 `斗地主` 的规划型 AI。T-RUNTIME-SPLIT 已由审查者合并完成（main `6cc314f`·BOARD done·143/746 绿+typecheck 净·打回 0 轮·回扫 0/0/0）。先读：coordination/PROTOCOL.md、coordination/BOARD.md 第八批本任务行、coordination/reports/T-RUNTIME-SPLIT.report.md（含验收披露段）。A 波剩余 T-VIEW-SEAT / T-PROFILE-FOLLOWS / T-DOCS-SYNC 可继续随到随合。
 
 ## 自检（对照验收项）
 - [x] 测试全绿
