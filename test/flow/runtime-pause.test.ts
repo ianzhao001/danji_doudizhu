@@ -98,10 +98,14 @@ describe('T-PAUSE-GATE runtime 暂停门（对局冻结）', () => {
     expect(clock.sleeps).toEqual([]);
   });
 
-  it('真暂停门：pause() 后 AI sleep 醒来不推进，state 不变；resume() 后继续', async () => {
+  it('真暂停门：pause() 后 AI sleep 醒来不推进，state 不变；resume() 后继续到 hero gate', async () => {
+    // 构造：heroSeat=0、turn=2、seat2 有 2 张牌、top=null。
+    // resume 后 seat2 领首张（top=null 分支·leadOneThenPass 出首张·手牌剩 1 不 settled）
+    // → nextSeat(2)=0=heroSeat → playing 分支顶部 `turn===heroSeat` 即 return → hero gate。
+    // 关键：resume 后恰好一手 AI 推进即达 hero gate，不 settled、不替 hero 决策。
     const clock = new PendingClock();
     const runtime = resumeRoundRuntime(
-      { state: state({ turn: 2, hands: [[A], [R3], [R4]] }), heroSeat: 1, bidMultiplier: 1, events: [] },
+      { state: state({ landlord: 0, turn: 2, hands: [[A], [R3], [R4, R4]] }), heroSeat: 0, bidMultiplier: 1, events: [] },
       config({ clock, thinkingDelayMs: 9 }),
     );
     await flush();
@@ -127,7 +131,9 @@ describe('T-PAUSE-GATE runtime 暂停门（对局冻结）', () => {
 
     clock.resolveAll();
     await flush();
+    // seat2 领首张后流转到 seat0=hero gate（不 settled）
     expect(runtime.isPlayerTurn()).toBe(true);
+    expect(runtime.phase()).toBe('playing');
   });
 
   it('守卫：暂停态 submitPlayerAction 照常接受（暂停只冻 AI·不拒玩家）', async () => {
