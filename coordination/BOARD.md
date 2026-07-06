@@ -859,7 +859,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > |----|----|----|----|----|----|
 > | ART-PAUSE-BTN | 7 | 美术 preview（用户图审·文生图） | `asset-previews/v13-pause-buttons/` + report | — | done 69d02fe |
 > | ART-IMPORT-PAUSE-BTN | 7 | 美术导入（新文件+纯增键） | `art/ui/pause-btn-*.png`+`.meta`+`asset-keys.ts` 纯增+report | ART-PAUSE-BTN 用户图审通过 | done aa1401b |
-> | P-G7-UIFIX3 | 7 | 游戏内三轮整改（①done `93cc7c2`·②暂停接线） | `game-scene-skeleton.ts`+`ui/components/game-scene/*.ts`+report | ①P-G6 ✅；②ART-IMPORT-PAUSE-BTN ✅`aa1401b` | ready |
+> | P-G7-UIFIX3 | 7 | 游戏内三轮整改（①done `93cc7c2`·②暂停接线） | `game-scene-skeleton.ts`+`ui/components/game-scene/*.ts`+report | ①P-G6 ✅；②ART-IMPORT-PAUSE-BTN ✅`aa1401b` | approved |
 > | V6 | 7 | 收口·验证（verify-only·spec `tasks/V6.md`·审查单 R-WAVE7 R:V6） | `reports/V6.report.md`+`reports/V6-*.png` | P-G7-UIFIX3 | blocked |
 >
 > **V5 用户签收裁定 + 第七波派发（规划者·2026-07-06）**：V5 **裁定：确认 done `3a23c6f`**（verify-only 技术门全绿）——**但 v1.2 终局未达**：用户 4 否点。**逐条诊断+代码根因**：**#3 出牌顺序**经查是 **UI 座位映射非 game 逻辑**（`game/seat.ts nextSeat=(seat+1)%3` 抽象轮转正确；UI `seats-renderer.ts seatName` seat1=左家渲染到左→视觉顺时针；标准斗地主逆时针=下家在右）→ **UI 翻转 seat1→右/seat2→左，game 层不动**（低风险·nextSeat 不改）。**#2** `renderPlayArea`(:578) 多牌+牌型标签重叠→布局避让。**#4** 左右家文字/btn 异常→复现修（疑与座位映射/nameplate 相关）。**#1** 暂停 6 按钮（`renderPauseMenu`:770 现 72×30/176×42 沿用 v13 皮肤太小 9-slice 压变形）——**用户裁决另生美术**（AskUserQuestion 2026-07-06）→ ART-PAUSE-BTN→用户图审→import→P-G7② 接线+包裹+两组同色。**派发**：ART-PAUSE-BTN（并行·用户图审外部时钟）+ P-G7-UIFIX3 阶段①（#2/#3/#4 即开·分支自 main 建）→ ART-IMPORT-PAUSE-BTN（图审后）→ P-G7② 暂停接线 → V6 收口 → 用户再签收。审查单 `tasks/R-WAVE7.md`。**双层视觉预审从严延续**（规划者逐项对照 4 否点+针对性 zoom）。main `90110ff` 基线 **141 文件/739 全绿 + typecheck 净（规划者独立复跑确认）**。**V6 done + 用户签收 = v1.2 终点**。
