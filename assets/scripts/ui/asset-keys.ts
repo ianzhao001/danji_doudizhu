@@ -50,6 +50,8 @@ export const RESOURCE_PATHS = {
   btnSecondaryV13: 'art/ui/btn-secondary-v13',
   btnTertiaryV13: 'art/ui/btn-tertiary-v13',
   btnDisabledV13: 'art/ui/btn-disabled-v13',
+  pauseBtnToggle: 'art/ui/pause-btn-toggle',
+  pauseBtnAction: 'art/ui/pause-btn-action',
   seatNameplateV13: 'art/ui/seat-nameplate-v13',
   bottomCardsDockV13: 'art/ui/bottom-cards-dock-v13',
   settlementBannerWinV13: 'art/ui/settlement-banner-win-v13',
