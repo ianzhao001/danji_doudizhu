@@ -79,8 +79,8 @@ $ git status --short --untracked-files=all
 - 合并前回归：
   - `npm --prefix test test`：141 passed (141) / 739 passed (739) · 27.58s（分支基线 d97a079·T-MEMORY-REAL 前）
   - `npm --prefix test run typecheck`：exit 0（净）
-- merge commit：待合并后回填
-- BOARD 状态：待合并后回填
+- merge commit：`081afe8`（`--no-ff` 合并 · main 合并后 143/746 绿 + typecheck 净）
+- BOARD 状态：done 081afe8
 - 规划者批量结构性把关（仅高风险任务）：不适用（常规任务）
 
 ## 全量回扫（审查者·写 approved 前一次）
@@ -131,15 +131,15 @@ $ git status --short --untracked-files=all
 - 评审结论：approved（常规·不虚标）
 - 打回轮次：0 轮
 - 全量回扫范围与分流结果：逐文件逐改动点核 BOARD/report 依据；0 域内致命 / 0 域外致命 / 0 拿不准
-- 合并 commit：待合并后回填
-- 最终测试基线：141 文件 739 用例全绿（27.58s·分支基 d97a079）+ typecheck 净 + diff --check 净
+- 合并 commit：`081afe8`
+- 最终测试基线：main 合并后 143 文件 746 用例全绿（27.19s）+ typecheck 净 + diff --check 净
 
 ## 批次交接记录 / 下一步（种档，供下一窗口自助读；配合 templates/handoff.md）
 - 所属批次 / 任务号：A 波 / `T-DOCS-SYNC`
 - 本回合结论 / 状态：审查者 approved + 合并完成；main 已含文档横屏化回填。
 - 下一步找谁：规划者
 - 用户终审配合（如适用）：不适用
-- 给下一窗口的可粘贴提示词（指针化）：待合并后回填。
+- 给下一窗口的可粘贴提示词（指针化）：你是本仓库 `斗地主` 的规划型 AI。T-DOCS-SYNC 已由审查者合并完成（main `081afe8`·BOARD done·143/746 绿+typecheck 净·打回 0 轮·回扫 0/0/0）。先读：coordination/PROTOCOL.md、coordination/BOARD.md 第八批本任务行、coordination/reports/T-DOCS-SYNC.report.md（含验收披露段）。A 波 T-MEMORY-REAL（done）+ T-RUNTIME-SPLIT（done）+ T-DOCS-SYNC（done）均已完成；剩余 T-VIEW-SEAT / T-PROFILE-FOLLOWS 可随到随合。
 
 ## 自检（对照验收项）
 - [x] 测试全绿
