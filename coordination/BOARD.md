@@ -899,3 +899,48 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > **⑤ 发布注记**：v1.2 收版后如需打包发布，按 v1.1 M6-D1 先例走 Creator web-mobile 构建+lobby 启动场景+三档烟测，由用户决定时机。
 >
 > **⑤ 发布注记执行（规划者·2026-07-06·`RELEASE-v1.2`）**：用户指令「打包发布」已执行——Creator 3.8.8 CLI web-mobile 构建自收版 main `24bf5e8`：`launchScene=lobby.scene`·`designResolution=844×390`·**`orientation=landscape`**（首建 auto 复现 E-ORIENT 的「CLI 不读 builder.json」caveat，按其已验证 inline packages 命令重建修正）。发布冒烟=发布产物上跑 V6 全链 harness：**四横屏 ×16 captures 全过，productErrors=[]×4**（两局 settled+逆时针链+暂停链）；规划者目检发布态 lobby 首屏正常。归档 `build/doudizhu-v1.2-web-mobile.zip`（43M·sha256 `5d5cd3f0…b69c`·不入库）。记录 `reports/RELEASE-v1.2.report.md`。**v1.2 发布包就绪。**
+
+---
+
+## 第八批·v1.3（技术债清偿版 · 规划者派发 · 2026-07-06）
+
+> 用户指令「不实现新功能，核心修复历史技术债务 + 打磨已有模块与代码规范」。规划者现状侦察（file:line 级·修正旧账）+ 四裁决问询后落本表。**用户四裁决（2026-07-06）**：① 困难档 AI 真记牌 **做**（本版唯一高风险项·三闸）；② lobby v13 统一 **本版不动**（留美术专版）；③ save 双序列化 **维持延后**（守「与叫抢存档一次升版」策略）；④ 可选债 **全选**（round-runtime 拆分 / 文案迁 strings.ts / 叫抢建议接线 / legalFollows 性能剥削 profiling 先行）。
+
+### 现状侦察（2026-07-06 实测·file:line）
+
+| 债项 | 当前实况 |
+|---|---|
+| skeleton 肥大 | `game-scene-skeleton.ts` 又长回 **1670 行**（P-G5/6/7 三轮整改增重）；audio/卡面/tween/暂停/顶栏未模块化 |
+| AI 假记牌 | **仅剩 AI 侧**：`hard.ts:88 trackPlayed([], hand)`（快照无历史）；HUD 记牌器已消费真实事件（`hud-renderer.ts:63 trackPlayed(ctx.fullGameEvents, hand)`）——修法走 flow 传递，**不动 game 状态机契约** |
+| helper 重复/死码 | `addButton/addSprite/drawPanelSkin` 在 skeleton 与 lobby 各有本地实现；`ui-helpers.addUiButton` **死导出**；`drawPanel` 是**活的**（渲染器 6 处消费·旧账有误差已修正） |
+| strings 零采用 | `ui/strings.ts` 30 行建成后 **0 消费**，两巨组件文案全硬编码 |
+| runtime 肥大 | `flow/round-runtime.ts` **462 行**（叫抢驱动/持久化/事件重放/终止诊断混居） |
+| 旧映射残留 | `ai-thinking-view.ts:13` label 仍 1=左家（v1.2 已改逆时针 1=右家）；渲染层未消费该 label 故零渲染影响，属 latent |
+| 文档过时 | `docs/KNOWN_LIMITATIONS.md`/`GAME_DESIGN.md`/`CLAUDE.md` 仍写「竖屏 390×844」；v1.2 横屏/landscape/v13 皮肤/逆时针未回填 |
+| 未接线能力 | `bidding-advisor`+`bidding-advice-view` 纯层带测试建好未接（P-G3② optional 遗留） |
+| 观感微调 | 顶部右角半裁小徽标（四档一致）、playing 左列密度（V4-R3 起登记的非硬伤观察） |
+| 性能存疑 | `legalFollows` 全量枚举无剪枝——既有立场：无实测瓶颈不动 keystone → 本版先 profiling 拿数据 |
+
+### 任务表（A/B 双波·文件域不相交·双窗并行）
+
+| ID | 波 | 类型 | 文件域 | 依赖 | 分支 | 状态 |
+|----|----|----|----|----|----|----|
+| T-MEMORY-REAL | A | 高风险(改产品码·flow+ai) | `flow/{types,driver,round-runtime,policies}.ts` + `ai/levels/hard.ts` + report | —（A 波首任务） | `task/T-MEMORY-REAL` | **ready·种子 `3548ae8`**（hard-memory 2 红/policy-history 1 红·typecheck 净）·**三闸** |
+| T-RUNTIME-SPLIT | A | move-only 强化 | `flow/round-runtime.ts` + 新 `flow/runtime/*.ts` + report | T-MEMORY-REAL | `task/T-RUNTIME-SPLIT`（届时自 main 建） | blocked |
+| T-VIEW-SEAT | A | 常规 | `ui/ai-thinking-view.ts` + report（+规划者改种 `test/ui/ai-thinking-view.test.ts`） | — | `task/T-VIEW-SEAT` | **ready·种子 `7afd853`**（2 红/3 绿·typecheck 净） |
+| T-PROFILE-FOLLOWS | A | 零风险(不改产品) | `test/bench/*`（新）+ report | — | `task/T-PROFILE-FOLLOWS` | ready（无种子·bench 不入默认套件） |
+| T-DOCS-SYNC | A | 常规(不虚标) | `docs/*.md` + `CLAUDE.md` + report | —（KNOWN_LIMITATIONS 记牌条目在 T-MEMORY-REAL 合并后收尾） | `task/T-DOCS-SYNC` | ready |
+| T-UIHELPERS | B | editor-evidence(机械重构) | `ui/components/ui-helpers.ts` + `game-scene-skeleton.ts` + `lobby-scene.ts` + `ui/strings.ts` + report | —（B 波首任务） | `task/T-UIHELPERS` | ready |
+| P-GS-SPLIT2 | B | move-only 强化(editor-evidence) | `game-scene-skeleton.ts` + 新 `game-scene/*.ts` + `ui/strings.ts`(rider) + report | T-UIHELPERS | `task/P-GS-SPLIT2`（届时自 main 建） | blocked |
+| P-BID-POLISH | B | editor-evidence(双层视觉预审从严) | `game-scene-skeleton.ts` + `game-scene/*.ts` + report | P-GS-SPLIT2 | `task/P-BID-POLISH`（届时自 main 建） | blocked |
+| V7 | C | verify-only | `reports/V7.report.md` + `reports/V7-*.png` | 全部 done | `task/V7`（届时自 main 建） | blocked |
+
+> **派发注记**：
+> - **A 波**（纯逻辑/文档域·flow/ai/docs）：T-MEMORY-REAL → T-RUNTIME-SPLIT **串行**（同文件域·MEMORY-REAL 先扩 `PlayPolicy` 入参，SPLIT 再拆 runtime）；T-VIEW-SEAT / T-PROFILE-FOLLOWS / T-DOCS-SYNC **批次随到随合**（文件域互不相交）。
+> - **B 波**（组件规范域·ui/components）：T-UIHELPERS → P-GS-SPLIT2 → P-BID-POLISH **串行流水线**（共享化先缩体积→再拆 skeleton→再接叫抢建议+微调）；全程**双层视觉预审**（执行者自审四类硬伤→规划者逐张视觉审→双达标才转审查者）。
+> - **A/B 双窗并行**，共用单 merge lane 排队（PROTOCOL 精确机器态）。
+> - **T-MEMORY-REAL 三闸**（本版首次实际启用 `approved-pending-planner`）：审查者置 `approved-pending-planner` 排队 → 规划者结构性把关（接口宽化可选参保旧行为 / `trackPlayed` 本体未改 / game·rules 零触碰 / 质量门三档不回退）→ 认可改 `approved` → 合并。
+> - **T-PROFILE-FOLLOWS 两段式**：第一段 profiling harness 实测 selfplay 60 seeds 总时长 + `legalFollows` 占比 → 数据回报 → **规划者裁定**：占比>40% 或总时长>30s 才派第二段等价剪枝（守护种子=枚举结果集合相等），否则记录归档不剪。
+> - **红线**：不加新功能入口（叫抢建议=接既有能力·面板默认低打扰）；不动 `game/`、`rules/` 语义；save/lobby 皮肤/叫抢存档不碰；settled 门控/相位互斥/逆时针映射/卡面无中心数字/暂停按钮等 v1.2 成果全不回归（各 R 单列不变量清单）。
+> - 审查单：`tasks/R-WAVE8.md`（9 任务 R 检查单·T-MEMORY-REAL 标三闸）。
+> - 终点：V7 done + 用户轻签收 → 规划者 v1.3 版本终局裁定。
