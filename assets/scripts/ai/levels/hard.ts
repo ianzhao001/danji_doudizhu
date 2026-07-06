@@ -13,10 +13,11 @@ import {
   type Card,
   type Move,
 } from '../../rules';
+import type { GameEvent } from '../../game';
 import { cardKey } from '../../rules/guards';
 import { trackPlayed } from '../cardMemory';
 import { canFinishInOneMove, finishingFollow } from '../endgame';
-import { evaluateHand } from '../handStrength';
+import { ALL_RANKS, evaluateHand } from '../handStrength';
 import type { AiStrategy } from '../strategy';
 import {
   bombLikeMoves,
@@ -84,8 +85,8 @@ type MemoryPressure = Readonly<{
   possibleBombRanks: number;
 }>;
 
-function estimateMemoryPressure(hand: Card[]): MemoryPressure {
-  const memory = trackPlayed([], hand);
+function estimateMemoryPressure(hand: Card[], history: GameEvent[] = []): MemoryPressure {
+  const memory = trackPlayed(history, hand);
   const highRanks = [Rank.R2, Rank.SmallJoker, Rank.BigJoker] as const;
   const unseenHighCards = highRanks.reduce((sum, rank) => sum + (memory.remainingByRank[rank] ?? 0), 0);
   const possibleBombRanks = Object.entries(memory.remainingByRank).filter(
@@ -163,9 +164,9 @@ function chooseFinishingMove(
   return finishingFollow(hand, snapshot.top.pattern);
 }
 
-function chooseLeadMove(hand: Card[], moves: Move[]): Move {
+function chooseLeadMove(hand: Card[], moves: Move[], history: GameEvent[]): Move {
   const protectedSet = protectedCards(hand);
-  const pressure = estimateMemoryPressure(hand);
+  const pressure = estimateMemoryPressure(hand, history);
   const shapingCandidates = moves.filter(
     (move) => !isBombLike(move.pattern.category) && !usesProtectedCards(move, protectedSet),
   );
@@ -204,8 +205,27 @@ function chooseControlFollow(hand: Card[], moves: Move[]): Move | null {
   return pickLargest(controlCandidates);
 }
 
+function isAbsoluteTopSingle(move: Move, remainingByRank: Readonly<Record<number, number>>): boolean {
+  if (move.pattern.category !== Category.Single) return false;
+  const rank = move.pattern.mainRank;
+  return ALL_RANKS.every((candidate) => candidate <= rank || (remainingByRank[candidate] ?? 0) === 0);
+}
+
+function chooseAbsoluteTopSingleFollow(
+  snapshot: Parameters<AiStrategy>[0],
+  hand: Card[],
+  moves: Move[],
+  history: GameEvent[],
+): Move | null {
+  if (history.length === 0 || snapshot.top?.pattern.category !== Category.Single) return null;
+  const memory = trackPlayed(history, hand);
+  const candidates = moves.filter((move) => isAbsoluteTopSingle(move, memory.remainingByRank));
+  if (candidates.length === 0) return null;
+  return pickSmallest(candidates);
+}
+
 /** 积极控权策略桩：实现见 M4-03。 */
-export const hardStrategy: AiStrategy = (snapshot) => {
+export const hardStrategy: AiStrategy = (snapshot, _rng, history = []) => {
   const hand = requireHand(snapshot);
   const moves = snapshot.top ? legalFollows(hand, snapshot.top.pattern) : enumerateMoves(hand);
 
@@ -223,10 +243,13 @@ export const hardStrategy: AiStrategy = (snapshot) => {
     return toPlay(snapshot, choosePressingLeadMove(hand, moves));
   }
 
-  if (!snapshot.top) return toPlay(snapshot, chooseLeadMove(hand, moves));
+  if (!snapshot.top) return toPlay(snapshot, chooseLeadMove(hand, moves, history));
 
   const controlFollow = chooseControlFollow(hand, moves);
   if (controlFollow !== null) return toPlay(snapshot, controlFollow);
+
+  const absoluteTopSingle = chooseAbsoluteTopSingleFollow(snapshot, hand, moves, history);
+  if (absoluteTopSingle !== null) return toPlay(snapshot, absoluteTopSingle);
 
   return conservativeAction(snapshot, hand, moves);
 };

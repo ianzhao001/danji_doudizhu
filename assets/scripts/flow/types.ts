@@ -24,7 +24,7 @@ export type BidPolicy = (args: { seat: SeatIndex; state: BiddingState; hand: Car
  * 出牌策略（M-FLOW 注入点）：依当前座位、只读快照与 rng 产出一个 RoundAction（seat 必须等于 snapshot.turn）。
  * 默认包装 baseline `chooseAction`；可用于让不同座位采用不同难度（M4-04 难度差异 selfplay）。
  */
-export type PlayPolicy = (args: { seat: SeatIndex; snapshot: GameSnapshot; rng: Rng }) => RoundAction;
+export type PlayPolicy = (args: { seat: SeatIndex; snapshot: GameSnapshot; rng: Rng; history?: GameEvent[] }) => RoundAction;
 
 export interface FlowConfig {
   seed: number;

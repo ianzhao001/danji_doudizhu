@@ -317,7 +317,12 @@ class RoundRuntimeImpl implements RoundRuntime {
 
           await this.sleepForAi();
           if (this.isDisposed()) return;
-          const action = decidePlayAction({ state: this.state, playPolicy: this.playPolicy, rng: this.rng });
+          const action = decidePlayAction({
+            state: this.state,
+            playPolicy: this.playPolicy,
+            rng: this.rng,
+            history: this.gameEvents,
+          });
           const result = applyPlayStep(this.state, action);
           this.state = result.state;
           this.pushApplyResult(result, bucket);

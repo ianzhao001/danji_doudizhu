@@ -5,7 +5,7 @@
  */
 
 import type { Rng } from '../rules';
-import type { GameSnapshot, RoundAction } from '../game';
+import type { GameEvent, GameSnapshot, RoundAction } from '../game';
 import { simpleStrategy } from './levels/simple';
 import { normalStrategy } from './levels/normal';
 import { hardStrategy } from './levels/hard';
@@ -21,7 +21,7 @@ export enum AiLevel {
  * 难度策略：基于只读 GameSnapshot 与可注入 Rng 产出一个合法 RoundAction。
  * 与基线 chooseAction 同形，便于 flow 后续按难度替换出牌决策。
  */
-export type AiStrategy = (snapshot: GameSnapshot, rng: Rng) => RoundAction;
+export type AiStrategy = (snapshot: GameSnapshot, rng: Rng, history?: GameEvent[]) => RoundAction;
 
 /** 按难度返回对应策略函数。 */
 export function strategyFor(level: AiLevel): AiStrategy {
