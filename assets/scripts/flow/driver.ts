@@ -71,11 +71,17 @@ export function createPlayingState(deal: Deal, landlord: SeatIndex): RoundState 
   return createPlayingRound(deal, landlord);
 }
 
-export function decidePlayAction(args: { state: RoundState; playPolicy: PlayPolicy; rng: Rng }): RoundAction {
+export function decidePlayAction(args: {
+  state: RoundState;
+  playPolicy: PlayPolicy;
+  rng: Rng;
+  history: GameEvent[];
+}): RoundAction {
   return args.playPolicy({
     seat: args.state.turn,
     snapshot: snapshot(args.state, args.state.turn),
     rng: args.rng,
+    history: args.history.slice(),
   });
 }
 
@@ -171,10 +177,9 @@ export async function runHeadlessRound(config: FlowConfig): Promise<FlowResult> 
           });
         }
 
-        const snap = snapshot(state, state.turn);
         const action = (() => {
           try {
-            return playPolicy({ seat: state.turn, snapshot: snap, rng });
+            return decidePlayAction({ state, playPolicy, rng, history: gameEvents });
           } catch (error) {
             throwPlayLoopError(error, {
               seed: config.seed,

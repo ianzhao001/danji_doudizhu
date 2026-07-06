@@ -16,6 +16,6 @@ export function levelPolicies(levels: [AiLevel, AiLevel, AiLevel]): {
 } {
   return {
     bidPolicy: ({ seat, state, hand }) => chooseBidByLevel(hand, state, levels[seat]),
-    playPolicy: ({ snapshot, rng }) => strategyFor(levels[snapshot.turn])(snapshot, rng),
+    playPolicy: ({ snapshot, rng, history }) => strategyFor(levels[snapshot.turn])(snapshot, rng, history ?? []),
   };
 }
