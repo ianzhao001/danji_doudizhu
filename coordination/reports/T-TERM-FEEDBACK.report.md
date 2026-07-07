@@ -94,16 +94,26 @@ no matches
 
 ## 合并证据（approved 后由审查者回填）
 
-- 合并前回归：
-  - `npm --prefix test test`：
-  - `npm --prefix test run typecheck`：
-- merge commit：
-- BOARD 状态：
+- 合并前回归（main 工作树）：
+  - `npm --prefix test test`：148/762 绿（合并前 main 基线）
+  - `npm --prefix test run typecheck`：通过
+- merge commit：`f8f1f55`
+- 合并后回归（main 工作树）：
+  - `npm --prefix test test`：149/768 绿（+1 文件 +6 用例·种子 `termination-feedback` 并入）
+  - `npm --prefix test run typecheck`：通过
+- BOARD 状态：`done f8f1f55`
 - 规划者批量结构性把关：不适用（常规任务）。
 
 ## 全量回扫（审查者·写 approved 前一次）
 
-- 待审查者回填。
+- 回扫范围：实现 commit `b0028b0` 全量 diff 逐行细读 + 全仓回归推理。
+- 文件域核验：实现 commit 仅触 `termination-feedback-view.ts`(+18) + `.ts.meta`(+9) + `game-scene-skeleton.ts`(+55/-1) + report(+148)。种子 commit `cd941f4` 仅触 `test/ui/termination-feedback.test.ts`(+86)。红线文件 `flow/`/`game/`/`rules/`/`result-overlay-renderer.ts`/`pause-menu.ts`/`toast-queue.ts` 零 diff。
+- 纯岛核验：`termination-feedback-view.ts` 无 `cc` import（rg 0 命中）；`deriveTerminationFeedback` 正向清单 `reason ∈ {'redealExhausted','error'}`·非 `!== 'settled'`·settled/null/非 disposed/已通知 → null。
+- 暂停接线核验：`openPauseMenu()` 追加 `runtime?.pause()`·`closePauseMenu()` 追加 `runtime?.resume()`·`restartFromPause()` 调 `closeMenu(pauseState)`+`startGame(true)` 不调 resume·`askPauseQuit` 确认走 `director.loadScene('lobby')` 不调 resume·`cancelPauseQuit` 只回菜单不关菜单不调 resume。
+- disposed 态处理：`phaseText('disposed') => '已终止'`·`phase !== 'disposed'` 才渲染暂停按钮·`terminationFeedbackActionsVisible` flag 在 `startGame()` 重置。
+- CDP 证据审计：`summary.json` pause 段四断言 `freezeOk=true`/`resumeOk=true`/`returnOk=true`/`idempotentOk=true`·`productErrors=[]`/`failedResponses=[]`·termination 段四横屏 + error 补充截图均有 `已终止` 顶栏 + 异常文案 + 返回大厅/重开按钮。证据文件路径与报告一致·构建日志 `build Task Finished` ·smoke 脚本存在。
+- 跨任务回归：settled 门控不回归（settled 走既有 result overlay·纯岛 null）·T-RESUME-REPLAY/T-HUD-LIVE/T-LASTACT-LEGIBILITY 既有行为不受影响（skeleton 改动纯追加·无删除既有渲染路径）·T-PAUSE-GATE/T-ADVANCE-REENTRY 既有 runtime 行为不受影响（pause/resume 为追加调用·不修改 pauseState 视觉冻结逻辑）。
+- 分流结果：0 域内致命·0 域外致命·0 拿不准。
 
 ## 与 spec 的偏差 / 关键决策
 
