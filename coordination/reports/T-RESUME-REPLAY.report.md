@@ -2,7 +2,7 @@
 
 - 实现方标识：Cursor Agent / GPT-5.5（执行者）
 - 分支：`task/T-RESUME-REPLAY`
-- 状态：in-review
+- 状态：done 8ca7d85（审查者 approved·0 issues·合并 8ca7d85·规划者视觉审待合并后补录）
 
 ## 改了哪些文件
 - **新** `assets/scripts/ui/resume-rebuild.ts`（纯岛·禁 import `cc`）
@@ -138,3 +138,23 @@ tsc --noEmit passed
 
 ### 结论
 **approved** — 常规任务·域内致命清零·全量回扫无未决阻断项·技术门全绿。规划者视觉审（第二层）待合并后作为用户审美签收前置补录。
+
+## 合并证据（审查者回填）
+- 合并前回归（main `ba26a09`）：
+  - `npm --prefix test test`：146/756 绿。
+  - `npm --prefix test run typecheck`：passed。
+- merge commit：`8ca7d85`（`--no-ff`·3-way 自动取 main 版 spec/BOARD·**无冲突**）。
+- 合并后回归（main `b68b34f`）：
+  - `npm --prefix test test`：**147/759 绿**（+1 文件 +3 用例 = `resume-replay-rebuild` 种子）。
+  - `npm --prefix test run typecheck`：passed。
+  - `git diff --check`：净。
+- BOARD 状态：`done 8ca7d85`。
+- 3-way 合并实绩：分支未触 `BOARD.md`/`R-WAVE9.md`/`T-RESUME-REPLAY.md`·main `2a3992b` 更新了此三文件·merge 自动取 main 版·零冲突·与预判一致。
+
+## 验收披露
+- **评审结论**：approved（0 issues·0 打回轮次）。
+- **打回轮次**：0。
+- **全量回扫范围与分流结果**：① `resume-rebuild.ts` 仅被 `game-scene-skeleton.ts:41` import·无其他消费者 ② `recentEvents` 仅被 `seats-renderer.ts:261` 消费（过滤 round 解包→`deriveLastActions`）·`screen-view.ts:32` 类型声明未引用 ③ 重建只产 round 事件·消费者也只取 round 事件·语义一致 ④ 恢复路径 recentEvents ≥ live round 数·`deriveLastActions` 取末次覆盖·结果一致或更完整 ⑤ `flow/`/`game/`/`rules/`/`data/`/`ai/` 零 diff ⑥ 跨模块/跨任务无交互隐患。**无域内致命·无域外致命·无拿不准**。
+- **合并 commit**：`8ca7d85`。
+- **最终测试基线**：main `b68b34f`·147 文件/759 用例绿·typecheck 净·diff check 净。
+- **待办**：规划者视觉审（双层视觉预审第二层）待补录·作为用户审美签收前置；T-HUD-LIVE 依赖已满足（T-RESUME-REPLAY done）·待规划者派发。
