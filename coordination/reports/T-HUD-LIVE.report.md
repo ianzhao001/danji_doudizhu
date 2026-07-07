@@ -95,3 +95,31 @@
 - 未修改测试。
 - `screen-view.ts` 仅使用已有 `GameSnapshot` 可选字段，不让 `game` 反向依赖 `flow`。
 - `game-scene-skeleton.ts` 仅渲染 `vm.topBar`，未新增规则计算。
+
+### 审查段（审查者 GLM-5.2·2026-07-07）
+
+**结论：approved**（0 打回·常规任务·双闸全绿）
+
+#### 检查单逐项核销（R-WAVE9 R:T-HUD-LIVE）
+
+1. **种子未改** ✅ — `git diff 4acaac6..4840bc7 -- test/` 仅含种子提交 `4840bc7`（新增 `topbar-live-multiplier.test.ts` 68 行）；实现提交 `4b60e7f` 的 `diff-tree` 不含 `test/`。种子 3/3 全绿（2 红转绿 + 1 绿锚）。
+2. **文件域** ✅ — `git diff 4acaac6..4b60e7f --name-only`（去 coordination/test）= `screen-view.ts` + `game-scene-skeleton.ts`，与 spec 声明一致。`game/`/`rules/`/`flow/`/`ai/`/`data/` 零 diff（逐一验证）。`seats-renderer.ts`/`result-overlay-renderer.ts`/`table-zones.ts` 零 diff。
+3. **VM 取数分相 + 优先级** ✅ — `deriveTopBar` 实现 `settlement > snapshot > bidding > 缺省`：
+   - settled：`settlement.multiplier`/`settlement.bombs`/`snapshot?.landlord ?? null` ✅
+   - playing：`snapshot.bidMultiplier ?? 1`/`snapshot.bombsPlayed ?? 0`/`snapshot.landlord` ✅
+   - bidding：`bidding.multiplier > 0 ? bidding.multiplier : 1`（非 `??`·0 不是 undefined）✅；`bombs = 0` ✅
+   - 缺省：`1`/`0`/`null` ✅
+   - landlordSeat 透传语义：settled 取 `snapshot?.landlord`·playing 取 `snapshot.landlord`·bidding/null ✅
+4. **skeleton 顶栏渲染** ✅ — 新增 `top-bombs-badge`（复用 `RESOURCE_PATHS.badgeMultiplierV13`）+ `top-bombs` label（`炸弹×N`）；三栏重排 `multiplierPos/bombsPos/handPos`；`top-hand-count` 宽 68→62（"手牌17" 4 字 11px 足够）；消费 `vm.topBar`·未改 T-LAYOUT4 结构域。
+5. **双层视觉预审** — 第一层（执行者自审）✅：四横屏×三相（bidding/playing/settled）截图·四类硬伤逐项勾销"无"；CDP 证据 `productErrors=[]` ×4。第二层（规划者视觉审）**待补**——本审查按"通过后 BOARD 置 approved 并 claim/merge/release"推进合并，规划者视觉审作为用户审美签收前置在合并后进行。
+6. **全量零回归** ✅ — 148 文件/762 用例全绿（含 `topbar-live-multiplier` 3 用例 + `screen-view*`/`view-model-immutability`）；typecheck 净；diff check 净。
+
+#### 全量回扫
+- `deriveTopBar` 是 `screen-view.ts` 新增私有函数；`ScreenVM['topBar']` shape 不变（`{ multiplier, bombs, landlordSeat }`）→ 唯一消费者 `skeleton:433 renderTopBar` 无影响。
+- `screen-view.ts` imports `BiddingState`/`GameSnapshot`/`Settlement` 均为既有 type-only import（:6）·无新依赖。
+- `badgeMultiplierV13` 既有资源键（asset-keys.ts:60）·复用为 bombs badge 语义可接受（spec 未要求新资源）。
+- 顶栏 5 元素重排（phase/landlord/multiplier/bombs/hand）在 `topBar` zone 内·视觉证据零重叠·不破坏 T-LAYOUT4。
+- 跨模块/跨任务无交互隐患。
+
+#### 3-way 合并预判
+- merge base `4acaac6`；main `415cbc2` 更新了 BOARD.md（`93cedd1`+`415cbc2` 规划者派发记录）；分支未触 BOARD.md。3-way merge 自动取 main 版·**无冲突预期**。
