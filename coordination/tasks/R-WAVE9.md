@@ -30,12 +30,13 @@
 - [ ] runtime 全家（runtime-pause/resume-phases/hardening/exceptions/diagnostics/bidding-visibility/round-runtime/policy-history/driver*）零改动全绿；全量+typecheck 零回归。
 - [ ] 置 `approved-pending-planner` 排队 → 规划者认可 → 合并。
 
-## R:T-RESUME-REPLAY（常规·双层视觉预审）
-- [ ] 种子未改；3 用例全绿（2 红转绿）。
-- [ ] 文件域仅 `game-scene-skeleton.ts` + report；`flow/`/`game/`/`rules/`/`data/save.ts`/`seats-renderer.ts`/`screen-view.ts` 零 diff。
-- [ ] recentEvents 从 fullGameEvents 重建（复用 `deriveLastActions`·不重算规则）；底牌保守牌背（不伪造面值·延后说明在案）。
+## R:T-RESUME-REPLAY（常规·双层视觉预审·2026-07-07 规划者种子期修订同步）
+- [ ] 种子未改；3 用例全绿（2 红转绿·红因=纯岛模块未建·今日 typecheck 红 1×TS2307 实现后须净）。
+- [ ] 文件域仅 **新 `ui/resume-rebuild.ts`（纯岛）** + `game-scene-skeleton.ts` + report；`flow/`/`game/`/`rules/`/`data/save.ts`/`seats-renderer.ts`/`last-action-view.ts`/`screen-view.ts` 零 diff。
+- [ ] 纯岛 `rebuildRecentEvents`：round 包装 + `slice(-12)` 镜像 live 截断（skeleton:386）·顺序保持·零非 round 事件（不伪造 deal/bid/bottomRevealed/settled）·**禁 import `cc`**。
+- [ ] skeleton 接线逐行核：恢复路径 `this.recentEvents = rebuildRecentEvents(this.fullGameEvents)`（`:376` 附近·紧随 fullGameEvents 重建）；`revealedBottomCards` 保持 null（保守牌背·不伪造面值·延后说明在案）；live 路径（onEvent 累积+cap）零改动。
 - [ ] 双层视觉预审：恢复后三席最近出牌可见 + 底牌牌背·四横屏零重叠；执行者自审表 + 规划者视觉审结论在案。
-- [ ] 全量零回归。
+- [ ] 全量零回归（含 `runtime-resume-phases`/`save-resume-e2e`）。
 
 ## R:T-HUD-LIVE（常规·双层视觉预审）
 - [ ] 种子未改；4 用例全绿（2 红转绿）。
