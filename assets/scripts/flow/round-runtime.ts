@@ -12,6 +12,9 @@ import {
   runtimeLegalInputs,
   runtimeSnapshot,
   advanceRuntimeUntilPause,
+  runtimeIsPaused,
+  runtimePause,
+  runtimeResume,
   scheduleRuntimeAdvance,
   startRuntimeDeal,
   submitRuntimePlayerAction,
@@ -61,6 +64,9 @@ export interface RoundRuntime {
   /** 叫抢期只读发牌视图（T-FLOW-BID）：bidding 相返回英雄 17 张副本 + [17,17,17]；其余相返回 null。 */
   biddingDeal(): BiddingDealView | null;
   isPlayerTurn(): boolean;
+  pause(): void;
+  resume(): void;
+  isPaused(): boolean;
   legalInputs(): PlayerInput[] | null;
   submitPlayerAction(input: PlayerInput): Promise<SubmitResult>;
   onEvent(cb: (e: FlowEvent) => void): () => void;
@@ -99,6 +105,8 @@ class RoundRuntimeImpl implements RoundRuntime {
   private currentTerminationDetail: unknown;
   private settledNotified = false;
   private replayClosed = false;
+  private paused = false;
+  private pauseRequested = false;
 
   constructor(config: RuntimeConfig, resume?: ResumeSnapshot) {
     const policies = levelPolicies(config.levels);
@@ -137,6 +145,12 @@ class RoundRuntimeImpl implements RoundRuntime {
 
   isPlayerTurn(): boolean { return runtimeIsPlayerTurn(this.driverContext()); }
 
+  pause(): void { runtimePause(this.driverContext()); }
+
+  resume(): void { runtimeResume(this.driverContext()); }
+
+  isPaused(): boolean { return runtimeIsPaused(this.driverContext()); }
+
   legalInputs(): PlayerInput[] | null { return runtimeLegalInputs(this.driverContext()); }
 
   async submitPlayerAction(input: PlayerInput): Promise<SubmitResult> { return submitRuntimePlayerAction(this.driverContext(), input); }
@@ -151,6 +165,8 @@ class RoundRuntimeImpl implements RoundRuntime {
 
   dispose(): void {
     this.currentPhase = 'disposed';
+    this.paused = false;
+    this.pauseRequested = false;
     this.subscribers.clear();
   }
 

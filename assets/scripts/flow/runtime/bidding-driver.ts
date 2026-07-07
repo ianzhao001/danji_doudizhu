@@ -70,6 +70,8 @@ export interface RuntimeDriverContext {
   currentTerminationReason: RuntimeTerminationReason | null;
   currentTerminationDetail: unknown;
   settledNotified: boolean;
+  paused: boolean;
+  pauseRequested: boolean;
   persist?: (payload: { round: RoundState; heroSeat: SeatIndex; bidMultiplier: number; events: GameEvent[] }) => void;
   onSettled?: (finish: RoundFinishInput) => void;
   emit(event: FlowEvent, bucket?: FlowEvent[]): void;
@@ -129,6 +131,24 @@ export function runtimeLegalInputs(runtime: RuntimeDriverContext): RuntimePlayer
   return null;
 }
 
+export function runtimePause(runtime: RuntimeDriverContext): void {
+  if (isRuntimeDisposed(runtime)) return;
+  runtime.paused = true;
+  runtime.pauseRequested = true;
+}
+
+export function runtimeResume(runtime: RuntimeDriverContext): void {
+  if (isRuntimeDisposed(runtime)) return;
+  if (!runtime.paused && !runtime.pauseRequested) return;
+  runtime.paused = false;
+  runtime.pauseRequested = false;
+  scheduleRuntimeAdvance(runtime);
+}
+
+export function runtimeIsPaused(runtime: RuntimeDriverContext): boolean {
+  return !isRuntimeDisposed(runtime) && (runtime.paused || runtime.pauseRequested);
+}
+
 export async function submitRuntimePlayerAction(
   runtime: RuntimeDriverContext,
   input: RuntimePlayerInput,
@@ -185,6 +205,7 @@ export async function advanceRuntimeUntilPause(
   try {
     let steps = 0;
     while (runtime.currentPhase !== 'disposed') {
+      if (runtimeIsPaused(runtime)) return;
       if (steps >= runtime.maxTurns) {
         terminateRuntimeWithError(runtime, new Error('ROUND_RUNTIME_MAX_TURNS'));
         return;
@@ -208,6 +229,7 @@ export async function advanceRuntimeUntilPause(
 
         await sleepForRuntimeAi(runtime);
         if (isRuntimeDisposed(runtime)) return;
+        if (runtimeIsPaused(runtime)) return;
         const action = decideBidAction({ bidding: runtime.bidding, deal: runtime.currentDeal, bidPolicy: runtime.bidPolicy });
         runtime.bidding = applyBiddingStep(runtime.bidding, action);
         runtime.emit(biddingEvent(action, runtime.bidding), bucket);
@@ -223,6 +245,7 @@ export async function advanceRuntimeUntilPause(
 
         await sleepForRuntimeAi(runtime);
         if (isRuntimeDisposed(runtime)) return;
+        if (runtimeIsPaused(runtime)) return;
         const action = decidePlayAction({
           state: runtime.state,
           playPolicy: runtime.playPolicy,
