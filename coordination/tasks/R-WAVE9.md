@@ -1,8 +1,8 @@
 # R-WAVE9 — v1.3 第九批修复波审查任务书（审查者专用）
 
-- 适用：T-PAUSE-GATE / T-LIVE-MULT / T-RESUME-REPLAY / T-HUD-LIVE / T-TERM-FEEDBACK（+ P-BID-POLISH 扩 spec 的 G2/G3 骑士）
+- 适用：T-PAUSE-GATE / T-LIVE-MULT / T-ADVANCE-REENTRY / T-RESUME-REPLAY / T-HUD-LIVE / T-TERM-FEEDBACK（+ P-BID-POLISH 扩 spec 的 G2/G3 骑士）
 - 通用核验/能力边界/回扫/交接：同 R-WAVE1 1-7 条 + PROTOCOL（批次作业·双层视觉预审关·精确机器态）。审查者不判美观。
-- lane：C 波纯层（PAUSE-GATE→LIVE-MULT 串行）与 C 波 UI（RESUME-REPLAY→HUD-LIVE→TERM-FEEDBACK 串行·均改 skeleton 须在 B 波 P-GS-SPLIT2 之前合）共用单 lane 排队；与 B 波双窗并行。
+- lane：C 波纯层（PAUSE-GATE→LIVE-MULT→ADVANCE-REENTRY 串行）与 C 波 UI（RESUME-REPLAY→HUD-LIVE→TERM-FEEDBACK 串行·均改 skeleton 须在 B 波 P-GS-SPLIT2 之前合；TERM-FEEDBACK 另需 ADVANCE-REENTRY 先 done）共用单 lane 排队；与 B 波双窗并行。
 
 ## R:T-PAUSE-GATE（**三闸·高风险 flow 接口**）
 - [ ] 种子未改（`git diff main..task -- test/` 仅规划者种子）；4 用例全绿（2 红转绿）。
@@ -21,6 +21,15 @@
 - [ ] 全量 vitest/typecheck 零回归；报告附三处 diff + 依赖方向自证。
 - [ ] 置 `approved-pending-planner` → 规划者认可 → 合并。
 
+## R:T-ADVANCE-REENTRY（**三闸·规划者裁量升级·flow 推进核心**）
+- [ ] 种子未改；`runtime-advance-reentry` 全绿（红转绿数以种入为准）。
+- [ ] 文件域仅 `flow/runtime/bidding-driver.ts` + `flow/round-runtime.ts` + report；`RoundRuntime` 公共接口零新增方法；`flow/types.ts`/`driver.ts`/`policies.ts`/`clock.ts`/`event-replay.ts`/`persistence.ts` 零 diff；`game/`/`rules/` 零触碰。
+- [ ] 防重入单一咽喉：`advanceRuntimeUntilPause` 入口查 `advanceLoopRunning`·置位·**finally 全路径清位**（player-gate/paused/disposed return、maxTurns/异常 terminate、throw 均清）；`scheduleRuntimeAdvance` 不加第二处检查。
+- [ ] 语义锚：resume 在旧 sleep 未醒时=新调度被吞、旧循环续跑（恰一循环·不多一次 sleep）；旧循环已退出后 resume=正常重启；**无丢唤醒**（paused 退出必清 flag）。
+- [ ] paused/disposed 既有 gate 零改动；submit 路径行为与事件桶语义不变（报告须复述「flag=true 时 submit 不可达」论证）。
+- [ ] runtime 全家（runtime-pause/resume-phases/hardening/exceptions/diagnostics/bidding-visibility/round-runtime/policy-history/driver*）零改动全绿；全量+typecheck 零回归。
+- [ ] 置 `approved-pending-planner` 排队 → 规划者认可 → 合并。
+
 ## R:T-RESUME-REPLAY（常规·双层视觉预审）
 - [ ] 种子未改；3 用例全绿（2 红转绿）。
 - [ ] 文件域仅 `game-scene-skeleton.ts` + report；`flow/`/`game/`/`rules/`/`data/save.ts`/`seats-renderer.ts`/`screen-view.ts` 零 diff。
@@ -35,10 +44,12 @@
 - [ ] 双层视觉预审：四横屏×三相顶栏截图·零重叠·包裹·对比度；执行者自审表 + 规划者视觉审结论在案。
 - [ ] 全量零回归。
 
-## R:T-TERM-FEEDBACK（常规·双层视觉预审）
-- [ ] 种子未改；4 用例全绿（2 红转绿）。
+## R:T-TERM-FEEDBACK（常规·双层视觉预审 + 暂停接线骑士）
+- [ ] 种子未改；termination-feedback 4 用例 + pause-wiring 种子全绿（红转绿数以种入为准）。
+- [ ] **前置核验**：T-ADVANCE-REENTRY 已 `done`（flow 防重入先行·否则暂停接线打开双循环窗口）。
 - [ ] 文件域仅 `game-scene-skeleton.ts` + report；`flow/`/`game/`/`rules/`/`result-overlay-renderer.ts`/`pause-menu.ts` 零 diff。
 - [ ] 轮询 `phase()==='disposed' && terminationReason()!=='settled'`；复用既有 toast/overlay·不新建场景/组件/资源；去重一次；settled 不触发。
+- [ ] 暂停接线骑士：openPauseMenu → `runtime.pause()`；完全退出暂停 → `runtime.resume()`；返回大厅/重开走 dispose 不调 resume；暂停菜单内子屏切换不重复调 pause/resume；既有 pauseState 视觉冻结（M3-66）零改动。
 - [ ] 双层视觉预审：异常终止反馈截图·零重叠·按钮包裹·对比度；执行者自审表 + 规划者视觉审结论在案。
 - [ ] 全量零回归。
 
