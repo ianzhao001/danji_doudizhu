@@ -50,17 +50,17 @@ export function renderTopBar(this: any,
   const landlordPos = this.screenPoint(canvas, 178, topY);
   const multiplierPos = this.screenPoint(canvas, canvas.width - 265, topY);
   const bombsPos = this.screenPoint(canvas, canvas.width - 165, topY);
-  const handPos = this.screenPoint(canvas, canvas.width - 68, topY);
+  const handPos = this.screenPoint(canvas, canvas.width - 86, topY);
   this.addSprite(RESOURCE_PATHS.badgeTimerV13, phasePos.x - 45, phasePos.y, 22, 22, this.uiRoot!, 'top-phase-badge');
   this.addSprite(RESOURCE_PATHS.seatNameplateV13, landlordPos.x, landlordPos.y, 92, 24, this.uiRoot!, 'top-landlord-nameplate', true);
   this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, multiplierPos.x - 40, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
   this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, bombsPos.x - 40, bombsPos.y, 20, 20, this.uiRoot!, 'top-bombs-badge');
-  this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 34, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
+  this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 31, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
   this.addLabel(phaseText(phase), phasePos.x + 4, phasePos.y, 16, this.uiRoot!, 112, 24, 'top-phase', BRIGHT_PANEL_TEXT);
   this.addLabel(topBar.landlordSeat === null ? GAME_TEXT.landlordPending : `${GAME_TEXT.landlordPrefix}${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
   this.addLabel(`${GAME_TEXT.multiplierPrefix}${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, 11, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
   this.addLabel(`${GAME_TEXT.bombsPrefix}${topBar.bombs}`, bombsPos.x + 4, bombsPos.y, 11, this.uiRoot!, 74, 20, 'top-bombs', BRIGHT_PANEL_TEXT);
-  this.addLabel(`${GAME_TEXT.handPrefix}${handCount}`, handPos.x + 2, handPos.y, 11, this.uiRoot!, 62, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
+  this.addLabel(`${GAME_TEXT.handPrefix}${handCount}`, handPos.x + 5, handPos.y, 11, this.uiRoot!, 58, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
 }
 
 export function renderRuntimeSettings(this: any, layout: TableRegions, canvas: { width: number; height: number }): void {

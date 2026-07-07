@@ -29,15 +29,14 @@ const SETTLEMENT_TRANSIENT_HUD_NODE_NAMES = [
   'hud-card-memory',
   'advisor-toggle',
   'advisor-panel',
+  'bid-advisor-toggle',
+  'bid-advisor-panel',
   'action-play',
   'action-pass',
   'action-hint',
   'bid-call',
   'bid-grab',
   'bid-pass',
-  'last-action-0',
-  'last-action-1',
-  'last-action-2',
   'ai-thinking-0',
   'ai-thinking-1',
   'ai-thinking-2',
@@ -107,6 +106,7 @@ export function isDecoratedButton(this: any, name: string): boolean {
     name.startsWith('action-') ||
     name.startsWith('bid-') ||
     name.startsWith('result-') ||
+    name.startsWith('termination-feedback-') ||
     name === 'advisor-toggle'
   );
 }

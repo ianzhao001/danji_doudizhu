@@ -14,7 +14,7 @@ import type { BiddingState, BidAction } from '../game';
 import { actionForStrength, isStrongHand } from './bidding';
 import { AiLevel } from './strategy';
 
-function thresholdFor(level: AiLevel): number {
+export function thresholdFor(level: AiLevel): number {
   switch (level) {
     case AiLevel.Simple:
       return 3;

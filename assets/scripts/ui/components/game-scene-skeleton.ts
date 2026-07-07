@@ -231,6 +231,7 @@ export class GameSceneSkeleton extends Component {
   private uiTickRenderMs = 0;
   private memoryExpanded = false;
   private advisorEnabled = false;
+  private biddingAdvisorEnabled = false;
   private revealedBottomCards: Card[] | null = null;
   private pauseState: PauseState = initialPause;
   private renderedPauseStage: PauseState['stage'] = 'closed';
@@ -314,6 +315,7 @@ export class GameSceneSkeleton extends Component {
     this.dealAnimationLockMs = 0;
     this.uiTickRenderMs = 0;
     this.advisorEnabled = false;
+    this.biddingAdvisorEnabled = false;
     this.revealedBottomCards = null;
     this.pauseState = initialPause;
     this.renderedPauseStage = 'closed';
@@ -447,6 +449,7 @@ export class GameSceneSkeleton extends Component {
       fullGameEvents: this.fullGameEvents,
       memoryExpanded: this.memoryExpanded,
       advisorEnabled: this.advisorEnabled,
+      biddingAdvisorEnabled: this.biddingAdvisorEnabled,
       turnTimerElapsedMs: this.turnTimerElapsedMs,
       turnTimerMs: TURN_TIMER_MS,
       spriteFrames: this.spriteFrames,
@@ -464,6 +467,7 @@ export class GameSceneSkeleton extends Component {
         this.memoryExpanded = value;
       },
       toggleAdvisor: this.toggleAdvisor.bind(this),
+      toggleBiddingAdvisor: this.toggleBiddingAdvisor.bind(this),
       submitBid: this.submitBid.bind(this),
       submitPlay: this.submitPlay.bind(this),
       submitPass: this.submitPass.bind(this),
@@ -635,6 +639,11 @@ export class GameSceneSkeleton extends Component {
 
   private toggleAdvisor(): void {
     this.advisorEnabled = !this.advisorEnabled;
+    this.render();
+  }
+
+  private toggleBiddingAdvisor(): void {
+    this.biddingAdvisorEnabled = !this.biddingAdvisorEnabled;
     this.render();
   }
 

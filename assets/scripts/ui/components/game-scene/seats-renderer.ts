@@ -19,6 +19,7 @@ export interface GameSceneRendererContext {
   fullGameEvents: GameEvent[];
   memoryExpanded: boolean;
   advisorEnabled: boolean;
+  biddingAdvisorEnabled: boolean;
   turnTimerElapsedMs: number;
   turnTimerMs: number;
   spriteFrames: Map<string, SpriteFrame>;
@@ -54,6 +55,7 @@ export interface GameSceneRendererContext {
   render(): void;
   setMemoryExpanded(value: boolean): void;
   toggleAdvisor(): void;
+  toggleBiddingAdvisor(): void;
   submitBid(id: 'call' | 'grab' | 'pass'): Promise<void>;
   submitPlay(): Promise<void>;
   submitPass(): Promise<void>;
