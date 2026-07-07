@@ -936,7 +936,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | V7 | C | verify-only | `reports/V7.report.md` + `reports/V7-*.png` | 全部 done | `task/V7`（届时自 main 建） | blocked |
 | T-PAUSE-GATE | C | 高风险(改产品码·flow 接口) | `flow/round-runtime.ts` + `flow/runtime/bidding-driver.ts` + report | —（C 波首任务） | `task/T-PAUSE-GATE`（已建自 main `411c972`） | done 7aa5adf |
 | T-LIVE-MULT | C | 高风险(改共享契约·game/types)·**三闸** | `game/types.ts` + `game/core.ts` + `flow/runtime/bidding-driver.ts`(runtimeSnapshot enrich) + report | T-PAUSE-GATE（done 7aa5adf·共域 bidding-driver） | `task/T-LIVE-MULT`（已建自 main `f2faf02`·种子 `7de950a`·实现 `152c38e`·审查 `053de68`） | done 8637f6a |
-| T-ADVANCE-REENTRY | C | 高风险(纯逻辑·flow 推进核心·裁量三闸) | `flow/runtime/bidding-driver.ts` + `flow/round-runtime.ts` + report | T-LIVE-MULT（共域 bidding-driver）·须先于 T-TERM-FEEDBACK 接线合 | `task/T-ADVANCE-REENTRY`（届时自含 LIVE-MULT 的 main 建） | blocked·**三闸** |
+| T-ADVANCE-REENTRY | C | 高风险(纯逻辑·flow 推进核心·裁量三闸)·**三闸** | `flow/runtime/bidding-driver.ts` + `flow/round-runtime.ts` + report | T-LIVE-MULT（done 8637f6a·共域 bidding-driver）·须先于 T-TERM-FEEDBACK 接线合 | `task/T-ADVANCE-REENTRY`（已建自 main `1c9bdc9`·种子 `4b8a735`） | ready |
 | T-RESUME-REPLAY | C | 常规(UI 接线·双层视觉预审) | `game-scene-skeleton.ts`(recentEvents 重建+底牌保守) + report | T-LIVE-MULT·须在 P-GS-SPLIT2 前合 | `task/T-RESUME-REPLAY`（届时自含 LIVE-MULT 的 main 建） | blocked |
 | T-HUD-LIVE | C | 常规(UI 接线·双层视觉预审) | `screen-view.ts` + `game-scene-skeleton.ts`(顶栏渲染) + report | T-LIVE-MULT·T-RESUME-REPLAY·须在 P-GS-SPLIT2 前合 | `task/T-HUD-LIVE`（届时自含 RESUME-REPLAY 的 main 建） | blocked |
 | T-TERM-FEEDBACK | C | 常规(UI 接线·双层视觉预审) | `game-scene-skeleton.ts`(terminationReason 轮询+暂停接线骑士) + report | T-HUD-LIVE·T-ADVANCE-REENTRY·须在 P-GS-SPLIT2 前合 | `task/T-TERM-FEEDBACK`（届时自含 HUD-LIVE 的 main 建） | blocked |
@@ -971,3 +971,8 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > **合并注意（3-way BOARD 冲突·审查者执行）**：分支建于 `f2faf02`，BOARD 第 938 行 branch/main 两侧同改（base=blocked·branch=approved-pending-planner·main=approved）→ 合并前先在分支 worktree `git merge main`，`coordination/BOARD.md` 冲突**一律取 main 版**（branch 行信息已并入 main 行·续派/把关记录只在 main），重跑 test/typecheck 双绿后再 `claim/merge/release`。
 > **流程观察（非阻断·记录归档）**：本任务 BOARD 状态更新（→approved-pending-planner）落在了**分支**而非 main（T-PAUSE-GATE 先例为 main `01f2d39`），量级 1 行且在本任务行内、无信息丢失，但制造了本次 3-way 冲突；后续任务状态行更新请一律在 **main 工作树**执行（agentctl 即如此），分支只承载种子/实现/报告。
 > **下一步**：审查者按上述合并 → done 后 T-ADVANCE-REENTRY 依赖满足，规划者种 `test/flow/runtime-advance-reentry.test.ts` 种子并自含 LIVE-MULT 的 main 建分支派发。
+
+> **C 波续派记录 ②（规划者·2026-07-07·T-LIVE-MULT 终局裁定 + T-ADVANCE-REENTRY 派发）**：
+> - **T-LIVE-MULT 裁定：确认 done `8637f6a`**。验收披露核毕：0 打回·三闸序列完整（`approved-pending-planner` `053de68` → 把关 `approved` `10c1387` → claim `7beb1af` → merge `8637f6a` → release `8e89501`）·BOARD 3-way 冲突按把关记录②指令取 main 版解决·终基线 **145 文件/753 用例绿 + typecheck 净**·回扫 0/0/0。
+> - **T-ADVANCE-REENTRY 派发**：分支 `task/T-ADVANCE-REENTRY` 已自 main `1c9bdc9`（自含 LIVE-MULT）建，种子 `test/flow/runtime-advance-reentry.test.ts` 提交 `4b8a735`，row→**ready**。种子 3 用例=**1 红 2 绿**（规划者实跑验证）：① 红·resume 在旧 sleep 未醒时起第二循环（`sleeps 2≠1`·**实证把关记录①诊断的双循环今日真实存在**·双循环世界会替 hero 决策）② 绿锚·旧循环 paused 退出后 resume 正常重启（无丢唤醒·防重入不得吞合法重启）③ 绿锚·player-gate submit 推进链路照常（彼时无活循环）。typecheck 今日净（纯内部守卫·种子零新 API 引用）。worktree 已建·`test/node_modules` 已装。
+> - **后续排期**：T-RESUME-REPLAY 依赖已满足（T-LIVE-MULT done）·待规划者下一爆发种 UI 种子（**注意与 B 波 T-UIHELPERS 共域 `game-scene-skeleton.ts` 的执行/合并次序**——两窗并行时以 merge lane 串行·后合者担 rebase）；T-HUD-LIVE 待 RESUME-REPLAY；T-TERM-FEEDBACK 待 HUD-LIVE + **ADVANCE-REENTRY**（暂停接线骑士不得先于防重入）。
