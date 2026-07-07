@@ -28,7 +28,7 @@
 - [ ] 仅 docs/*+CLAUDE.md+report；逐改动点核 BOARD/report 依据（虚标=打回）；记牌条目与 T-MEMORY-REAL 实际状态一致。
 
 ## R:T-UIHELPERS（常规）
-- [ ] 文件域仅 ui-helpers+两组件+strings.ts+report；`addUiButton` 消失且全仓无引用；`drawPanel` 保留。
+- [ ] 文件域仅 ui-helpers+两组件+strings.ts+report；`addUiButton` 2026-07-07 全仓 grep 已 0 命中（历次清理已删·本任务不含此项·执行者报告如实记录）；`drawPanel` 保留（5 处消费）。
 - [ ] 组件侧机械替换（diff 核无逻辑改动）；**文案迁移零漂移**（grep：迁移清单字面前后逐字一致、组件内不再出现已迁移字面量）。
 - [ ] 报告含改前/改后四横屏对照 + 执行者自审表 + **规划者视觉审结论（BOARD）**——缺一不合并；`productErrors=[]`；全量零回归。
 
