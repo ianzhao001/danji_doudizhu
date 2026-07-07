@@ -1,6 +1,6 @@
 # R-WAVE9 — v1.3 第九批修复波审查任务书（审查者专用）
 
-- 适用：T-PAUSE-GATE / T-LIVE-MULT / T-ADVANCE-REENTRY / T-RESUME-REPLAY / T-HUD-LIVE / T-TERM-FEEDBACK（+ P-BID-POLISH 扩 spec 的 G2/G3 骑士）
+- 适用：T-PAUSE-GATE / T-LIVE-MULT / T-ADVANCE-REENTRY / T-RESUME-REPLAY / T-HUD-LIVE / T-TERM-FEEDBACK / T-LASTACT-LEGIBILITY（+ P-BID-POLISH 扩 spec 的 G2/G3 骑士）
 - 通用核验/能力边界/回扫/交接：同 R-WAVE1 1-7 条 + PROTOCOL（批次作业·双层视觉预审关·精确机器态）。审查者不判美观。
 - lane：C 波纯层（PAUSE-GATE→LIVE-MULT→ADVANCE-REENTRY 串行）与 C 波 UI（RESUME-REPLAY→HUD-LIVE→TERM-FEEDBACK 串行·均改 skeleton 须在 B 波 P-GS-SPLIT2 之前合；TERM-FEEDBACK 另需 ADVANCE-REENTRY 先 done）共用单 lane 排队；与 B 波双窗并行。
 
@@ -38,12 +38,13 @@
 - [ ] 双层视觉预审：恢复后三席最近出牌可见 + 底牌牌背·四横屏零重叠；执行者自审表 + 规划者视觉审结论在案。
 - [ ] 全量零回归（含 `runtime-resume-phases`/`save-resume-e2e`）。
 
-## R:T-HUD-LIVE（常规·双层视觉预审）
-- [ ] 种子未改；4 用例全绿（2 红转绿）。
+## R:T-HUD-LIVE（常规·双层视觉预审·2026-07-07 规划者种子期口径修订）
+- [ ] 种子未改；`topbar-live-multiplier` 全绿（红转绿数以种入为准·「顶栏 label 存在」不在种子——cc 渲染归视觉审+逐行核）。
 - [ ] 文件域仅 `screen-view.ts` + `game-scene-skeleton.ts`（顶栏渲染）+ report；`game/`/`rules/`/`flow/`/`seats-renderer.ts`/`result-overlay-renderer.ts`/`table-zones.ts` 零 diff。
-- [ ] VM 取数分相（bidding=bidding.multiplier/playing=snapshot.bidMultiplier+bombsPlayed/settled=settlement）；顶栏不重算结算公式；新增 bombs label 不破坏 T-LAYOUT4。
+- [ ] VM 取数分相 + 优先级 settlement > snapshot > bidding > 缺省：bidding 相 `multiplier>0 ? multiplier : 1`（未叫 0 显示 1·不用 `??`——0 不是 undefined）·bombs 恒 0；playing 相 `snapshot.bidMultiplier ?? 1` + `snapshot.bombsPlayed ?? 0`（旧快照无字段回退 1/0）；settled 相 settlement 值（既有·不回退）。顶栏不重算结算公式、不自行统计事件。
+- [ ] skeleton 顶栏渲染逐行核：消费 VM 值·新增 bombs label 不破坏 T-LAYOUT4（相位可见集·零重叠）。
 - [ ] 双层视觉预审：四横屏×三相顶栏截图·零重叠·包裹·对比度；执行者自审表 + 规划者视觉审结论在案。
-- [ ] 全量零回归。
+- [ ] 全量零回归（含 `screen-view*`/`view-model-immutability`）。
 
 ## R:T-TERM-FEEDBACK（常规·双层视觉预审 + 暂停接线骑士）
 - [ ] 种子未改；termination-feedback 4 用例 + pause-wiring 种子全绿（红转绿数以种入为准）。
@@ -53,6 +54,13 @@
 - [ ] 暂停接线骑士：openPauseMenu → `runtime.pause()`；完全退出暂停 → `runtime.resume()`；返回大厅/重开走 dispose 不调 resume；暂停菜单内子屏切换不重复调 pause/resume；既有 pauseState 视觉冻结（M3-66）零改动。
 - [ ] 双层视觉预审：异常终止反馈截图·零重叠·按钮包裹·对比度；执行者自审表 + 规划者视觉审结论在案。
 - [ ] 全量零回归。
+
+## R:T-LASTACT-LEGIBILITY（常规·editor-evidence·视觉审②存量转派·2026-07-07 增补）
+- [ ] 无种子（无纯逻辑缝）；全量 vitest/typecheck 零回归。
+- [ ] 文件域仅 `game-scene/seats-renderer.ts`（`renderLastActions` 及其布点助手）+ report；`last-action-view.ts`/`game-scene-skeleton.ts`/`table-zones.ts` 零 diff。
+- [ ] 只动呈现（底衬/颜色/坐标）：`deriveLastActions` 数据链、文案、`'—'` 占位语义零改动。
+- [ ] 证据核：四横屏 × live-playing + resumed 两态截图——三席 last-action 可辨读（含右家压亮背景）、hero label 与操作按钮行零重叠；执行者四类硬伤自审表在案；规划者视觉审结论在案（审查者不判美观·只核证据链完整）。
+- [ ] 审慎背景：源于 T-RESUME-REPLAY 规划者视觉审第二层两处存量发现（对比不足②·按钮叠压①）·live/resumed 一致故非回归·details 见任务卡。
 
 ## P-BID-POLISH 扩 spec 骑士（G2 叫抢建议接线 + G3 阈值对齐）
 - [ ] `ai/bidding-advisor.ts` `adviseBid` 加 `level: AiLevel` 参数·按 `thresholdFor(level)` 取阈值（不再硬编码 2）；规划者重种 `test/ai/bidding-advisor.test.ts`（原锁死阈值 2 的断言改为按档断言）。

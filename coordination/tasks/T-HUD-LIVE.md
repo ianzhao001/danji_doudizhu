@@ -13,11 +13,12 @@
 
 ## 行为要求（实现到种子绿）
 
-1. **VM 取数分相**：`screen-view.ts:61-65` 的 `topBar.multiplier`/`bombs` 改为：
-   - **bidding 相**：`multiplier = bidding?.multiplier ?? 1`（过程倍数·叫=1/每抢×2）；`bombs = 0`。
-   - **playing 相**：`multiplier = snapshot?.bidMultiplier ?? 1`；`bombs = snapshot?.bombsPlayed ?? 0`。
-   - **settled 相**：`multiplier = settlement?.multiplier ?? 1`；`bombs = settlement?.bombs ?? 0`（既有·不变）。
-   - 三相取数源单一真相·不复用结算公式（`game/settlement.ts:44` 是结算态·不用于 live）。
+1. **VM 取数分相（2026-07-07 规划者种子期修订：优先级 + bidding 零值语义）**：`screen-view.ts:61-65` 的 `topBar.multiplier`/`bombs` 改为，**优先级 settlement > snapshot > bidding > 缺省**：
+   - **settled 相**（settlement 传入）：`multiplier = settlement.multiplier`；`bombs = settlement.bombs`（既有·不回退·优先级最高）。
+   - **playing 相**（无 settlement·snapshot 传入）：`multiplier = snapshot.bidMultiplier ?? 1`；`bombs = snapshot.bombsPlayed ?? 0`（旧快照无字段回退 1/0）。
+   - **bidding 相**（无 settlement/snapshot·bidding 传入）：`multiplier = bidding.multiplier > 0 ? bidding.multiplier : 1`（**未叫时 `createBidding` 的 multiplier=0·须显示 1——不可用 `??`，0 不是 undefined**）；`bombs = 0`。
+   - **缺省**（三者皆无）：`multiplier = 1`；`bombs = 0`。
+   - 三相取数源单一真相·不复用结算公式（`game/settlement.ts` 是结算态·不用于 live）·UI 不自行统计事件、不自行算 `2**bombs`。
 2. **顶栏渲染**：`game-scene-skeleton.ts:507-510` 消费 VM 值；**新增 bombs label**（顶栏显示"炸弹×N"或并入倍数提示）——具体文案与布局对齐已批准 v1.2 顶栏风格（cream/gold·不破坏 T-LAYOUT4 契约）。
 3. **不重算规则**：倍数/炸弹数**只**从纯层口子取（`snapshot.bidMultiplier`/`bombsPlayed`/`bidding.multiplier`/`settlement`），UI 不自行统计事件、不自行算 `2**bombs`。
 4. **确定性**：纯取数，同输入同输出。
@@ -28,7 +29,7 @@
 - 不破坏 T-LAYOUT4 顶栏契约（相位可见集·零重叠）。
 
 ## 验收
-- 种子 `test/ui/topbar-live-multiplier.test.ts` 全绿（含 2 红转绿）：① bidding 叫抢后 multiplier=2 ② playing 出炸弹后 bombs=1 ③ settled 回到 settlement 值 ④ 顶栏 label 存在。
-- 既有 `screen-view*`/`topbar*`/`T-LAYOUT4` 相关零回退；全量 vitest/typecheck 零回归。
-- 双层视觉预审：四横屏×三相（bidding/playing/settled）顶栏截图·零重叠·文字包裹·对比度。
-- 审查按 `tasks/R-WAVE9.md` R:T-HUD-LIVE（常规·双层视觉预审）。
+- 种子 `test/ui/topbar-live-multiplier.test.ts` 全绿（红转绿数以种入为准）：① bidding 相（未叫 0→显 1·抢后跟随 bidding.multiplier·bombs 恒 0）② playing 相（snapshot.bidMultiplier/bombsPlayed·旧快照缺字段回退 1/0）③ settled 相优先级（settlement 与 snapshot 并存时 settlement 胜·既有值不回退）。**原验收④「顶栏 label 存在」不入种子**——cc 渲染归审查者逐行核 + 双层视觉预审（cc 组件不可入 vitest·同 T-RESUME-REPLAY 先例）。
+- 既有 `screen-view*`/`view-model-immutability`/`T-LAYOUT4` 相关零回退；全量 vitest/typecheck 零回归。
+- 双层视觉预审：四横屏×三相（bidding/playing/settled）顶栏截图·零重叠·文字包裹·对比度·bombs label 新增不破坏 T-LAYOUT4。
+- 审查按 `tasks/R-WAVE9.md` R:T-HUD-LIVE（常规·双层视觉预审·含种子期口径修订）。
