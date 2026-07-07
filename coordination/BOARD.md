@@ -927,8 +927,8 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 |----|----|----|----|----|----|----|
 | T-MEMORY-REAL | A | 高风险(改产品码·flow+ai) | `flow/{types,driver,round-runtime,policies}.ts` + `ai/levels/hard.ts` + report | —（A 波首任务） | `task/T-MEMORY-REAL` | done 408a2ea |
 | T-RUNTIME-SPLIT | A | move-only 强化 | `flow/round-runtime.ts` + 新 `flow/runtime/*.ts` + report | T-MEMORY-REAL（done） | `task/T-RUNTIME-SPLIT`（已建自 main `93d5fff`） | done 6cc314f |
-| T-VIEW-SEAT | A | 常规(F3 扩域 2026-07-07) | `ui/ai-thinking-view.ts` + `ui/bidding-view.ts` + `game-scene/{bid-actions-renderer,seat-display}.ts` + report（+规划者改种 `test/ui/{ai-thinking-view,bidding-view}.test.ts`） | —（A 波随到随合·先于 P-BID-POLISH 合·V7 前必修） | `task/T-VIEW-SEAT`（基点 main `2ceaf2d`·种子 `a89320f`+F3 补种 `9e8fb01`） | **ready·种子 `9e8fb01`**（4 红/8 绿·侧别镜像验红·F3 两轨清账扩域） |
-| T-PROFILE-FOLLOWS | A | 零风险(不改产品) | `test/bench/*`（新）+ report | — | `task/T-PROFILE-FOLLOWS` | ready（无种子·bench 不入默认套件） |
+| T-VIEW-SEAT | A | 常规(F3 扩域 2026-07-07) | `ui/ai-thinking-view.ts` + `ui/bidding-view.ts` + `game-scene/{bid-actions-renderer,seat-display}.ts` + report（+规划者改种 `test/ui/{ai-thinking-view,bidding-view}.test.ts`） | —（A 波随到随合·V7 前必修·**P-BID-POLISH 已合 `7a1b022`·此注记已 stale**） | `task/T-VIEW-SEAT`（基点 main `afe4a75`·种子 `a89320f`+`9e8fb01`·实现 `460904e`·审查 `33b851e` approved：F3 单轨化·swapLegacySideText 全清·等价自证·149/770 绿·typecheck 净·回扫 0/0/1非阻断） | approved |
+| T-PROFILE-FOLLOWS | A | 零风险(不改产品) | `test/bench/*`（新）+ report | — | `task/T-PROFILE-FOLLOWS`（基点 main `620510f`·实现 `f7dffd0`·审查 `d17c142` approved：产品码零改·bench 隔离·数据可复现·ratio 4.4%<40%·148/762 绿·typecheck 净·回扫 0/0/0） | approved |
 | T-DOCS-SYNC | A | 常规(不虚标) | `docs/*.md` + `CLAUDE.md` + report | —（KNOWN_LIMITATIONS 记牌条目在 T-MEMORY-REAL 合并后收尾） | `task/T-DOCS-SYNC` | done 081afe8 |
 | T-UIHELPERS | B | editor-evidence(机械重构) | `ui/components/ui-helpers.ts` + `game-scene-skeleton.ts` + `lobby-scene.ts` + `ui/strings.ts` + report | —（B 波首任务·C 波 UI 链已全合 skeleton 竞写解除 2026-07-07） | `task/T-UIHELPERS`（基点 main `c5d3029`·实现 `480b2e4`·规划者视觉审②PASS `c5f5756`·审查 `7dda3ea`：48 对像素 diff=0·73 key 零漂移·drawPanel 5 消费未动·全量回扫 0 致命） | done 30a9e74 |
 | P-GS-SPLIT2 | B | move-only 强化(editor-evidence) | `game-scene-skeleton.ts` + 新 `game-scene/*.ts` + `ui/strings.ts`(rider·预计零改动) + report | T-UIHELPERS（done `30a9e74` ✅·skeleton 漂移域已解锁） | `task/P-BID-POLISH`（批次合并·基点 main `c4d1156`·实现 `6343846`·规划者视觉审②PASS·审查 `8045e96`：move-only 验证·C 波接线原样搬迁·T-UIHELPERS 消费确认·skeleton 768 行·全量回扫 0/0/0） | done 7a1b022 |
@@ -1031,3 +1031,10 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > - **SPLIT2 视觉审②条件后置**：执行者自审须含四横屏 before/after 像素 diff 机械证据（move-only 预期 diff=0·非 0 须逐处解释否则自修再续批）——满足则规划者审推迟批末无风险。
 > - **P-BID-POLISH row：blocked→ready**（批次内随到随做·不再等 SPLIT2 入 main 才派）。V7 排期不变（B 波批次合并后即全前置满足·V7+用户轻签收+终局裁定并轮）。压缩后发布路径 ≈ **B 窗批次 1 → 规划者爆发 1 → 审查批量 1 → V7 执行 1 → 签收+裁定 1 = 5 次窗口往返**（A 窗组批并行穿插）。
 
+> **B 波收官记录（规划者·2026-07-08·P-GS-SPLIT2 + P-BID-POLISH 终局裁定）**：
+> - **P-GS-SPLIT2 裁定：确认 done `7a1b022`**。验收披露核毕：0 打回·回扫 0/0/0·合并前后 main `bd45b7f` 149/769 绿 + typecheck 净·move-only 逐项核销（skeleton 768 行≤800·C 波接线原样搬迁·T-UIHELPERS 共享化消费不回退·3 dead 条目原样搬移）·双层视觉预审闭环（执行者自审 44 对 diff=0 + 规划者视觉审②PASS）。
+> - **P-BID-POLISH 裁定：确认 done `7a1b022`**。验收披露核毕：0 打回·回扫 0/0/0·同基线·bidding-levels 仅 export 一词·bidding.ts 零改动·adviseBid 三参全更新·独立开关与 G4 出牌建议互不干扰·种子 diff 空·双层视觉预审闭环（执行者自审四类硬伤全零 + 规划者视觉审②PASS·termination 按钮 decorated 顺手收·dead last-action-0/1/2 已删）。
+> - **批次合并证据链**：merge commit `7a1b022`（`--no-ff`）含 SPLIT2 `6343846` + BID-POLISH seed `58ebc05` + impl `a87dd67`·审查者验收披露回填 `afe4a75`·main HEAD `afe4a75`。
+> - **B 波串行流水线全闭环**：T-UIHELPERS `done 30a9e74` → P-GS-SPLIT2 `done 7a1b022` → P-BID-POLISH `done 7a1b022`。压缩轮次机制验证：批次连做 + 种子搬运 + 规划者爆发视觉审② + 审查者批量审·全链 5 次窗口往返达成。
+> - **V7 前置全景（更新后·2026-07-08）**：A 波 **T-VIEW-SEAT**（ready·种子 `9e8fb01`·分支 `9e8fb01` 仍 in-progress 待执行者认领·**V7 前必修**）+ **T-PROFILE-FOLLOWS**（ready·零风险 bench·不改产品）→ 两任务 done 后 V7 全前置满足 → V7（verify-only·四横屏全链 + 用户轻签收·签收页并入 TERM-FEEDBACK 等 C 波签收项·V6 同款同屏验收页）→ v1.3 终局裁定。
+> - **下一步**：执行者认领 T-VIEW-SEAT（可与 T-PROFILE-FOLLOWS 组一批清完）→ 审查者按 R-WAVE8 审 → V7 执行 → 签收+裁定。
