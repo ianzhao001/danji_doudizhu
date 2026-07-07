@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex / GPT-5
 - 分支：`task/T-PAUSE-GATE`
-- 状态：in-review（三闸高风险·规划者已裁定种子矛盾并修正·待执行者复跑后提审）
+- 状态：approved-pending-planner（三闸高风险·审查者已审毕·排队待规划者结构性把关）
 
 ## 改了哪些文件
 - `assets/scripts/flow/round-runtime.ts`
@@ -97,19 +97,43 @@ $ git status --short --untracked-files=all
 - BOARD 状态：待审查者 / 规划者。
 - 规划者批量结构性把关（仅高风险任务）：待审查者置 `approved-pending-planner` 后由规划者回填。
 
-## 全量回扫（审查者·写 approved 前一次）
-- 待审查者填写。
+## 审查者评审段（GLM-5.2·2026-07-07 12:20 CST）
 
-## 回扫升级（转规划者，全量回扫的域外致命 / 拿不准，由审查者填写）
-- 待审查者填写。
+### 检查单逐项核销（R-WAVE9 R:T-PAUSE-GATE）
+- [x] **种子未改**：`git diff main..task -- test/` 仅含 `runtime-pause.test.ts`（规划者种子 `c092b19` + 规划者修正 `36cbf33`）；执行者实现提交 `93cbc29` 零触 test/；4 用例全绿（原 2 红+1 绿→4 绿，规划者修正后 2 红转绿）。
+- [x] **文件域**：产品码仅 `flow/round-runtime.ts`（+16 行）+ `flow/runtime/bidding-driver.ts`（+23 行）+ report；`game/`/`rules/` 零触碰；`flow/types.ts`/`driver.ts`/`policies.ts`/`clock.ts`/`runtime/event-replay.ts`/`runtime/persistence.ts` 零 diff。
+- [x] **RoundRuntime 接口**：加 `pause(): void` / `resume(): void` / `isPaused(): boolean` 三方法（`round-runtime.ts:67-69`）；既有 14 方法签名一字不动；`submitPlayerAction` 暂停态仍接受——`submitRuntimePlayerAction` 先处理玩家动作再调 `advanceRuntimeUntilPause`，后者在 while 顶部被 paused gate 拦截即 return（契约·非 bug·种子第 3 例钉此语义）。
+- [x] **gate 位置**：3 处 gate——① `advanceRuntimeUntilPause` while 顶部（`bidding-driver.ts:207`·step 计数前）② 叫抢 `sleepForRuntimeAi` 醒后、`decideBidAction` 前（`:231`）③ 出牌 `sleepForRuntimeAi` 醒后、`decidePlayAction` 前（`:247`）；in-flight sleep 醒来若 paused → return（丢弃该步决策）；`runtimeResume` 清 gate 后调 `scheduleRuntimeAdvance` 重启循环。
+- [x] **disposed 幂等**：`runtimePause`/`runtimeResume` 首行 `isRuntimeDisposed` 检查→return；`dispose()` 清 `paused=false`/`pauseRequested=false`；`runtimeIsPaused` 返回 `!disposed && (paused||pauseRequested)`→disposed 后恒 false；种子第 4 例验证 `pause()/resume()` 不抛、不复活。
+- [x] **headless 零影响**：`driver.ts` 无 `pause`/`resume`/`isPaused` 调用（`rg` 确认）；runtime 全家（resume-phases/hardening/diagnostics/exceptions/bidding-visibility/round-runtime/policy-history/driver*）零改动全绿。
+- [x] **全量零回归**：`npm --prefix test test` 144 文件/750 用例全绿（27.65s）；`npm --prefix test run typecheck` 净；`git diff --check` 净。
+
+### 逐行细读结论
+- **round-runtime.ts**：接口 3 方法纯加法，位于 `isPlayerTurn()` 与 `legalInputs()` 之间，不影响既有调用方。impl 3 方法为一行转发（`runtimePause(this.driverContext())` 等），与既有风格一致。`driverContext()` 用 `this as unknown as RuntimeDriverContext`——impl 的 `paused`/`pauseRequested` 私有字段即 context 字段（同一对象引用），转发直接写读。`dispose()` 增两行清理，与既有 `subscribers.clear()` 同位。
+- **bidding-driver.ts**：`RuntimeDriverContext` 加两字段（`paused`/`pauseRequested`·均为 `boolean`）。3 新函数语义正确——`runtimePause`：disposed 短路→置双 flag；`runtimeResume`：disposed 短路→未 paused/requested 短路（幂等）→清双 flag→`scheduleRuntimeAdvance`；`runtimeIsPaused`：`!disposed && (paused||pauseRequested)`。gate 三处插入点与 `isRuntimeDisposed` 检查同形同位（`:210,:225` 既有模式），风格一致。`paused` 与 `pauseRequested` 当前始终同步赋值/清除，OR 检查冗余但无害（预留语义扩展）。
+- **submitPlayerAction 契约**：暂停态调用时，`submitRuntimePlayerAction` 先执行 `applyPlayStep`/`applyBiddingStep`（改 state/turn），再 `await advanceRuntimeUntilPause`（paused gate 立即 return）。效果：玩家动作被处理、turn 前进到下一席，但 AI 不自驱动。与 spec "照常处理并推进到下一个 player-gate" 一致——暂停态下 "gate" 即 paused gate 立即返回。
+
+### 全量回扫（审查者·写 approved-pending-planner 前一次）
+- **RoundRuntime 消费者**：`game-scene-skeleton.ts`（`private runtime: RoundRuntime | null`·`startRoundRuntime`/`resumeRoundRuntime` 创建·`currentSnapshot` 返回类型引用）、`seats-renderer.ts`（`runtime: RoundRuntime | null` 纯类型）—— 均为纯消费方，接口加法不破坏。
+- **RuntimeDriverContext 消费者**：仅 `round-runtime.ts`（`driverContext()` 构造）+ `bidding-driver.ts`（所有 runtime 函数参数）—— 均在文件域内，无外部消费者。
+- **flow/index.ts 桶**：零 diff（未导出新函数·pause/resume/isPaused 通过 RoundRuntime 接口暴露·不经桶）。
+- **driver.ts runHeadlessRound**：无 pause/resume/isPaused 调用 → headless 自对弈模式零影响。
+- **cc import**：`rg` 确认 flow/ 全目录无 `cc` import。
+- **全量回归**：144/750 绿 + typecheck 净 + diff --check 净。
+
+### 回扫升级（转规划者）
+- **拿不准（非阻断）**：`scheduleRuntimeAdvance` 是 fire-and-forget async（`void advanceRuntimeUntilPause(runtime).catch(...)`）。若 `resume()` 在旧 advance 循环的 `clock.sleep` 尚未 resolve 时被调用（即 pause 后 sleep 未醒即 resume），会启动第二个 advance 循环，可能导致两个循环并发推进状态。当前种子用 `PendingClock` 控制时序不会触发（测试中 `resolveAll()` → `await flush()` 确保旧循环退出后再 `resume()`）；生产环境 `realClock` + `thinkingDelayMs > 0` 时存在理论窗口。此为 **pre-existing 设计模式**（constructor 和 `submitRuntimePlayerAction` 也有同样的 fire-and-forget 调用 `scheduleRuntimeAdvance`/`advanceRuntimeUntilPause`），**非本任务引入的回归**。建议规划者评估是否需要加 "advance loop running" 防重入标志（可另拆任务·不阻断本任务）。
+- **域外致命**：无。
+- **打回轮次**：0 轮。
+- **回扫分流**：域内致命 0 / 域外致命 0 / 拿不准 1（上述·非阻断·转规划者）。
 
 ## 批次交接记录 / 下一步
 - 所属批次 / 任务号：C 波 / `T-PAUSE-GATE`
-- 本回合结论 / 状态：规划者已裁定并修正不可达种子；执行者复跑确认 4/4 + 144/750 绿、typecheck 净；状态 `in-review`，正式提交通知审查者评审。
-- 下一步找谁：审查者（R-WAVE9 R:T-PAUSE-GATE；三闸任务，通过后置 `approved-pending-planner` 排队待规划者结构性把关，不自行合并）。
+- 本回合结论 / 状态：**approved-pending-planner**（三闸高风险·审查者已审毕·0 打回·回扫 0/0/1 拿不准非阻断）。审查者复跑 `runtime-pause` 4/4、全量 144/750 绿、typecheck 净、diff --check 净。排队待规划者批量结构性把关认可后改 `approved`，再由审查者执行 claim/merge/release。
+- 下一步找谁：**规划者**（三闸结构性把关：RoundRuntime 接口加法纯增量·gate 位置与 isDisposed 同形同位·submitPlayerAction 暂停态契约·pauseRequested 冗余但无害·fire-and-forget 防重入建议）。
 - 用户终审配合：不适用。
 - 给下一窗口的可粘贴提示词：
-  > 你是本仓库 `斗地主` 的审查者。请读取 `coordination/PROTOCOL.md`、`coordination/reports/T-PAUSE-GATE.report.md`，并按 R-WAVE9 的 `R:T-PAUSE-GATE` 检查单评审 `task/T-PAUSE-GATE`：实现提交 `93cbc29`、规划者种子修正 `36cbf33`、报告更新 `c433279` 后，执行者已复跑 `runtime-pause` 4/4、全量 `npm --prefix test test` 144/750 绿、`npm --prefix test run typecheck` 净。此任务为高风险三闸；若审查通过，请置 `approved-pending-planner` 排队待规划者结构性把关，不自行合并。
+  > 你是本仓库 `斗地主` 的规划型 AI。T-PAUSE-GATE 审查者已审毕置 `approved-pending-planner`（main `51b8bb3`·分支 `task/T-PAUSE-GATE` `e43aa91`·0 打回·回扫 0/0/1 拿不准非阻断）。先读：`coordination/PROTOCOL.md`、`coordination/tasks/R-WAVE9.md` R:T-PAUSE-GATE、`coordination/reports/T-PAUSE-GATE.report.md`（含审查者评审段+全量回扫+拿不准项）、`coordination/BOARD.md` 第九波 T-PAUSE-GATE 行。请做三闸结构性把关：① RoundRuntime 接口 3 方法纯加法·既有签名一字不动 ② gate 3 处插入点（while 顶 + bidding sleep 后 + playing sleep 后）与 isDisposed 同形同位 ③ submitPlayerAction 暂停态仍接受是契约（gate 在 advance 顶部拦截 AI·不拒玩家输入）④ disposed 后 pause/resume 幂等 ⑤ headless 零影响 ⑥ 全量 144/750 绿+typecheck 净。拿不准项：`scheduleRuntimeAdvance` fire-and-forget 在 resume 时若旧 sleep 未醒可能双循环并发（pre-existing·非回归·建议评估是否加防重入标志）。认可后请改 BOARD 状态为 `approved` 并通知审查者执行合并。
 
 ## 自检（对照验收项）
 - [x] 测试全绿（4/4·规划者修正种子后 144/750 绿）
