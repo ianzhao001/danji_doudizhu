@@ -50,3 +50,29 @@
 - Cocos Creator 3.8.8 web-mobile build: pass (`build Task (web-mobile) Finished`; command exits with Creator's known `36` status).
 - `npm --prefix test test`: pass, 149 files / 768 tests.
 - `npm --prefix test run typecheck`: pass.
+
+## Review (Reviewer · GLM-5.2)
+
+- Result: **approved** (0 打回轮次 · 0 域内致命 · 0 域外致命 · 0 拿不准)
+- Branch: `task/P-BID-POLISH`（批次合并·SPLIT2 commit `6343846`）
+- 基点: main `c4d1156`
+
+### 逐项核销
+
+1. **Move-only 验证**: `git diff --color-moved=zebra c4d1156..6343846` 确认 skeleton 函数体替换为 `*Impl` 委托，8 个新模块含搬移的 `export function` 体；17 文件 +1639/-1203，skeleton 1390 行变更全为删除+委托替换
+2. **skeleton 行数**: 768 行 (≤ 800 ✅)
+3. **C 波接线原样搬迁**:
+   - Resume rebuild: `rebuildRecentEvents(this.fullGameEvents)` skeleton:366 ✅
+   - 顶栏 live: `renderTopBar(phase, vm.topBar, handCount, layout, canvas)` skeleton:421 ✅
+   - 暂停接线: `openPauseMenu` → `this.runtime?.pause()` / `closePauseMenu` → `this.runtime?.resume()` pause-overlay-renderer:103/109 ✅
+   - 终止反馈: `pollTerminationFeedback()` skeleton:286 → runtime-feedback.ts ✅
+4. **T-UIHELPERS 共享化消费**: ui-runtime-helpers.ts 从 `../ui-helpers` 导入 `addSkinnedButton`/`addSkinnedSprite`/`drawPanelSkin`；新模块零本地 `new Button` 重实现（hud-renderer.ts:110 `button.transition` 系 C 波存量，SPLIT2 未触）
+5. **SETTLEMENT_TRANSIENT_HUD_NODE_NAMES**: 3 个 dead `last-action-0/1/2` 原样搬入 ui-runtime-helpers.ts，未删 ✅
+6. **import 方向**: 纯层 (ai/game/rules/flow/data) 零 `cc` 导入 ✅；ui 模块仅依赖同层 + game/rules/ai/flow
+7. **strings.ts / asset-keys.ts / lobby-scene.ts**: 零改动 ✅
+
+### 全量回扫
+
+- 覆盖全仓 + 整批 diff（P-GS-SPLIT2 + P-BID-POLISH 合计 25 文件）
+- 回扫结果: 0 域内致命 · 0 域外致命 · 0 拿不准
+- 视觉证据链: 44 对 PNG diff=0（规划者视觉审②PASS）·productErrors=[]（四档）
