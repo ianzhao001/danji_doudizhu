@@ -500,16 +500,19 @@ export class GameSceneSkeleton extends Component {
     const topY = Math.max(14, layout.topBar.y + layout.topBar.height * 0.52);
     const phasePos = this.screenPoint(canvas, 70, topY);
     const landlordPos = this.screenPoint(canvas, 178, topY);
-    const multiplierPos = this.screenPoint(canvas, canvas.width - 182, topY);
-    const handPos = this.screenPoint(canvas, canvas.width - 82, topY);
+    const multiplierPos = this.screenPoint(canvas, canvas.width - 265, topY);
+    const bombsPos = this.screenPoint(canvas, canvas.width - 165, topY);
+    const handPos = this.screenPoint(canvas, canvas.width - 68, topY);
     this.addSprite(RESOURCE_PATHS.badgeTimerV13, phasePos.x - 45, phasePos.y, 22, 22, this.uiRoot!, 'top-phase-badge');
     this.addSprite(RESOURCE_PATHS.seatNameplateV13, landlordPos.x, landlordPos.y, 92, 24, this.uiRoot!, 'top-landlord-nameplate', true);
     this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, multiplierPos.x - 40, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
+    this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, bombsPos.x - 40, bombsPos.y, 20, 20, this.uiRoot!, 'top-bombs-badge');
     this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 34, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
     this.addLabel(phaseText(phase), phasePos.x + 4, phasePos.y, 16, this.uiRoot!, 112, 24, 'top-phase', BRIGHT_PANEL_TEXT);
     this.addLabel(topBar.landlordSeat === null ? '地主待定' : `地主${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
     this.addLabel(`倍数×${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, 11, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
-    this.addLabel(`手牌${handCount}`, handPos.x + 2, handPos.y, 11, this.uiRoot!, 68, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
+    this.addLabel(`炸弹×${topBar.bombs}`, bombsPos.x + 4, bombsPos.y, 11, this.uiRoot!, 74, 20, 'top-bombs', BRIGHT_PANEL_TEXT);
+    this.addLabel(`手牌${handCount}`, handPos.x + 2, handPos.y, 11, this.uiRoot!, 62, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
   }
 
   private renderRuntimeSettings(layout: TableRegions, canvas: { width: number; height: number }): void {

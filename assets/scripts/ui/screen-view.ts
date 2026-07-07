@@ -20,6 +20,36 @@ export interface ScreenVM {
   topBar: { multiplier: number; bombs: number; landlordSeat: SeatIndex | null };
 }
 
+function deriveTopBar(args: {
+  snapshot?: GameSnapshot;
+  bidding?: BiddingState;
+  settlement?: Settlement;
+}): ScreenVM['topBar'] {
+  const { snapshot, bidding, settlement } = args;
+  if (settlement) {
+    return {
+      multiplier: settlement.multiplier,
+      bombs: settlement.bombs,
+      landlordSeat: snapshot?.landlord ?? null,
+    };
+  }
+  if (snapshot) {
+    return {
+      multiplier: snapshot.bidMultiplier ?? 1,
+      bombs: snapshot.bombsPlayed ?? 0,
+      landlordSeat: snapshot.landlord,
+    };
+  }
+  if (bidding) {
+    return {
+      multiplier: bidding.multiplier > 0 ? bidding.multiplier : 1,
+      bombs: 0,
+      landlordSeat: null,
+    };
+  }
+  return { multiplier: 1, bombs: 0, landlordSeat: null };
+}
+
 function emptyActions(): ActionButtonsState {
   return { play: false, pass: false, hint: false };
 }
@@ -58,10 +88,6 @@ export function deriveScreenVM(args: {
     actions: snapshot ? deriveActionButtons({ snapshot, selectedCards, viewerSeat: heroSeat }) : emptyActions(),
     bidding: bidding ? deriveBiddingView(bidding, heroSeat) : undefined,
     result: settlement ? deriveResultView({ settlement, landlord: snapshot?.landlord ?? 0, heroSeat }) : undefined,
-    topBar: {
-      multiplier: settlement?.multiplier ?? 1,
-      bombs: settlement?.bombs ?? 0,
-      landlordSeat: snapshot?.landlord ?? null,
-    },
+    topBar: deriveTopBar({ snapshot, bidding, settlement }),
   };
 }
