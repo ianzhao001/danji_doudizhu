@@ -134,3 +134,15 @@ Top 5 heaviest single calls:
 - 覆盖全仓 + 本任务 diff（2 新文件）
 - 回扫结果：0 域内致命 · 0 域外致命 · 0 拿不准
 - 跨模块回归：bench 为独立脚本，无任何模块 import bench；产品代码零改动，无下游影响
+
+## 验收披露（审查者·2026-07-08·合并收尾）
+
+- **合并 commit**：`d851925`（`--no-ff` merge·release commit `01b29d5`）
+- **分支末态**：`d17c142`（实现 `f7dffd0` + 审查 `d17c142`）
+- **合并文件**：仅增 2 新文件（`test/bench/legal-follows.bench.ts` 325 行 + 本报告）·产品码零改动
+- **合并前双闸**：149 files / 770 tests 绿 + typecheck 净（T-VIEW-SEAT 合并后基线）
+- **合并后双闸**：149 files / 770 tests 绿 + typecheck 净（bench 不入 vitest 套件·测试数不变）
+- **打回轮次**：0
+- **全量回扫分流**：0 域内致命 · 0 域外致命 · 0 拿不准
+- **最终基线**：main HEAD `01b29d5`（含两任务合并）·149/770 绿 + typecheck 净 + `git diff --check` 净
+- **BOARD 终态**：`done d851925`

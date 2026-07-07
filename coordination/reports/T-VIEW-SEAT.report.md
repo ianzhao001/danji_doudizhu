@@ -91,3 +91,15 @@ Planner note: the exact broader command `rg -n "swapLegacySideText" assets test`
 - 覆盖全仓 + 本任务 diff（4 产品文件 + 2 种子测试 + 报告）
 - 回扫结果：0 域内致命 · 0 域外致命 · 1 拿不准（上述 test 注释 swapLegacySideText 残留·非阻断·转规划者）
 - 跨模块回归：`swapLegacySideText` 唯一消费点 `bid-actions-renderer.ts` 已去包装直用 prompt；无其他消费者（全仓 grep 确认）；`seat-display.ts` 其余导出未改，无下游影响
+
+## 验收披露（审查者·2026-07-08·合并收尾）
+
+- **合并 commit**：`1a26839`（`--no-ff` merge·release commit `6eda9d9`）
+- **分支末态**：`3bb9243`（实现 `460904e` + 审查 `33b851e` + stale 注释清理 `3bb9243`）
+- **stale 注释清理**：`test/ui/bidding-view.test.ts:5` 提及 `swapLegacySideText` 的注释行已删除（commit `3bb9243`·仅删注释·不改测试逻辑·回扫 1 非阻断项已归零）
+- **合并前双闸**：149 files / 769 tests 绿 + typecheck 净
+- **合并后双闸**：149 files / 770 tests 绿 + typecheck 净
+- **打回轮次**：0
+- **全量回扫分流**：0 域内致命 · 0 域外致命 · 0 拿不准（原 1 非阻断 stale 注释已清理归零）
+- **最终基线**：main HEAD `01b29d5`（含两任务合并）·149/770 绿 + typecheck 净 + `git diff --check` 净
+- **BOARD 终态**：`done 1a26839`
