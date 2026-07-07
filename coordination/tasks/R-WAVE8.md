@@ -35,9 +35,11 @@
 - [ ] 组件侧机械替换（diff 核无逻辑改动）；**文案迁移零漂移**（grep：迁移清单字面前后逐字一致、组件内不再出现已迁移字面量）。
 - [ ] 报告含改前/改后四横屏对照 + 执行者自审表 + **规划者视觉审结论（BOARD）**——缺一不合并；`productErrors=[]`；全量零回归。
 
-## R:P-GS-SPLIT2（常规·move-only 强化）
-- [ ] 拆前基线截图在案；`--color-moved=zebra` 纯搬移；skeleton <800 行；strings rider 零漂移。
-- [ ] 不变量自证清单（settled 门控/相位互斥/逆时针/卡面/暂停按钮）逐项核；四横屏对照 + `productErrors=[]`；规划者视觉审结论在案。
+## R:P-GS-SPLIT2（常规·move-only 强化·2026-07-07 基点期扩项）
+- [ ] 拆前基线截图在案；`--color-moved=zebra` 纯搬移；skeleton 1775 → **<800 行**；strings rider 零漂移（T-UIHELPERS 已迁尽·预计 strings.ts 零改动·组件零汉字现状保持）。
+- [ ] 不变量自证清单（settled 门控/相位互斥/逆时针/卡面/暂停两组按钮 + C 波新增：disposed 隐藏暂停入口/顶栏 live 值/暂停冻结）逐项核；四横屏对照 + `productErrors=[]`；规划者视觉审结论在案。
+- [ ] **C 波接线原样搬迁核**：resume 重建调用/顶栏 live VM 消费/termination 轮询+去重 flag/`openPauseMenu→pause()`·`closePauseMenu→resume()`·重开与返回大厅不调 resume——语义零改（diff 内容只挪位置）；runtime-pause/advance-reentry/termination-feedback/resume-replay 测试全家零改动全绿。
+- [ ] **共享件不回退核**：拆出模块消费 `addSkinnedButton`/`addSkinnedSprite`/`drawPanelSkin`/`t()`，无本地重实现（新模块 `\bButton\b` 装配仅经共享件）；`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` dead 条目原样在（不删·归 P-BID-POLISH）。
 
 ## R:P-BID-POLISH（常规）
 - [ ] 建议面板仅叫抢期存在（相位互斥 diff 核）、默认低打扰、消费既有纯层（UI 无规则重算）；零新增重叠。
