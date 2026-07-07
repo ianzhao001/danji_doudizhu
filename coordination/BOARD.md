@@ -927,7 +927,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 |----|----|----|----|----|----|----|
 | T-MEMORY-REAL | A | 高风险(改产品码·flow+ai) | `flow/{types,driver,round-runtime,policies}.ts` + `ai/levels/hard.ts` + report | —（A 波首任务） | `task/T-MEMORY-REAL` | done 408a2ea |
 | T-RUNTIME-SPLIT | A | move-only 强化 | `flow/round-runtime.ts` + 新 `flow/runtime/*.ts` + report | T-MEMORY-REAL（done） | `task/T-RUNTIME-SPLIT`（已建自 main `93d5fff`） | done 6cc314f |
-| T-VIEW-SEAT | A | 常规 | `ui/ai-thinking-view.ts` + report（+规划者改种 `test/ui/ai-thinking-view.test.ts`） | — | `task/T-VIEW-SEAT` | **ready·种子 `7afd853`**（2 红/3 绿·typecheck 净） |
+| T-VIEW-SEAT | A | 常规 | `ui/ai-thinking-view.ts` + report（+规划者改种 `test/ui/ai-thinking-view.test.ts`） | — | `task/T-VIEW-SEAT`（重建自最新 main `2ceaf2d`·种子 `a89320f`） | **ready·种子 `a89320f`**（2 红/3 绿·typecheck 净·重建基点对齐 v1.3 全量） |
 | T-PROFILE-FOLLOWS | A | 零风险(不改产品) | `test/bench/*`（新）+ report | — | `task/T-PROFILE-FOLLOWS` | ready（无种子·bench 不入默认套件） |
 | T-DOCS-SYNC | A | 常规(不虚标) | `docs/*.md` + `CLAUDE.md` + report | —（KNOWN_LIMITATIONS 记牌条目在 T-MEMORY-REAL 合并后收尾） | `task/T-DOCS-SYNC` | done 081afe8 |
 | T-UIHELPERS | B | editor-evidence(机械重构) | `ui/components/ui-helpers.ts` + `game-scene-skeleton.ts` + `lobby-scene.ts` + `ui/strings.ts` + report | —（B 波首任务） | `task/T-UIHELPERS` | ready |
