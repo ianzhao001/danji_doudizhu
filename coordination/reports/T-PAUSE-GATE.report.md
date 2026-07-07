@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex / GPT-5
 - 分支：`task/T-PAUSE-GATE`
-- 状态：approved-pending-planner（三闸高风险·审查者已审毕·排队待规划者结构性把关）
+- 状态：done 7aa5adf（三闸高风险·审查者 approved-pending-planner→规划者三闸把关→approved→审查者合并·已 release）
 
 ## 改了哪些文件
 - `assets/scripts/flow/round-runtime.ts`
@@ -88,14 +88,21 @@ $ git status --short --untracked-files=all
 - 需规划者裁定的问题：
   - `runtime-pause.test.ts` 第二例应改为“resume 后到 hero gate”的可达牌局，还是接受当前构造下 resume 后 settled 的合法结果？
 
-## 合并证据（approved 后由审查者回填）
-- 合并前回归：
-  - `npm --prefix test test -- runtime-pause`：4/4 绿（执行者复跑确认）。
-  - `npm --prefix test test`：144/750 绿（执行者复跑确认）。
+## 合并证据（审查者回填）
+- **高风险三闸流程**：审查者置 `approved-pending-planner`（main `01f2d39`·分支 `da61e4e`·0 打回·回扫 0/0/1 拿不准非阻断）→ 规划者三闸结构性把关通过·BOARD 置 `approved`（main `1db017b`·把关记录见 `coordination/BOARD.md` 尾部「C 波把关记录 ①」·六项逐条亲核 diff）→ 审查者执行 claim/merge/release。
+- **合并前双闸**（main 工作树）：
+  - `npm --prefix test test`：143 文件/746 用例绿（合并前·runtime-pause 种子在分支·尚未入 main）。
   - `npm --prefix test run typecheck`：passed。
-- merge commit：待审查者回填。
-- BOARD 状态：待审查者 / 规划者。
-- 规划者批量结构性把关（仅高风险任务）：待审查者置 `approved-pending-planner` 后由规划者回填。
+  - `git diff --check main..task/T-PAUSE-GATE`：净。
+- **合并序列**：
+  - `claim T-PAUSE-GATE`：main `c6d934b`（`merge-claimed:T-PAUSE-GATE`）。
+  - `merge T-PAUSE-GATE`：`--no-ff` merge commit `7aa5adf`（4 files changed, 359 insertions: `round-runtime.ts` +16 / `bidding-driver.ts` +23 / `runtime-pause.test.ts` +175 / report +145）。
+  - `release T-PAUSE-GATE`：main `c9faa45`·BOARD 置 `done 7aa5adf`·分支 `task/T-PAUSE-GATE` 已删除。
+- **合并后双闸**（main 工作树）：
+  - `npm --prefix test test`：**144 文件/750 用例绿**（+1 文件 +4 用例 = runtime-pause 种子·27.70s）。
+  - `npm --prefix test run typecheck`：passed。
+- **BOARD 终态**：`done 7aa5adf`。
+- **规划者三闸把关记录**：见 `coordination/BOARD.md` 尾部「C 波把关记录 ①（规划者·2026-07-07·T-PAUSE-GATE 三闸结构性把关 → approved）」——六项逐条亲核（接口纯加法 / gate 3 处同形同位 / submitPlayerAction 契约 / disposed 幂等 / headless 零影响 / worktree 独立复跑 144/750 绿+typecheck 净）。
 
 ## 审查者评审段（GLM-5.2·2026-07-07 12:20 CST）
 
@@ -127,13 +134,30 @@ $ git status --short --untracked-files=all
 - **打回轮次**：0 轮。
 - **回扫分流**：域内致命 0 / 域外致命 0 / 拿不准 1（上述·非阻断·转规划者）。
 
+## 验收披露段（审查者·合并后回填）
+
+### 评审结论
+- 结论：**approved** → **done 7aa5adf**（三闸高风险·审查者 + 规划者双闸把关后合并）。
+- 打回轮次：0 轮。
+- 全量回扫范围与分流结果：覆盖全仓（RoundRuntime 消费者 / RuntimeDriverContext 消费者 / flow/index.ts 桶 / driver.ts headless / cc import）；域内致命 0 / 域外致命 0 / 拿不准 1（`scheduleRuntimeAdvance` fire-and-forget 防重入·pre-existing·非回归·非阻断·规划者已采纳立 T-ADVANCE-REENTRY）。
+
+### 合并证据
+- 合并 commit：`7aa5adf`（`--no-ff`·4 files / 359 insertions）。
+- 最终基线：main `c9faa45`·BOARD `done 7aa5adf`·**144 文件/750 用例绿 + typecheck 净**。
+- 规划者三闸把关记录：见 `coordination/BOARD.md` 尾部「C 波把关记录 ①」。
+
+### 交接
+- T-PAUSE-GATE done。T-LIVE-MULT 依赖满足（共域 `bidding-driver.ts` 已含 pause gate）。
+- 规划者下一步：种 T-LIVE-MULT 种子并自含 PAUSE-GATE 的 main 建分支派发。
+- T-ADVANCE-REENTRY 与 T-TERM-FEEDBACK（暂停接线骑士）为新登记项，待规划者排期。
+
 ## 批次交接记录 / 下一步
 - 所属批次 / 任务号：C 波 / `T-PAUSE-GATE`
-- 本回合结论 / 状态：**approved-pending-planner**（三闸高风险·审查者已审毕·0 打回·回扫 0/0/1 拿不准非阻断）。审查者复跑 `runtime-pause` 4/4、全量 144/750 绿、typecheck 净、diff --check 净。排队待规划者批量结构性把关认可后改 `approved`，再由审查者执行 claim/merge/release。
-- 下一步找谁：**规划者**（三闸结构性把关：RoundRuntime 接口加法纯增量·gate 位置与 isDisposed 同形同位·submitPlayerAction 暂停态契约·pauseRequested 冗余但无害·fire-and-forget 防重入建议）。
+- 本回合结论 / 状态：**done 7aa5adf**（三闸高风险·审查者 approved-pending-planner→规划者三闸把关 approved→审查者 claim/merge/release·已合并入 main·144/750 绿 + typecheck 净）。
+- 下一步找谁：**规划者**（种 T-LIVE-MULT 种子并自含 PAUSE-GATE 的 main 建分支派发；T-ADVANCE-REENTRY / T-TERM-FEEDBACK 排期）。
 - 用户终审配合：不适用。
 - 给下一窗口的可粘贴提示词：
-  > 你是本仓库 `斗地主` 的规划型 AI。T-PAUSE-GATE 审查者已审毕置 `approved-pending-planner`（main `51b8bb3`·分支 `task/T-PAUSE-GATE` `e43aa91`·0 打回·回扫 0/0/1 拿不准非阻断）。先读：`coordination/PROTOCOL.md`、`coordination/tasks/R-WAVE9.md` R:T-PAUSE-GATE、`coordination/reports/T-PAUSE-GATE.report.md`（含审查者评审段+全量回扫+拿不准项）、`coordination/BOARD.md` 第九波 T-PAUSE-GATE 行。请做三闸结构性把关：① RoundRuntime 接口 3 方法纯加法·既有签名一字不动 ② gate 3 处插入点（while 顶 + bidding sleep 后 + playing sleep 后）与 isDisposed 同形同位 ③ submitPlayerAction 暂停态仍接受是契约（gate 在 advance 顶部拦截 AI·不拒玩家输入）④ disposed 后 pause/resume 幂等 ⑤ headless 零影响 ⑥ 全量 144/750 绿+typecheck 净。拿不准项：`scheduleRuntimeAdvance` fire-and-forget 在 resume 时若旧 sleep 未醒可能双循环并发（pre-existing·非回归·建议评估是否加防重入标志）。认可后请改 BOARD 状态为 `approved` 并通知审查者执行合并。
+  > 你是本仓库 `斗地主` 的规划型 AI。T-PAUSE-GATE 已 done（合并 commit `7aa5adf`·BOARD `done 7aa5adf`·main `c9faa45`·144/750 绿 + typecheck 净）。先读：`coordination/PROTOCOL.md`、`coordination/reports/T-PAUSE-GATE.report.md`（含验收披露段）、`coordination/BOARD.md` 第九波 T-PAUSE-GATE 行 + 「C 波把关记录 ①」。T-LIVE-MULT 依赖已满足（共域 `bidding-driver.ts` 已含 pause gate）。请种 T-LIVE-MULT 种子并自含 PAUSE-GATE 的 main 建分支派发。T-ADVANCE-REENTRY（拿不准项采纳·fire-and-forget 防重入）与 T-TERM-FEEDBACK（暂停接线骑士）为新登记项，待你排期。
 
 ## 自检（对照验收项）
 - [x] 测试全绿（4/4·规划者修正种子后 144/750 绿）
