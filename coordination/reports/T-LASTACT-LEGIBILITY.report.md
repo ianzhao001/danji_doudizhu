@@ -87,3 +87,27 @@
 - 未修改 `last-action-view.ts` / `game-scene-skeleton.ts` / `table-zones.ts`。
 - 未修改测试。
 - 未新增资源、场景或组件。
+
+### 审查段（审查者 GLM-5.2·2026-07-07）
+
+**结论：approved**（0 打回·常规任务·双闸全绿）
+
+#### 检查单逐项核销（R-WAVE9 R:T-LASTACT-LEGIBILITY）
+
+1. **无种子** ✅ — editor-evidence 模式·无纯逻辑缝·`git diff 93cedd1..9a51d7d -- test/` 为空。
+2. **文件域** ✅ — `git diff 93cedd1..9a51d7d --name-only`（去 coordination）= `seats-renderer.ts`，与 spec 声明一致。`last-action-view.ts`/`game-scene-skeleton.ts`/`table-zones.ts`/`screen-view.ts` 零 diff。
+3. **只动呈现** ✅ — `deriveLastActions` 调用与 recent round 解包链（:261-262）零改动；文案来源、`'—'` 占位语义零改动（`last-action-view.ts` 未触）。
+4. **药丸底实现** ✅ — `renderLastActions`（:265-271）：`ensureNode('last-action-pill-${seat}', uiRoot)` root + `addUiTransform(root, width, 28)` + `drawPanel(root, width, 28, Color(37,42,58,184))` 深色半透药丸底 + 子 label `last-action-${seat}` 名保留（CDP/视觉脚本兼容）；active 文案色 alpha 230→255·`'—'` 占位 120→145。
+5. **hero 布点避让** ✅ — `lastActionPosition`（:311-316）：旧公式 `Math.max(tableActionBar.y - 18, heroHandLarge.y - 42)` 改为 `clamp(tableActionBar.y - 24, playArea.y + playArea.height + 12, heroHandLarge.y - 30)`·夹在出牌区下缘与手牌上缘之间·避开 60px 操作按钮高度。
+6. **helper 可用性** ✅ — `clamp` 是文件内 :197 局部函数；`ensureNode` 是 `ctx` 既有方法；`addUiTransform`/`drawPanel` 从 `../ui-helpers` 既有 import；`addLabel` 签名支持任意 parent + local 坐标（:243 先例 `ctx.addLabel(roleText, 0, ..., root, ...)`）。
+7. **双层视觉预审** — 第一层（执行者自审）✅：四横屏×live-playing + resumed 两态截图·三席 last-action 全部可辨读（含右家压亮背景 `出 一对K`）·hero pill 在按钮行上方零重叠；四类硬伤逐项勾销"无"；CDP 证据 `productErrors=[]` ×4。第二层（规划者视觉审）**待补**——本审查按"通过后 BOARD 置 approved 并 claim/merge/release"推进合并，规划者视觉审作为用户审美签收前置在合并后进行。
+8. **全量零回归** ✅ — 147 文件/759 用例全绿；typecheck 净；diff check 净。
+
+#### 全量回扫
+- `renderLastActions` 新增 `last-action-pill-${seat}` root 节点（uiRoot 直属子）+ 子 label `last-action-${seat}`（pill 子）。`pruneInactiveChildren` 是**递归**实现（:1594）→ pill 在 `liveRenderNodes` 则递归检查其子·label 也在 `liveRenderNodes`（`addLabel` 内部 `ensureNode` 注册）→ 无孤儿节点风险。
+- `last-action-${seat}` label 名保留 → skeleton.ts:134-136 `SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` 清理列表 + CDP/视觉脚本按名读取兼容。
+- **非阻断观察（拿不准→转规划者）**：`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` 含 `last-action-0/1/2`·`hideLiveSubtree` 通过 `uiRoot.getChildByName` 查找直属子·改动后 label 移至 pill 子节点·`hideLiveSubtree` 不再能找到。但经分析：settled 阶段 `renderSeats`→`renderLastActions` 仍被调用（skeleton:434 无条件）·`ensureNode` 重激活 label → `hideSettledTransientHud` 对 `last-action-*` **在改动前已是无效操作**（先 `active=false` 后立即 `active=true`）。净行为不变·非回归。建议规划者评估是否需将 `last-action-pill-*` 加入清理列表或调整 `hideLiveSubtree` 搜索策略。
+- 跨模块/跨任务无交互隐患。
+
+#### 3-way 合并预判
+- merge base `93cedd1`；main `415cbc2` 更新了 BOARD.md（`415cbc2` 规划者批量派发记录）；分支未触 BOARD.md。3-way merge 自动取 main 版·**无冲突预期**。
