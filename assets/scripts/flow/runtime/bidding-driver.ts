@@ -79,7 +79,8 @@ export interface RuntimeDriverContext {
 }
 
 export function runtimeSnapshot(runtime: RuntimeDriverContext): GameSnapshot | null {
-  return runtime.state ? snapshot(runtime.state, runtime.heroSeat) : null;
+  if (!runtime.state) return null;
+  return { ...snapshot(runtime.state, runtime.heroSeat), bidMultiplier: runtime.bidMultiplier };
 }
 
 export function runtimeBidding(runtime: RuntimeDriverContext): BiddingState | null {
