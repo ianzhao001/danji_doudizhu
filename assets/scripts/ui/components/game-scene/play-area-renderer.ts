@@ -1,0 +1,235 @@
+import { Color, Sprite } from 'cc';
+import type { SeatIndex, TopPlay } from '../../../game';
+import type { Card } from '../../../rules';
+import { cardKey } from '../../../rules/guards';
+import { dealCardDelay } from '../../animation-params';
+import { deriveScreenVM } from '../../screen-view';
+import { t } from '../../strings';
+import type { Rect } from '../../table-layout';
+import type { TableZones } from '../../table-zones';
+import { RESOURCE_PATHS } from '../../asset-keys';
+import { addUiTransform } from '../ui-helpers';
+import { dropZoneForSeat, visualSideForSeat } from './seat-display';
+import { CARD_SIZE, HAND_LIFT, cardsSignature } from './card-node';
+
+const HERO_SEAT: SeatIndex = 0;
+const TABLE_TEXT = new Color(74, 70, 72, 235);
+const GAME_TEXT = {
+  playerHand: t('tutorial.playerHand'),
+};
+
+interface PlayAreaLayout {
+  screenX: number;
+  screenY: number;
+  width: number;
+  height: number;
+  rows: number;
+  cardsPerRow: number;
+  cardScale: number;
+  spacing: number;
+  rowSpacing: number;
+}
+
+function clampNumber(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+export function renderBottomCardsDock(this: any, cards: Card[] | null, layout: TableZones, canvas: { width: number; height: number }): void {
+  const dock = this.ensureNode('bottom-cards-dock-runtime', this.uiRoot!);
+  const pos = this.rectPoint(layout.bottomCardsDock, canvas, 0.5, 0.5);
+  dock.setPosition(pos.x, pos.y, 0);
+  addUiTransform(dock, layout.bottomCardsDock.width, layout.bottomCardsDock.height);
+  const skinWidth = Math.max(150, Math.min(220, layout.bottomCardsDock.width + 18));
+  const skinHeight = Math.max(48, layout.bottomCardsDock.height + 20);
+  this.addSprite(RESOURCE_PATHS.bottomCardsDockV13, 0, 0, skinWidth, skinHeight, dock, 'bottom-cards-dock-skin', true);
+
+  const spacing = 30;
+  const startX = -spacing;
+  const signature = cards ? cardsSignature(cards) : 'backs';
+  const animateReveal = Boolean(cards) && this.settings.animation && signature !== this.lastBottomCardsSignature;
+  this.lastBottomCardsSignature = signature;
+  for (let index = 0; index < 3; index += 1) {
+    const x = startX + index * spacing;
+    if (cards?.[index]) {
+      const cardNode = this.addDisplayCard(cards[index], x, 0, dock, `bottom-card-${index}`, animateReveal);
+      cardNode.setScale(0.44, 0.44, 1);
+      continue;
+    }
+    const back = this.ensureNode(`bottom-card-back-${index}`, dock);
+    back.setPosition(x, 0, 0);
+    addUiTransform(back, 26, 38);
+    const sprite = back.getComponent(Sprite) ?? back.addComponent(Sprite);
+    sprite.type = Sprite.Type.SIMPLE;
+    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+    this.loadSprite(RESOURCE_PATHS.cardBackV13, sprite);
+  }
+}
+
+export function renderPlayArea(this: any, top: TopPlay | null, layout: TableZones, canvas: { width: number; height: number }): void {
+  const area = this.ensureNode('play-area-runtime', this.uiRoot!);
+  this.playAreaRoot = area;
+  const dropZone = top ? dropZoneForSeat(layout, top.seat) : layout.dropZoneHero;
+  const cards = top?.pattern.cards ?? [];
+  const playLayout = this.playAreaLayout(top?.seat ?? HERO_SEAT, cards.length, dropZone, layout, canvas);
+  const pos = this.screenPoint(canvas, playLayout.screenX, playLayout.screenY);
+  const width = playLayout.width;
+  const height = playLayout.height;
+  area.setPosition(pos.x, pos.y, 0);
+  addUiTransform(area, width, height);
+
+  if (!top) {
+    this.lastPlayAreaSignature = '';
+    return;
+  }
+
+  const signature = `${top.seat}:${cardsSignature(cards)}`;
+  const animate = this.settings.animation && signature !== this.lastPlayAreaSignature;
+  this.lastPlayAreaSignature = signature;
+  cards.forEach((card, index) => {
+    const position = this.playCardPosition(index, cards.length, playLayout);
+    const node = this.addDisplayCard(card, position.x, position.y, area, `play-card-${index}`, animate);
+    node.setScale(playLayout.cardScale, playLayout.cardScale, 1);
+  });
+}
+
+export function playAreaLayout(this: any,
+  seat: SeatIndex,
+  cardCount: number,
+  dropZone: Rect,
+  layout: TableZones,
+  canvas: { width: number; height: number },
+): PlayAreaLayout {
+  const isSideSeat = seat !== HERO_SEAT;
+  const rows = cardCount >= 8 ? 2 : 1;
+  const cardsPerRow = Math.max(1, Math.ceil(Math.max(1, cardCount) / rows));
+  const maxWidth = isSideSeat
+    ? Math.min(330, Math.max(248, Math.round(canvas.width * 0.37)))
+    : Math.min(360, Math.max(180, dropZone.width + 124));
+  const baseCardScale = clampNumber(
+    (maxWidth - Math.max(0, cardsPerRow - 1) * 2) / (CARD_SIZE.width * cardsPerRow),
+    rows > 1 ? 0.58 : 0.66,
+    isSideSeat ? 0.88 : 0.94,
+  );
+  const hudBand = isSideSeat ? this.sideSeatPlaySafeBand(seat, layout, canvas) : null;
+  const bandHeight = hudBand ? Math.max(1, hudBand.bottom - hudBand.top) : Infinity;
+  const verticalScaleCap = rows > 1
+    ? (bandHeight - 5) / (CARD_SIZE.height * rows)
+    : bandHeight / CARD_SIZE.height;
+  const cardScale = hudBand
+    ? clampNumber(Math.min(baseCardScale, verticalScaleCap), rows > 1 ? 0.58 : 0.66, baseCardScale)
+    : baseCardScale;
+  const visualCardWidth = CARD_SIZE.width * cardScale;
+  const visualCardHeight = CARD_SIZE.height * cardScale;
+  const spacing = cardCount <= 1 ? 0 : visualCardWidth + 2;
+  const rowSpacing = visualCardHeight + 5;
+  const contentWidth = visualCardWidth * cardsPerRow + Math.max(0, cardsPerRow - 1) * 2;
+  const width = Math.ceil(contentWidth + 28);
+  const height = Math.ceil(visualCardHeight * rows + (rows - 1) * 5 + 34);
+  let screenX = dropZone.x + dropZone.width / 2;
+  if (isSideSeat) {
+    const side = visualSideForSeat(seat);
+    const portraitReserve = Math.max(140, Math.round(canvas.width * 0.18));
+    const safeLeft = side === 'left' ? portraitReserve : Math.round(canvas.width * 0.48);
+    const safeRight = side === 'left' ? Math.round(canvas.width * 0.52) : canvas.width - portraitReserve;
+    const minCenter = safeLeft + width / 2;
+    const maxCenter = safeRight - width / 2;
+    screenX = minCenter <= maxCenter ? clampNumber(screenX, minCenter, maxCenter) : (safeLeft + safeRight) / 2;
+  }
+  let screenY = dropZone.y + dropZone.height / 2 + (rows > 1 ? 8 : 0);
+  if (hudBand) {
+    const verticalBounds = this.playAreaCardVerticalBounds(rows, visualCardHeight, rowSpacing);
+    const minCenterY = hudBand.top - verticalBounds.top;
+    const maxCenterY = hudBand.bottom - verticalBounds.bottom;
+    screenY = minCenterY <= maxCenterY
+      ? clampNumber(screenY, minCenterY, maxCenterY)
+      : (hudBand.top + hudBand.bottom - verticalBounds.top - verticalBounds.bottom) / 2;
+  }
+  return { screenX, screenY, width, height, rows, cardsPerRow, cardScale, spacing, rowSpacing };
+}
+
+export function sideSeatPlaySafeBand(this: any,
+  seat: SeatIndex,
+  layout: TableZones,
+  canvas: { width: number; height: number },
+): { top: number; bottom: number } {
+  const side = visualSideForSeat(seat);
+  const hudTop = side === 'left'
+    ? Math.min(layout.strengthMeter.y, layout.memoryDock.y)
+    : Math.min(layout.turnTimer.y, layout.advisorDock.y);
+  return {
+    top: Math.max(layout.topBar.y + layout.topBar.height + 8, Math.round(canvas.height * 0.12)),
+    bottom: Math.max(1, hudTop - 8),
+  };
+}
+
+export function playAreaCardVerticalBounds(this: any,
+  rows: number,
+  visualCardHeight: number,
+  rowSpacing: number,
+): { top: number; bottom: number } {
+  if (rows <= 1) {
+    return {
+      top: 8 - visualCardHeight / 2,
+      bottom: 8 + visualCardHeight / 2,
+    };
+  }
+  return {
+    top: 6 - rowSpacing / 2 - visualCardHeight / 2,
+    bottom: rowSpacing / 2 + 6 + visualCardHeight / 2,
+  };
+}
+
+export function playCardPosition(this: any,
+  index: number,
+  total: number,
+  layout: PlayAreaLayout,
+): { x: number; y: number } {
+  const fullTopRow = total > layout.cardsPerRow ? layout.cardsPerRow : total;
+  const row = index < fullTopRow ? 0 : 1;
+  const indexInRow = row === 0 ? index : index - fullTopRow;
+  const rowCount = row === 0 ? fullTopRow : total - fullTopRow;
+  const startX = -((rowCount - 1) * layout.spacing) / 2;
+  const x = startX + indexInRow * layout.spacing;
+  const y = layout.rows === 1 ? -8 : ((layout.rows - 1) / 2 - row) * layout.rowSpacing - 6;
+  return { x, y };
+}
+
+export function renderHand(this: any,
+  hand: ReturnType<typeof deriveScreenVM>['hand'],
+  layout: TableZones,
+  canvas: { width: number; height: number },
+): void {
+  const handFrame = this.handLayoutFrame(canvas);
+  if (hand.length === 0) {
+    const title = this.screenPoint(canvas, handFrame.x + handFrame.width / 2, layout.heroHandLarge.y + Math.min(24, layout.heroHandLarge.height * 0.22));
+    this.addLabel(GAME_TEXT.playerHand, title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title', TABLE_TEXT);
+  }
+  const handSignature = cardsSignature(hand.map((slot) => slot.card));
+  const animateDeal = this.settings.animation && handSignature !== this.lastHandSignature;
+  const nextSelectedKeys = new Set<string>();
+  const handTopY = layout.heroHandLarge.y + Math.round(layout.heroHandLarge.height * 0.54);
+  hand.forEach((slot, index) => {
+    const screenX = handFrame.x + slot.x + CARD_SIZE.width / 2;
+    const screenY = handTopY + slot.y;
+    const { x, y } = this.screenPoint(canvas, screenX, screenY);
+    this.addCard(slot.card, x, y, slot.selected, index, hand.length, animateDeal);
+    if (slot.selected) nextSelectedKeys.add(cardKey(slot.card));
+  });
+  this.lastHandSignature = handSignature;
+  this.renderedSelectedCardKeys = nextSelectedKeys;
+}
+
+export function handLayoutFrame(this: any, canvas: { width: number; height: number }): { x: number; width: number } {
+  const inset = Math.round(Math.min(96, Math.max(64, canvas.width * 0.095)));
+  return {
+    x: inset,
+    width: Math.max(CARD_SIZE.width, canvas.width - inset * 2),
+  };
+}
+
+export function armDealAnimationLock(this: any, phase: string, hand: ReturnType<typeof deriveScreenVM>['hand']): void {
+  if (!this.settings.animation || phase !== 'bidding' || hand.length === 0) return;
+  const handSignature = cardsSignature(hand.map((slot) => slot.card));
+  if (handSignature === this.lastHandSignature) return;
+  this.dealAnimationLockMs = Math.max(this.dealAnimationLockMs, dealCardDelay(hand.length - 1, hand.length) + 180);
+}
