@@ -174,6 +174,7 @@ export function snapshot(state: RoundState, viewer?: SeatIndex): GameSnapshot {
     top: state.top,
     handCounts,
     winner: state.winner,
+    bombsPlayed: state.bombsPlayed,
   };
 
   if (viewer !== undefined) {
