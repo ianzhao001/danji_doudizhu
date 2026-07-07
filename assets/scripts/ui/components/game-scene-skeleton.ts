@@ -3,7 +3,6 @@ import {
   AudioClip,
   AudioSource,
   BlockInputEvents,
-  Button,
   Color,
   Component,
   Graphics,
@@ -53,7 +52,14 @@ import {
   spriteFrameResourcePath,
   type ResourcePath,
 } from '../asset-keys';
-import { addLabel as addUiLabel, addUiTransform } from './ui-helpers';
+import { t } from '../strings';
+import {
+  addLabel as addUiLabel,
+  addSkinnedButton,
+  addSkinnedSprite,
+  addUiTransform,
+  drawPanelSkin as drawUiPanelSkin,
+} from './ui-helpers';
 import {
   renderActions as renderActionsSection,
   renderAdvisor as renderAdvisorSection,
@@ -148,6 +154,42 @@ const BUTTON_TERTIARY_TEXT = new Color(116, 68, 28, 255);
 const BUTTON_DISABLED_TEXT = new Color(86, 72, 82, 220);
 const BUTTON_PAUSE_TOGGLE_TEXT = new Color(116, 54, 72, 255);
 const BUTTON_PAUSE_ACTION_TEXT = new Color(98, 54, 24, 255);
+const GAME_TEXT = {
+  phaseBidding: t('phase.bidding'),
+  phasePlaying: t('phase.playing'),
+  phaseSettled: t('phase.settled'),
+  phaseDisposed: t('phase.disposed'),
+  landlordPending: t('game.landlordPending'),
+  landlordPrefix: t('game.landlordPrefix'),
+  multiplierPrefix: t('game.multiplierPrefix'),
+  bombsPrefix: t('game.bombsPrefix'),
+  handPrefix: t('game.handPrefix'),
+  sound: t('settings.sound'),
+  animation: t('settings.animation'),
+  vibration: t('settings.vibration'),
+  on: t('common.on'),
+  off: t('common.off'),
+  playerHand: t('tutorial.playerHand'),
+  roundTerminated: t('game.roundTerminated'),
+  backLobby: t('result.backLobby'),
+  restartShort: t('common.restartShort'),
+  pause: t('game.pause'),
+  progressKept: t('game.progressKept'),
+  continue: t('common.continue'),
+  exit: t('common.exit'),
+  quitTitle: t('game.quitTitle'),
+  quitHint: t('game.quitHint'),
+  confirm: t('common.confirm'),
+  cancel: t('common.cancel'),
+  bidFailed: t('game.bidFailed'),
+  playFailed: t('game.playFailed'),
+  passFailed: t('game.passFailed'),
+  bombToast: t('cue.bombToast'),
+  rocketToast: t('cue.rocketToast'),
+  pass: t('action.pass'),
+  springToast: t('cue.springToast'),
+  antiSpringToast: t('cue.antiSpringToast'),
+};
 const RUNTIME_PRELOAD_SPRITES: readonly ResourcePath[] = [
   RESOURCE_PATHS.gameTableBgV13,
   RESOURCE_PATHS.heroBodyV13,
@@ -204,11 +246,15 @@ function suitText(suit: Suit | 'joker'): string {
 }
 
 function phaseText(phase: string): string {
-  if (phase === 'bidding') return '叫地主';
-  if (phase === 'playing') return '对局中';
-  if (phase === 'settled') return '本局结算';
-  if (phase === 'disposed') return '已终止';
+  if (phase === 'bidding') return GAME_TEXT.phaseBidding;
+  if (phase === 'playing') return GAME_TEXT.phasePlaying;
+  if (phase === 'settled') return GAME_TEXT.phaseSettled;
+  if (phase === 'disposed') return GAME_TEXT.phaseDisposed;
   return phase;
+}
+
+function compactToggleText(label: string, on: boolean): string {
+  return `${label}${on ? GAME_TEXT.on : GAME_TEXT.off}`;
 }
 
 function clampNumber(value: number, min: number, max: number): number {
@@ -519,18 +565,18 @@ export class GameSceneSkeleton extends Component {
     this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, bombsPos.x - 40, bombsPos.y, 20, 20, this.uiRoot!, 'top-bombs-badge');
     this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 34, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
     this.addLabel(phaseText(phase), phasePos.x + 4, phasePos.y, 16, this.uiRoot!, 112, 24, 'top-phase', BRIGHT_PANEL_TEXT);
-    this.addLabel(topBar.landlordSeat === null ? '地主待定' : `地主${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
-    this.addLabel(`倍数×${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, 11, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
-    this.addLabel(`炸弹×${topBar.bombs}`, bombsPos.x + 4, bombsPos.y, 11, this.uiRoot!, 74, 20, 'top-bombs', BRIGHT_PANEL_TEXT);
-    this.addLabel(`手牌${handCount}`, handPos.x + 2, handPos.y, 11, this.uiRoot!, 62, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
+    this.addLabel(topBar.landlordSeat === null ? GAME_TEXT.landlordPending : `${GAME_TEXT.landlordPrefix}${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
+    this.addLabel(`${GAME_TEXT.multiplierPrefix}${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, 11, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
+    this.addLabel(`${GAME_TEXT.bombsPrefix}${topBar.bombs}`, bombsPos.x + 4, bombsPos.y, 11, this.uiRoot!, 74, 20, 'top-bombs', BRIGHT_PANEL_TEXT);
+    this.addLabel(`${GAME_TEXT.handPrefix}${handCount}`, handPos.x + 2, handPos.y, 11, this.uiRoot!, 62, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
   }
 
   private renderRuntimeSettings(layout: TableRegions, canvas: { width: number; height: number }): void {
     const settings = this.settings;
     const controls: { key: ToggleKey; label: string; on: boolean; fx: number }[] = [
-      { key: 'sound', label: '音效', on: settings.sound, fx: 0.22 },
-      { key: 'animation', label: '动效', on: settings.animation, fx: 0.5 },
-      { key: 'vibration', label: '震动', on: settings.vibration, fx: 0.78 },
+      { key: 'sound', label: GAME_TEXT.sound, on: settings.sound, fx: 0.22 },
+      { key: 'animation', label: GAME_TEXT.animation, on: settings.animation, fx: 0.5 },
+      { key: 'vibration', label: GAME_TEXT.vibration, on: settings.vibration, fx: 0.78 },
     ];
     const landscape = this.isLandscape(canvas);
     const y = landscape
@@ -545,7 +591,7 @@ export class GameSceneSkeleton extends Component {
       const x = landscape ? landscapeXs[index] : canvas.width * control.fx;
       const pos = this.screenPoint(canvas, x, y);
       this.addButton(
-        `${control.label}${control.on ? '开' : '关'}`,
+        compactToggleText(control.label, control.on),
         pos.x,
         pos.y,
         landscape ? 72 : 88,
@@ -758,7 +804,7 @@ export class GameSceneSkeleton extends Component {
     const handFrame = this.handLayoutFrame(canvas);
     if (hand.length === 0) {
       const title = this.screenPoint(canvas, handFrame.x + handFrame.width / 2, layout.heroHandLarge.y + Math.min(24, layout.heroHandLarge.height * 0.22));
-      this.addLabel('玩家手牌', title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title', TABLE_TEXT);
+      this.addLabel(GAME_TEXT.playerHand, title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title', TABLE_TEXT);
     }
     const handSignature = cardsSignature(hand.map((slot) => slot.card));
     const animateDeal = this.settings.animation && handSignature !== this.lastHandSignature;
@@ -848,9 +894,9 @@ export class GameSceneSkeleton extends Component {
     graphics.roundRect(-(panelWidth - 18) / 2, -(panelHeight - 16) / 2, panelWidth - 18, panelHeight - 16, 8);
     graphics.fill();
     backing.setSiblingIndex(1);
-    this.addLabel(this.terminationFeedbackText ?? '本局已终止', 0, 28, 16, panel, panelWidth - 38, 30, 'termination-feedback-title', BRIGHT_PANEL_TEXT);
-    this.addButton('返回大厅', -72, -28, 126, 54, true, () => director.loadScene('lobby'), panel, 'termination-feedback-lobby');
-    this.addButton('重开', 72, -28, 126, 54, true, () => this.startGame(true), panel, 'termination-feedback-restart');
+    this.addLabel(this.terminationFeedbackText ?? GAME_TEXT.roundTerminated, 0, 28, 16, panel, panelWidth - 38, 30, 'termination-feedback-title', BRIGHT_PANEL_TEXT);
+    this.addButton(GAME_TEXT.backLobby, -72, -28, 126, 54, true, () => director.loadScene('lobby'), panel, 'termination-feedback-lobby');
+    this.addButton(GAME_TEXT.restartShort, 72, -28, 126, 54, true, () => this.startGame(true), panel, 'termination-feedback-restart');
     panel.setSiblingIndex(this.uiRoot!.children.length - 1);
   }
 
@@ -875,7 +921,7 @@ export class GameSceneSkeleton extends Component {
     const screenY = Math.max(28, layout.topBar.y + layout.topBar.height * 0.52);
     const pos = this.screenPoint(canvas, canvas.width - 42, screenY);
     const label = this.addButton(
-      '暂停',
+      GAME_TEXT.pause,
       pos.x,
       pos.y,
       64,
@@ -917,28 +963,28 @@ export class GameSceneSkeleton extends Component {
   }
 
   private renderPauseMenu(panel: Node, panelWidth: number, panelHeight: number): void {
-    this.addLabel('暂停', 0, panelHeight / 2 - 46, 26, panel, panelWidth - 48, 48, 'pause-title', BRIGHT_PANEL_TEXT);
-    const hint = this.addLabel('本局进度已保留', 0, panelHeight / 2 - 82, 14, panel, panelWidth - 58, 30, 'pause-hint', BRIGHT_PANEL_MUTED);
+    this.addLabel(GAME_TEXT.pause, 0, panelHeight / 2 - 46, 26, panel, panelWidth - 48, 48, 'pause-title', BRIGHT_PANEL_TEXT);
+    const hint = this.addLabel(GAME_TEXT.progressKept, 0, panelHeight / 2 - 82, 14, panel, panelWidth - 58, 30, 'pause-hint', BRIGHT_PANEL_MUTED);
     hint.color = BRIGHT_PANEL_MUTED;
     const buttonWidth = Math.min(88, Math.max(82, Math.floor((panelWidth - 56) / 3)));
     const buttonStep = buttonWidth + 8;
     const buttonHeight = 60;
     const leftX = -buttonStep;
     const rightX = buttonStep;
-    this.addButton(`音效${this.settings.sound ? '开' : '关'}`, leftX, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('sound'), panel, 'pause-setting-sound');
-    this.addButton(`动效${this.settings.animation ? '开' : '关'}`, 0, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('animation'), panel, 'pause-setting-animation');
-    this.addButton(`震动${this.settings.vibration ? '开' : '关'}`, rightX, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('vibration'), panel, 'pause-setting-vibration');
-    this.addButton('继续', leftX, -58, buttonWidth, buttonHeight, true, () => this.closePauseMenu(), panel, 'pause-continue');
-    this.addButton('重开', 0, -58, buttonWidth, buttonHeight, true, () => this.restartFromPause(), panel, 'pause-restart');
-    this.addButton('退出', rightX, -58, buttonWidth, buttonHeight, true, () => this.askPauseQuit(), panel, 'pause-quit');
+    this.addButton(compactToggleText(GAME_TEXT.sound, this.settings.sound), leftX, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('sound'), panel, 'pause-setting-sound');
+    this.addButton(compactToggleText(GAME_TEXT.animation, this.settings.animation), 0, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('animation'), panel, 'pause-setting-animation');
+    this.addButton(compactToggleText(GAME_TEXT.vibration, this.settings.vibration), rightX, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('vibration'), panel, 'pause-setting-vibration');
+    this.addButton(GAME_TEXT.continue, leftX, -58, buttonWidth, buttonHeight, true, () => this.closePauseMenu(), panel, 'pause-continue');
+    this.addButton(GAME_TEXT.restartShort, 0, -58, buttonWidth, buttonHeight, true, () => this.restartFromPause(), panel, 'pause-restart');
+    this.addButton(GAME_TEXT.exit, rightX, -58, buttonWidth, buttonHeight, true, () => this.askPauseQuit(), panel, 'pause-quit');
   }
 
   private renderPauseConfirm(panel: Node, panelWidth: number, panelHeight: number): void {
-    this.addLabel('退出对局？', 0, panelHeight / 2 - 48, 24, panel, panelWidth - 48, 48, 'pause-confirm-title', BRIGHT_PANEL_TEXT);
-    const hint = this.addLabel('确认后返回大厅', 0, 14, 16, panel, panelWidth - 58, 36, 'pause-confirm-hint', BRIGHT_PANEL_MUTED);
+    this.addLabel(GAME_TEXT.quitTitle, 0, panelHeight / 2 - 48, 24, panel, panelWidth - 48, 48, 'pause-confirm-title', BRIGHT_PANEL_TEXT);
+    const hint = this.addLabel(GAME_TEXT.quitHint, 0, 14, 16, panel, panelWidth - 58, 36, 'pause-confirm-hint', BRIGHT_PANEL_MUTED);
     hint.color = BRIGHT_PANEL_MUTED;
-    this.addButton('确认', -64, -64, 112, 60, true, () => director.loadScene('lobby'), panel, 'pause-confirm');
-    this.addButton('取消', 64, -64, 112, 60, true, () => this.cancelPauseQuit(), panel, 'pause-cancel');
+    this.addButton(GAME_TEXT.confirm, -64, -64, 112, 60, true, () => director.loadScene('lobby'), panel, 'pause-confirm');
+    this.addButton(GAME_TEXT.cancel, 64, -64, 112, 60, true, () => this.cancelPauseQuit(), panel, 'pause-cancel');
   }
 
   private openPauseMenu(): void {
@@ -973,7 +1019,7 @@ export class GameSceneSkeleton extends Component {
     this.submitting = true;
     const type = id === 'call' ? 'call' : id === 'grab' ? 'grab' : 'pass';
     const result = await this.runtime.submitPlayerAction({ kind: 'bid', action: { type, seat: HERO_SEAT } });
-    if (!result.ok) this.showStatus(result.error?.reason ?? '叫抢失败');
+    if (!result.ok) this.showStatus(result.error?.reason ?? GAME_TEXT.bidFailed);
     else this.statusText = '';
     this.submitting = false;
     this.render();
@@ -987,7 +1033,7 @@ export class GameSceneSkeleton extends Component {
       action: { type: 'play', seat: HERO_SEAT, cards: this.selected },
     });
     if (result.ok) this.selected = clearSelection();
-    else this.showStatus(result.error?.reason ?? '出牌失败');
+    else this.showStatus(result.error?.reason ?? GAME_TEXT.playFailed);
     if (result.ok) this.statusText = '';
     this.submitting = false;
     this.render();
@@ -997,7 +1043,7 @@ export class GameSceneSkeleton extends Component {
     if (!this.runtime || this.submitting) return;
     this.submitting = true;
     const result = await this.runtime.submitPlayerAction({ kind: 'play', action: { type: 'pass', seat: HERO_SEAT } });
-    if (!result.ok) this.showStatus(result.error?.reason ?? '不能过牌');
+    if (!result.ok) this.showStatus(result.error?.reason ?? GAME_TEXT.passFailed);
     else this.statusText = '';
     this.submitting = false;
     this.render();
@@ -1197,49 +1243,45 @@ export class GameSceneSkeleton extends Component {
     name?: string,
   ): Label {
     const nodeName = name ?? `button-${text}-${x}-${y}`;
-    const node = this.ensureNode(nodeName, parent);
-    const decorated = this.isDecoratedButton(nodeName);
-    const renderHeight = decorated ? Math.max(height, 62) : height;
-    node.setPosition(x, y, 0);
-    addUiTransform(node, width, renderHeight);
-    const button = node.getComponent(Button) ?? node.addComponent(Button);
-    const bg = this.addSprite(this.buttonSkinPath(nodeName, enabled), 0, 0, width, renderHeight, node, 'button-bg', true);
-    bg.setSiblingIndex(0);
-    button.target = bg;
-    button.transition = Button.Transition.COLOR;
-    button.interactable = enabled;
-    button.normalColor = new Color(255, 255, 255, 255);
-    button.pressedColor = new Color(255, 235, 240, 255);
-    button.hoverColor = new Color(255, 255, 255, 255);
-    button.disabledColor = new Color(255, 255, 255, 255);
-    node.off(Button.EventType.CLICK);
-    node.on(Button.EventType.CLICK, cb, this);
-
-    const iconPath = this.buttonIconPath(nodeName);
-    const showIcon = Boolean(iconPath) && width >= 136;
-    const iconSize = Math.min(22, Math.max(16, renderHeight - 40));
-    const labelX = showIcon ? 10 : 0;
-    const labelY = decorated ? -8 : 0;
-    const labelWidth = showIcon ? width - 38 : width - (decorated ? 14 : 0);
-    const labelHeight = decorated ? Math.max(30, renderHeight - 26) : renderHeight;
-    if (iconPath && showIcon) {
-      this.addSprite(iconPath, -width / 2 + 23, labelY, iconSize, iconSize, node, 'button-icon');
-    }
-
-    const label = addUiLabel(this.ensureNode.bind(this), {
+    return addSkinnedButton(this.ensureNode.bind(this), this.loadSprite.bind(this), {
       text,
-      x: labelX,
-      y: labelY,
-      fontSize: decorated ? 17 : 20,
-      parent: node,
-      width: labelWidth,
-      height: labelHeight,
-      name: 'button-label',
-      color: this.buttonTextColor(nodeName, enabled),
-      lineHeightOffset: 4,
+      x,
+      y,
+      width,
+      height,
+      enabled,
+      cb,
+      parent,
+      name: nodeName,
+      owner: this,
+      skinPath: (buttonName, isEnabled) => this.buttonSkinPath(buttonName, isEnabled),
+      textColor: (buttonName, isEnabled) => this.buttonTextColor(buttonName, isEnabled),
+      iconPath: (buttonName) => this.buttonIconPath(buttonName),
+      layout: ({ name: buttonName, iconPath, width: buttonWidth, height: buttonHeight }) => {
+        const decorated = this.isDecoratedButton(buttonName);
+        const renderHeight = decorated ? Math.max(buttonHeight, 62) : buttonHeight;
+        const showIcon = Boolean(iconPath) && buttonWidth >= 136;
+        const labelY = decorated ? -8 : 0;
+        return {
+          renderHeight,
+          label: {
+            x: showIcon ? 10 : 0,
+            y: labelY,
+            width: showIcon ? buttonWidth - 38 : buttonWidth - (decorated ? 14 : 0),
+            height: decorated ? Math.max(30, renderHeight - 26) : renderHeight,
+            fontSize: decorated ? 17 : 20,
+            lineHeight: decorated ? 21 : 24,
+          },
+          icon: showIcon
+            ? {
+                x: -buttonWidth / 2 + 23,
+                y: labelY,
+                size: Math.min(22, Math.max(16, renderHeight - 40)),
+              }
+            : undefined,
+        };
+      },
     });
-    label.lineHeight = decorated ? 21 : 24;
-    return label;
   }
 
   private isDecoratedButton(name: string): boolean {
@@ -1313,14 +1355,16 @@ export class GameSceneSkeleton extends Component {
     name: string,
     sliced = false,
   ): Node {
-    const node = this.ensureNode(name, parent);
-    node.setPosition(x, y, 0);
-    addUiTransform(node, width, height);
-    const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
-    sprite.type = sliced ? Sprite.Type.SLICED : Sprite.Type.SIMPLE;
-    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-    this.loadSprite(path, sprite);
-    return node;
+    return addSkinnedSprite(this.ensureNode.bind(this), this.loadSprite.bind(this), {
+      path,
+      x,
+      y,
+      width,
+      height,
+      parent,
+      name,
+      sliced,
+    });
   }
 
   private loadSprite(path: ResourcePath, sprite: Sprite | null): void {
@@ -1347,10 +1391,13 @@ export class GameSceneSkeleton extends Component {
   }
 
   private drawPanelSkin(parent: Node, width: number, height: number, name = 'panel-skin'): Node {
-    parent.getComponent(Graphics)?.clear();
-    const skin = this.addSprite(RESOURCE_PATHS.panelPopup, 0, 0, width, height, parent, name, true);
-    skin.setSiblingIndex(0);
-    return skin;
+    return drawUiPanelSkin(this.ensureNode.bind(this), this.loadSprite.bind(this), {
+      path: RESOURCE_PATHS.panelPopup,
+      parent,
+      width,
+      height,
+      name,
+    });
   }
 
   private addLabel(
@@ -1414,14 +1461,14 @@ export class GameSceneSkeleton extends Component {
   private eventToastText(event: FlowEvent): string | null {
     if (event.type === 'round') {
       const round = event.event;
-      if (round.type === 'bomb') return `${seatDisplayName(round.seat)} 炸弹！`;
-      if (round.type === 'rocket') return `${seatDisplayName(round.seat)} 火箭！`;
-      if (round.type === 'pass') return `${seatDisplayName(round.seat)} 不要`;
+      if (round.type === 'bomb') return `${seatDisplayName(round.seat)} ${GAME_TEXT.bombToast}`;
+      if (round.type === 'rocket') return `${seatDisplayName(round.seat)} ${GAME_TEXT.rocketToast}`;
+      if (round.type === 'pass') return `${seatDisplayName(round.seat)} ${GAME_TEXT.pass}`;
       return null;
     }
     if (event.type === 'settled') {
-      if (event.settlement.spring === 'spring') return '春天！';
-      if (event.settlement.spring === 'anti-spring') return '反春天！';
+      if (event.settlement.spring === 'spring') return GAME_TEXT.springToast;
+      if (event.settlement.spring === 'anti-spring') return GAME_TEXT.antiSpringToast;
     }
     return null;
   }
