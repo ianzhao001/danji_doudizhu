@@ -940,7 +940,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-RESUME-REPLAY | C | 常规(UI 接线·双层视觉预审) | 新 `ui/resume-rebuild.ts`(纯岛) + `game-scene-skeleton.ts`(接线+底牌保守) + report | T-LIVE-MULT（done 8637f6a）·须在 P-GS-SPLIT2 前合 | `task/T-RESUME-REPLAY`（已建自 main `df8eb03`·种子 `462624b`·实现 `e27d734`·审查 `baac5d6`） | done 8ca7d85 |
 | T-HUD-LIVE | C | 常规(UI 接线·双层视觉预审) | `screen-view.ts` + `game-scene-skeleton.ts`(顶栏渲染) + report | T-LIVE-MULT（done 8637f6a）·T-RESUME-REPLAY（done 8ca7d85）·须在 P-GS-SPLIT2 前合 | `task/T-HUD-LIVE`（已建自 main `4acaac6`·种子 `4840bc7`） | ready |
 | T-TERM-FEEDBACK | C | 常规(UI 接线·双层视觉预审) | `game-scene-skeleton.ts`(terminationReason 轮询+暂停接线骑士) + report | T-HUD-LIVE·T-ADVANCE-REENTRY（done 601e9fe）·须在 P-GS-SPLIT2 前合 | `task/T-TERM-FEEDBACK`（届时自含 HUD-LIVE 的 main 建） | blocked |
-| T-LASTACT-LEGIBILITY | C | 常规(editor-evidence·视觉审②转派) | `game-scene/seats-renderer.ts`(renderLastActions 呈现) + report | —（seats-renderer 不在 P-GS-SPLIT2 漂移域·建议排 C 波 UI 链后）·V7 前必修 | `task/T-LASTACT-LEGIBILITY`（届时自 main 建） | ready |
+| T-LASTACT-LEGIBILITY | C | 常规(editor-evidence·视觉审②转派) | `game-scene/seats-renderer.ts`(renderLastActions 呈现) + report | —（seats-renderer 不在 P-GS-SPLIT2 漂移域·与 T-HUD-LIVE 同批派发文件域零交叉）·V7 前必修 | `task/T-LASTACT-LEGIBILITY`（已建自 main `93cedd1`·无种子·editor-evidence） | ready |
 
 > **派发注记**：
 > - **A 波**（纯逻辑/文档域·flow/ai/docs）：T-MEMORY-REAL → T-RUNTIME-SPLIT **串行**（同文件域·MEMORY-REAL 先扩 `PlayPolicy` 入参，SPLIT 再拆 runtime）；T-VIEW-SEAT / T-PROFILE-FOLLOWS / T-DOCS-SYNC **批次随到随合**（文件域互不相交）。
