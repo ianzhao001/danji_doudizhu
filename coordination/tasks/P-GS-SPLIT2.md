@@ -26,3 +26,8 @@
 ## 验收
 - `game-scene-skeleton.ts` **<800 行**；全量 vitest/typecheck 零回归（runtime/ui 测试全家零改动全绿）；四横屏对照 + `productErrors=[]`。
 - **双层视觉预审**（等价对照：执行者自审四类硬伤 → 规划者视觉审）→ 审查 R-WAVE8 R:P-GS-SPLIT2（常规·color-moved 强化核 + C 波接线原样搬迁核）。
+
+## 批次连做（压缩轮次·2026-07-08 规划者修订）
+- 本任务与 **P-BID-POLISH 同窗批次连做**：完成本任务（提交+报告）后不交接，直接自本分支尖建 `task/P-BID-POLISH` 续做（见其 spec「批次连做流程」），**批末一次交接**覆盖两任务。
+- **规划者视觉审②推迟到批末一并做**（两任务一次爆发），前提：本任务执行者自审必须含**四横屏 before/after 像素 diff 机械证据**（数字化 diffCount，同 T-UIHELPERS 48 对先例）——move-only 拆分预期 diff=0；若非 0 须逐处解释成因（如渲染顺序差异），无法解释即自修后再续批。
+- 合并串行不变：审查者一次批量审两任务，SPLIT2 先合、BID-POLISH 后合（其分支含 SPLIT2 提交·序合无冲突）。

@@ -41,9 +41,13 @@
 - [ ] **C 波接线原样搬迁核**：resume 重建调用/顶栏 live VM 消费/termination 轮询+去重 flag/`openPauseMenu→pause()`·`closePauseMenu→resume()`·重开与返回大厅不调 resume——语义零改（diff 内容只挪位置）；runtime-pause/advance-reentry/termination-feedback/resume-replay 测试全家零改动全绿。
 - [ ] **共享件不回退核**：拆出模块消费 `addSkinnedButton`/`addSkinnedSprite`/`drawPanelSkin`/`t()`，无本地重实现（新模块 `\bButton\b` 装配仅经共享件）；`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` dead 条目原样在（不删·归 P-BID-POLISH）。
 
-## R:P-BID-POLISH（常规）
+## R:P-BID-POLISH（常规·2026-07-08 批次连做扩项）
+- [ ] **种子搬运逐字节核**：`diff coordination/seeds/P-BID-POLISH-bidding-advisor.test.ts test/ai/bidding-advisor.test.ts` 为空（规划者预写·执行者仅搬运·独立 seed commit）；按档断言全绿（Simple 阈3/Normal 阈2/Hard 阈1 + `strong ≡ isStrongHand(hand, thresholdFor(level))` 全对齐）。
+- [ ] `bidding-levels.ts` diff **仅 `export` 一词**（thresholdFor 语义/数值/其余零改）；`bidding.ts` 零 diff；G4 `advisorEnabled=false` 未改（红线）。
 - [ ] 建议面板仅叫抢期存在（相位互斥 diff 核）、默认低打扰、消费既有纯层（UI 无规则重算）；零新增重叠。
-- [ ] 半裁徽标修复 + 左列密度微调有 zoom 证据；T-LAYOUT4 契约不回归。
+- [ ] 半裁徽标修复 + 左列密度微调 + termination 按钮 decorated 收编有 zoom/对照证据；T-LAYOUT4 契约不回归。
+- [ ] dead 条目删除（若做）：`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` 仅删 `last-action-0/1/2` 三项 + settled 相四横屏行为零变化证据；未做则零 diff。
+- [ ] **批次串行合并**：本分支含 P-GS-SPLIT2 提交——SPLIT2 先合后本分支序合；两任务一次批量审。
 - [ ] 执行者自审表 + 规划者视觉审结论在案；四横屏 + `productErrors=[]`；全量零回归。
 
 ## R:V7（verify-only）
