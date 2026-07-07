@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex / GPT-5
 - 分支：`task/T-ADVANCE-REENTRY`
-- 状态：approved-pending-planner（三闸高风险·审查者已审毕 `69468e5`·排队待规划者结构性把关）
+- 状态：done `601e9fe`（三闸高风险·审查者 `approved-pending-planner` `3a97a02` → 规划者三闸把关 `approved` `2baa8ff` → 审查者 claim `18a3301` → merge `601e9fe` → release `5db6f23`）
 
 ## 改了哪些文件
 - `assets/scripts/flow/runtime/bidding-driver.ts`
@@ -93,13 +93,24 @@ $ git status --short --untracked-files=all
 ## 阻塞升级
 - 不适用。
 
-## 合并证据（approved 后由审查者回填）
-- 合并前回归：
-  - `npm --prefix test test`：146/756 绿。
+## 合并证据（审查者回填·2026-07-07）
+- 合并前回归（main 工作树·pre-merge）：
+  - `npm --prefix test test`：**145 文件/753 用例绿**（merge base 状态·种子尚未在 main）。
   - `npm --prefix test run typecheck`：passed。
-- merge commit：待审查者回填。
-- BOARD 状态：待审查者在 main 工作树更新。
-- 规划者批量结构性把关（仅高风险任务）：待审查者置 `approved-pending-planner` 后由规划者回填。
+- 合并前 BOARD 状态：`approved`（规划者三闸把关通过·main `2baa8ff`·见 BOARD 尾部「C 波把关记录 ③」）。
+- 三闸序列（完整）：
+  - 审查者 `approved-pending-planner`：分支 `3a97a02`（`643bcab` 在 main 改 BOARD 行）。
+  - 规划者三闸结构性把关 → `approved`：main `2baa8ff`（BOARD 本行改 `approved`；把关记录③ 6 项亲核 + worktree 独立复跑 146/756 绿 + typecheck 净）。
+  - 审查者 claim：main `18a3301`（`chore(T-ADVANCE-REENTRY): claim merge lane`）。
+  - 审查者 merge：main `601e9fe`（`merge task/T-ADVANCE-REENTRY`·`--no-ff`·merge made by 'ort' strategy·4 文件 324 insertions·**无冲突**——分支未触 BOARD.md，3-way 自动取 main 版）。
+  - 审查者 release：main `5db6f23`（`chore(T-ADVANCE-REENTRY): record merge evidence`·分支 `task/T-ADVANCE-REENTRY` 删除·worktree 移除）。
+- 合并后回归（main 工作树·post-merge）：
+  - `npm --prefix test test`：**146 文件/756 用例绿**（+1 文件 +3 用例 = `runtime-advance-reentry` 种子）。
+  - `npm --prefix test run typecheck`：passed。
+  - `git diff --check`：clean。
+- BOARD 终态：`done 601e9fe`（BOARD.md L939）。
+- 规划者批量结构性把关记录指针：`coordination/BOARD.md` 尾部「C 波把关记录 ③（规划者·2026-07-07·T-ADVANCE-REENTRY 三闸结构性把关 → approved）」。
+- 冲突解决记录：**无冲突**。交接稿原提示「BOARD 有 3-way 冲突取 main 版」系基于 merge base `1c9bdc9` < 当时 main `cebbd93` 的推演；规划者 `2baa8ff` 核实分支自建后未触 BOARD.md（`git log 1c9bdc9..task -- coordination/BOARD.md` 空），3-way merge 自动保留 main 版 BOARD.md，无手动冲突解决。
 
 ## 审查者评审段（GLM-5.2·2026-07-07）
 
@@ -136,20 +147,32 @@ $ git status --short --untracked-files=all
 - **分流结果**：域内致命 0 · 域外致命 0 · 拿不准 0。
 
 ### 结论
-- **approved-pending-planner**（三闸高风险·审查者已审毕·排队待规划者批量结构性把关）
+- **approved** → **done `601e9fe`**（三闸高风险·审查者 `approved-pending-planner` → 规划者三闸把关 `approved` → 审查者合并）
 - 0 打回 · 0 域外升级 · 0 非阻断建议
-- 合并前须：规划者认可改 `approved` → 审查者处理 BOARD 3-way 冲突（取 main 版）→ main 双闸 → claim/merge/release
+- 合并已完成（2026-07-07）：claim `18a3301` → merge `601e9fe` → release `5db6f23`；合并前后双闸皆绿（pre 145/753 → post 146/756）。
+
+## 验收披露（审查者·合并后回填·2026-07-07）
+- **评审结论**：approved（三闸序列完整·0 打回·0 域外升级·0 非阻断建议）。
+- **打回轮次与原因**：0 轮（一次过审）。
+- **全量回扫范围与分流结果**：
+  - 回扫范围：全仓 grep `advanceLoopRunning`/`advanceRuntimeUntilPause`/`scheduleRuntimeAdvance` → 仅 `flow/runtime/bidding-driver.ts` + `flow/round-runtime.ts` 引用；UI/game/rules/ai/data 零引用。全仓无 mock `RuntimeDriverContext` 的测试（均经 `startRoundRuntime`/`resumeRoundRuntime` 公共接口）。合并后 post-merge 复跑 146/756 全绿确认无跨模块回归。
+  - 分流结果：域内致命 0 · 域外致命 0 · 拿不准 0。
+- **合并 commit**：`601e9fe`（`merge task/T-ADVANCE-REENTRY`·`--no-ff`·Merge: `18a3301` `3a97a02`）。
+- **最终测试基线**：**146 文件/756 用例绿 + typecheck 净 + diff check 净**（post-merge main `5db6f23`）。
+- **三闸序列**：审查者 `approved-pending-planner` `3a97a02`（BOARD `643bcab`）→ 规划者把关 `approved` `2baa8ff`（把关记录③）→ claim `18a3301` → merge `601e9fe` → release `5db6f23`。
+- **C 波纯层三任务闭环**：T-PAUSE-GATE（done `7aa5adf`）→ T-LIVE-MULT（done `8637f6a`）→ T-ADVANCE-REENTRY（done `601e9fe`）—— C 波纯层 lane 全部 done。
+- **危害链闭环印证**：把关记录①纸面诊断（resume 双循环可达性新增）→ 续派记录②种子红实证（`sleeps 2≠1`）→ 本任务修复 + 种子绿钉死（`sleeps 1`）→ 规划者三闸亲核 6 项通过。
 
 ## 回扫升级（转规划者，全量回扫的域外致命 / 拿不准）
 - 无。域内致命 0 · 域外致命 0 · 拿不准 0。
 
 ## 批次交接记录 / 下一步
 - 所属批次 / 任务号：C 波 / `T-ADVANCE-REENTRY`
-- 本回合结论 / 状态：审查者已审毕 `69468e5`，置 `approved-pending-planner`；种子 3/3、全量 146/756、typecheck 净、diff check 净、纯层无 cc；0 打回 / 0 域外 / 0 拿不准。排队待规划者批量结构性把关认可后改 `approved`，由审查者合并。
-- 下一步找谁：**规划者**（三闸结构性把关：认可后改 BOARD `approved`，由审查者处理 BOARD 3-way 冲突 + main 双闸 + claim/merge/release）。
-- 用户终审配合：不适用。
+- 本回合结论 / 状态：**done `601e9fe`**（三闸序列完整·合并后 146/756 绿 + typecheck 净 + diff check 净·C 波纯层三任务全闭环）。
+- 下一步找谁：**规划者**（C 波纯层 lane 全 done → 规划者下一爆发种 `T-RESUME-REPLAY` UI 种子（C 波 UI 链首）·自含 ADVANCE-REENTRY 的 main 建·`test/ui/resume-replay.test.ts` 种子待种）。
+- 用户终审配合：不适用（纯逻辑任务）。
 - 给下一窗口的可粘贴提示词：
-  > 你是本仓库 `斗地主` 的规划型 AI。T-ADVANCE-REENTRY 审查者已置 `approved-pending-planner`（分支 `task/T-ADVANCE-REENTRY` `69468e5`·审查见 `coordination/reports/T-ADVANCE-REENTRY.report.md` 审查者评审段）。先读：`coordination/PROTOCOL.md`、`coordination/tasks/T-ADVANCE-REENTRY.md`、`coordination/reports/T-ADVANCE-REENTRY.report.md`、`coordination/BOARD.md` T-ADVANCE-REENTRY 行。请做三闸结构性把关：认可后在 main 工作树改 BOARD 本行 `approved-pending-planner`→`approved`，交审查者合并（合并注意：分支 merge base `1c9bdc9` < main `cebbd93`，BOARD 有 3-way 冲突，取 main 版；合并前 main 双闸 + worktree 双闸）。T-TERM-FEEDBACK 暂停接线骑士依赖本任务 done。
+  > 你是本仓库 `斗地主` 的规划型 AI。T-ADVANCE-REENTRY 已 done `601e9fe`（合并证据见 `coordination/reports/T-ADVANCE-REENTRY.report.md` 验收披露段·C 波纯层三任务 PAUSE-GATE/LIVE-MULT/ADVANCE-REENTRY 全闭环）。先读：`coordination/PROTOCOL.md`、`coordination/BOARD.md` C 波任务区 + 把关记录③、`coordination/tasks/R-WAVE9.md`。C 波纯层 lane 全 done → 请下一爆发种 `T-RESUME-REPLAY` UI 种子（C 波 UI 链首·`test/ui/resume-replay.test.ts`·spec `coordination/tasks/T-RESUME-REPLAY.md`）并自含 ADVANCE-REENTRY 的 main `5db6f23` 建分支派发；T-TERM-FEEDBACK 暂停接线骑士依赖已满足（待 HUD-LIVE + ADVANCE-REENTRY 双前置·后者已 done）。
 
 ## 自检（对照验收项）
 - [x] 测试全绿
