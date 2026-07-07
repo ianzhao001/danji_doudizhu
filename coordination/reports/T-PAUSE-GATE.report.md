@@ -14,6 +14,7 @@
   - 新增 `runtimePause` / `runtimeResume` / `runtimeIsPaused`。
   - `advanceRuntimeUntilPause` 在主循环入口加 paused gate；在 bidding/play 两处 `sleepForRuntimeAi` 醒后、决策前再次检查 paused，命中即 return。
   - `runtimeResume` 清 gate 后重新调用 `scheduleRuntimeAdvance`。
+- 复跑确认（2026-07-07 11:39 CST）：规划者修正种子后，执行者复跑 `runtime-pause` 4/4、全量 144/750、typecheck 全绿；实现无需改动，转审查者评审。
 
 ## 接口 diff + gate 插入点
 - `round-runtime.ts:60-76`：`RoundRuntime` additive API。
@@ -89,7 +90,8 @@ $ git status --short --untracked-files=all
 
 ## 合并证据（approved 后由审查者回填）
 - 合并前回归：
-  - `npm --prefix test test`：144/750 绿（规划者修正种子后·待执行者复跑确认）。
+  - `npm --prefix test test -- runtime-pause`：4/4 绿（执行者复跑确认）。
+  - `npm --prefix test test`：144/750 绿（执行者复跑确认）。
   - `npm --prefix test run typecheck`：passed。
 - merge commit：待审查者回填。
 - BOARD 状态：待审查者 / 规划者。
@@ -103,11 +105,11 @@ $ git status --short --untracked-files=all
 
 ## 批次交接记录 / 下一步
 - 所属批次 / 任务号：C 波 / `T-PAUSE-GATE`
-- 本回合结论 / 状态：实现已按文件域完成，但被种子第二例不可达断言阻塞；状态 `blocked`。
-- 下一步找谁：规划者。
+- 本回合结论 / 状态：规划者已裁定并修正不可达种子；执行者复跑确认 4/4 + 144/750 绿、typecheck 净；状态 `in-review`，正式提交通知审查者评审。
+- 下一步找谁：审查者（R-WAVE9 R:T-PAUSE-GATE；三闸任务，通过后置 `approved-pending-planner` 排队待规划者结构性把关，不自行合并）。
 - 用户终审配合：不适用。
 - 给下一窗口的可粘贴提示词：
-  > 你是本仓库 `斗地主` 的规划者。请读取 `coordination/PROTOCOL.md`、`coordination/tasks/T-PAUSE-GATE.md`、`coordination/reports/T-PAUSE-GATE.report.md`，并裁定 `test/flow/runtime-pause.test.ts:101-130` 的种子矛盾：当前牌局 `heroSeat=1/turn=2/seat2 单牌/top=null` resume 后按既有规则会 settled 或至少不会到 hero gate。请决定修正种子为可达 hero gate，或改验收为当前构造下的合法 settled 终点；裁定后再交执行者复跑并提审。
+  > 你是本仓库 `斗地主` 的审查者。请读取 `coordination/PROTOCOL.md`、`coordination/reports/T-PAUSE-GATE.report.md`，并按 R-WAVE9 的 `R:T-PAUSE-GATE` 检查单评审 `task/T-PAUSE-GATE`：实现提交 `93cbc29`、规划者种子修正 `36cbf33`、报告更新 `c433279` 后，执行者已复跑 `runtime-pause` 4/4、全量 `npm --prefix test test` 144/750 绿、`npm --prefix test run typecheck` 净。此任务为高风险三闸；若审查通过，请置 `approved-pending-planner` 排队待规划者结构性把关，不自行合并。
 
 ## 自检（对照验收项）
 - [x] 测试全绿（4/4·规划者修正种子后 144/750 绿）
