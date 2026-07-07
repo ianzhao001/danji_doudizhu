@@ -1038,3 +1038,11 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > - **B 波串行流水线全闭环**：T-UIHELPERS `done 30a9e74` → P-GS-SPLIT2 `done 7a1b022` → P-BID-POLISH `done 7a1b022`。压缩轮次机制验证：批次连做 + 种子搬运 + 规划者爆发视觉审② + 审查者批量审·全链 5 次窗口往返达成。
 > - **V7 前置全景（更新后·2026-07-08）**：A 波 **T-VIEW-SEAT**（ready·种子 `9e8fb01`·分支 `9e8fb01` 仍 in-progress 待执行者认领·**V7 前必修**）+ **T-PROFILE-FOLLOWS**（ready·零风险 bench·不改产品）→ 两任务 done 后 V7 全前置满足 → V7（verify-only·四横屏全链 + 用户轻签收·签收页并入 TERM-FEEDBACK 等 C 波签收项·V6 同款同屏验收页）→ v1.3 终局裁定。
 > - **下一步**：执行者认领 T-VIEW-SEAT（可与 T-PROFILE-FOLLOWS 组一批清完）→ 审查者按 R-WAVE8 审 → V7 执行 → 签收+裁定。
+
+> **A 波收官记录（审查者·2026-07-08·T-VIEW-SEAT + T-PROFILE-FOLLOWS 合并）**：
+> - **T-VIEW-SEAT 裁定：done `1a26839`**（`--no-ff` merge·合并前 149/769 绿 + typecheck 净·合并后 149/770 绿 + typecheck 净·打回 0 轮·回扫 0/0/1非阻断已清理：test/ui/bidding-view.test.ts:5 stale `swapLegacySideText` 注释已删·分支末态 `3bb9243`·worktree+分支已清）。
+> - **T-PROFILE-FOLLOWS 裁定：done `d851925`**（`--no-ff` merge·仅增 2 新文件 `test/bench/legal-follows.bench.ts` + report·合并后 149/770 绿 + typecheck 净·打回 0 轮·回扫 0/0/0·分支末态 `d17c142`·worktree+分支已清）。
+> - **A 波 5/5 全闭环**：T-MEMORY-REAL `done 408a2ea` + T-RUNTIME-SPLIT `done 6cc314f` + T-DOCS-SYNC `done 081afe8` + T-VIEW-SEAT `done 1a26839` + T-PROFILE-FOLLOWS `done d851925`。
+> - **V7 全前置满足**：A 波 5/5 + B 波 3/3 + C 波 7/7 = 15/15 全 done。
+> - **最终基线**：main HEAD `01b29d5`·149 files / 770 tests 绿 + typecheck 净 + `git diff --check` 净。
+> - **下一步**：交规划者派发 V7（verify-only·四横屏全链 + 用户轻签收·V6 同款同屏验收页）→ v1.3 终局裁定。
