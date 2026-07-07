@@ -11,13 +11,6 @@ export function seatDisplayName(seat: number): string {
   return `座位${seat + 1}`;
 }
 
-export function swapLegacySideText(text: string): string {
-  return text
-    .replace(/左家/g, '__DDZ_RIGHT__')
-    .replace(/右家/g, '左家')
-    .replace(/__DDZ_RIGHT__/g, '右家');
-}
-
 export function visualSideForSeat(seat: SeatIndex): SeatVisualSide {
   if (seat === 0) return 'hero';
   return seat === 1 ? 'right' : 'left';
