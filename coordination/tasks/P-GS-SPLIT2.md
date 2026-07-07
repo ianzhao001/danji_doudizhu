@@ -1,6 +1,7 @@
 # P-GS-SPLIT2 — game-scene-skeleton 二次 move-only 拆分（1670 → <800）
 
 - 状态：blocked（等 T-UIHELPERS 落 main——共享化先缩体积，同域串行）
+- **skeleton 漂移域约束已解除（规划者·2026-07-07）**：C 波七任务全 done（PAUSE-GATE/LIVE-MULT/ADVANCE-REENTRY/RESUME-REPLAY/HUD-LIVE/TERM-FEEDBACK/LASTACT-LEGIBILITY），改 skeleton 的 C 波 UI 链已全部先行合入 main——本任务唯一剩余前置 = T-UIHELPERS done；届时自最新 main 建分支（拆分基线含 C 波全部接线：resume 重建/顶栏 live/终止反馈+暂停接线）。
 - 任务模式：editor-evidence（move-only·P-G3① 纪律照抄）
 - 文件域（**只允许改这些**）：
   - `assets/scripts/ui/components/game-scene-skeleton.ts`

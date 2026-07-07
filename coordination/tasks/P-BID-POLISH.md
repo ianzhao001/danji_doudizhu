@@ -20,7 +20,8 @@
 
 **② 观感微调**（V4-R3 起登记的非硬伤观察）：
 - 顶部右角**半裁小徽标**修复（定位该节点：溢出屏缘/被裁的 badge——修正定位或尺寸，四档核）；
-- playing **左列密度**微调（强度/剩牌/左家名牌四层堆叠区适度拉开呼吸感——微调间距，不重排结构、不破 T-LAYOUT4 无重叠契约）。
+- playing **左列密度**微调（强度/剩牌/左家名牌四层堆叠区适度拉开呼吸感——微调间距，不重排结构、不破 T-LAYOUT4 无重叠契约）；
+- **termination 按钮 decorated 收编**（T-TERM-FEEDBACK 视觉审②记录·2026-07-07）：`termination-feedback-lobby/restart` 未入 `isDecoratedButton` 名单 → 默认 `btnSecondaryV13` 压扁绘制致顶部宝石高光与居中白字轻微交叠（四档一致·可辨认·非硬伤）。修法一行：进 decorated 名单（labelY=-8 避顶饰）或 `buttonSkinPath` 特判；修后补 844×390 异常终止截图对照。**注意 P-GS-SPLIT2 拆分后该函数可能已迁 `game-scene/*.ts`，按拆后落点改**。
 
 ## 红线（C 波扩 spec 增补）
 - **G4 出牌建议保持默认关**（`advisorEnabled=false` 不改·红线·用户裁决 2026-07-07）：本任务**不**改出牌建议默认值、不加首局引导；只接叫抢建议 + 对齐阈值。

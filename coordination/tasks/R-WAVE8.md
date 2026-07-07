@@ -18,8 +18,11 @@
 - [ ] `RoundRuntime` 公共接口零变化；新模块不入 flow/index 桶；`--color-moved=zebra` 纯搬移、发现顺手改=打回。
 - [ ] runtime 全家测试（hardening/diagnostics/resume/bidding-visibility/exceptions）零改动全绿；全量零回归。
 
-## R:T-VIEW-SEAT（常规）
-- [ ] 种子未改（`7afd853`）；5 用例绿；仅 ai-thinking-view.ts+report；与 `seat-display.ts` 语义一致（offset1=右/2=左）。
+## R:T-VIEW-SEAT（常规·F3 扩域 2026-07-07）
+- [ ] 种子未改（规划者种子 commit：ai-thinking 改种 `a89320f` + bidding-view 侧别改种 `9e8fb01`）；ai-thinking 5 + bidding-view 7 用例全绿（侧别 2 红转绿）。
+- [ ] 文件域仅 `ai-thinking-view.ts` + `bidding-view.ts` + `game-scene/bid-actions-renderer.ts` + `game-scene/seat-display.ts` + report；与 `seatDisplayName` 真相源一致（1=右/2=左）。
+- [ ] **F3 单轨化核**：bidding-view seatLabel 源头改正；bid-actions-renderer 去 `swapLegacySideText` 包装与 import；seat-display 删该函数（`seatDisplayName`/`visualSideForSeat`/`dropZoneForSeat` 零 diff）；全仓 `rg swapLegacySideText` **0 命中**。
+- [ ] 报告含渲染字符串等价自证（swap(legacy)≡fixed 逐席对照·无需截图）；纯岛零 `cc`；全量+typecheck 零回归。
 
 ## R:T-PROFILE-FOLLOWS（常规）
 - [ ] **产品代码零改动**；bench 不入 vitest 默认套件（跑套件时长不变）；数据可复现（命令/seed/环境记录）；报告只有数据无优化实现。
