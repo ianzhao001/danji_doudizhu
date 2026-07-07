@@ -65,8 +65,9 @@ export function renderCardMemory(
   const panelWidth = ctx.memoryExpanded ? Math.min(204, layout.memoryDock.width + 86) : layout.memoryDock.width;
   const panelHeight = ctx.memoryExpanded ? 96 : layout.memoryDock.height;
   const pos = ctx.rectPoint(layout.memoryDock, canvas, 0.5, ctx.memoryExpanded ? 1.8 : 0.5);
+  const verticalBreath = ctx.isLandscape(canvas) && !ctx.memoryExpanded ? -8 : 0;
   const root = ctx.ensureNode('hud-card-memory', ctx.uiRoot);
-  root.setPosition(pos.x, pos.y, 0);
+  root.setPosition(pos.x, pos.y + verticalBreath, 0);
   addUiTransform(root, panelWidth, panelHeight);
   drawPanel(root, panelWidth, panelHeight, new Color(42, 54, 62, 168));
 
@@ -83,7 +84,7 @@ export function renderCardMemory(
     const col = index % cols;
     const line = Math.floor(index / cols);
     const x = -panelWidth / 2 + 16 + cellWidth / 2 + col * cellWidth;
-      const y = panelHeight / 2 - 44 - line * 19;
+    const y = panelHeight / 2 - 44 - line * 19;
     const text = `${row.rankLabel}${row.remaining}`;
     const item = ctx.addLabel(text, x, y, 12, root, cellWidth, 22, `hud-memory-${index}`);
     item.color = row.exhausted ? new Color(255, 255, 255, 112) : new Color(255, 250, 228, 255);
