@@ -38,6 +38,7 @@ import { cueForFlowEvent, type CueId } from '../event-cues';
 import { decideCuePlayback } from '../audio-gate';
 import { dealCardDelay, playFlyFromTo, pulseParams } from '../animation-params';
 import { clearSelection, isSelected, toggle } from '../selection';
+import { rebuildRecentEvents } from '../resume-rebuild';
 import { deriveScreenVM } from '../screen-view';
 import { emptyToasts, pushToast, tickToasts, type ToastQueue } from '../toast-queue';
 import { deriveAiThinking } from '../ai-thinking-view';
@@ -374,6 +375,7 @@ export class GameSceneSkeleton extends Component {
     }
 
     this.fullGameEvents = resume?.events.slice() ?? [];
+    this.recentEvents = rebuildRecentEvents(this.fullGameEvents);
     this.runtime = resume ? resumeRoundRuntime(resume, config) : startRoundRuntime(config);
     this.unsubscribe = this.runtime.onEvent((event) => {
       if (event.type === 'deal' || event.type === 'redeal') {
