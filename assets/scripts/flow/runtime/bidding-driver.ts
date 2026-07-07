@@ -72,6 +72,7 @@ export interface RuntimeDriverContext {
   settledNotified: boolean;
   paused: boolean;
   pauseRequested: boolean;
+  advanceLoopRunning: boolean;
   persist?: (payload: { round: RoundState; heroSeat: SeatIndex; bidMultiplier: number; events: GameEvent[] }) => void;
   onSettled?: (finish: RoundFinishInput) => void;
   emit(event: FlowEvent, bucket?: FlowEvent[]): void;
@@ -203,6 +204,8 @@ export async function advanceRuntimeUntilPause(
   runtime: RuntimeDriverContext,
   bucket?: FlowEvent[],
 ): Promise<void> {
+  if (runtime.advanceLoopRunning) return;
+  runtime.advanceLoopRunning = true;
   try {
     let steps = 0;
     while (runtime.currentPhase !== 'disposed') {
@@ -264,6 +267,8 @@ export async function advanceRuntimeUntilPause(
     }
   } catch (error) {
     terminateRuntimeWithError(runtime, error);
+  } finally {
+    runtime.advanceLoopRunning = false;
   }
 }
 

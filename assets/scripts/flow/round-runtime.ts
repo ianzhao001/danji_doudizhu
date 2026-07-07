@@ -107,6 +107,7 @@ class RoundRuntimeImpl implements RoundRuntime {
   private replayClosed = false;
   private paused = false;
   private pauseRequested = false;
+  private advanceLoopRunning = false;
 
   constructor(config: RuntimeConfig, resume?: ResumeSnapshot) {
     const policies = levelPolicies(config.levels);
