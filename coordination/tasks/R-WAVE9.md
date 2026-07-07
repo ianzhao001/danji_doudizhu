@@ -47,7 +47,7 @@
 - [ ] 全量零回归（含 `screen-view*`/`view-model-immutability`）。
 
 ## R:T-TERM-FEEDBACK（常规·双层视觉预审 + 暂停接线骑士·2026-07-07 规划者种子期口径修订）
-- [ ] 种子未改；`termination-feedback` 全绿（4 红转绿 + 1 绿锚·钉纯岛 `deriveTerminationFeedback` + toast-queue 复用目标）。
+- [ ] 种子未改；`termination-feedback` 全绿（4 红转绿 + 2 绿锚·钉纯岛 `deriveTerminationFeedback` + toast-queue 复用目标 pushToast 上限 3/tickToasts 过期）。
 - [ ] **前置核验**：T-ADVANCE-REENTRY 已 `done 601e9fe`（flow 防重入先行·否则暂停接线打开双循环窗口）。
 - [ ] 文件域仅 **新 `ui/termination-feedback-view.ts`（纯岛·禁 cc）** + `game-scene-skeleton.ts` + report；`flow/`/`game/`/`rules/`/`result-overlay-renderer.ts`/`pause-menu.ts`/`toast-queue.ts` 零 diff。
 - [ ] 纯岛判定为**正向清单** `reason ∈ {redealExhausted, error}`（**非 `!== 'settled'`**——玩家主动退出 dispose 时 reason=null 不得弹"异常终止"·种子③钉死）；文案两条固定（重发耗尽/内部错误）；skeleton update 经纯岛决策 → pushToast + 去重 flag + 返回大厅/重开按钮。
