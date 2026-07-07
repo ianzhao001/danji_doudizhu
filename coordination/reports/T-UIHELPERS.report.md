@@ -114,6 +114,16 @@ diffCount: 0
 
 执行者自审仅覆盖机械视觉硬伤，不替代规划者视觉审，也不替代用户主观终审。
 
+## 规划者视觉审第二层（Opus · 2026-07-07 · **PASS**）
+
+> 机械重构等价性 = 本任务视觉审的唯一命题：before 基线为 main `c5d3029`（C 波验收过的画面），若 after 与 before 逐像素一致则不可能引入新硬伤；剩余风险仅「一致地坏」，以目检兜底排除。
+
+- **像素 diff 独立重算（不采信报告数字）**：规划者用 PIL `ImageChops.difference` 亲算全部 **48 对**（4 视口 × 11 常规 + 4 视口 × 1 pause）——`missing=0`、`diffPairs=0`，每像素 RGBA 完全一致。文件名清单 before/after 逐一对齐。
+- **summary 独立核验**：4 份 summary × 4 视口（844×390/812×375/915×412/780×360）全部 `productErrors=[]` + `failedResponses=[]`；before/after 同 seed=`20260705`（同局面可比）；覆盖 lobby/bidding/playing/settled/pause 相位。
+- **目检兜底（防「一致地坏」）**：contact sheet 16 格全景 + 844×390 lobby/playing/settlement/pause 全尺寸 + 780×360 playing 最窄档全尺寸，四类硬伤逐类核销——① 文字重叠/溢出：零（面板/名牌/顶栏/手牌行各归其位）② 裸文字按钮：零（lobby 三面板、出牌/不要/提示、结算双按钮、暂停六按钮皮肤全在位，disabled 灰皮肤正确）③ 视觉错位/裁切：零（对照历史基线画面结构一致）④ 低对比/不可读：零（难度描述小字、结算明细、最窄档均可读）。
+- **文件域 sanity**：diff 恰 5 文件全在声明域（ui-helpers +161 / strings +63 / skeleton / lobby / report），规模与机械重构 + 文案迁移相称；代码逐行正确性归审查者。
+- **结论：规划者视觉审 PASS。** 双层视觉预审闭合（执行者自审 + 规划者第二层），转审查者按 R-WAVE8 `R:T-UIHELPERS` 审代码与证据（grep 文案零漂移 / addUiButton 0 命中如实记录 / 机械替换逐行核 / 全量双绿）。
+
 ## 测试与类型检查
 
 ```
