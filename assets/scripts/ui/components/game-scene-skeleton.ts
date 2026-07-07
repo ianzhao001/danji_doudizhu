@@ -40,6 +40,7 @@ import { dealCardDelay, playFlyFromTo, pulseParams } from '../animation-params';
 import { clearSelection, isSelected, toggle } from '../selection';
 import { rebuildRecentEvents } from '../resume-rebuild';
 import { deriveScreenVM } from '../screen-view';
+import { deriveTerminationFeedback } from '../termination-feedback-view';
 import { emptyToasts, pushToast, tickToasts, type ToastQueue } from '../toast-queue';
 import { deriveAiThinking } from '../ai-thinking-view';
 import { askQuit, cancelQuit, closeMenu, initialPause, openMenu, type PauseState } from '../pause-menu';
@@ -206,6 +207,7 @@ function phaseText(phase: string): string {
   if (phase === 'bidding') return '叫地主';
   if (phase === 'playing') return '对局中';
   if (phase === 'settled') return '本局结算';
+  if (phase === 'disposed') return '已终止';
   return phase;
 }
 
@@ -258,6 +260,9 @@ export class GameSceneSkeleton extends Component {
   private settings: Settings = defaultSettings();
   private statusText = '';
   private submitting = false;
+  private terminationFeedbackNotified = false;
+  private terminationFeedbackActionsVisible = false;
+  private terminationFeedbackText: string | null = null;
   private readonly spriteFrames = new Map<string, SpriteFrame>();
   private lastHandSignature = '';
   private lastPlayAreaSignature = '';
@@ -300,6 +305,7 @@ export class GameSceneSkeleton extends Component {
     this.uiTickRenderMs += deltaMs;
 
     let shouldRender = this.tickToastState();
+    if (this.pollTerminationFeedback()) shouldRender = true;
     if (this.dealAnimationLockMs > 0) {
       const nextLock = Math.max(0, this.dealAnimationLockMs - deltaMs);
       if (nextLock === 0) shouldRender = true;
@@ -335,6 +341,9 @@ export class GameSceneSkeleton extends Component {
     this.pauseState = initialPause;
     this.renderedPauseStage = 'closed';
     this.submitting = false;
+    this.terminationFeedbackNotified = false;
+    this.terminationFeedbackActionsVisible = false;
+    this.terminationFeedbackText = null;
     this.animatedToastIds.clear();
     this.statusText = '';
     this.lastHandSignature = '';
@@ -443,9 +452,10 @@ export class GameSceneSkeleton extends Component {
     if (showTransientHud) this.renderTurnTimer(layout, canvas);
     if (phase === 'playing') this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, layout, canvas);
     if (showTransientHud) this.renderToasts(layout, canvas);
+    this.renderTerminationFeedbackActions(layout, canvas);
     this.renderResult(vm.result, handCounts, layout, canvas);
     if (!vm.result) {
-      this.renderPauseControl(layout, canvas);
+      if (phase !== 'disposed') this.renderPauseControl(layout, canvas);
       this.renderPauseOverlay(canvas);
     }
     this.endRenderDiff();
@@ -818,6 +828,32 @@ export class GameSceneSkeleton extends Component {
     });
   }
 
+  private renderTerminationFeedbackActions(_layout: TableRegions, canvas: { width: number; height: number }): void {
+    if (!this.terminationFeedbackActionsVisible) return;
+    const panelWidth = Math.min(340, Math.max(300, canvas.width - 96));
+    const panelHeight = 110;
+    const panelScreenY = Math.min(canvas.height - 78, Math.max(214, canvas.height * 0.58));
+    const pos = this.screenPoint(canvas, canvas.width / 2, panelScreenY);
+    const panel = this.ensureNode('termination-feedback-actions-runtime', this.uiRoot!);
+    panel.setPosition(pos.x, pos.y, 0);
+    panel.setScale(1, 1, 1);
+    addUiTransform(panel, panelWidth, panelHeight);
+    this.drawPanelSkin(panel, panelWidth, panelHeight);
+    const backing = this.ensureNode('termination-feedback-backdrop', panel);
+    backing.setPosition(0, 0, 0);
+    addUiTransform(backing, panelWidth - 18, panelHeight - 16);
+    const graphics = backing.getComponent(Graphics) ?? backing.addComponent(Graphics);
+    graphics.clear();
+    graphics.fillColor = new Color(255, 246, 250, 238);
+    graphics.roundRect(-(panelWidth - 18) / 2, -(panelHeight - 16) / 2, panelWidth - 18, panelHeight - 16, 8);
+    graphics.fill();
+    backing.setSiblingIndex(1);
+    this.addLabel(this.terminationFeedbackText ?? '本局已终止', 0, 28, 16, panel, panelWidth - 38, 30, 'termination-feedback-title', BRIGHT_PANEL_TEXT);
+    this.addButton('返回大厅', -72, -28, 126, 54, true, () => director.loadScene('lobby'), panel, 'termination-feedback-lobby');
+    this.addButton('重开', 72, -28, 126, 54, true, () => this.startGame(true), panel, 'termination-feedback-restart');
+    panel.setSiblingIndex(this.uiRoot!.children.length - 1);
+  }
+
   private renderResult(
     result: ReturnType<typeof deriveScreenVM>['result'],
     handCounts: [number, number, number],
@@ -907,11 +943,13 @@ export class GameSceneSkeleton extends Component {
 
   private openPauseMenu(): void {
     this.pauseState = openMenu(this.pauseState);
+    this.runtime?.pause();
     this.render();
   }
 
   private closePauseMenu(): void {
     this.pauseState = closeMenu(this.pauseState);
+    this.runtime?.resume();
     this.render();
   }
 
@@ -1350,6 +1388,21 @@ export class GameSceneSkeleton extends Component {
     const activeIds = new Set(this.toasts.items.map((toast) => toast.id));
     this.animatedToastIds = new Set(Array.from(this.animatedToastIds).filter((id) => activeIds.has(id)));
     return before !== this.toasts.items.map((toast) => toast.id).join('|');
+  }
+
+  private pollTerminationFeedback(): boolean {
+    if (!this.runtime) return false;
+    const feedback = deriveTerminationFeedback({
+      phase: this.runtime.phase(),
+      reason: this.runtime.terminationReason(),
+      alreadyNotified: this.terminationFeedbackNotified,
+    });
+    if (!feedback) return false;
+    this.terminationFeedbackNotified = true;
+    this.terminationFeedbackActionsVisible = true;
+    this.terminationFeedbackText = feedback.text;
+    this.toasts = pushToast(this.toasts, feedback.text, this.toastClockMs);
+    return true;
   }
 
   private pushEventToast(event: FlowEvent): void {
