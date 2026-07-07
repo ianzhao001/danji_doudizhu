@@ -933,7 +933,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-UIHELPERS | B | editor-evidence(机械重构) | `ui/components/ui-helpers.ts` + `game-scene-skeleton.ts` + `lobby-scene.ts` + `ui/strings.ts` + report | —（B 波首任务·C 波 UI 链已全合 skeleton 竞写解除 2026-07-07） | `task/T-UIHELPERS`（基点 main `c5d3029`·实现 `480b2e4`·规划者视觉审②PASS `c5f5756`·审查 `7dda3ea`：48 对像素 diff=0·73 key 零漂移·drawPanel 5 消费未动·全量回扫 0 致命） | done 30a9e74 |
 | P-GS-SPLIT2 | B | move-only 强化(editor-evidence) | `game-scene-skeleton.ts` + 新 `game-scene/*.ts` + `ui/strings.ts`(rider·预计零改动) + report | T-UIHELPERS（done `30a9e74` ✅·skeleton 漂移域已解锁） | `task/P-BID-POLISH`（批次合并·基点 main `c4d1156`·实现 `6343846`·规划者视觉审②PASS·审查 `8045e96`：move-only 验证·C 波接线原样搬迁·T-UIHELPERS 消费确认·skeleton 768 行·全量回扫 0/0/0） | done 7a1b022 |
 | P-BID-POLISH | B | editor-evidence(双层视觉预审从严·批次连做) | `game-scene-skeleton.ts` + `game-scene/*.ts` + `ai/bidding-advisor.ts`(G3) + `bidding-levels.ts`(仅 export 一词) + `test/ai/bidding-advisor.test.ts`(种子搬运) + report（+termination rider+dead 条目顺手删） | P-GS-SPLIT2（同窗批次前序·V7 最后前置·done 后 V7 全前置满足） | `task/P-BID-POLISH`（执行者自 SPLIT2 尖建·种子 `58ebc05`·实现 `a87dd67`·规划者视觉审②PASS·审查 `8045e96`：bidding-levels 仅 export·bidding.ts 零改动·adviseBid 三参全更新·独立开关·种子 diff 空·全量回扫 0/0/0） | done 7a1b022 |
-| V7 | C | verify-only | `reports/V7.report.md` + `reports/V7-*.png` | 全部 done | `task/V7`（届时自 main 建） | blocked |
+| V7 | C | verify-only | `reports/V7.report.md` + `reports/V7-*.png` | 全部 done | `task/V7`（已建自 main `b204b0b`） | **ready**（V7 全前置满足·15/15 全 done） |
 | T-PAUSE-GATE | C | 高风险(改产品码·flow 接口) | `flow/round-runtime.ts` + `flow/runtime/bidding-driver.ts` + report | —（C 波首任务） | `task/T-PAUSE-GATE`（已建自 main `411c972`） | done 7aa5adf |
 | T-LIVE-MULT | C | 高风险(改共享契约·game/types)·**三闸** | `game/types.ts` + `game/core.ts` + `flow/runtime/bidding-driver.ts`(runtimeSnapshot enrich) + report | T-PAUSE-GATE（done 7aa5adf·共域 bidding-driver） | `task/T-LIVE-MULT`（已建自 main `f2faf02`·种子 `7de950a`·实现 `152c38e`·审查 `053de68`） | done 8637f6a |
 | T-ADVANCE-REENTRY | C | 高风险(纯逻辑·flow 推进核心·裁量三闸)·**三闸** | `flow/runtime/bidding-driver.ts` + `flow/round-runtime.ts` + report | T-LIVE-MULT（done 8637f6a·共域 bidding-driver）·须先于 T-TERM-FEEDBACK 接线合 | `task/T-ADVANCE-REENTRY`（已建自 main `1c9bdc9`·种子 `4b8a735`·实现 `69468e5`·审查 `3a97a02`） | done 601e9fe |
@@ -1044,5 +1044,18 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > - **T-PROFILE-FOLLOWS 裁定：done `d851925`**（`--no-ff` merge·仅增 2 新文件 `test/bench/legal-follows.bench.ts` + report·合并后 149/770 绿 + typecheck 净·打回 0 轮·回扫 0/0/0·分支末态 `d17c142`·worktree+分支已清）。
 > - **A 波 5/5 全闭环**：T-MEMORY-REAL `done 408a2ea` + T-RUNTIME-SPLIT `done 6cc314f` + T-DOCS-SYNC `done 081afe8` + T-VIEW-SEAT `done 1a26839` + T-PROFILE-FOLLOWS `done d851925`。
 > - **V7 全前置满足**：A 波 5/5 + B 波 3/3 + C 波 7/7 = 15/15 全 done。
-> - **最终基线**：main HEAD `01b29d5`·149 files / 770 tests 绿 + typecheck 净 + `git diff --check` 净。
+> - **最终基线**：main HEAD `b204b0b`·149 files / 770 tests 绿 + typecheck 净 + `git diff --check` 净。
 > - **下一步**：交规划者派发 V7（verify-only·四横屏全链 + 用户轻签收·V6 同款同屏验收页）→ v1.3 终局裁定。
+
+> **V7 派发记录（规划者·2026-07-08·V7 全前置满足·15/15 全 done）**：
+> - **分支已建**：`task/V7` 自 main `b204b0b`（verify-only·不改产品码/测试·仅落报告+证据）。
+> - **main 基线**：149 files / 770 tests 绿 + typecheck 净。
+> - **V7 任务要点**（详见 `tasks/V7.md`）：
+>   1. 固定 seed `20260705` 四横屏全相位 e2e（v1.2 全部不变量回归 + 本版新面：叫抢建议面板开关两态、微调项）；`productErrors=[]`。
+>   2. AI 新基线记账：真记牌经 `test/selfplay/difficulty.ts` harness 跑胜率差对照 v1.2（Hard−Normal +0.133 / Hard−Simple +0.633——期望同向或更优·记录新值为 v1.3 基线）。
+>   3. 拆分/共享化视觉等价抽查（对照 T-UIHELPERS/P-GS-SPLIT2 基线截图）。
+>   4. profiling 数据归档复述 + 规划者剪枝裁定结果记录（T-PROFILE-FOLLOWS ratio 4.4% < 40% → 不剪枝·归档）。
+>   5. **同屏验收页**（沿 V6 `build/v6-signoff.html` 布局·规划者记忆 `user-signoff-page-layout`）：内嵌实机 + 签收卡片（叫抢建议观感 / 微调项 / 整体手感 / AI 更聪明了吗）+ 证据分组 → **用户轻签收**。
+> - **审查按 R-WAVE8 R:V7**（verify-only·diff 仅 reports/V7*·四横屏全相位 e2e + 不变量回归 + 新面证据 + AI 新基线表 + 同屏验收页产出 + 用户轻签收项列明不代判）。
+> - **终点**：V7 done + 用户轻签收 = v1.3 终局裁定（规划者版本终局裁定·BOARD 记裁定·发布归档）。
+> - **下一步**：执行者认领 V7（`./coordination/agentctl.sh work V7`）→ 审查者按 R-WAVE8 R:V7 审 → 用户轻签收 → 规划者终局裁定。
