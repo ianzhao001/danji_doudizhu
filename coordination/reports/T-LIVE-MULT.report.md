@@ -2,7 +2,7 @@
 
 - 实现方标识：Codex / GPT-5
 - 分支：`task/T-LIVE-MULT`
-- 状态：approved-pending-planner（三闸高风险·审查者已审毕·排队待规划者结构性把关）
+- 状态：done 8637f6a（三闸高风险·审查者 approved-pending-planner → 规划者把关 approved → 审查者合并完成）
 
 ## 改了哪些文件
 - `assets/scripts/game/types.ts`
@@ -106,15 +106,22 @@ $ git status --short --untracked-files=all
 ## 阻塞升级
 - 不适用。
 
-## 合并证据（approved 后由审查者回填）
+## 合并证据（审查者回填）
 - 合并前回归（worktree 复跑·2026-07-07 13:25 CST）：
   - `npm --prefix test test -- snapshot-live-multiplier`：3/3 绿。
   - `npm --prefix test test`：145/753 绿。
   - `npm --prefix test run typecheck`：passed。
   - `git diff --check main..task/T-LIVE-MULT`：净。
-- merge commit：待规划者结构性把关认可后由审查者回填。
-- BOARD 状态：approved-pending-planner（审查者已置）。
-- 规划者批量结构性把关（仅高风险任务）：待规划者回填。
+- 规划者三闸结构性把关（main `10c1387`·BOARD「C 波把关记录 ②」）：
+  - 逐项亲核 diff（分支 `053de68`·产品 delta 恰 3 文件 6 行）——① `GameSnapshot` 纯加法 2 可选字段·消费方零回退·145/753 全绿证无深等断言碰壁 ② `game/core.ts` snapshot 单行 `bombsPlayed: state.bombsPlayed`·两参签名不动·纯 game 不填 bidMultiplier ③ `runtimeSnapshot` spread-enrich 源=`runtime.bidMultiplier` 非 `bidding.multiplier`（resume-safe）④ 红线文件零 diff·game 零 import flow ⑤ 种子零 diff ⑥ 规划者 worktree 独立复跑 145/753 + typecheck 净。→ BOARD 置 `approved`。
+- 3-way BOARD 冲突解决：分支建于 `f2faf02`（早于 main `10c1387` 的把关记录提交），BOARD 第 938 行两侧同改→`git merge main` 后冲突取 main 版（`git checkout --theirs coordination/BOARD.md`）·分支行信息已并入 main 行·续派/把关记录只在 main·worktree 重跑双绿后提交 `f6b5dbd`。
+- 合并序列（main 工作树·2026-07-07 13:37–13:39 CST）：
+  - 合并前 main 双闸：144/750 绿 + typecheck 净。
+  - `agentctl.sh claim T-LIVE-MULT` → `7beb1af`。
+  - `agentctl.sh merge T-LIVE-MULT` → merge commit `8637f6a`（`--no-ff`·5 files changed, +295/-1）。
+  - `agentctl.sh release T-LIVE-MULT` → `8e89501`·分支 `task/T-LIVE-MULT` 已删·BOARD → `done 8637f6a`。
+- 合并后 main 双闸：**145 文件/753 用例绿 + typecheck 净**（+1 文件 +3 用例=种子 `snapshot-live-multiplier`）。
+- 最终基线：main `8e89501`·145/753 + typecheck 净。
 
 ## 全量回扫（审查者·写 approved 前一次）
 - 回扫范围：全仓 `assets/scripts/` + `test/` + 本任务 diff（2026-07-07 13:26 CST）。
@@ -141,13 +148,22 @@ $ git status --short --untracked-files=all
 ## 回扫升级（转规划者，全量回扫的域外致命 / 拿不准，由审查者填写）
 - 无域外致命，无拿不准。
 
+## 验收披露（审查者合并后回填）
+- 评审结论：**approved**（三闸序列完整：审查者 `approved-pending-planner` `053de68` → 规划者结构性把关 `approved` `10c1387` → 审查者 claim `7beb1af` → merge `8637f6a` → release `8e89501`）。
+- 打回轮次：0。
+- 全量回扫范围与分流结果：全仓 `assets/scripts/` + `test/` + 本任务 diff；域内致命 0 / 域外致命 0 / 拿不准 0。
+- 合并 commit：`8637f6a`（merge `--no-ff`·5 files +295/-1）。
+- 冲突解决记录：BOARD.md 3-way 冲突取 main 版（`git checkout --theirs`）·分支行信息已并入 main 行。
+- 最终测试基线：**145 文件/753 用例绿 + typecheck 净**（main `8e89501`）。
+- 规划者把关记录指针：`coordination/BOARD.md` 尾部「C 波把关记录 ②」。
+
 ## 批次交接记录 / 下一步
 - 所属批次 / 任务号：C 波 / `T-LIVE-MULT`
-- 本回合结论 / 状态：审查者已审毕，置 `approved-pending-planner`；种子 3/3、全量 145/753、typecheck 净、diff-check 净；全量回扫域内/域外/拿不准三项清零。三闸高风险·排队待规划者结构性把关。
-- 下一步找谁：**规划者**（结构性把关认可后改 `approved` → 审查者合并）。
+- 本回合结论 / 状态：**done `8637f6a`**（三闸闭环·审查者已合并·main 基线 145/753 + typecheck 净·打回 0 轮·回扫 0/0/0）。
+- 下一步找谁：**规划者**（种 T-ADVANCE-REENTRY 种子 `test/flow/runtime-advance-reentry.test.ts` 并自含 LIVE-MULT 的 main 建分支派发）。
 - 用户终审配合：不适用。
 - 给下一窗口的可粘贴提示词：
-  > 你是本仓库 `斗地主` 的规划型 AI。T-LIVE-MULT 审查者已置 `approved-pending-planner`（三闸高风险）。先读：`coordination/PROTOCOL.md`、`coordination/tasks/T-LIVE-MULT.md`、`coordination/tasks/R-WAVE9.md` R:T-LIVE-MULT、`coordination/reports/T-LIVE-MULT.report.md`（含全量回扫段+合并证据段）、`coordination/BOARD.md` T-LIVE-MULT 行。分支 `task/T-LIVE-MULT`（`152c38e`·自 main `f2faf02` 建·种子 `7de950a`）。审查者复跑：种子 3/3、全量 145/753、typecheck 净、diff-check 净；文件域仅 `game/types.ts`+`game/core.ts`+`bidding-driver.ts`+report；`RoundState`/`settle()`/`FlowEvent`/`PlayPolicy`/`BidPolicy`/`round-runtime.ts` 零 diff；依赖方向 game 不 import flow；回扫三项清零。请做结构性把关：认可→改 BOARD `approved` 并通知审查者合并；有问题→责令重开。合并后 T-ADVANCE-REENTRY 依赖满足（共域 bidding-driver），可种种子并建分支派发。
+  > 你是本仓库 `斗地主` 的规划型 AI。T-LIVE-MULT **已 done `8637f6a`**（三闸闭环·main `8e89501`·145/753 + typecheck 净）。先读：`coordination/PROTOCOL.md`、`coordination/tasks/R-WAVE9.md`、`coordination/reports/T-LIVE-MULT.report.md`（验收披露+合并证据+冲突解决记录）、`coordination/BOARD.md` T-LIVE-MULT 行 + 「C 波把关记录 ②」。T-ADVANCE-REENTRY 依赖满足（共域 `bidding-driver.ts`），请种 `test/flow/runtime-advance-reentry.test.ts` 种子并自含 LIVE-MULT 的 main 建分支派发。spec `coordination/tasks/T-ADVANCE-REENTRY.md` 已落（高风险·裁量三闸·暂停后重入防护）。
 
 ## 自检（对照验收项）
 - [x] 测试全绿
