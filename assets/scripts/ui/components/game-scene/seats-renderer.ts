@@ -262,8 +262,13 @@ function renderLastActions(
   const rows = deriveLastActions(recentRoundEvents);
   rows.forEach((row) => {
     const pos = lastActionPosition(ctx, row.seat, layout, canvas);
-    const label = ctx.addLabel(row.text, pos.x, pos.y, 12, ctx.uiRoot, pos.width, 24, `last-action-${row.seat}`);
-    label.color = row.text === '—' ? new Color(255, 255, 255, 120) : new Color(255, 244, 209, 230);
+    const root = ctx.ensureNode(`last-action-pill-${row.seat}`, ctx.uiRoot);
+    root.setPosition(pos.x, pos.y, 0);
+    addUiTransform(root, pos.width, 28);
+    drawPanel(root, pos.width, 28, new Color(37, 42, 58, 184));
+
+    const labelColor = row.text === '—' ? new Color(255, 255, 255, 145) : new Color(255, 244, 209, 255);
+    ctx.addLabel(row.text, 0, 1, 12, root, pos.width - 16, 22, `last-action-${row.seat}`, labelColor);
   });
 }
 
@@ -304,7 +309,10 @@ export function lastActionPosition(
   canvas: { width: number; height: number },
 ): { x: number; y: number; width: number } {
   if (seat === HERO_SEAT) {
-    const pos = ctx.screenPoint(canvas, canvas.width / 2, Math.max(layout.tableActionBar.y - 18, layout.heroHandLarge.y - 42));
+    const minY = layout.playArea.y + layout.playArea.height + 12;
+    const maxY = layout.heroHandLarge.y - 30;
+    const screenY = clamp(layout.tableActionBar.y - 24, minY, maxY);
+    const pos = ctx.screenPoint(canvas, canvas.width / 2, screenY);
     return { ...pos, width: 146 };
   }
   const rect = dropZoneForSeat(layout, seat);
