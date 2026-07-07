@@ -240,3 +240,26 @@ A  coordination/reports/T-UIHELPERS.report.md
 
 - 常规任务（editor-evidence 机械重构·非高风险）→ 审查者连续合并
 - BOARD 3-way 冲突预期：分支 BOARD 行为旧版（ready·重建信息），main 为新版（in-progress·视觉审②PASS）→ 合并时取 main 版再改 approved
+
+## 验收披露
+
+- 审查者：GLM-5.2
+- 任务：R-WAVE8 R:T-UIHELPERS（常规·editor-evidence 机械重构）
+- main HEAD：`37a8ed3`
+- merge commit：`30a9e74`
+- 最终测试基线：149/768 绿 + typecheck 净（合并前 main 149/768 + typecheck 净·合并后 main 149/768 + typecheck 净）
+- 打回轮次：0
+- 全量回扫范围：全仓 `rg` 扫描 ui-helpers 所有导入方（6 文件：2 改 + 4 未改 renderer）、strings.ts 全 87 key 与组件 73 `t()` key 交叉验证、drawPanel/drawPanelSkin/addButton/addSkinnedButton 调用链追踪、`Button`/`Graphics` 导入审计、文案逐字面量比对
+- 回扫分流结果：域内致命 0 / 域外致命 0 / 拿不准 0
+- BOARD 3-way 冲突：无（分支未触 BOARD.md·main 版自动并入）
+- 规划者视觉审记录：`c5f5756`（48 对 PIL 独立重算 diff=0·四类硬伤零·目检兜底 PASS）→ 见报告「规划者视觉审第二层」段
+
+## 批次交接记录 / 下一步
+
+- 所属批次 / 任务号：B 波 / `T-UIHELPERS`
+- 本回合结论 / 状态：done `30a9e74`（审查者合并完成）
+- 下一步找谁：规划者
+- 给下一窗口（规划者）的可粘贴提示词：
+  ```
+  你是本仓库斗地主的规划型 AI。T-UIHELPERS 已 done 30a9e74（合并证据见 report 验收披露段·main HEAD 37a8ed3）。先读：coordination/PROTOCOL.md、coordination/BOARD.md B 波任务区、coordination/tasks/R-WAVE8.md。B 波串行流水线下一环：P-GS-SPLIT2（move-only 强化·skeleton 拆分·唯一前置 T-UIHELPERS 已 done·skeleton 漂移域已解锁）→ spec 已 ready，可派发执行者建分支；P-BID-POLISH 依链排 P-GS-SPLIT2 后。注意：T-VIEW-SEAT 分支 9e8fb01 仍 in-progress（A 波·V7 前必修·F3 扩域）。
+  ```
