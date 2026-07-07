@@ -206,3 +206,37 @@ A  coordination/reports/T-UIHELPERS.report.md
 - [x] 全量测试通过
 - [x] typecheck 通过
 - [x] `git diff --check` 通过
+
+## 审查者评审（GLM-5.2 · 2026-07-07）
+
+### 评审结论：approved（0 打回轮次）
+
+- 分支：`task/T-UIHELPERS`（基线 main `bb59483`·实现 `480b2e4`·规划者视觉审②PASS `c5f5756`）
+- 审查基线：main `ddee2e9` → 分支 `c5f5756`
+
+### 逐项核销
+
+1. **文件域**：恰 5 产品文件（ui-helpers.ts +161 / game-scene-skeleton.ts / lobby-scene.ts / strings.ts +63 / report）+ BOARD.md（规划者状态行更新·预期）。test/ 零 diff。✅
+2. **机械替换逐行核**：
+   - `addSkinnedButton`：Button transition/target/interactable/colors、bg sprite SLICED、icon 阈值（skeleton ≥136 / lobby ≥72）、label fontSize/lineHeight/position/width/height 逐参数等价。skeleton 旧版 `selected` 不传 skinPath（2 参回调），lobby 旧版传 `selected`（3 参回调）——共享件通过 `options.selected ?? false` + 回调签名统一处理，两组件行为不变。✅
+   - `addSkinnedSprite`：ensureNode/setPosition/addUiTransform/Sprite Type/sizeMode/load 调用链与旧 `this.addSprite` 逐行等价。skeleton 旧 `loadSprite` 带内部 cache，lobby 新增私有 `loadSprite` 包装 `loadSprite(path, sprite, this.spriteFrames)`。✅
+   - `drawPanelSkin`：`parent.getComponent(Graphics)?.clear()` + `addSkinnedSprite(sliced=true)` + `setSiblingIndex(0)` 与旧实现逐行等价。✅
+3. **文案迁移零漂移**：`rg "[\p{Han}]"` 两组件 0 命中；73 个 `t()` key 全部在 strings.ts 定义（87 key 中 73 被消费·14 为既有 key 供其它组件用）；strings.ts 纯增 63 行无删除；逐字面量比对全部一致（含 `倍数×`/`炸弹×` 前缀、`重点：` 含冒号、`退出对局？` 含问号）。`outcomeLabel === LOBBY_TEXT.win` 等价 `=== '胜'`（值不变·机械迁移非 i18n）。✅
+4. **drawPanel 5 处消费未动**：`drawPanel` 函数体未改；bid-actions-renderer / hud-renderer / result-overlay-renderer / seats-renderer diff 零行；均只导入 `addUiTransform` + `drawPanel`（均未改）。✅
+5. **addUiButton**：全仓 `rg "addUiButton"` 0 命中；报告如实记录"已不存在、无需删"。✅
+6. **Button 导入**：两组件 `\bButton\b` 0 命中；`Graphics` 保留（其它绘制仍用）。✅
+7. **测试/类型检查**：149/768 绿、typecheck 净、`git diff --check` 净。✅
+8. **视觉证据链**（只核链完整性·不亲验图像）：48 对（44 常规 + 4 pause）`diffCount=0`/`missing=0`、4 横屏×5 相位 `productErrors=[]`、规划者 PIL `ImageChops.difference` 独立重算 PASS（c5f5756）、双层视觉预审闭合。✅
+
+### 全量回扫
+
+- **范围**：全仓 `rg` 扫描 ui-helpers 所有导入方（6 文件：2 改 + 4 未改 renderer）、strings.ts 全 key 交叉验证、drawPanel/drawPanelSkin/addButton 调用链追踪、`Button`/`Graphics` 导入审计。
+- **域内致命**：0
+- **域外致命**：0
+- **拿不准**：0
+- 无其它模块回归或交互隐患。
+
+### 合并计划
+
+- 常规任务（editor-evidence 机械重构·非高风险）→ 审查者连续合并
+- BOARD 3-way 冲突预期：分支 BOARD 行为旧版（ready·重建信息），main 为新版（in-progress·视觉审②PASS）→ 合并时取 main 版再改 approved
