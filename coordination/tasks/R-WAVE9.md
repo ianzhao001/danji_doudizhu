@@ -46,14 +46,14 @@
 - [ ] 双层视觉预审：四横屏×三相顶栏截图·零重叠·包裹·对比度；执行者自审表 + 规划者视觉审结论在案。
 - [ ] 全量零回归（含 `screen-view*`/`view-model-immutability`）。
 
-## R:T-TERM-FEEDBACK（常规·双层视觉预审 + 暂停接线骑士）
-- [ ] 种子未改；termination-feedback 4 用例 + pause-wiring 种子全绿（红转绿数以种入为准）。
-- [ ] **前置核验**：T-ADVANCE-REENTRY 已 `done`（flow 防重入先行·否则暂停接线打开双循环窗口）。
-- [ ] 文件域仅 `game-scene-skeleton.ts` + report；`flow/`/`game/`/`rules/`/`result-overlay-renderer.ts`/`pause-menu.ts` 零 diff。
-- [ ] 轮询 `phase()==='disposed' && terminationReason()!=='settled'`；复用既有 toast/overlay·不新建场景/组件/资源；去重一次；settled 不触发。
-- [ ] 暂停接线骑士：openPauseMenu → `runtime.pause()`；完全退出暂停 → `runtime.resume()`；返回大厅/重开走 dispose 不调 resume；暂停菜单内子屏切换不重复调 pause/resume；既有 pauseState 视觉冻结（M3-66）零改动。
-- [ ] 双层视觉预审：异常终止反馈截图·零重叠·按钮包裹·对比度；执行者自审表 + 规划者视觉审结论在案。
-- [ ] 全量零回归。
+## R:T-TERM-FEEDBACK（常规·双层视觉预审 + 暂停接线骑士·2026-07-07 规划者种子期口径修订）
+- [ ] 种子未改；`termination-feedback` 全绿（4 红转绿 + 1 绿锚·钉纯岛 `deriveTerminationFeedback` + toast-queue 复用目标）。
+- [ ] **前置核验**：T-ADVANCE-REENTRY 已 `done 601e9fe`（flow 防重入先行·否则暂停接线打开双循环窗口）。
+- [ ] 文件域仅 **新 `ui/termination-feedback-view.ts`（纯岛·禁 cc）** + `game-scene-skeleton.ts` + report；`flow/`/`game/`/`rules/`/`result-overlay-renderer.ts`/`pause-menu.ts`/`toast-queue.ts` 零 diff。
+- [ ] 纯岛判定为**正向清单** `reason ∈ {redealExhausted, error}`（**非 `!== 'settled'`**——玩家主动退出 dispose 时 reason=null 不得弹"异常终止"·种子③钉死）；文案两条固定（重发耗尽/内部错误）；skeleton update 经纯岛决策 → pushToast + 去重 flag + 返回大厅/重开按钮。
+- [ ] 暂停接线骑士（**无 vitest 种子·CDP 行为证据 + 逐行核**）：openPauseMenu → `runtime.pause()`；完全退出暂停（`closePauseMenu :892`）→ `runtime.resume()`；返回大厅/重开（`restartFromPause :893` 等）走 dispose/startGame 不调 resume；暂停菜单内子屏切换不重复调；既有 pauseState 视觉冻结（M3-66）零改动。CDP 证据四条：暂停 AI 冻结/继续恢复/退出 disposed 不复活/重复开关幂等。
+- [ ] 双层视觉预审：异常终止反馈截图（四横屏）·零重叠·按钮包裹·对比度；执行者自审表 + 规划者视觉审结论在案。
+- [ ] 全量零回归（含 runtime-pause/runtime-advance-reentry/toast-queue）。
 
 ## R:T-LASTACT-LEGIBILITY（常规·editor-evidence·视觉审②存量转派·2026-07-07 增补）
 - [ ] 无种子（无纯逻辑缝）；全量 vitest/typecheck 零回归。
