@@ -10,7 +10,7 @@ export interface AiThinkingView {
 function seatName(seat: SeatIndex, heroSeat: SeatIndex): string {
   if (seat === heroSeat) return '我';
   const offset = (seat - heroSeat + 3) % 3;
-  return offset === 1 ? 'AI 左家' : 'AI 右家';
+  return offset === 1 ? 'AI 右家' : 'AI 左家';
 }
 
 export function deriveAiThinking(

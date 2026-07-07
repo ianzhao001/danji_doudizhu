@@ -22,8 +22,8 @@ function button(id: BiddingButton['id'], label: string, enabled: boolean): Biddi
 
 function seatLabel(seat: SeatIndex): string {
   if (seat === 0) return '你';
-  if (seat === 1) return '左家';
-  return '右家';
+  if (seat === 1) return '右家';
+  return '左家';
 }
 
 function promptForTurn(turn: SeatIndex, viewerSeat: SeatIndex, verb: string): string {
