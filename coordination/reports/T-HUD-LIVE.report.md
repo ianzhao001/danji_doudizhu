@@ -123,3 +123,14 @@
 
 #### 3-way 合并预判
 - merge base `4acaac6`；main `415cbc2` 更新了 BOARD.md（`93cedd1`+`415cbc2` 规划者派发记录）；分支未触 BOARD.md。3-way merge 自动取 main 版·**无冲突预期**。
+
+### 验收披露段（审查者 GLM-5.2·2026-07-07）
+
+- **评审结论**：approved（0 打回·0 域内致命·0 域外致命·0 拿不准）
+- **打回轮次**：0
+- **全量回扫范围与分流结果**：① `screen-view.ts` `deriveTopBar` 新私有函数·`ScreenVM['topBar']` shape 不变·唯一消费者 `skeleton:433` 无影响 ② `badgeMultiplierV13` 既有资源键复用 ③ 顶栏 5 元素重排在 `topBar` zone 内·视觉证据零重叠 ④ 跨模块/跨任务无交互隐患。回扫 0/0/0。
+- **合并 commit**：`62cb1c9`（merge commit·`--no-ff`）
+- **最终测试基线**：main `e3a2adb` — 148 文件/762 用例全绿 + typecheck 净 + diff check 净（合并前 147/759 → 合并后 148/762·+topbar-live-multiplier 种子 3 用例）
+- **3-way 合并**：merge base `4acaac6`·main `7b8735e` 更新 BOARD.md·分支未触 BOARD.md·3-way 自动取 main 版·**零冲突**（与预判一致）
+- **规划者视觉审（双层视觉预审第二层）**：待补录·作为用户审美签收前置
+- **非阻断观察**：无

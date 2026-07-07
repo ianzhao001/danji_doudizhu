@@ -111,3 +111,14 @@
 
 #### 3-way 合并预判
 - merge base `93cedd1`；main `415cbc2` 更新了 BOARD.md（`415cbc2` 规划者批量派发记录）；分支未触 BOARD.md。3-way merge 自动取 main 版·**无冲突预期**。
+
+### 验收披露段（审查者 GLM-5.2·2026-07-07）
+
+- **评审结论**：approved（0 打回·0 域内致命·0 域外致命·1 拿不准→转规划者非阻断）
+- **打回轮次**：0
+- **全量回扫范围与分流结果**：① `renderLastActions` 新增 `last-action-pill-${seat}` root + 子 label·`pruneInactiveChildren` 递归实现保证无孤儿节点 ② `last-action-${seat}` label 名保留→CDP/视觉脚本兼容 ③ **拿不准（非阻断→转规划者）**：`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` 含 `last-action-0/1/2`·改动后 `hideLiveSubtree` 的 `getChildByName` 不再能找到（label 移至 pill 子节点）·但 `renderLastActions` 在 settled 阶段仍被调用并重激活→改动前已是无效操作→净行为不变·建议规划者评估是否需将 `last-action-pill-*` 加入清理列表 ④ 跨模块/跨任务无交互隐患。回扫 0/0/1（拿不准）。
+- **合并 commit**：`595a626`（merge commit·`--no-ff`）
+- **最终测试基线**：main `e3a2adb` — 148 文件/762 用例全绿 + typecheck 净 + diff check 净（T-LASTACT-LEGIBILITY 无种子·测试数不变）
+- **3-way 合并**：merge base `93cedd1`·main `4d3f162` 更新 BOARD.md·分支未触 BOARD.md·3-way 自动取 main 版·**零冲突**（与预判一致）
+- **规划者视觉审（双层视觉预审第二层）**：待补录·作为用户审美签收前置
+- **拿不准转规划者建议单**：`SETTLEMENT_TRANSIENT_HUD_NODE_NAMES` 的 `last-action-0/1/2` 条目在 T-LASTACT-LEGIBILITY 后变为 stale（`hideLiveSubtree` 无法找到 pill 子节点下的 label）·净行为无变化（settled 阶段 `renderLastActions` 重激活）·建议清理列表加入 `last-action-pill-0/1/2` 或调整 `hideLiveSubtree` 搜索策略（非阻断·不阻塞合并）
