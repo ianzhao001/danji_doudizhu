@@ -95,3 +95,12 @@
 - `thresholdFor` 导出: 仅 bidding-advisor.ts + test 消费，无其他消费者受影响
 - `adviseBid` 签名变更: barrel-exports/view-model-immutability 仅 type-only 导入，不受影响
 - 视觉证据链: 四类硬伤全零（规划者视觉审②PASS）·productErrors=[]（四档 e2e + 四档 targeted）
+
+## 验收披露
+
+- 合并 commit: `7a1b022`（merge task/P-BID-POLISH·批次合并含 P-GS-SPLIT2 + P-BID-POLISH）
+- 最终基线: main `bd45b7f`·149 files / 769 tests 绿·typecheck 净
+- 打回轮次: 0
+- 全量回扫: 0 域内致命 / 0 域外致命 / 0 拿不准
+- 批次合并说明: P-GS-SPLIT2 与 P-BID-POLISH 共享分支 `task/P-BID-POLISH`·seed `58ebc05` + impl `a87dd67`·merge commit 同为 `7a1b022`·BOARD 两行均置 `done 7a1b022`
+- 种子搬运验证: diff coordination/seeds/P-BID-POLISH-bidding-advisor.test.ts test/ai/bidding-advisor.test.ts 为空

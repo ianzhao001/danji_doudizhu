@@ -76,3 +76,11 @@
 - 覆盖全仓 + 整批 diff（P-GS-SPLIT2 + P-BID-POLISH 合计 25 文件）
 - 回扫结果: 0 域内致命 · 0 域外致命 · 0 拿不准
 - 视觉证据链: 44 对 PNG diff=0（规划者视觉审②PASS）·productErrors=[]（四档）
+
+## 验收披露
+
+- 合并 commit: `7a1b022`（merge task/P-BID-POLISH·批次合并含 P-GS-SPLIT2 + P-BID-POLISH）
+- 最终基线: main `bd45b7f`·149 files / 769 tests 绿·typecheck 净
+- 打回轮次: 0
+- 全量回扫: 0 域内致命 / 0 域外致命 / 0 拿不准
+- 批次合并说明: P-GS-SPLIT2 与 P-BID-POLISH 共享分支 `task/P-BID-POLISH`·SPLIT2 commit `6343846`·merge commit 同为 `7a1b022`·BOARD 两行均置 `done 7a1b022`
