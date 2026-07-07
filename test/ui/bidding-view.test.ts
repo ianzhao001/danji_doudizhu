@@ -1,8 +1,7 @@
 /**
  * 叫抢视图模型失败测试（架构种入·不可改）。相对措辞契约：轮到你<动作> / 等待<座位><动作>。
  * T-COPY-BID：当前 bidding-view.ts 仍输出「请座位 N 行动」→ 应先红，实现到绿。
- * T-VIEW-SEAT F3 改种（规划者·2026-07-07）：侧别对齐逆时针真相源 seatDisplayName（seat1=右家/seat2=左家）；
- * legacy seat1=左家 + swapLegacySideText 补丁两轨清账后，本断言直接锁源头正确侧别。
+ * T-VIEW-SEAT F3 改种（规划者·2026-07-07）：侧别对齐逆时针真相源 seatDisplayName（seat1=右家/seat2=左家）。
  */
 import { describe, it, expect } from 'vitest';
 import { deriveBiddingView } from '../../assets/scripts/ui/bidding-view';
