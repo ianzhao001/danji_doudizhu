@@ -935,7 +935,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | P-BID-POLISH | B | editor-evidence(双层视觉预审从严) | `game-scene-skeleton.ts` + `game-scene/*.ts` + `ai/bidding-advisor.ts`(G3 骑士) + report | P-GS-SPLIT2 | `task/P-BID-POLISH`（届时自 main 建） | blocked |
 | V7 | C | verify-only | `reports/V7.report.md` + `reports/V7-*.png` | 全部 done | `task/V7`（届时自 main 建） | blocked |
 | T-PAUSE-GATE | C | 高风险(改产品码·flow 接口) | `flow/round-runtime.ts` + `flow/runtime/bidding-driver.ts` + report | —（C 波首任务） | `task/T-PAUSE-GATE`（已建自 main `411c972`） | done 7aa5adf |
-| T-LIVE-MULT | C | 高风险(改共享契约·game/types) | `game/types.ts` + `game/core.ts` + `flow/runtime/bidding-driver.ts`(runtimeSnapshot enrich) + report | T-PAUSE-GATE（共域 bidding-driver） | `task/T-LIVE-MULT`（届时自含 PAUSE-GATE 的 main 建） | blocked·**三闸** |
+| T-LIVE-MULT | C | 高风险(改共享契约·game/types)·**三闸** | `game/types.ts` + `game/core.ts` + `flow/runtime/bidding-driver.ts`(runtimeSnapshot enrich) + report | T-PAUSE-GATE（done 7aa5adf·共域 bidding-driver） | `task/T-LIVE-MULT`（已建自 main `f2faf02`·种子 `7de950a`·提交 `152c38e`） | approved-pending-planner |
 | T-ADVANCE-REENTRY | C | 高风险(纯逻辑·flow 推进核心·裁量三闸) | `flow/runtime/bidding-driver.ts` + `flow/round-runtime.ts` + report | T-LIVE-MULT（共域 bidding-driver）·须先于 T-TERM-FEEDBACK 接线合 | `task/T-ADVANCE-REENTRY`（届时自含 LIVE-MULT 的 main 建） | blocked·**三闸** |
 | T-RESUME-REPLAY | C | 常规(UI 接线·双层视觉预审) | `game-scene-skeleton.ts`(recentEvents 重建+底牌保守) + report | T-LIVE-MULT·须在 P-GS-SPLIT2 前合 | `task/T-RESUME-REPLAY`（届时自含 LIVE-MULT 的 main 建） | blocked |
 | T-HUD-LIVE | C | 常规(UI 接线·双层视觉预审) | `screen-view.ts` + `game-scene-skeleton.ts`(顶栏渲染) + report | T-LIVE-MULT·T-RESUME-REPLAY·须在 P-GS-SPLIT2 前合 | `task/T-HUD-LIVE`（届时自含 RESUME-REPLAY 的 main 建） | blocked |
