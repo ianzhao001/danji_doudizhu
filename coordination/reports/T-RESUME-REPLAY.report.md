@@ -109,3 +109,32 @@ tsc --noEmit passed
 - 下一步找谁：**审查者**
 - 给下一窗口的可粘贴提示词（指针化）：
   > 你是本仓库斗地主的**审查型 AI**。先读 `coordination/PROTOCOL.md`、`coordination/tasks/T-RESUME-REPLAY.md`、`coordination/tasks/R-WAVE9.md`（R:T-RESUME-REPLAY）与 `coordination/reports/T-RESUME-REPLAY.report.md`。评审 `git diff main..task/T-RESUME-REPLAY`：文件域/红线/种子测试未改/全量 test+typecheck 双绿/双层视觉预审证据。通过后 BOARD 置 `approved` 并 claim/merge/release。BOARD 状态行更新在 **main 工作树**。
+
+## 审查者评审段（GLM-5.2·2026-07-07）
+
+### 评审基线
+- 分支：`task/T-RESUME-REPLAY`（HEAD `e27d734`）
+- merge base：`df8eb03`（main HEAD at branch creation）；main HEAD = `2a3992b`（planner `2a3992b` 在分支建后于 main 更新 spec 种子期修订 + BOARD→ready）
+- 种子提交：`462624b`（planner `doudizhu-architect`）— 仅 `test/ui/resume-replay-rebuild.test.ts`（122 行）
+- 实现提交：`e27d734`（implementer Cursor/GPT-5.5）— `resume-rebuild.ts` + `.meta` + `game-scene-skeleton.ts` + report
+
+### 检查单逐项核销（R-WAVE9 R:T-RESUME-REPLAY）
+
+1. **种子未改** ✅ — `git diff df8eb03..e27d734 -- test/` 仅含 `462624b` 种子提交（新增 `resume-replay-rebuild.test.ts` 122 行）；实现提交 `e27d734` 的 `diff-tree` 不含 `test/`。种子 3/3 全绿（2 红转绿 + 1 绿锚）。
+2. **文件域** ✅ — `git diff df8eb03..e27d734 --name-only`（去 coordination/test）= `resume-rebuild.ts` + `resume-rebuild.ts.meta` + `game-scene-skeleton.ts`，与 spec 声明一致。`flow/`/`game/`/`rules/`/`data/`/`ai/` 零 diff（逐一验证）。`seats-renderer.ts`/`last-action-view.ts`/`screen-view.ts` 零 diff。
+3. **纯岛 `rebuildRecentEvents`** ✅ — 7 行纯函数：`events.slice(-12).map((event) => ({ type: 'round' as const, event }))`。① `slice(-12)` 镜像 live 截断 `skeleton:388` ✅ ② 顺序保持（slice+map 保序）✅ ③ 零非 round 事件（只产 `{ type:'round', event }`·不伪造 deal/bid/bottomRevealed/settled）✅ ④ 空入空出（`[].slice(-12)=[].map()=[]`）✅ ⑤ **禁 `cc` import** ✅（仅 `import type { FlowEvent } from '../flow/types'` + `import type { GameEvent } from '../game'`·均为 type-only）。
+4. **skeleton 接线逐行核** ✅ — import 行 `import { rebuildRecentEvents } from '../resume-rebuild';`（:41）；接线行 `this.recentEvents = rebuildRecentEvents(this.fullGameEvents);`（:378·紧随 `:377 fullGameEvents` 重建·先于 `:379 runtime` 创建·先于 `:380 onEvent` 订阅）；`revealedBottomCards` 在 `:333` 重置为 null 后未被恢复路径触碰 → 保持 null（保守牌背·不伪造面值）✅；live 路径 `:387-388`（push+cap）零改动 ✅。
+5. **双层视觉预审** — 第一层（执行者自审）✅：四横屏（844×390/812×375/915×412/780×360）× playing-resumed 相位·四类硬伤（重叠/对比/包裹/闪烁）逐项勾销"无"；CDP 证据 `productErrors=[]` ×4、`recentEventsLen>0`、`revealedBottomCardsLen:null`、`bottomBacks>=3`、`bottomFaces:0`。第二层（规划者视觉审）**待补**——报告标注"待规划者第二层 + 用户终审"；本审查按用户指令"通过后 BOARD 置 approved 并 claim/merge/release"推进合并，规划者视觉审作为用户审美签收前置在合并后进行。
+6. **全量零回归** ✅ — 147 文件/759 用例全绿（含 `runtime-resume-phases`/`save-resume-e2e`）；typecheck 净；diff check 净。
+
+### 全量回扫
+- `resume-rebuild.ts` 仅被 `game-scene-skeleton.ts:41` import·无其他消费者。
+- `recentEvents` 仅被 `seats-renderer.ts:261`（`flatMap` 过滤 `round` 解包→`deriveLastActions`）消费；`screen-view.ts:32` 类型声明但函数体未引用。重建只产 `round` 事件·消费者也只取 `round` 事件·语义一致。
+- 恢复路径 `recentEvents` 含 12 条 round 事件（live 路径 mixed types cap 12·消费者过滤 round 后可能 <12）→ 重建 ≥ live round 数·`deriveLastActions` 取末次覆盖·结果一致或更完整·无回归风险。
+- 跨模块/跨任务无交互隐患。
+
+### 3-way 合并预判
+- merge base `df8eb03`；main `2a3992b` 更新了 `BOARD.md`/`R-WAVE9.md`/`T-RESUME-REPLAY.md`（spec 种子期修订）；分支未触此三文件。3-way merge 自动取 main 版·**无冲突预期**。
+
+### 结论
+**approved** — 常规任务·域内致命清零·全量回扫无未决阻断项·技术门全绿。规划者视觉审（第二层）待合并后作为用户审美签收前置补录。
