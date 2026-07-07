@@ -1,4 +1,4 @@
-import { _decorator, Button, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UITransform } from 'cc';
+import { _decorator, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UITransform } from 'cc';
 import { AiLevel } from '../../ai';
 import {
   deserializeStats,
@@ -29,7 +29,15 @@ import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
 import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
 import { RESOURCE_PATHS, type ResourcePath } from '../asset-keys';
-import { addLabel as addUiLabel, addUiTransform, loadSprite } from './ui-helpers';
+import { t } from '../strings';
+import {
+  addLabel as addUiLabel,
+  addSkinnedButton,
+  addSkinnedSprite,
+  addUiTransform,
+  drawPanelSkin as drawUiPanelSkin,
+  loadSprite,
+} from './ui-helpers';
 
 const { ccclass, property } = _decorator;
 const SETTINGS_KEY = STORAGE_KEYS.settings;
@@ -54,9 +62,52 @@ const BUTTON_SECONDARY_TEXT = new Color(34, 78, 132, 255);
 const BUTTON_DISABLED_TEXT = new Color(118, 108, 114, 180);
 
 const TOGGLE_LABELS: Record<ToggleKey, string> = {
-  sound: '音效',
-  vibration: '震动',
-  animation: '动效',
+  sound: t('settings.sound'),
+  vibration: t('settings.vibration'),
+  animation: t('settings.animation'),
+};
+
+const LOBBY_TEXT = {
+  title: t('lobby.title'),
+  startNewGame: t('lobby.startNewGame'),
+  continueGame: t('lobby.continueGame'),
+  noSave: t('lobby.noSave'),
+  tutorialHeading: t('tutorial.heading'),
+  focusPrefix: t('tutorial.focusPrefix'),
+  playerHand: t('tutorial.playerHand'),
+  biddingPanel: t('tutorial.biddingPanel'),
+  playArea: t('tutorial.playArea'),
+  actionButtons: t('tutorial.actionButtons'),
+  scorePanel: t('tutorial.scorePanel'),
+  currentStep: t('tutorial.currentStep'),
+  previous: t('common.previous'),
+  next: t('common.next'),
+  finish: t('common.finish'),
+  skip: t('common.skip'),
+  help: t('lobby.help'),
+  upScroll: t('common.upScroll'),
+  downScroll: t('common.downScroll'),
+  back: t('common.back'),
+  stats: t('lobby.stats'),
+  records: t('lobby.records'),
+  noCompletedRecords: t('stats.empty'),
+  all: t('common.all'),
+  win: t('common.win'),
+  loss: t('common.loss'),
+  landlord: t('common.landlord'),
+  farmer: t('common.farmer'),
+  newest: t('common.newest'),
+  oldest: t('common.oldest'),
+  noMatchedRecords: t('records.empty'),
+  current: t('common.current'),
+  on: t('common.on'),
+  off: t('common.off'),
+  rounds: t('stats.rounds'),
+  winRate: t('stats.winRate'),
+  netScore: t('stats.netScore'),
+  noRecord: t('records.none'),
+  difficulty: t('settings.difficulty'),
+  normalDifficulty: t('difficulty.normal'),
 };
 
 interface HelpRow {
@@ -77,18 +128,26 @@ type LobbyScreen = 'home' | 'tutorial' | 'help' | 'stats' | 'records';
 function highlightLabel(step: TutorialStep): string {
   switch (step.highlight) {
     case 'playerHand':
-      return '玩家手牌';
+      return LOBBY_TEXT.playerHand;
     case 'biddingPanel':
-      return '叫抢区域';
+      return LOBBY_TEXT.biddingPanel;
     case 'playArea':
-      return '出牌区';
+      return LOBBY_TEXT.playArea;
     case 'actionButtons':
-      return '操作按钮';
+      return LOBBY_TEXT.actionButtons;
     case 'scorePanel':
-      return '结算面板';
+      return LOBBY_TEXT.scorePanel;
     default:
-      return '当前步骤';
+      return LOBBY_TEXT.currentStep;
   }
+}
+
+function toggleText(on: boolean): string {
+  return on ? LOBBY_TEXT.on : LOBBY_TEXT.off;
+}
+
+function summaryText(label: string, value: string | number): string {
+  return `${label} ${value}`;
 }
 
 function wrapText(text: string, charsPerLine: number): string[] {
@@ -160,18 +219,18 @@ export class LobbyScene extends Component {
     this.renderPlaceholderBackground(canvas);
 
     this.setText(this.continueLabel, lobby.continueLabel);
-    this.setText(this.roundsLabel, `局数 ${statsView.rounds}`);
-    this.setText(this.winRateLabel, `胜率 ${statsView.winRatePct}%`);
-    this.setText(this.netScoreLabel, `净分 ${statsView.netScoreLabel}`);
-    this.setText(this.difficultyLabel, `难度 ${difficulty?.label ?? '普通'}`);
-    this.setText(this.latestRecordLabel, recordRows[0]?.scoreLabel ?? '暂无战绩');
+    this.setText(this.roundsLabel, summaryText(LOBBY_TEXT.rounds, statsView.rounds));
+    this.setText(this.winRateLabel, `${summaryText(LOBBY_TEXT.winRate, statsView.winRatePct)}%`);
+    this.setText(this.netScoreLabel, summaryText(LOBBY_TEXT.netScore, statsView.netScoreLabel));
+    this.setText(this.difficultyLabel, summaryText(LOBBY_TEXT.difficulty, difficulty?.label ?? LOBBY_TEXT.normalDifficulty));
+    this.setText(this.latestRecordLabel, recordRows[0]?.scoreLabel ?? LOBBY_TEXT.noRecord);
     this.setHomeLabelsVisible(false);
     this.renderRuntimeControls(settings, {
       hasSavedGame: lobby.hasSavedGame,
-      rounds: `局数 ${statsView.rounds}`,
-      winRate: `胜率 ${statsView.winRatePct}%`,
-      netScore: `净分 ${statsView.netScoreLabel}`,
-      latestRecord: recordRows[0]?.scoreLabel ?? '暂无战绩',
+      rounds: summaryText(LOBBY_TEXT.rounds, statsView.rounds),
+      winRate: `${summaryText(LOBBY_TEXT.winRate, statsView.winRatePct)}%`,
+      netScore: summaryText(LOBBY_TEXT.netScore, statsView.netScoreLabel),
+      latestRecord: recordRows[0]?.scoreLabel ?? LOBBY_TEXT.noRecord,
     });
   }
 
@@ -227,9 +286,9 @@ export class LobbyScene extends Component {
     summary.setPosition(leftX, 0, 0);
     addUiTransform(summary, summaryWidth, panelHeight);
     this.drawPanelSkin(summary, summaryWidth, panelHeight);
-    this.addLabel('斗地主', 0, panelHeight / 2 - 38, 28, summary, summaryWidth - 34, 40, 'home-title');
+    this.addLabel(LOBBY_TEXT.title, 0, panelHeight / 2 - 38, 28, summary, summaryWidth - 34, 40, 'home-title');
     this.addButton(
-      '开始新局',
+      LOBBY_TEXT.startNewGame,
       0,
       panelHeight / 2 - 88,
       summaryWidth - 38,
@@ -241,7 +300,7 @@ export class LobbyScene extends Component {
       'home-start-button',
     );
     this.addButton(
-      home.hasSavedGame ? '继续游戏' : '暂无存档',
+      home.hasSavedGame ? LOBBY_TEXT.continueGame : LOBBY_TEXT.noSave,
       0,
       panelHeight / 2 - 138,
       summaryWidth - 38,
@@ -264,10 +323,10 @@ export class LobbyScene extends Component {
     addUiTransform(settingsPanel, settingsWidth, panelHeight);
     this.drawPanelSkin(settingsPanel, settingsWidth, panelHeight);
     this.addSprite(RESOURCE_PATHS.iconSettings, -settingsWidth / 2 + 34, panelHeight / 2 - 34, 24, 24, settingsPanel, 'home-settings-icon');
-    this.addLabel('设置', 0, panelHeight / 2 - 34, 22, settingsPanel, settingsWidth - 34, 34, 'home-settings-title');
+    this.addLabel(t('lobby.settings'), 0, panelHeight / 2 - 34, 22, settingsPanel, settingsWidth - 34, 34, 'home-settings-title');
     settingsView.toggles.forEach((toggle, index) => {
       this.addButton(
-        `${TOGGLE_LABELS[toggle.key]} ${toggle.on ? '开' : '关'}`,
+        `${TOGGLE_LABELS[toggle.key]} ${toggleText(toggle.on)}`,
         0,
         panelHeight / 2 - 82 - index * 40,
         settingsWidth - 46,
@@ -288,7 +347,7 @@ export class LobbyScene extends Component {
     panel.setPosition(x, y, 0);
     addUiTransform(panel, panelWidth, panelHeight);
     this.drawPanelSkin(panel, panelWidth, panelHeight);
-    this.addLabel('难度', 0, panelHeight / 2 - 34, 22, panel, panelWidth - 34, 34, 'difficulty-title');
+    this.addLabel(LOBBY_TEXT.difficulty, 0, panelHeight / 2 - 34, 22, panel, panelWidth - 34, 34, 'difficulty-title');
 
     const rowWidth = panelWidth - 18;
     const rowPadding = 10;
@@ -343,7 +402,7 @@ export class LobbyScene extends Component {
       });
       if (option.selected) {
         this.addLabel(
-          '当前',
+          LOBBY_TEXT.current,
           currentX,
           rowY,
           12,
@@ -363,21 +422,21 @@ export class LobbyScene extends Component {
     const rightX = buttonWidth / 2 + 6;
     const rowOneY = -panelHeight / 2 + 72;
     const rowTwoY = -panelHeight / 2 + 28;
-    this.addButton('教程', leftX, rowOneY, buttonWidth, 34, true, () => {
+    this.addButton(t('lobby.tutorial'), leftX, rowOneY, buttonWidth, 34, true, () => {
       this.screen = 'tutorial';
       this.tutorialIndex = 0;
       this.render();
     }, parent, false, 'entry-tutorial-button');
-    this.addButton('帮助', rightX, rowOneY, buttonWidth, 34, true, () => {
+    this.addButton(LOBBY_TEXT.help, rightX, rowOneY, buttonWidth, 34, true, () => {
       this.screen = 'help';
       this.helpScrollIndex = 0;
       this.render();
     }, parent, false, 'entry-help-button');
-    this.addButton('战绩', leftX, rowTwoY, buttonWidth, 34, true, () => {
+    this.addButton(LOBBY_TEXT.stats, leftX, rowTwoY, buttonWidth, 34, true, () => {
       this.screen = 'stats';
       this.render();
     }, parent, false, 'entry-stats-button');
-    this.addButton('历史', rightX, rowTwoY, buttonWidth, 34, true, () => {
+    this.addButton(LOBBY_TEXT.records, rightX, rowTwoY, buttonWidth, 34, true, () => {
       this.screen = 'records';
       this.render();
     }, parent, false, 'entry-records-button');
@@ -401,19 +460,19 @@ export class LobbyScene extends Component {
     panel.setPosition(0, 0, 0);
     addUiTransform(panel, panelWidth, panelHeight);
     this.drawPanelSkin(panel, panelWidth, panelHeight);
-    this.addLabel('新手教程', 0, panelHeight / 2 - 34, 22, panel, 240, 34, 'tutorial-heading');
+    this.addLabel(LOBBY_TEXT.tutorialHeading, 0, panelHeight / 2 - 34, 22, panel, 240, 34, 'tutorial-heading');
     this.addLabel(`${currentIndex + 1}/${steps.length}`, panelWidth / 2 - 58, panelHeight / 2 - 34, 13, panel, 54, 24, 'tutorial-progress');
     this.addLabel(current.title, 0, panelHeight / 2 - 80, 24, panel, panelWidth - 96, 42, 'tutorial-title');
     wrapText(current.body, Math.max(18, Math.floor((panelWidth - 132) / 16))).slice(0, 3).forEach((line, index) => {
       this.addLabel(line, 0, 42 - index * 25, 16, panel, panelWidth - 128, 24, `tutorial-body-${index}`);
     });
-    if (current.highlight) this.addLabel(`重点：${highlightLabel(current)}`, 0, -42, 14, panel, panelWidth - 160, 28, 'tutorial-highlight');
+    if (current.highlight) this.addLabel(`${LOBBY_TEXT.focusPrefix}${highlightLabel(current)}`, 0, -42, 14, panel, panelWidth - 160, 28, 'tutorial-highlight');
 
-    this.addButton('上一步', -96, -panelHeight / 2 + 34, 78, 36, this.tutorialIndex > 0, () => {
+    this.addButton(LOBBY_TEXT.previous, -96, -panelHeight / 2 + 34, 78, 36, this.tutorialIndex > 0, () => {
       this.tutorialIndex = Math.max(0, this.tutorialIndex - 1);
       this.render();
     }, panel, false, 'tutorial-prev-button');
-    this.addButton(this.tutorialIndex >= steps.length - 1 ? '完成' : '下一步', 0, -panelHeight / 2 + 34, 78, 36, true, () => {
+    this.addButton(this.tutorialIndex >= steps.length - 1 ? LOBBY_TEXT.finish : LOBBY_TEXT.next, 0, -panelHeight / 2 + 34, 78, 36, true, () => {
       if (this.tutorialIndex >= steps.length - 1) {
         this.screen = 'home';
       } else {
@@ -421,7 +480,7 @@ export class LobbyScene extends Component {
       }
       this.render();
     }, panel, false, 'tutorial-next-button');
-    this.addButton('跳过', 96, -panelHeight / 2 + 34, 78, 36, true, () => {
+    this.addButton(LOBBY_TEXT.skip, 96, -panelHeight / 2 + 34, 78, 36, true, () => {
       this.screen = 'home';
       this.render();
     }, panel, false, 'tutorial-skip-button');
@@ -442,7 +501,7 @@ export class LobbyScene extends Component {
     panel.setPosition(0, 0, 0);
     addUiTransform(panel, panelWidth, panelHeight);
     this.drawPanelSkin(panel, panelWidth, panelHeight);
-    this.addLabel('帮助', 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'help-heading');
+    this.addLabel(LOBBY_TEXT.help, 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'help-heading');
     this.addLabel(`${start + 1}-${Math.min(rows.length, start + visibleRows)}/${rows.length}`, panelWidth / 2 - 64, panelHeight / 2 - 34, 12, panel, 72, 22, 'help-progress', PANEL_MUTED);
 
     visible.forEach((row, index) => {
@@ -461,15 +520,15 @@ export class LobbyScene extends Component {
       );
     });
 
-    this.addButton('上滚', -98, -panelHeight / 2 + 34, 78, 36, start > 0, () => {
+    this.addButton(LOBBY_TEXT.upScroll, -98, -panelHeight / 2 + 34, 78, 36, start > 0, () => {
       this.helpScrollIndex = Math.max(0, start - 5);
       this.render();
     }, panel, false, 'help-scroll-up-button');
-    this.addButton('下滚', 0, -panelHeight / 2 + 34, 78, 36, start < maxStart, () => {
+    this.addButton(LOBBY_TEXT.downScroll, 0, -panelHeight / 2 + 34, 78, 36, start < maxStart, () => {
       this.helpScrollIndex = Math.min(maxStart, start + 5);
       this.render();
     }, panel, false, 'help-scroll-down-button');
-    this.addButton('返回', 98, -panelHeight / 2 + 34, 78, 36, true, () => {
+    this.addButton(LOBBY_TEXT.back, 98, -panelHeight / 2 + 34, 78, 36, true, () => {
       this.screen = 'home';
       this.render();
     }, panel, false, 'help-back-button');
@@ -485,10 +544,10 @@ export class LobbyScene extends Component {
     panel.setPosition(0, 0, 0);
     addUiTransform(panel, panelWidth, panelHeight);
     this.drawPanelSkin(panel, panelWidth, panelHeight);
-    this.addLabel('战绩', 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'stats-heading');
+    this.addLabel(LOBBY_TEXT.stats, 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'stats-heading');
     if (view.empty) {
       this.addSprite(RESOURCE_PATHS.emptyRecords, 0, 22, 72, 72, panel, 'stats-empty-art');
-      this.addLabel('暂无完成对局', 0, -34, 13, panel, 150, 24, 'stats-empty', PANEL_MUTED);
+      this.addLabel(LOBBY_TEXT.noCompletedRecords, 0, -34, 13, panel, 150, 24, 'stats-empty', PANEL_MUTED);
     }
 
     view.rows.forEach((row, index) => {
@@ -497,11 +556,11 @@ export class LobbyScene extends Component {
       this.addLabel(row.value, 92, y, 14, panel, 150, 22, `stats-value-${index}`, PANEL_ACCENT);
     });
 
-    this.addButton('历史', -72, -panelHeight / 2 + 34, 96, 36, true, () => {
+    this.addButton(LOBBY_TEXT.records, -72, -panelHeight / 2 + 34, 96, 36, true, () => {
       this.screen = 'records';
       this.render();
     }, panel, false, 'stats-records-button');
-    this.addButton('返回', 72, -panelHeight / 2 + 34, 96, 36, true, () => {
+    this.addButton(LOBBY_TEXT.back, 72, -panelHeight / 2 + 34, 96, 36, true, () => {
       this.screen = 'home';
       this.render();
     }, panel, false, 'stats-back-button');
@@ -519,15 +578,15 @@ export class LobbyScene extends Component {
     panel.setPosition(0, 0, 0);
     addUiTransform(panel, panelWidth, panelHeight);
     this.drawPanelSkin(panel, panelWidth, panelHeight);
-    this.addLabel('历史', 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'records-heading');
+    this.addLabel(LOBBY_TEXT.records, 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'records-heading');
 
     this.renderFilterGroup(
       panel,
       panelHeight / 2 - 74,
       [
-        { label: '全部', value: 'all' },
-        { label: '胜', value: 'win' },
-        { label: '负', value: 'loss' },
+        { label: LOBBY_TEXT.all, value: 'all' },
+        { label: LOBBY_TEXT.win, value: 'win' },
+        { label: LOBBY_TEXT.loss, value: 'loss' },
       ],
       this.recordQuery.outcome,
       (value) => {
@@ -540,9 +599,9 @@ export class LobbyScene extends Component {
       panel,
       panelHeight / 2 - 110,
       [
-        { label: '全部', value: 'all' },
-        { label: '地主', value: 'landlord' },
-        { label: '农民', value: 'farmer' },
+        { label: LOBBY_TEXT.all, value: 'all' },
+        { label: LOBBY_TEXT.landlord, value: 'landlord' },
+        { label: LOBBY_TEXT.farmer, value: 'farmer' },
       ],
       this.recordQuery.role,
       (value) => {
@@ -555,8 +614,8 @@ export class LobbyScene extends Component {
       panel,
       panelHeight / 2 - 146,
       [
-        { label: '最新', value: 'newest' },
-        { label: '最早', value: 'oldest' },
+        { label: LOBBY_TEXT.newest, value: 'newest' },
+        { label: LOBBY_TEXT.oldest, value: 'oldest' },
       ],
       this.recordQuery.order,
       (value) => {
@@ -569,7 +628,7 @@ export class LobbyScene extends Component {
     this.addLabel(view.filterLabel, 0, -14, 13, panel, 260, 22, 'records-filter-label', PANEL_MUTED);
     if (view.empty) {
       this.addSprite(RESOURCE_PATHS.emptyRecords, 0, -34, 68, 68, panel, 'records-empty-art');
-      this.addLabel('暂无匹配历史', 0, -88, 16, panel, 180, 30, 'records-empty', PANEL_MUTED);
+      this.addLabel(LOBBY_TEXT.noMatchedRecords, 0, -88, 16, panel, 180, 30, 'records-empty', PANEL_MUTED);
     } else {
       view.rows.forEach((row, index) => {
         const y = -50 - index * 26;
@@ -583,16 +642,16 @@ export class LobbyScene extends Component {
           panelWidth - 122,
           22,
           `records-row-${index}`,
-          row.outcomeLabel === '胜' ? PANEL_GOOD : PANEL_BAD,
+          row.outcomeLabel === LOBBY_TEXT.win ? PANEL_GOOD : PANEL_BAD,
         );
       });
     }
 
-    this.addButton('战绩', -72, -panelHeight / 2 + 34, 96, 36, true, () => {
+    this.addButton(LOBBY_TEXT.stats, -72, -panelHeight / 2 + 34, 96, 36, true, () => {
       this.screen = 'stats';
       this.render();
     }, panel, false, 'records-stats-button');
-    this.addButton('返回', 72, -panelHeight / 2 + 34, 96, 36, true, () => {
+    this.addButton(LOBBY_TEXT.back, 72, -panelHeight / 2 + 34, 96, 36, true, () => {
       this.screen = 'home';
       this.render();
     }, panel, false, 'records-back-button');
@@ -758,44 +817,43 @@ export class LobbyScene extends Component {
     name?: string,
   ): Label {
     const nodeName = name ?? `button-${text}-${x}-${y}`;
-    const node = this.ensureNode(nodeName, parent);
-    node.setPosition(x, y, 0);
-    addUiTransform(node, width, height);
-    const button = node.getComponent(Button) ?? node.addComponent(Button);
-    const bg = this.addSprite(this.buttonSkinPath(nodeName, enabled, selected), 0, 0, width, height, node, 'button-bg', true);
-    bg.setSiblingIndex(0);
-    button.target = bg;
-    button.transition = Button.Transition.COLOR;
-    button.interactable = enabled;
-    button.normalColor = new Color(255, 255, 255, 255);
-    button.pressedColor = new Color(255, 235, 240, 255);
-    button.hoverColor = new Color(255, 255, 255, 255);
-    button.disabledColor = new Color(255, 255, 255, 255);
-    node.off(Button.EventType.CLICK);
-    node.on(Button.EventType.CLICK, cb, this);
-
-    const iconPath = this.buttonIconPath(nodeName);
-    const iconSize = Math.min(21, Math.max(16, height - 14));
-    const labelX = iconPath && width >= 72 ? 8 : 0;
-    const labelWidth = iconPath && width >= 72 ? width - 32 : width;
-    if (iconPath && width >= 72) {
-      this.addSprite(iconPath, -width / 2 + 20, 0, iconSize, iconSize, node, 'button-icon');
-    }
-
-    const label = addUiLabel(this.ensureNode.bind(this), {
+    return addSkinnedButton(this.ensureNode.bind(this), this.loadSprite.bind(this), {
       text,
-      x: labelX,
-      y: 0,
-      fontSize: 16,
-      parent: node,
-      width: labelWidth,
+      x,
+      y,
+      width,
       height,
-      name: 'button-label',
-      color: this.buttonTextColor(nodeName, enabled, selected),
-      lineHeightOffset: 4,
+      enabled,
+      cb,
+      parent,
+      name: nodeName,
+      owner: this,
+      selected,
+      skinPath: (buttonName, isEnabled, isSelected) => this.buttonSkinPath(buttonName, isEnabled, isSelected),
+      textColor: (buttonName, isEnabled, isSelected) => this.buttonTextColor(buttonName, isEnabled, isSelected),
+      iconPath: (buttonName) => this.buttonIconPath(buttonName),
+      layout: ({ iconPath: buttonIconPath, width: buttonWidth, height: buttonHeight }) => {
+        const showIcon = Boolean(buttonIconPath) && buttonWidth >= 72;
+        return {
+          renderHeight: buttonHeight,
+          label: {
+            x: showIcon ? 8 : 0,
+            y: 0,
+            width: showIcon ? buttonWidth - 32 : buttonWidth,
+            height: buttonHeight,
+            fontSize: 16,
+            lineHeight: 20,
+          },
+          icon: showIcon
+            ? {
+                x: -buttonWidth / 2 + 20,
+                y: 0,
+                size: Math.min(21, Math.max(16, buttonHeight - 14)),
+              }
+            : undefined,
+        };
+      },
     });
-    label.lineHeight = 20;
-    return label;
   }
 
   private buttonSkinPath(name: string, enabled: boolean, selected: boolean): ResourcePath {
@@ -826,21 +884,30 @@ export class LobbyScene extends Component {
     name: string,
     sliced = false,
   ): Node {
-    const node = this.ensureNode(name, parent);
-    node.setPosition(x, y, 0);
-    addUiTransform(node, width, height);
-    const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
-    sprite.type = sliced ? Sprite.Type.SLICED : Sprite.Type.SIMPLE;
-    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-    loadSprite(path, sprite, this.spriteFrames);
-    return node;
+    return addSkinnedSprite(this.ensureNode.bind(this), this.loadSprite.bind(this), {
+      path,
+      x,
+      y,
+      width,
+      height,
+      parent,
+      name,
+      sliced,
+    });
   }
 
   private drawPanelSkin(parent: Node, width: number, height: number, name = 'panel-skin'): Node {
-    parent.getComponent(Graphics)?.clear();
-    const skin = this.addSprite(RESOURCE_PATHS.panelPopup, 0, 0, width, height, parent, name, true);
-    skin.setSiblingIndex(0);
-    return skin;
+    return drawUiPanelSkin(this.ensureNode.bind(this), this.loadSprite.bind(this), {
+      path: RESOURCE_PATHS.panelPopup,
+      parent,
+      width,
+      height,
+      name,
+    });
+  }
+
+  private loadSprite(path: ResourcePath, sprite: Sprite | null): void {
+    loadSprite(path, sprite, this.spriteFrames);
   }
 
   private ensureNode(name: string, parent: Node): Node {

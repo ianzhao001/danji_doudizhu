@@ -1,7 +1,9 @@
 import { Color, Graphics } from 'cc';
+import { adviseBid } from '../../../ai/bidding-advisor';
 import { adviseAction } from '../../../ai/insight';
 import type { RoundRuntime } from '../../../flow/round-runtime';
 import { RESOURCE_PATHS } from '../../asset-keys';
+import { deriveBiddingAdviceView, type BiddingAdviceView } from '../../bidding-advice-view';
 import { deriveInsightView } from '../../insight-view';
 import { deriveScreenVM } from '../../screen-view';
 import type { TableZones } from '../../table-zones';
@@ -12,6 +14,10 @@ import { swapLegacySideText } from './seat-display';
 
 const STATUS_TEXT = new Color(255, 247, 226, 255);
 const STATUS_BACKDROP = new Color(64, 38, 60, 186);
+const BID_ADVICE_BACKDROP = new Color(62, 42, 68, 190);
+const BID_ADVICE_STRONG_BACKDROP = new Color(72, 72, 50, 198);
+const BID_ADVICE_TEXT = new Color(255, 248, 226, 255);
+const BID_ADVICE_STRONG_TEXT = new Color(255, 243, 181, 255);
 
 export function renderBidding(
   ctx: GameSceneRendererContext,
@@ -34,6 +40,7 @@ export function renderBidding(
       void ctx.submitBid(button.id);
     }, ctx.uiRoot, `bid-${button.id}`);
   });
+  renderBiddingAdvisor(ctx, layout, canvas);
 }
 
 export function renderActions(
@@ -159,4 +166,53 @@ function renderStatusPill(
   drawPanel(root, width, height, STATUS_BACKDROP);
   const label = ctx.addLabel(text, 0, 1, fontSize, root, width - 18, height - 4, `${name}-text`);
   label.color = STATUS_TEXT;
+}
+
+function renderBiddingAdvisor(
+  ctx: GameSceneRendererContext,
+  layout: TableZones,
+  canvas: { width: number; height: number },
+): void {
+  const state = ctx.runtime?.currentBidding();
+  const hand = ctx.runtime?.biddingDeal()?.viewerHand;
+  if (
+    !state ||
+    !hand ||
+    !ctx.runtime?.isPlayerTurn() ||
+    (state.phase !== 'calling' && state.phase !== 'grabbing')
+  ) {
+    return;
+  }
+
+  const togglePos = ctx.rectPoint(layout.advisorDock, canvas, 0.5, 0.5);
+  ctx.addButton(
+    ctx.biddingAdvisorEnabled ? '建议开' : '建议关',
+    togglePos.x,
+    togglePos.y,
+    Math.min(92, layout.advisorDock.width),
+    60,
+    true,
+    () => ctx.toggleBiddingAdvisor(),
+    ctx.uiRoot,
+    'bid-advisor-toggle',
+  );
+
+  if (!ctx.biddingAdvisorEnabled) return;
+
+  const view = deriveBiddingAdviceView(adviseBid(hand, state.phase, ctx.settings.difficulty));
+  const width = Math.min(176, Math.max(136, layout.advisorDock.width + 54));
+  const height = 34;
+  const panelPos = ctx.rectPoint(layout.advisorDock, canvas, 0.5, 1.75);
+  const root = ctx.ensureNode('bid-advisor-panel', ctx.uiRoot);
+  root.setPosition(panelPos.x, panelPos.y, 0);
+  addUiTransform(root, width, height);
+  drawPanel(root, width, height, view.emphasize ? BID_ADVICE_STRONG_BACKDROP : BID_ADVICE_BACKDROP);
+
+  const label = ctx.addLabel(biddingAdviceText(view), 0, 1, 13, root, width - 18, height - 6, 'bid-advisor-label');
+  label.color = view.emphasize ? BID_ADVICE_STRONG_TEXT : BID_ADVICE_TEXT;
+}
+
+function biddingAdviceText(view: BiddingAdviceView): string {
+  const actionText = view.text.startsWith('建议') ? view.text.slice(2) : view.text;
+  return `建议：${actionText}${view.emphasize ? '（手牌强）' : ''}`;
 }

@@ -66,6 +66,7 @@
 - [ ] `ai/bidding-advisor.ts` `adviseBid` 加 `level: AiLevel` 参数·按 `thresholdFor(level)` 取阈值（不再硬编码 2）；规划者重种 `test/ai/bidding-advisor.test.ts`（原锁死阈值 2 的断言改为按档断言）。
 - [ ] 叫抢建议面板接线（`bidding-advice-view` 消费 `adviseBid`·低打扰·与既有 P-BID-POLISH spec 合并）。
 - [ ] G4 出牌建议**保持默认关**（`advisorEnabled=false` 不改·红线）。
+- [ ] termination 按钮 decorated 收编（T-TERM-FEEDBACK 视觉审②转入·2026-07-07）：`termination-feedback-lobby/restart` 文字不再与按钮素材顶饰交叠（修后 844×390 异常终止对照截图在案·异常终止行为/文案零改动）。
 - [ ] 审查按既有 R:P-BID-POLISH + 本骑士补充。
 
 ---

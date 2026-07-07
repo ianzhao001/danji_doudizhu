@@ -2,6 +2,33 @@ import { Button, Color, Graphics, Label, Node, Sprite, SpriteFrame, UITransform,
 import { spriteFrameResourcePath, type ResourcePath } from '../asset-keys';
 
 type EnsureNode = (name: string, parent: Node) => Node;
+type SpriteLoader = (path: ResourcePath, sprite: Sprite | null) => void;
+
+interface SkinnedButtonLayout {
+  renderHeight: number;
+  label: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fontSize: number;
+    lineHeight: number;
+  };
+  icon?: {
+    x: number;
+    y: number;
+    size: number;
+  };
+}
+
+interface SkinnedButtonLayoutInput {
+  name: string;
+  width: number;
+  height: number;
+  enabled: boolean;
+  selected: boolean;
+  iconPath: ResourcePath | null;
+}
 
 function labelColor(enabled: boolean): Color {
   return enabled ? new Color(255, 255, 255, 255) : new Color(255, 255, 255, 120);
@@ -113,6 +140,140 @@ export function addButton(
   label.horizontalAlign = Label.HorizontalAlign.CENTER;
   label.verticalAlign = Label.VerticalAlign.CENTER;
   label.color = labelColor(options.enabled);
+  return label;
+}
+
+export function addSkinnedSprite(
+  ensureNode: EnsureNode,
+  load: SpriteLoader,
+  options: {
+    path: ResourcePath;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    parent: Node;
+    name: string;
+    sliced?: boolean;
+  },
+): Node {
+  const node = ensureNode(options.name, options.parent);
+  node.setPosition(options.x, options.y, 0);
+  addUiTransform(node, options.width, options.height);
+  const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
+  sprite.type = options.sliced ? Sprite.Type.SLICED : Sprite.Type.SIMPLE;
+  sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+  load(options.path, sprite);
+  return node;
+}
+
+export function drawPanelSkin(
+  ensureNode: EnsureNode,
+  load: SpriteLoader,
+  options: {
+    path: ResourcePath;
+    parent: Node;
+    width: number;
+    height: number;
+    name?: string;
+  },
+): Node {
+  options.parent.getComponent(Graphics)?.clear();
+  const skin = addSkinnedSprite(ensureNode, load, {
+    path: options.path,
+    x: 0,
+    y: 0,
+    width: options.width,
+    height: options.height,
+    parent: options.parent,
+    name: options.name ?? 'panel-skin',
+    sliced: true,
+  });
+  skin.setSiblingIndex(0);
+  return skin;
+}
+
+export function addSkinnedButton(
+  ensureNode: EnsureNode,
+  load: SpriteLoader,
+  options: {
+    text: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    enabled: boolean;
+    cb: () => void;
+    parent: Node;
+    name: string;
+    owner?: unknown;
+    selected?: boolean;
+    skinPath(name: string, enabled: boolean, selected: boolean): ResourcePath;
+    textColor(name: string, enabled: boolean, selected: boolean): Color;
+    iconPath?(name: string): ResourcePath | null;
+    layout(input: SkinnedButtonLayoutInput): SkinnedButtonLayout;
+  },
+): Label {
+  const selected = options.selected ?? false;
+  const iconPath = options.iconPath?.(options.name) ?? null;
+  const layout = options.layout({
+    name: options.name,
+    width: options.width,
+    height: options.height,
+    enabled: options.enabled,
+    selected,
+    iconPath,
+  });
+  const node = ensureNode(options.name, options.parent);
+  node.setPosition(options.x, options.y, 0);
+  addUiTransform(node, options.width, layout.renderHeight);
+  const button = node.getComponent(Button) ?? node.addComponent(Button);
+  const bg = addSkinnedSprite(ensureNode, load, {
+    path: options.skinPath(options.name, options.enabled, selected),
+    x: 0,
+    y: 0,
+    width: options.width,
+    height: layout.renderHeight,
+    parent: node,
+    name: 'button-bg',
+    sliced: true,
+  });
+  bg.setSiblingIndex(0);
+  button.target = bg;
+  button.transition = Button.Transition.COLOR;
+  button.interactable = options.enabled;
+  button.normalColor = new Color(255, 255, 255, 255);
+  button.pressedColor = new Color(255, 235, 240, 255);
+  button.hoverColor = new Color(255, 255, 255, 255);
+  button.disabledColor = new Color(255, 255, 255, 255);
+  node.off(Button.EventType.CLICK);
+  node.on(Button.EventType.CLICK, options.cb, options.owner);
+
+  if (iconPath && layout.icon) {
+    addSkinnedSprite(ensureNode, load, {
+      path: iconPath,
+      x: layout.icon.x,
+      y: layout.icon.y,
+      width: layout.icon.size,
+      height: layout.icon.size,
+      parent: node,
+      name: 'button-icon',
+    });
+  }
+
+  const label = addLabel(ensureNode, {
+    text: options.text,
+    x: layout.label.x,
+    y: layout.label.y,
+    fontSize: layout.label.fontSize,
+    parent: node,
+    width: layout.label.width,
+    height: layout.label.height,
+    name: 'button-label',
+    color: options.textColor(options.name, options.enabled, selected),
+    lineHeightOffset: 4,
+  });
+  label.lineHeight = layout.label.lineHeight;
   return label;
 }
 
