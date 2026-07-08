@@ -4,7 +4,7 @@
 
 本项目是基于 Cocos Creator 3.8.8 的单机斗地主游戏。首版目标是完整单机版：手机横屏、经典三人斗地主、多难度 AI、本地设置与战绩。
 
-当前 M0-M6 与 v1.1/v1.2 发布收口均已完成。v1.2 收版基线为 **141 测试文件 / 739 用例全绿、typecheck 净**，发布包由 Creator 3.8.8 CLI `web-mobile` 构建，`launchScene=lobby.scene`、`designResolution=844×390`、`orientation=landscape`，四横屏 V6 全链冒烟 `productErrors=[]`。v1.3 技术债清偿版已开 A/B 波：A 波处理真历史记牌、runtime 拆分、座位视图/性能数据/文档同步，B 波处理 UI helper 与 game-scene 模块化；以 `coordination/BOARD.md` 为当前执行真相源。
+当前 M0-M6、v1.1/v1.2 与 **v1.3 技术债清偿版**均已收口。v1.2 收版基线为 141 测试文件 / 739 用例全绿；**v1.3 收版基线为 149 测试文件 / 770 用例全绿、typecheck 净、`git diff --check` 净**，发布包由 Creator 3.8.8 CLI `web-mobile` 构建，`launchScene=lobby.scene`、`designResolution=844×390`、`orientation=landscape`。v1.3 含 A 波（真历史记牌、runtime 拆分、座位视图、性能数据、文档同步）、B 波（UI helper + game-scene 模块化 + 叫抢建议接线）、C 波（暂停门控/实时倍数/续局重放/HUD/termination 等 7 项 P0 修复），共 15 任务全 done，经 **V7 收口验证（精简版·四横屏 `productErrors=0` + AI 真历史基线 + 用户轻签收）** 于 2026-07-09 终局裁定 **CLOSED**。V7 真历史基线要点：真记牌属行为拟真而非胜率提升，「困难≈普通」的胜率现象系 v1.2 既有性质（非 v1.3 回归）——详见 `docs/KNOWN_LIMITATIONS.md`。执行真相源以 `coordination/BOARD.md` 为准。
 
 ## 迭代阶段
 

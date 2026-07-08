@@ -933,7 +933,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-UIHELPERS | B | editor-evidence(机械重构) | `ui/components/ui-helpers.ts` + `game-scene-skeleton.ts` + `lobby-scene.ts` + `ui/strings.ts` + report | —（B 波首任务·C 波 UI 链已全合 skeleton 竞写解除 2026-07-07） | `task/T-UIHELPERS`（基点 main `c5d3029`·实现 `480b2e4`·规划者视觉审②PASS `c5f5756`·审查 `7dda3ea`：48 对像素 diff=0·73 key 零漂移·drawPanel 5 消费未动·全量回扫 0 致命） | done 30a9e74 |
 | P-GS-SPLIT2 | B | move-only 强化(editor-evidence) | `game-scene-skeleton.ts` + 新 `game-scene/*.ts` + `ui/strings.ts`(rider·预计零改动) + report | T-UIHELPERS（done `30a9e74` ✅·skeleton 漂移域已解锁） | `task/P-BID-POLISH`（批次合并·基点 main `c4d1156`·实现 `6343846`·规划者视觉审②PASS·审查 `8045e96`：move-only 验证·C 波接线原样搬迁·T-UIHELPERS 消费确认·skeleton 768 行·全量回扫 0/0/0） | done 7a1b022 |
 | P-BID-POLISH | B | editor-evidence(双层视觉预审从严·批次连做) | `game-scene-skeleton.ts` + `game-scene/*.ts` + `ai/bidding-advisor.ts`(G3) + `bidding-levels.ts`(仅 export 一词) + `test/ai/bidding-advisor.test.ts`(种子搬运) + report（+termination rider+dead 条目顺手删） | P-GS-SPLIT2（同窗批次前序·V7 最后前置·done 后 V7 全前置满足） | `task/P-BID-POLISH`（执行者自 SPLIT2 尖建·种子 `58ebc05`·实现 `a87dd67`·规划者视觉审②PASS·审查 `8045e96`：bidding-levels 仅 export·bidding.ts 零改动·adviseBid 三参全更新·独立开关·种子 diff 空·全量回扫 0/0/0） | done 7a1b022 |
-| V7 | C | verify-only | `reports/V7.report.md` + `reports/V7-*.png` | 全部 done | `task/V7`（已建自 main `b204b0b`） | **ready**（V7 全前置满足·15/15 全 done） |
+| V7 | C | verify-only | `reports/V7.report.md` + `reports/V7-*.png` | 全部 done | `task/V7`（已建自 main `b204b0b`） | done 2026-07-09（verify-only·精简版·用户轻签收通过·v1.3 CLOSED） |
 | T-PAUSE-GATE | C | 高风险(改产品码·flow 接口) | `flow/round-runtime.ts` + `flow/runtime/bidding-driver.ts` + report | —（C 波首任务） | `task/T-PAUSE-GATE`（已建自 main `411c972`） | done 7aa5adf |
 | T-LIVE-MULT | C | 高风险(改共享契约·game/types)·**三闸** | `game/types.ts` + `game/core.ts` + `flow/runtime/bidding-driver.ts`(runtimeSnapshot enrich) + report | T-PAUSE-GATE（done 7aa5adf·共域 bidding-driver） | `task/T-LIVE-MULT`（已建自 main `f2faf02`·种子 `7de950a`·实现 `152c38e`·审查 `053de68`） | done 8637f6a |
 | T-ADVANCE-REENTRY | C | 高风险(纯逻辑·flow 推进核心·裁量三闸)·**三闸** | `flow/runtime/bidding-driver.ts` + `flow/round-runtime.ts` + report | T-LIVE-MULT（done 8637f6a·共域 bidding-driver）·须先于 T-TERM-FEEDBACK 接线合 | `task/T-ADVANCE-REENTRY`（已建自 main `1c9bdc9`·种子 `4b8a735`·实现 `69468e5`·审查 `3a97a02`） | done 601e9fe |
@@ -1059,3 +1059,14 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > - **审查按 R-WAVE8 R:V7**（verify-only·diff 仅 reports/V7*·四横屏全相位 e2e + 不变量回归 + 新面证据 + AI 新基线表 + 同屏验收页产出 + 用户轻签收项列明不代判）。
 > - **终点**：V7 done + 用户轻签收 = v1.3 终局裁定（规划者版本终局裁定·BOARD 记裁定·发布归档）。
 > - **下一步**：执行者认领 V7（`./coordination/agentctl.sh work V7`）→ 审查者按 R-WAVE8 R:V7 审 → 用户轻签收 → 规划者终局裁定。
+
+> **V7 收官 + v1.3 终局裁定（规划者·2026-07-09·精简版 verify-only + 用户轻签收通过）**：
+> - **执行形态**：用户授权跑**精简版 V7**（保留 AI 真历史基线 + v1.3 新面四横屏抽查 + 同屏签收页；砍全套 16×4 不变量回归大戏——已被 V6 冒烟 + 770 绿测兜底）。verify-only 未改产品码/测试。
+> - **技术门**：`npm --prefix test test` = **149 files / 770 tests 全绿**（无 V6 那次 selfplay 5s 抖动）· typecheck 净 · `git diff --check` 净。
+> - **构建**：Cocos 3.8.8 CLI headless web-mobile（`env -u ELECTRON_RUN_AS_NODE` 是关键·否则主二进制退化纯 node·`--project` 报 bad option）·显式 `startScene=<lobby uuid>` 修正 launchScene·收尾 `build-script` SIGTERM 系与开着的编辑器抢锁·**产物完整**并经实机加载验证。
+> - **四横屏 E2E**：seed 20260705·844/812/915/780 全 `productErrors=0`/`failedResponses=0`·新面实拍（叫抢建议开关 + 实时 HUD 倍数/炸弹/手牌 + 暂停「本局进度已保留」门控）。
+> - **AI 真历史新基线（核心裁定）**：经生产 `levelPolicies` 真历史链路取数。**真记牌属拟真非增胜**——困难−普通 `−0.023→−0.090`、困难−简单 `+0.390→+0.310`（100 seed·小幅降）；控制组普通−简单 old≡new 恒等 `+0.460`（harness 无泄漏）。**v1.2 对照证无回归**：v1.2 旧路径 100 seed 与 v1.3 逐值恒等（Hard−Normal `−0.023`）·published `+0.1333` 系 30-seed 巧合。裁定：**接受为既有性质**·如实入 `KNOWN_LIMITATIONS`·「困难真变强」留 v1.3 后增强（用户选：接受·如实收版·不阻塞）。
+> - **Profiling 归档**：`legalFollows` 4.4% < 40%·selfplay 60 seed 3788ms < 30000ms → 不剪枝（沿 T-PROFILE-FOLLOWS）。
+> - **用户轻签收通过**（2026-07-09·四卡「确认」·卡④接受 AI 现状）→ 落 `reports/V7-user-review.md`。
+> - **裁定：V7 done + 用户轻签收 = v1.3 CLOSED（规划者版本终局裁定）**。证据：`reports/V7.report.md` + `reports/V7-evidence/**`（截图/机读 JSON）+ `build/v7-signoff.html`（本地·gitignore）。
+> - **V7 row 状态**：ready → **done（2026-07-09·verify-only·用户轻签收通过）**。v1.3 技术债清偿版 **15/15 任务 + V7 收官 = 全线收版**。

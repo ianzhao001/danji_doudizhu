@@ -1,0 +1,35 @@
+{
+  "base": "http://127.0.0.1:7788/",
+  "seed": 20260705,
+  "viewports": [
+    {
+      "name": "844x390",
+      "productErrors": [],
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "name": "812x375",
+      "productErrors": [],
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "name": "915x412",
+      "productErrors": [],
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "name": "780x360",
+      "productErrors": [],
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "drive": {
+    "productErrors": [],
+    "consoleErrors": [],
+    "failedResponses": []
+  }
+}

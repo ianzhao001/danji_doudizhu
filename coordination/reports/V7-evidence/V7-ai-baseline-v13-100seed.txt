@@ -1,0 +1,11 @@
+=== 100-seed baseline started Thu Jul  9 00:59:28 CST 2026 ===
+seeds=1..100  roundsPerSide=300
+
+pair            | v1.2published | old-repro(A/B=diff)        | NEW real-history(A/B=diff)
+----------------|---------------|----------------------------|----------------------------
+Hard-Normal     |       +0.1333 | 0.450/0.473=-0.0233  | 0.420/0.510=-0.0900
+Hard-Simple     |       +0.6333 | 0.673/0.283=+0.3900  | 0.637/0.327=+0.3100
+Normal-Simple   |        n/a    | 0.697/0.237=+0.4600  | 0.697/0.237=+0.4600
+
+JSON={"seeds":100,"roundsPerSide":300,"pairs":{"Hard-Normal":{"old":{"targetA":0.45,"targetB":0.47333333333333333,"diff":-0.023333333333333317,"roundsPerSide":300},"new":{"targetA":0.42,"targetB":0.51,"diff":-0.09000000000000002,"roundsPerSide":300},"v12Published":0.1333},"Hard-Simple":{"old":{"targetA":0.6733333333333333,"targetB":0.2833333333333333,"diff":0.39,"roundsPerSide":300},"new":{"targetA":0.6366666666666667,"targetB":0.32666666666666666,"diff":0.31000000000000005,"roundsPerSide":300},"v12Published":0.6333},"Normal-Simple":{"old":{"targetA":0.6966666666666667,"targetB":0.23666666666666666,"diff":0.45999999999999996,"roundsPerSide":300},"new":{"targetA":0.6966666666666667,"targetB":0.23666666666666666,"diff":0.45999999999999996,"roundsPerSide":300},"v12Published":null}}}
+=== 100-seed exited code=0 at Thu Jul  9 01:02:46 CST 2026 ===
