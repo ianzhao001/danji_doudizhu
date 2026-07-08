@@ -37,6 +37,7 @@
 ## Release Gates
 
 - v1.2 发布包已就绪：Creator 3.8.8 CLI `web-mobile` 构建，`launchScene=lobby.scene`，`designResolution=844×390`，`orientation=landscape`，归档 `build/doudizhu-v1.2-web-mobile.zip`（不入库）。
+- v1.3 发布包已就绪（2026-07-09·V7 收官后打包）：同上 Creator 3.8.8 CLI `web-mobile` 构建（`launchScene=lobby.scene`），基线 149/770 绿，归档 `build/doudizhu-v1.3-web-mobile.zip`（45.3MB·448 文件·`unzip -t` 净·不入库）。
 - 后续 UI/场景任务仍必须走双层视觉预审：执行者自审四类硬伤，规划者视觉审达标后才交用户主观签收。
 
 ## Deferred Refactors (Post-Release · 第十六批审查登记 2026-07-01)
