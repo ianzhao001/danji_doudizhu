@@ -18,7 +18,8 @@
 
 - AI 只基于 `GameSnapshot` 与 `viewerHand` 决策，不读取隐藏手牌。
 - 难度差异已由 selfplay 与策略测试覆盖，但仍是启发式 AI，不承诺最优解。
-- Hard 困难档的记牌机制已闭合到真实历史链路：flow/round-runtime 传累积 `GameEvent`，困难策略用 `estimateMemoryPressure(hand, history)` 与 `trackPlayed(history, hand)` 估算外部剩牌，并在跟单牌时可用「绝对最大单」接管。simple/normal 仍不记牌。量化强度主张等待 V7 真历史基线，不在此处虚标“变强”数值。
+- Hard 困难档的记牌机制已闭合到真实历史链路：flow/round-runtime 传累积 `GameEvent`，困难策略用 `estimateMemoryPressure(hand, history)` 与 `trackPlayed(history, hand)` 估算外部剩牌，并在跟单牌时可用「绝对最大单」接管。simple/normal 仍不记牌。
+- **V7 真历史 AI 基线（2026-07-09·同 harness/同 seed·唯一变量=是否喂真历史）**：真记牌属**行为拟真而非胜率提升**——喂真历史使困难胜率差 Hard−Normal `−0.023→−0.090`、Hard−Simple `+0.390→+0.310`（100 seed·**小幅降**）；控制组普通−简单 old≡new 恒等 `+0.460` 证 harness 无泄漏。且「困难压普通」在大样本本就不成立（v1.2 旧路径 100 seed Hard−Normal 亦为 `−0.023`，v1.2 published `+0.1333` 系 30-seed 巧合），且 **memory-off 困难 v1.2≡v1.3 逐值恒等 → 非 v1.3 回归**。困难 vs **简单**仍明显分层。lobby 难度面「困难…压制更强」文案在胜率轴上属愿景表述；「困难真变强」如需兑现另立增强任务（用户 2026-07-09 选：接受·如实收版·不阻塞）。
 - turn timer 仅做提示，不会超时自动代打，避免改变 `round-runtime` 契约。
 
 ## Save And Resume

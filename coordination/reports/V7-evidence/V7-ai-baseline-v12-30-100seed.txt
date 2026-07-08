@@ -1,0 +1,14 @@
+=== v1.2 baseline started Thu Jul  9 01:13:25 CST 2026 ===
+
+=== v1.2 old-path, seeds=1..30 (roundsPerSide=90) ===
+Hard-Normal     0.533/0.389 = +0.1444
+Hard-Simple     0.800/0.233 = +0.5667
+Normal-Simple   0.800/0.189 = +0.6111
+
+=== v1.2 old-path, seeds=1..100 (roundsPerSide=300) ===
+Hard-Normal     0.450/0.473 = -0.0233
+Hard-Simple     0.673/0.283 = +0.3900
+Normal-Simple   0.697/0.237 = +0.4600
+
+JSON={"commit":"24bf5e8 (v1.2)","pairs":{"Hard-Normal@30":{"targetA":0.5333333333333333,"targetB":0.3888888888888889,"diff":0.14444444444444443},"Hard-Simple@30":{"targetA":0.8,"targetB":0.23333333333333334,"diff":0.5666666666666667},"Normal-Simple@30":{"targetA":0.8,"targetB":0.18888888888888888,"diff":0.6111111111111112},"Hard-Normal@100":{"targetA":0.45,"targetB":0.47333333333333333,"diff":-0.023333333333333317},"Hard-Simple@100":{"targetA":0.6733333333333333,"targetB":0.2833333333333333,"diff":0.39},"Normal-Simple@100":{"targetA":0.6966666666666667,"targetB":0.23666666666666666,"diff":0.45999999999999996}}}
+=== v1.2 baseline exited code=0 at Thu Jul  9 01:15:34 CST 2026 ===
