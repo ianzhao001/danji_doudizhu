@@ -1,8 +1,8 @@
 # P-PLAY-FEEL Report
 
-- status: in-review
+- status: approved
 - branch: `task/P-PLAY-FEEL`
-- base: `task/P-THEME-APPLY @ 8c75dd5`
+- base: `task/P-THEME-APPLY @ b523975`
 - original implementation: `afad056`（在新 THEME 尖上重放）
 
 ## 实现摘要
@@ -54,5 +54,8 @@
 ## 审查记录
 
 - 原审查尖：`64d4fe0`，结论 `changes-requested`。
-- 复审范围：`8c75dd5..本分支新尖`；逐行审行为 diff，定向抽查 `dragSelectCards`、`layoutHandInteractive`、`deriveFollowUx`、`sortForDisplay` 消费链。
-- 待最终验收回填：全量 test/typecheck、main 双闸、merge commit 与 BOARD done 状态。
+- 复审范围：`b523975..1873bc1`；逐行审行为 diff，定向抽查 `dragSelectCards`、`layoutHandInteractive`、`deriveFollowUx`、`sortForDisplay` 消费链。
+- 结构结论：cc 层只透传 cardWidth 给纯 helper 并消费 `hitRight`；无命中宽度算法；mustPass 无自动过牌/出牌；strings 只追加；纯岛/test/event-cues 零 diff。
+- 分支回归：152 files / 815 tests 绿；`npm --prefix test run typecheck` 绿；`git diff --check` 净。
+- 视觉结论：继承 BOARD「UI 批视觉审②」分级放行；动态证据债转 V8。
+- 合并门：常规任务，批准在 P-THEME-APPLY 合并后进入 `claim/merge/release`；main 双闸、merge commit 与 done 状态在合并后回填。
