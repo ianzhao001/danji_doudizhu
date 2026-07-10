@@ -1079,7 +1079,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 
 | ID | 类型 | 文件域（详见 spec） | 分支 | 状态 |
 |----|----|----|----|----|
-| T-THEME-TOKENS | 纯逻辑(纯岛·纯 spec) | 新 `ui/theme.ts` + index 桶一行 + 新 `test/ui/theme.test.ts` | `task/T-THEME-TOKENS`（已建） | merge-claimed:T-THEME-TOKENS |
+| T-THEME-TOKENS | 纯逻辑(纯岛·纯 spec) | 新 `ui/theme.ts` + index 桶一行 + 新 `test/ui/theme.test.ts` | `task/T-THEME-TOKENS`（已建） | done 59420e0 |
 | T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加 + 桶 + 新测试 | 批内自 T-THEME-TOKENS 尖建 | ready |
 | T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建 | ready |
 | P-THEME-APPLY | UI(双层视觉预审) | `ui-helpers.ts` + `lobby-scene.ts` + `game-scene-skeleton.ts` + `game-scene/**` | 待纯逻辑批入 main 后建 | blocked |
