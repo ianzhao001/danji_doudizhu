@@ -33,7 +33,8 @@ export function deriveFollowUx(args: { snapshot: GameSnapshot; viewerSeat?: Seat
 // hand-interaction.ts —— 追加
 export function dragSelectCards(slots: InteractiveSlot[], fromX: number, toX: number): Card[];
 ```
-- 语义：给定滑动起止 x（与 `layoutHandInteractive` 产出的 slot 同一坐标系），返回**被扫过区间命中的连续手牌**（命中测试沿用既有 slot 重叠/宽度语义：每张牌的可点宽度=与下一张的间距，最后一张全宽）。`fromX > toX` 自动归一；起止越界夹取到首尾；区间不触任何 slot → 空数组；空 slots → 空数组。**纯计算，不持状态**——选中/反选的合成由 cc 层用既有 `selection.toggle` 组合。
+- 语义：给定滑动起止 x（与 `layoutHandInteractive` 产出的 slot 同一坐标系），返回**被扫过区间命中的连续手牌**。`fromX > toX` 自动归一；起止越界夹取到首尾；区间不触任何 slot → 空数组；空 slots → 空数组。**纯计算，不持状态**——选中/反选的合成由 cc 层用既有 `selection.toggle` 组合。
+- **规划者裁定（2026-07-10·采审查者建议 A·契约修订）**：仅凭 `slots.x` 在重叠布局下无法恢复末张全宽（审查已证），故授权 **`InteractiveSlot` 追加加法字段 `hitRight: number`**（绝对坐标命中右边界），由 `layoutHandInteractive` 产出——**非末张 = 下一张 slot 的 x；末张 = 自身 x + cardWidth**（cardWidth 为该函数已知值）。命中区间：非末张 `[x, hitRight)`，**末张右闭 `[x, hitRight]`**（扫到牌右沿仍命中）；**单张手牌按末张语义（有限宽，禁止 Infinity）**。`dragSelectCards` 签名不变，只消费 `slot.hitRight`，不得自行反推宽度。选 A 弃 B 的理由：命中几何的真相源留在 layout 单点，避免各调用点自传 `cardWidth` 与实际布局漂移。风险面已由规划者预核：既有测试对 slot 仅投影断言（`x`/`card.rank`），无锁形 `toEqual`，加法字段零破坏；`layoutHandInteractive` 既有消费方只读 slot，不受影响。
 
 ```ts
 // selection.ts —— 追加
@@ -46,7 +47,8 @@ export function sortForDisplay(cards: Card[]): Card[];
 2. mustPass 与 `deriveActionButtons` 一致性：同一快照下 `mustPass===true` ⟹ `deriveActionButtons(...).hint===false` 且任意选牌 `play` 不可真（抽 1–2 组数据钉一致性）。
 3. alerts：单席报单、单席报双、两席同时报（1+2）、0 张不报、对局结束（winner 非 null）返回空。
 4. dragSelectCards：正向/反向扫过同区间结果相等；单点（fromX===toX）等价单张命中；越界夹取；区间落在缝隙外返回空；扫过全手牌返回全量且**保持手牌序**。
-5. sortForDisplay：含双王+2+普通点的混合手降序正确；不改入参（断言原数组未变）；与 `sortByRank` 元素集合相等。
+4b. **（裁定新增·缺一不收）**：① 重叠态末张右半区命中——`containerWidth=390, cardWidth=60, count=20` 时扫 `x=380` 命中末张（审查者复现例钉死）；② 单张手牌左右越界不命中（如 `x=1e6` 返回空——有限宽护栏）；③ `hitRight` 字段契约直接断言：非末张 === 下一张 `x`，末张 === 自身 `x + cardWidth`。
+5. sortForDisplay：含双王+2+普通点的混合手降序正确；不改入参（断言原数组未变）；与 `sortByRank` 元素集合相等；**同点数内保持 `sortByRank` 稳定序不反转**（如 `[3♠,3♥,5♣]` → `[5♣,3♠,3♥]`——按 rank 降序、原 index 升序稳定排序，禁止整体 `.reverse()`）。
 6. 三个新文件/函数源码零 `from 'cc'`（护栏断言）。
 
 ## 红线

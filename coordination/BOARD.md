@@ -1080,7 +1080,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ID | 类型 | 文件域（详见 spec） | 分支 | 状态 |
 |----|----|----|----|----|
 | T-THEME-TOKENS | 纯逻辑(纯岛·纯 spec) | 新 `ui/theme.ts` + index 桶一行 + 新 `test/ui/theme.test.ts` | `task/T-THEME-TOKENS`（已建） | done 59420e0 |
-| T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加 + 桶 + 新测试 | 批内自 T-THEME-TOKENS 尖建 | blocked |
+| T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加（裁定：`InteractiveSlot` 加法字段 `hitRight`）+ 桶 + 新测试 | `task/T-INTERACT-VIEWS`（尖 `b7bfc3a`） | changes-requested |
 | T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建 | changes-requested |
 | P-THEME-APPLY | UI(双层视觉预审) | `ui-helpers.ts` + `lobby-scene.ts` + `game-scene-skeleton.ts` + `game-scene/**` | 待纯逻辑批入 main 后建 | blocked |
 | P-PLAY-FEEL | UI(双层视觉预审) | `game-scene-skeleton.ts` + `game-scene/**` + strings 纯追加 | 批内自 P-THEME-APPLY 尖建 | blocked |
@@ -1088,5 +1088,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | V8 | verify-only 收口 | 仅报告+证据（spec 波末出） | 待 UI 批 done | todo |
 
 > **纯逻辑批审查披露（Codex·2026-07-10）**：T-THEME-TOKENS 逐行 diff + 现值定向对照 + 双闸通过，已按 `claim/merge/release` 并入（merge `eb6fcaf`，后基线 150 files / 775 tests 绿）。T-INTERACT-VIEWS 定向探针确认重叠手牌末张全宽无法由现 `InteractiveSlot` 形状反推，且同点稳定序被反转，已 `blocked` 转规划者裁定 API/spec（详见报告）。T-LASTPLAY-CARDS 存在非相邻 bomb/rocket 污染旧 play 及单张用例被同席后续 play 覆盖的覆盖缺口，已 `changes-requested`。链尖全量 152 files / 807 tests 绿 + typecheck 净，但不替代上述契约阻断。
+>
+> **契约裁定记录（规划者·2026-07-10·T-INTERACT-VIEWS drag 宽度 → 采建议 A）**：审查者证明成立（`InteractiveSlot` 仅 `x/y/card/selected`，重叠布局 step≈17.37 < cardWidth=60 时末张全宽不可由 x 序列反推；单张 `slotHitWidth=Infinity` 违越界语义）。**裁定采 A**：`InteractiveSlot` 追加**加法字段 `hitRight: number`**（绝对命中右边界），由 `layoutHandInteractive` 产出（非末张=下张 x；末张=x+cardWidth）；命中区间非末张 `[x, hitRight)`、末张右闭 `[x, hitRight]`、单张按末张语义**有限宽**；`dragSelectCards` 签名不变只消费 `hitRight`。**弃 B 理由**：命中几何真相源留在 layout 单点，避免各调用点自传 cardWidth 与实际布局漂移（cc 层缩放场景）。**风险面规划者预核**：既有测试对 slot 仅投影断言（x/card.rank，无锁形 toEqual）、既有消费方只读——加法零破坏。**同点稳定序**按审查意见修（rank 降序 + 原 index 稳定，禁整体 reverse）。spec 已修订（契约段 + 用例 4b/5），row 置 `changes-requested` 交执行者修复；T-LASTPLAY-CARDS 两阻断项均域内、无契约变更，维持审查者打回意见。**修复批指令**：Cursor 单窗按链序修 T-INTERACT-VIEWS（`b7bfc3a` 尖续）→ T-LASTPLAY-CARDS（`1f41c28` 尖续，各改自己文件域，**不互 merge 不 rebase**——LASTPLAY 分支所含旧 INTERACT 实现未再改动，合并守序（INTERACT 先）时 3-way 自取 main 修复版），批末一次交接 Codex 复审增量（`b7bfc3a..尖` 与 `1f41c28..尖`）。
 
 > **依赖与红线摘要**：UI 批逐棒消费纯逻辑批产物（THEME→APPLY；INTERACT→PLAY-FEEL；LASTPLAY→TABLE-INFO）；「超时仅视觉、绝不自动出牌/过牌」契约在要不起态下仍然成立；**不新增 CueId**（G17 穷尽断言域）；v1.2/v1.3 成果（settled 门控/逆时针映射/暂停冻结/termination 面板/LASTACT 可读性）零回归。基线：main `0f21926` 起步，149 files / 770 tests 绿 + typecheck 净。

@@ -10,13 +10,14 @@
 - [ ] 必须覆盖用例清单 5 项逐一落实（冻结/值域/单调/无cc/快照锁形）。
 - [ ] 桶 diff 恰一行导出；未触任何消费方。
 
-## R:T-INTERACT-VIEWS（常规）
-- [ ] 既有导出零改动：`deriveActionButtons`/`layoutHandInteractive`/`sortByRank`/`toggle` 的 diff 为纯追加。
+## R:T-INTERACT-VIEWS（常规·2026-07-10 裁定后复审口径）
+- [ ] 既有导出签名零改动：`deriveActionButtons`/`sortByRank`/`toggle` 纯追加；`layoutHandInteractive` **仅允许**按裁定新增 `hitRight` 产出（`InteractiveSlot` 加法字段），x/y/card/selected 语义零漂移。
+- [ ] **hitRight 契约（裁定 A）**：非末张 === 下张 x；末张 === x + cardWidth；`dragSelectCards` 只消费 `hitRight` 不自行反推宽度；非末张 `[x, hitRight)`、末张右闭、单张有限宽（无 Infinity 残留）。
+- [ ] **复审你上轮两项发现闭环**：① 20 张/390/60 重叠态扫 x=380 命中末张（用例 4b①）；② 单张 x=1e6 不命中（4b②）；③ 同点稳定序不反转（用例 5 修正后期望 `[5♣,3♠,3♥]`）；不得删弱上轮已提审的其他覆盖。
 - [ ] `mustPass` 语义与 `deriveActionButtons` 同源（都走 legalFollows；lead 恒 false；非本席 false）；一致性用例在测试里钉住。
 - [ ] `alerts` 消费 `handCounts`；对局结束返回空；席序稳定。
-- [ ] `dragSelectCards` 命中语义与 `layoutHandInteractive` slot 宽度语义一致（读两处代码对照）；归一/夹取/空入用例齐。
 - [ ] `sortForDisplay` 不改入参；与 `sortByRank` 集合相等用例在。
-- [ ] 用例清单 6 项逐一落实；零 cc。
+- [ ] 用例清单 6 项 + 4b 三项逐一落实；零 cc。复审增量范围：`b7bfc3a..分支新尖`。
 
 ## R:T-LASTPLAY-CARDS（常规）
 - [ ] `deriveLastActions` 本体零 diff；新文件内部复用它做 text（无第二份文案 switch）。
