@@ -1,7 +1,7 @@
 import { Color, Label, Node, Sprite, SpriteFrame, UITransform, resources } from 'cc';
 import { RESOURCE_PATHS, spriteFrameResourcePath, type ResourcePath } from '../../asset-keys';
 import type { Rect } from '../../table-layout';
-import { addLabel as addUiLabel, addSkinnedButton, addSkinnedSprite, addUiTransform, drawPanelSkin as drawUiPanelSkin } from '../ui-helpers';
+import { THEME, addLabel as addUiLabel, addSkinnedButton, addSkinnedSprite, addUiTransform, drawPanelSkin as drawUiPanelSkin, toColor } from '../ui-helpers';
 
 const LANDSCAPE_CANVAS = { width: 844, height: 390 };
 const SCAFFOLD_NODE_NAMES = [
@@ -41,12 +41,12 @@ const SETTLEMENT_TRANSIENT_HUD_NODE_NAMES = [
   'ai-thinking-1',
   'ai-thinking-2',
 ];
-const BUTTON_PRIMARY_TEXT = new Color(116, 36, 82, 255);
-const BUTTON_SECONDARY_TEXT = new Color(255, 255, 255, 255);
-const BUTTON_TERTIARY_TEXT = new Color(116, 68, 28, 255);
-const BUTTON_DISABLED_TEXT = new Color(86, 72, 82, 220);
-const BUTTON_PAUSE_TOGGLE_TEXT = new Color(116, 54, 72, 255);
-const BUTTON_PAUSE_ACTION_TEXT = new Color(98, 54, 24, 255);
+const BUTTON_PRIMARY_TEXT = toColor(THEME.palette.brandDark);
+const BUTTON_SECONDARY_TEXT = toColor(THEME.palette.textOnAccent);
+const BUTTON_TERTIARY_TEXT = toColor(THEME.palette.brandDark);
+const BUTTON_DISABLED_TEXT = toColor(THEME.palette.textDisabled);
+const BUTTON_PAUSE_TOGGLE_TEXT = toColor(THEME.palette.brandDark);
+const BUTTON_PAUSE_ACTION_TEXT = toColor(THEME.palette.brandDark);
 
 export function addButton(this: any,
   text: string,
@@ -116,6 +116,7 @@ export function buttonSkinPath(this: any, name: string, enabled: boolean): Resou
   if (this.isPauseToggleButton(name)) return RESOURCE_PATHS.pauseBtnToggle;
   if (this.isPauseActionButton(name)) return RESOURCE_PATHS.pauseBtnAction;
   if (name === 'action-hint') return RESOURCE_PATHS.btnTertiaryV13;
+  if (name === 'action-must-pass') return RESOURCE_PATHS.btnPrimaryV13;
   if (
     name === 'action-play' ||
     name === 'bid-call' ||
@@ -131,6 +132,7 @@ export function buttonSkinPath(this: any, name: string, enabled: boolean): Resou
 
 export function buttonTextColor(this: any, name: string, enabled: boolean): Color {
   if (!enabled) return BUTTON_DISABLED_TEXT;
+  if (name === 'action-must-pass') return toColor(THEME.palette.accentGold);
   if (this.isPauseToggleButton(name)) return BUTTON_PAUSE_TOGGLE_TEXT;
   if (this.isPauseActionButton(name)) return BUTTON_PAUSE_ACTION_TEXT;
   const skin = this.buttonSkinPath(name, enabled);
@@ -156,6 +158,7 @@ export function isPauseActionButton(this: any, name: string): boolean {
 export function buttonIconPath(this: any, name: string): ResourcePath | null {
   if (name === 'action-play') return RESOURCE_PATHS.iconPlay;
   if (name === 'action-pass') return RESOURCE_PATHS.iconPass;
+  if (name === 'action-must-pass') return RESOURCE_PATHS.iconPass;
   if (name === 'action-hint') return RESOURCE_PATHS.iconHint;
   if (name === 'bid-call' || name === 'bid-grab') return RESOURCE_PATHS.iconBid;
   if (name === 'pause-open-button') return RESOURCE_PATHS.iconSettings;
@@ -227,7 +230,7 @@ export function addLabel(this: any,
   width = 220,
   height = 72,
   name?: string,
-  color = new Color(255, 255, 255, 255),
+  color = toColor(THEME.palette.textOnAccent),
 ): Label {
   return addUiLabel(this.ensureNode.bind(this), {
     text,
@@ -308,9 +311,9 @@ export function hideSceneScaffold(this: any): void {
 }
 
 export function strengthColor(this: any, tone: 'weak' | 'mid' | 'strong'): Color {
-  if (tone === 'strong') return new Color(124, 218, 150, 230);
-  if (tone === 'mid') return new Color(255, 210, 112, 230);
-  return new Color(255, 134, 134, 230);
+  if (tone === 'strong') return toColor(THEME.palette.success);
+  if (tone === 'mid') return toColor(THEME.palette.warning);
+  return toColor(THEME.palette.danger);
 }
 
 export function canvasSize(this: any): { width: number; height: number } {

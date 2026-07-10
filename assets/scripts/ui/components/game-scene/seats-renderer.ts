@@ -8,7 +8,7 @@ import { deriveLastActions, type SeatLastAction } from '../../last-action-view';
 import { RESOURCE_PATHS, type ResourcePath } from '../../asset-keys';
 import type { Rect } from '../../table-layout';
 import type { TableZones } from '../../table-zones';
-import { addUiTransform, drawPanel } from '../ui-helpers';
+import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
 import { dropZoneForSeat, seatDisplayName, visualSideForSeat } from './seat-display';
 
 export interface GameSceneRendererContext {
@@ -69,8 +69,8 @@ export interface GameSceneRendererContext {
 }
 
 const HERO_SEAT: SeatIndex = 0;
-const NAMEPLATE_TEXT = new Color(108, 46, 76, 255);
-const NAMEPLATE_MUTED = new Color(96, 48, 74, 248);
+const NAMEPLATE_TEXT = toColor(THEME.palette.brandDark);
+const NAMEPLATE_MUTED = toColor(THEME.palette.textSecondary);
 
 export function renderSeats(
   ctx: GameSceneRendererContext,
@@ -267,10 +267,10 @@ function renderLastActions(
     const root = ctx.ensureNode(`last-action-pill-${row.seat}`, ctx.uiRoot);
     root.setPosition(pos.x, pos.y, 0);
     addUiTransform(root, pos.width, 28);
-    drawPanel(root, pos.width, 28, new Color(37, 42, 58, 184));
+    drawPanel(root, pos.width, 28, toColor(THEME.palette.surfaceRaised, 184));
 
-    const labelColor = row.text === '—' ? new Color(255, 255, 255, 145) : new Color(255, 244, 209, 255);
-    ctx.addLabel(row.text, 0, 1, 12, root, pos.width - 16, 22, `last-action-${row.seat}`, labelColor);
+    const labelColor = row.text === '—' ? toColor(THEME.palette.textOnAccent, 145) : toColor(THEME.palette.accentGold);
+    ctx.addLabel(row.text, 0, 1, THEME.typography.xs, root, pos.width - 16, 22, `last-action-${row.seat}`, labelColor);
   });
 }
 
@@ -288,11 +288,11 @@ function renderAiThinking(
   const root = ctx.ensureNode(`ai-thinking-${thinking.seat}`, ctx.uiRoot);
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, pos.width, 28);
-  drawPanel(root, pos.width, 28, new Color(37, 42, 58, 176));
+  drawPanel(root, pos.width, 28, toColor(THEME.palette.surfaceRaised, 176));
 
   const dots = ctx.settings.animation ? '.'.repeat(thinking.dots) : '';
-  const label = ctx.addLabel(`${seatDisplayName(thinking.seat)}思考中${dots}`, 0, 1, 13, root, pos.width - 12, 24, 'ai-thinking-label');
-  label.color = new Color(221, 242, 255, 255);
+  const label = ctx.addLabel(`${seatDisplayName(thinking.seat)}思考中${dots}`, 0, 1, THEME.typography.sm, root, pos.width - 12, 24, 'ai-thinking-label');
+  label.color = toColor(THEME.palette.textOnAccent);
 }
 
 function clearAiThinkingNodes(ctx: GameSceneRendererContext): void {

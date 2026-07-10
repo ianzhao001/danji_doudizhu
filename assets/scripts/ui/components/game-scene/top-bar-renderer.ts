@@ -1,14 +1,14 @@
-import { Color, Graphics, Sprite } from 'cc';
+import { Graphics, Sprite } from 'cc';
 import type { TableRegions } from '../../table-layout';
 import type { TableZones } from '../../table-zones';
 import type { ToggleKey } from '../../settings-view';
 import { RESOURCE_PATHS } from '../../asset-keys';
 import { t } from '../../strings';
-import { addUiTransform } from '../ui-helpers';
+import { THEME, addUiTransform, toColor } from '../ui-helpers';
 import { seatDisplayName } from './seat-display';
 
 const GAME_TABLE_BACKGROUND_ASPECT = 1688 / 780;
-const BRIGHT_PANEL_TEXT = new Color(108, 46, 76, 255);
+const BRIGHT_PANEL_TEXT = toColor(THEME.palette.brandDark);
 const GAME_TEXT = {
   phaseBidding: t('phase.bidding'),
   phasePlaying: t('phase.playing'),
@@ -56,11 +56,11 @@ export function renderTopBar(this: any,
   this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, multiplierPos.x - 40, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
   this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, bombsPos.x - 40, bombsPos.y, 20, 20, this.uiRoot!, 'top-bombs-badge');
   this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 31, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
-  this.addLabel(phaseText(phase), phasePos.x + 4, phasePos.y, 16, this.uiRoot!, 112, 24, 'top-phase', BRIGHT_PANEL_TEXT);
-  this.addLabel(topBar.landlordSeat === null ? GAME_TEXT.landlordPending : `${GAME_TEXT.landlordPrefix}${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 11, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
-  this.addLabel(`${GAME_TEXT.multiplierPrefix}${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, 11, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
-  this.addLabel(`${GAME_TEXT.bombsPrefix}${topBar.bombs}`, bombsPos.x + 4, bombsPos.y, 11, this.uiRoot!, 74, 20, 'top-bombs', BRIGHT_PANEL_TEXT);
-  this.addLabel(`${GAME_TEXT.handPrefix}${handCount}`, handPos.x + 5, handPos.y, 11, this.uiRoot!, 58, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
+  this.addLabel(phaseText(phase), phasePos.x + 4, phasePos.y, THEME.typography.md, this.uiRoot!, 112, 24, 'top-phase', BRIGHT_PANEL_TEXT);
+  this.addLabel(topBar.landlordSeat === null ? GAME_TEXT.landlordPending : `${GAME_TEXT.landlordPrefix}${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, THEME.typography.xs, this.uiRoot!, 84, 20, 'top-landlord', BRIGHT_PANEL_TEXT);
+  this.addLabel(`${GAME_TEXT.multiplierPrefix}${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, THEME.typography.xs, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
+  this.addLabel(`${GAME_TEXT.bombsPrefix}${topBar.bombs}`, bombsPos.x + 4, bombsPos.y, THEME.typography.xs, this.uiRoot!, 74, 20, 'top-bombs', BRIGHT_PANEL_TEXT);
+  this.addLabel(`${GAME_TEXT.handPrefix}${handCount}`, handPos.x + 5, handPos.y, THEME.typography.xs, this.uiRoot!, 58, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
 }
 
 export function renderRuntimeSettings(this: any, layout: TableRegions, canvas: { width: number; height: number }): void {

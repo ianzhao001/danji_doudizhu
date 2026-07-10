@@ -31,12 +31,14 @@ import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
 import { RESOURCE_PATHS, type ResourcePath } from '../asset-keys';
 import { t } from '../strings';
 import {
+  THEME,
   addLabel as addUiLabel,
   addSkinnedButton,
   addSkinnedSprite,
   addUiTransform,
   drawPanelSkin as drawUiPanelSkin,
   loadSprite,
+  toColor,
 } from './ui-helpers';
 
 const { ccclass, property } = _decorator;
@@ -52,14 +54,14 @@ const LEGACY_LABEL_NODE_NAMES = [
   'settings-label',
   'records-label',
 ];
-const PANEL_TEXT = new Color(108, 46, 76, 255);
-const PANEL_MUTED = new Color(142, 88, 108, 235);
-const PANEL_ACCENT = new Color(198, 68, 124, 255);
-const PANEL_GOOD = new Color(77, 126, 88, 245);
-const PANEL_BAD = new Color(176, 72, 88, 245);
-const BUTTON_PRIMARY_TEXT = new Color(116, 36, 82, 255);
-const BUTTON_SECONDARY_TEXT = new Color(34, 78, 132, 255);
-const BUTTON_DISABLED_TEXT = new Color(118, 108, 114, 180);
+const PANEL_TEXT = toColor(THEME.palette.brandDark);
+const PANEL_MUTED = toColor(THEME.palette.textSecondary);
+const PANEL_ACCENT = toColor(THEME.palette.brand);
+const PANEL_GOOD = toColor(THEME.palette.success);
+const PANEL_BAD = toColor(THEME.palette.danger);
+const BUTTON_PRIMARY_TEXT = toColor(THEME.palette.brandDark);
+const BUTTON_SECONDARY_TEXT = toColor(THEME.palette.brandDark);
+const BUTTON_DISABLED_TEXT = toColor(THEME.palette.textDisabled);
 
 const TOGGLE_LABELS: Record<ToggleKey, string> = {
   sound: t('settings.sound'),
@@ -286,7 +288,16 @@ export class LobbyScene extends Component {
     summary.setPosition(leftX, 0, 0);
     addUiTransform(summary, summaryWidth, panelHeight);
     this.drawPanelSkin(summary, summaryWidth, panelHeight);
-    this.addLabel(LOBBY_TEXT.title, 0, panelHeight / 2 - 38, 28, summary, summaryWidth - 34, 40, 'home-title');
+    this.addLabel(
+      LOBBY_TEXT.title,
+      0,
+      panelHeight / 2 - 38,
+      THEME.typography.display,
+      summary,
+      summaryWidth - 34,
+      40,
+      'home-title',
+    );
     this.addButton(
       LOBBY_TEXT.startNewGame,
       0,
@@ -841,8 +852,8 @@ export class LobbyScene extends Component {
             y: 0,
             width: showIcon ? buttonWidth - 32 : buttonWidth,
             height: buttonHeight,
-            fontSize: 16,
-            lineHeight: 20,
+            fontSize: THEME.typography.md,
+            lineHeight: THEME.typography.lg,
           },
           icon: showIcon
             ? {

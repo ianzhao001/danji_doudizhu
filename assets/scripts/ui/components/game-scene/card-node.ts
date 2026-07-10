@@ -3,7 +3,7 @@ import { Rank, Suit, type Card } from '../../../rules';
 import { cardKey } from '../../../rules/guards';
 import { cardView } from '../../card-view';
 import { RESOURCE_PATHS, type ResourcePath } from '../../asset-keys';
-import { addUiTransform } from '../ui-helpers';
+import { THEME, addUiTransform, toColor } from '../ui-helpers';
 
 export const CARD_SIZE = { width: 56, height: 82 };
 const CARD_SUIT_ICON_SIZE = 21;
@@ -161,8 +161,8 @@ export function configureCardSprite(this: any, sprite: Sprite): void {
 export function drawCardBase(this: any, parent: Node, width: number, height: number): void {
   const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
   graphics.clear();
-  graphics.fillColor = new Color(255, 252, 245, 248);
-  graphics.strokeColor = new Color(248, 143, 173, 230);
+  graphics.fillColor = toColor(THEME.palette.surface, 248);
+  graphics.strokeColor = toColor(THEME.palette.brand, 230);
   graphics.lineWidth = 1.5;
   graphics.roundRect(-width / 2, -height / 2, width, height, 7);
   graphics.fill();

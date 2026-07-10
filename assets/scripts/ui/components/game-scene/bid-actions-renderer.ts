@@ -1,4 +1,4 @@
-import { Color, Graphics } from 'cc';
+import { Graphics } from 'cc';
 import { adviseBid } from '../../../ai/bidding-advisor';
 import { adviseAction } from '../../../ai/insight';
 import type { RoundRuntime } from '../../../flow/round-runtime';
@@ -8,15 +8,15 @@ import { deriveInsightView } from '../../insight-view';
 import { deriveScreenVM } from '../../screen-view';
 import type { TableZones } from '../../table-zones';
 import { deriveTurnTimer } from '../../turn-timer';
-import { addUiTransform, drawPanel } from '../ui-helpers';
+import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
 import type { GameSceneRendererContext } from './seats-renderer';
 
-const STATUS_TEXT = new Color(255, 247, 226, 255);
-const STATUS_BACKDROP = new Color(64, 38, 60, 186);
-const BID_ADVICE_BACKDROP = new Color(62, 42, 68, 190);
-const BID_ADVICE_STRONG_BACKDROP = new Color(72, 72, 50, 198);
-const BID_ADVICE_TEXT = new Color(255, 248, 226, 255);
-const BID_ADVICE_STRONG_TEXT = new Color(255, 243, 181, 255);
+const STATUS_TEXT = toColor(THEME.palette.accentCream);
+const STATUS_BACKDROP = toColor(THEME.palette.surfaceRaised, 186);
+const BID_ADVICE_BACKDROP = toColor(THEME.palette.surfaceRaised, 190);
+const BID_ADVICE_STRONG_BACKDROP = toColor(THEME.palette.warning, 198);
+const BID_ADVICE_TEXT = toColor(THEME.palette.accentCream);
+const BID_ADVICE_STRONG_TEXT = toColor(THEME.palette.accentGold);
 
 export function renderBidding(
   ctx: GameSceneRendererContext,
@@ -87,7 +87,7 @@ export function renderTurnTimer(
   const root = ctx.ensureNode('turn-timer-runtime', ctx.uiRoot);
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, width, height);
-  drawPanel(root, width, height, new Color(34, 39, 52, 166));
+  drawPanel(root, width, height, toColor(THEME.palette.surfaceRaised, 166));
   ctx.addSprite(RESOURCE_PATHS.badgeTimerV13, -width / 2 + 14, 0, 20, 20, root, 'turn-timer-badge');
 
   const barWidth = width - 54;
@@ -97,15 +97,15 @@ export function renderTurnTimer(
   addUiTransform(bar, barWidth, barHeight);
   const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
   graphics.clear();
-  graphics.fillColor = new Color(255, 255, 255, 42);
+  graphics.fillColor = toColor(THEME.palette.textOnAccent, 42);
   graphics.roundRect(-barWidth / 2, -barHeight / 2, barWidth, barHeight, 3);
   graphics.fill();
-  graphics.fillColor = timer.urgent ? new Color(255, 114, 114, 235) : new Color(134, 206, 255, 230);
+  graphics.fillColor = timer.urgent ? toColor(THEME.palette.danger, 235) : toColor(THEME.palette.success, 230);
   graphics.roundRect(-barWidth / 2, -barHeight / 2, Math.round((barWidth * timer.pct) / 100), barHeight, 3);
   graphics.fill();
 
-  const label = ctx.addLabel(`计时 ${timer.label}`, width / 2 - 31, 1, 12, root, 56, 20, 'turn-timer-label');
-  label.color = timer.urgent ? new Color(255, 196, 196, 255) : new Color(238, 248, 255, 255);
+  const label = ctx.addLabel(`计时 ${timer.label}`, width / 2 - 31, 1, THEME.typography.xs, root, 56, 20, 'turn-timer-label');
+  label.color = timer.urgent ? toColor(THEME.palette.danger) : toColor(THEME.palette.textOnAccent);
 }
 
 export function renderAdvisor(
@@ -139,14 +139,14 @@ export function renderAdvisor(
   root.setPosition(panelPos.x, panelPos.y, 0);
   addUiTransform(root, width, height);
   const color = insight.isPass
-    ? new Color(43, 55, 75, 190)
+    ? toColor(THEME.palette.surfaceRaised, 190)
     : insight.emphasize
-      ? new Color(52, 86, 63, 192)
-      : new Color(37, 42, 58, 184);
+      ? toColor(THEME.palette.success, 192)
+      : toColor(THEME.palette.surfaceRaised, 184);
   drawPanel(root, width, height, color);
 
-  const label = ctx.addLabel(insight.text, 0, 1, 12, root, width - 18, height - 4, 'advisor-label');
-  label.color = insight.emphasize ? new Color(221, 255, 224, 255) : new Color(255, 248, 226, 255);
+  const label = ctx.addLabel(insight.text, 0, 1, THEME.typography.xs, root, width - 18, height - 4, 'advisor-label');
+  label.color = insight.emphasize ? toColor(THEME.palette.textOnAccent) : toColor(THEME.palette.accentCream);
 }
 
 function renderStatusPill(
@@ -207,7 +207,7 @@ function renderBiddingAdvisor(
   addUiTransform(root, width, height);
   drawPanel(root, width, height, view.emphasize ? BID_ADVICE_STRONG_BACKDROP : BID_ADVICE_BACKDROP);
 
-  const label = ctx.addLabel(biddingAdviceText(view), 0, 1, 13, root, width - 18, height - 6, 'bid-advisor-label');
+  const label = ctx.addLabel(biddingAdviceText(view), 0, 1, THEME.typography.sm, root, width - 18, height - 6, 'bid-advisor-label');
   label.color = view.emphasize ? BID_ADVICE_STRONG_TEXT : BID_ADVICE_TEXT;
 }
 
