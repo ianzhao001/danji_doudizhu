@@ -12,6 +12,7 @@ export interface InteractiveSlot {
   x: number;
   y: number;
   selected: boolean;
+  hitRight: number;
 }
 
 export function layoutHandInteractive(args: {
@@ -29,28 +30,25 @@ export function layoutHandInteractive(args: {
 
   return sortedHand.map((card, index) => {
     const selected = isSelected(args.selected, card);
+    const x = baseSlots[index].x;
+    const hitRight = index < baseSlots.length - 1
+      ? baseSlots[index + 1].x
+      : x + args.cardWidth;
     return {
       card,
-      x: baseSlots[index].x,
+      x,
       y: selected ? -args.liftOffset : 0,
       selected,
+      hitRight,
     };
   });
 }
 
-function slotHitWidth(slots: InteractiveSlot[], index: number): number {
-  if (slots.length === 0) return 0;
-  if (index < slots.length - 1) {
-    return slots[index + 1].x - slots[index].x;
+function slotOverlapsDrag(slot: InteractiveSlot, isLast: boolean, start: number, end: number): boolean {
+  if (isLast) {
+    return slot.hitRight >= start && slot.x <= end;
   }
-  if (slots.length === 1) {
-    return Number.POSITIVE_INFINITY;
-  }
-  return slots[index].x - slots[index - 1].x;
-}
-
-function slotHitEnd(slots: InteractiveSlot[], index: number): number {
-  return slots[index].x + slotHitWidth(slots, index);
+  return slot.hitRight > start && slot.x < end;
 }
 
 export function dragSelectCards(slots: InteractiveSlot[], fromX: number, toX: number): Card[] {
@@ -61,17 +59,17 @@ export function dragSelectCards(slots: InteractiveSlot[], fromX: number, toX: nu
   if (start > end) [start, end] = [end, start];
 
   const firstLeft = slots[0].x;
-  const lastRight = slotHitEnd(slots, slots.length - 1);
-  start = Math.max(firstLeft, Math.min(start, lastRight));
-  end = Math.max(firstLeft, Math.min(end, lastRight));
+  const lastRight = slots[slots.length - 1].hitRight;
 
   if (end < firstLeft || start > lastRight) return [];
 
+  start = Math.max(firstLeft, start);
+  end = Math.min(lastRight, end);
+
   const selected: Card[] = [];
+  const lastIndex = slots.length - 1;
   for (let index = 0; index < slots.length; index += 1) {
-    const left = slots[index].x;
-    const right = slotHitEnd(slots, index);
-    if (right > start && left < end) {
+    if (slotOverlapsDrag(slots[index], index === lastIndex, start, end)) {
       selected.push(slots[index].card);
     }
   }

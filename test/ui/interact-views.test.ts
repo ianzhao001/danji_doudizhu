@@ -130,7 +130,7 @@ describe('dragSelectCards', () => {
   it('正向/反向扫过同区间结果相等', () => {
     const s = slots();
     const left = s[0].x;
-    const right = s[s.length - 1].x + (s[1].x - s[0].x);
+    const right = s[s.length - 1].hitRight;
     const forward = dragSelectCards(s, left, right);
     const backward = dragSelectCards(s, right, left);
     expect(backward).toEqual(forward);
@@ -144,7 +144,7 @@ describe('dragSelectCards', () => {
 
   it('越界夹取', () => {
     const s = slots();
-    const lastEnd = s[s.length - 1].x + (s[1].x - s[0].x);
+    const lastEnd = s[s.length - 1].hitRight;
     const all = dragSelectCards(s, -1000, 10000);
     const clamped = dragSelectCards(s, s[0].x, lastEnd);
     expect(all).toEqual(clamped);
@@ -158,9 +158,54 @@ describe('dragSelectCards', () => {
 
   it('扫过全手牌返回全量且保持手牌序', () => {
     const s = slots();
-    const lastEnd = s[s.length - 1].x + (s[1].x - s[0].x);
+    const lastEnd = s[s.length - 1].hitRight;
     const picked = dragSelectCards(s, s[0].x, lastEnd);
     expect(picked).toEqual(s.map((slot) => slot.card));
+  });
+});
+
+describe('dragSelectCards 4b（裁定新增）', () => {
+  it('重叠态末张右半区命中：20 张/390/60 扫 x=380 命中末张', () => {
+    const hand = cards('3 4 5 6 7 8 9 10 J Q K A 2 3 4 5 6 7 8 9');
+    expect(hand).toHaveLength(20);
+    const s = layoutHandInteractive({
+      hand,
+      selected: [],
+      containerWidth: 390,
+      cardWidth: 60,
+      liftOffset: 10,
+    });
+    const last = s[s.length - 1];
+    expect(last.hitRight).toBeCloseTo(390, 5);
+    expect(dragSelectCards(s, 380, 380)).toEqual([last.card]);
+  });
+
+  it('单张手牌左右越界不命中（x=1e6 返回空）', () => {
+    const hand = cards('K');
+    const s = layoutHandInteractive({
+      hand,
+      selected: [],
+      containerWidth: 390,
+      cardWidth: 60,
+      liftOffset: 10,
+    });
+    expect(dragSelectCards(s, 1e6, 1e6)).toEqual([]);
+  });
+
+  it('hitRight 契约：非末张=下一张 x，末张=自身 x+cardWidth', () => {
+    const hand = cards('3 4 5 6 7');
+    const s = layoutHandInteractive({
+      hand,
+      selected: [],
+      containerWidth: 390,
+      cardWidth: 60,
+      liftOffset: 10,
+    });
+    for (let index = 0; index < s.length - 1; index += 1) {
+      expect(s[index].hitRight).toBe(s[index + 1].x);
+    }
+    const last = s[s.length - 1];
+    expect(last.hitRight).toBeCloseTo(last.x + 60, 5);
   });
 });
 
@@ -184,8 +229,12 @@ describe('sortForDisplay', () => {
       Rank.R3,
       Rank.R3,
     ]);
-    expect(sortForDisplay(input)[5]).toEqual(R3H);
-    expect(sortForDisplay(input)[6]).toEqual(R3S);
+    expect(sortForDisplay(input)[5]).toEqual(R3S);
+    expect(sortForDisplay(input)[6]).toEqual(R3H);
+  });
+
+  it('同点数内保持 sortByRank 稳定序不反转', () => {
+    expect(sortForDisplay([R3S, R3H, R5C])).toEqual([R5C, R3S, R3H]);
   });
 
   it('不改入参', () => {
