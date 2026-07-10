@@ -1,4 +1,4 @@
-import { Color, Graphics, Node, Sprite, UIOpacity, Vec3, tween } from 'cc';
+import { Color, EventTouch, Graphics, Node, Sprite, UIOpacity, UITransform, Vec3, tween } from 'cc';
 import { Rank, Suit, type Card } from '../../../rules';
 import { cardKey } from '../../../rules/guards';
 import { cardView } from '../../card-view';
@@ -87,15 +87,26 @@ export function addCardNode(this: any, card: Card, x: number, y: number, parent:
   this.configureCardSprite(sprite);
   this.loadSprite(this.cardSpritePath(card), sprite);
   node.off(Node.EventType.TOUCH_START);
+  node.off(Node.EventType.TOUCH_MOVE);
   node.off(Node.EventType.TOUCH_END);
   node.off(Node.EventType.TOUCH_CANCEL);
   if (interactive) {
-    node.on(Node.EventType.TOUCH_START, () => this.setCardPressed(node, true), this);
-    node.on(Node.EventType.TOUCH_END, () => {
+    node.on(Node.EventType.TOUCH_START, (event: EventTouch) => {
+      this.setCardPressed(node, true);
+      this.onHandDragStart?.(event);
+    }, this);
+    node.on(Node.EventType.TOUCH_MOVE, (event: EventTouch) => {
+      this.onHandDragMove?.(event);
+    }, this);
+    node.on(Node.EventType.TOUCH_END, (event: EventTouch) => {
       this.setCardPressed(node, false);
+      if (this.onHandDragEnd?.(event)) return;
       this.toggleCard(card);
     }, this);
-    node.on(Node.EventType.TOUCH_CANCEL, () => this.setCardPressed(node, false), this);
+    node.on(Node.EventType.TOUCH_CANCEL, () => {
+      this.setCardPressed(node, false);
+      this.onHandDragCancel?.();
+    }, this);
   }
 
   const faceColor = this.cardFaceColor(view.suitKey);

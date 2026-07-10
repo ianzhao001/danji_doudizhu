@@ -6,6 +6,7 @@ import { RESOURCE_PATHS } from '../../asset-keys';
 import { deriveBiddingAdviceView, type BiddingAdviceView } from '../../bidding-advice-view';
 import { deriveInsightView } from '../../insight-view';
 import { deriveScreenVM } from '../../screen-view';
+import { t } from '../../strings';
 import type { TableZones } from '../../table-zones';
 import { deriveTurnTimer } from '../../turn-timer';
 import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
@@ -49,6 +50,7 @@ export function renderActions(
   hint: boolean,
   layout: TableZones,
   canvas: { width: number; height: number },
+  mustPass = false,
 ): void {
   const y = layout.tableActionBar.y + layout.tableActionBar.height * 0.5;
   const buttonHeight = 60;
@@ -58,9 +60,21 @@ export function renderActions(
   const playPos = ctx.screenPoint(canvas, center - step, y);
   const passPos = ctx.screenPoint(canvas, center, y);
   const hintPos = ctx.screenPoint(canvas, center + step, y);
-  ctx.addButton('出牌', playPos.x, playPos.y, buttonWidth, buttonHeight, play, () => void ctx.submitPlay(), ctx.uiRoot, 'action-play');
-  ctx.addButton('不要', passPos.x, passPos.y, buttonWidth, buttonHeight, pass, () => void ctx.submitPass(), ctx.uiRoot, 'action-pass');
-  ctx.addButton('提示', hintPos.x, hintPos.y, buttonWidth, buttonHeight, hint, () => ctx.applyHint(), ctx.uiRoot, 'action-hint');
+  const playEnabled = mustPass ? false : play;
+  const hintEnabled = mustPass ? false : hint;
+  ctx.addButton(t('action.play'), playPos.x, playPos.y, buttonWidth, buttonHeight, playEnabled, () => void ctx.submitPlay(), ctx.uiRoot, 'action-play');
+  ctx.addButton(
+    mustPass ? t('action.mustPass') : t('action.pass'),
+    passPos.x,
+    passPos.y,
+    buttonWidth,
+    buttonHeight,
+    pass,
+    () => void ctx.submitPass(),
+    ctx.uiRoot,
+    mustPass ? 'action-must-pass' : 'action-pass',
+  );
+  ctx.addButton(t('action.hint'), hintPos.x, hintPos.y, buttonWidth, buttonHeight, hintEnabled, () => ctx.applyHint(), ctx.uiRoot, 'action-hint');
 }
 
 export function renderStatus(

@@ -22,6 +22,7 @@ import type { GameEvent, ResumeSnapshot, RoundFinishInput, SeatIndex } from '../
 import type { Card } from '../../rules';
 import { cocosStorage } from '../../runtime/cocos-storage';
 import { clearSelection, toggle } from '../selection';
+import { deriveFollowUx } from '../follow-ux';
 import { rebuildRecentEvents } from '../resume-rebuild';
 import { deriveScreenVM } from '../screen-view';
 import { emptyToasts, type ToastQueue } from '../toast-queue';
@@ -71,6 +72,8 @@ import {
   renderHand as renderHandImpl,
   handLayoutFrame as handLayoutFrameImpl,
   armDealAnimationLock as armDealAnimationLockImpl,
+  layoutDisplayHandSlots as layoutDisplayHandSlotsImpl,
+  bindHandDragHandlers as bindHandDragHandlersImpl,
 } from './game-scene/play-area-renderer';
 import {
   renderTopBar as renderTopBarImpl,
@@ -248,6 +251,11 @@ export class GameSceneSkeleton extends Component {
   private renderedSelectedCardKeys = new Set<string>();
   private animatedToastIds = new Set<number>();
   private liveRenderNodes: Set<Node> | null = null;
+  private displayHandSlots: ReturnType<typeof layoutDisplayHandSlotsImpl> = [];
+  private handDragActive = false;
+  private handDragMoved = false;
+  private handDragStartX = 0;
+  private handDragCurrentX = 0;
 
   onLoad(): void {
     if (this.background) this.background.node.active = false;
@@ -255,6 +263,7 @@ export class GameSceneSkeleton extends Component {
     this.hideSceneScaffold();
     this.audioSource = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
     this.uiRoot = this.ensureNode('runtime-ui', this.node);
+    bindHandDragHandlersImpl.call(this);
     this.preloadRuntimeSprites();
     this.startGame(false);
   }
@@ -413,7 +422,19 @@ export class GameSceneSkeleton extends Component {
     const phase = this.runtime.phase();
     const handCounts = snapshot?.handCounts ?? biddingDeal?.handCounts ?? [0, 0, 0];
     const handCount = snapshot?.viewerHand?.length ?? biddingDeal?.viewerHand.length ?? 0;
-    this.armDealAnimationLock(phase, vm.hand);
+    const handFrame = this.handLayoutFrame(canvas);
+    const viewerHand = snapshot?.viewerHand ?? biddingDeal?.viewerHand ?? [];
+    this.displayHandSlots = viewerHand.length > 0
+      ? layoutDisplayHandSlotsImpl({
+        hand: viewerHand,
+        selected: this.selected,
+        containerWidth: handFrame.width,
+        cardWidth: CARD_SIZE.width,
+        liftOffset: HAND_LIFT,
+      })
+      : [];
+    this.armDealAnimationLock(phase, this.displayHandSlots);
+    const followUx = snapshot ? deriveFollowUx({ snapshot, viewerSeat: HERO_SEAT }) : { mustPass: false, alerts: [] };
     const showTransientHud = phase !== 'settled';
 
     this.beginRenderDiff();
@@ -424,12 +445,17 @@ export class GameSceneSkeleton extends Component {
     this.renderBottomCardsDock(phase === 'bidding' ? null : this.revealedBottomCards, layout, canvas);
     this.renderPlayArea(snapshot?.top ?? null, layout, canvas);
     if (showTransientHud) this.renderHud(snapshot?.viewerHand ?? [], layout, canvas);
-    this.renderHand(vm.hand, layout, canvas);
+    this.renderHand(this.displayHandSlots, layout, canvas);
     if (showTransientHud) this.renderAdvisor(snapshot, layout, canvas);
     if (phase === 'bidding') this.renderBidding(vm.bidding, layout, canvas);
     if (showTransientHud && phase !== 'bidding') this.renderStatus(this.statusText, layout, canvas);
     if (showTransientHud) this.renderTurnTimer(layout, canvas);
-    if (phase === 'playing') this.renderActions(vm.actions.play, vm.actions.pass, vm.actions.hint, layout, canvas);
+    if (phase === 'playing') {
+      const actions = vm.actions;
+      const playEnabled = followUx.mustPass ? false : actions.play;
+      const hintEnabled = followUx.mustPass ? false : actions.hint;
+      this.renderActions(playEnabled, actions.pass, hintEnabled, layout, canvas, followUx.mustPass);
+    }
     if (showTransientHud) this.renderToasts(layout, canvas);
     this.renderTerminationFeedbackActions(layout, canvas);
     this.renderResult(vm.result, handCounts, layout, canvas);
@@ -537,8 +563,9 @@ export class GameSceneSkeleton extends Component {
     hint: boolean,
     layout: TableZones,
     canvas: { width: number; height: number },
+    mustPass = false,
   ): void {
-    renderActionsSection(this.rendererContext(), play, pass, hint, layout, canvas);
+    renderActionsSection(this.rendererContext(), play, pass, hint, layout, canvas, mustPass);
   }
 
   private renderStatus(text: string, layout: TableZones, canvas: { width: number; height: number }): void {
