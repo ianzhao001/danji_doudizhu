@@ -4,7 +4,7 @@
 - 分支：`task/T-LASTPLAY-CARDS`
 - 链式基点：`task/T-INTERACT-VIEWS` 尖 commit `fa3c4f0`
 - 复审基点：`1f41c28`
-- 状态：in-review（打回项已修，待 Codex 复审）
+- 状态：approved
 
 ## 改了哪些文件
 - `assets/scripts/ui/last-play-view.ts`：bomb/rocket 仅当紧邻前一事件为同席 `play` 时置 `emphasis`
@@ -39,7 +39,21 @@ npm --prefix test run typecheck
 ## 评审结论（Codex 审查者·2026-07-10·首轮）
 - 结论：`changes-requested`（bomb 非相邻污染、四牌型覆盖缺口）。
 
+## 修复复审（Codex 审查者·2026-07-10）
+- 结论：`approved`（常规 ui 纯岛，无高风险面）。
+- 增量 diff 逐行审读：`1f41c28..b5e3ff2`；仅 `last-play-view.ts` / 执行者自写测试 / 本报告，`last-action-view.ts` 零 diff，零 `cc` import，`git diff --check` 净。
+- emphasis 核销：仅紧邻前一事件为同席 play 时接受 bomb/rocket；`play → pass → bomb` 不再污染旧 play，相邻炸弹/火箭既有用例保留。
+- 覆盖核销：单/对/顺子/三带一已拆为 4 个独立事件流，每例均断言 cards 引用同一性+逐张等值+text 与 `deriveLastActions` 一致。
+- 定向抽查：`deriveLastActions` 的 `seats-renderer.ts` / `resume-replay-rebuild` 消费链零改动；新 `deriveLastPlays` 尚无产品消费方，符合 P-TABLE-INFO 后置接线。
+- 定向闸门：`last-play-view` + `last-action-view` + `resume-replay-rebuild` 共20/20 绿；win 隔断紧邻性探针通过。
+- 全量闸门：152 files / 811 tests 绿；`npm --prefix test run typecheck` exit 0；`git diff --check` 净。
+
+## 兜底修复披露（Codex 审查者）
+- 范围：仅 `assets/scripts/ui/last-play-view.ts` 的 `previous` 推进，未改测试、未越文件域。
+- 摘要：`win` 对席位最近动作仍然忽略，但作为事件序列节点必须中断「紧邻」；在 `continue` 前设 `previous=event`，防止 `play → win → bomb` 误设 emphasis。
+- 证据：修前上述探针输出 `emphasis:'bomb'`；修后为 `null`，定向 20/20 + 全量 811/811 + typecheck 绿。
+
 ## 自检
 - [x] `last-action-view.ts` 零 diff
 - [x] 未改既有测试
-- [x] 待批末双闸复跑
+- [x] 批末双闸已复跑并全绿

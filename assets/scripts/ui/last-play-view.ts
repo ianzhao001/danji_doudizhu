@@ -23,7 +23,10 @@ export function deriveLastPlays(recentEvents: GameEvent[]): SeatLastPlay[] {
   let previous: GameEvent | null = null;
 
   for (const event of recentEvents) {
-    if (event.type === 'win') continue;
+    if (event.type === 'win') {
+      previous = event;
+      continue;
+    }
     if (event.type === 'reset') {
       bySeat.clear();
       previous = event;
