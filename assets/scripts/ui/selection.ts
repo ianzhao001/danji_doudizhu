@@ -27,6 +27,10 @@ export function sortByRank(cards: Card[]): Card[] {
     .map(({ card }) => card);
 }
 
+export function sortForDisplay(cards: Card[]): Card[] {
+  return [...sortByRank(cards)].reverse();
+}
+
 export function clearSelection(): Card[] {
   return [];
 }
