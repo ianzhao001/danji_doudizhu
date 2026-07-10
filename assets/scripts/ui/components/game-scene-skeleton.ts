@@ -193,6 +193,8 @@ const RUNTIME_PRELOAD_SPRITES: readonly ResourcePath[] = [
   RESOURCE_PATHS.iconBid,
   RESOURCE_PATHS.iconBack,
   RESOURCE_PATHS.iconSettings,
+  RESOURCE_PATHS.emphasisBomb,
+  RESOURCE_PATHS.emphasisRocket,
 ];
 
 @ccclass('GameSceneSkeleton')
@@ -440,7 +442,7 @@ export class GameSceneSkeleton extends Component {
     this.beginRenderDiff();
     if (!showTransientHud) this.hideSettledTransientHud();
     this.renderTopBar(phase, vm.topBar, handCount, layout, canvas);
-    this.renderSeats(handCounts, snapshot?.landlord ?? null, layout, canvas);
+    this.renderSeats(handCounts, snapshot?.landlord ?? null, layout, canvas, followUx.alerts);
     if (showTransientHud) this.renderSeatFeedback(layout, canvas);
     this.renderBottomCardsDock(phase === 'bidding' ? null : this.revealedBottomCards, layout, canvas);
     this.renderPlayArea(snapshot?.top ?? null, layout, canvas);
@@ -504,6 +506,7 @@ export class GameSceneSkeleton extends Component {
       startGame: this.startGame.bind(this),
       animateScaleIn: this.animateScaleIn.bind(this),
       drawDimOverlay: this.drawDimOverlay.bind(this),
+      addDisplayCard: this.addDisplayCard.bind(this),
     };
   }
 
@@ -516,8 +519,9 @@ export class GameSceneSkeleton extends Component {
     landlord: number | null,
     layout: TableZones,
     canvas: { width: number; height: number },
+    alerts: ReturnType<typeof deriveFollowUx>['alerts'] = [],
   ): void {
-    renderSeatsSection(this.rendererContext(), handCounts, landlord, layout, canvas);
+    renderSeatsSection(this.rendererContext(), handCounts, landlord, layout, canvas, alerts);
   }
 
   private renderSeatFeedback(layout: TableZones, canvas: { width: number; height: number }): void {
