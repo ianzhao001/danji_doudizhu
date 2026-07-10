@@ -249,7 +249,7 @@ export function addSkinnedButton(
   button.transition = Button.Transition.COLOR;
   button.interactable = options.enabled;
   button.normalColor = toColor(THEME.palette.textOnAccent);
-  button.pressedColor = toColor(THEME.palette.selectedTint);
+  button.pressedColor = toColor(THEME.palette.selectedTint, 255);
   button.hoverColor = toColor(THEME.palette.textOnAccent);
   button.disabledColor = toColor(THEME.palette.textOnAccent);
   node.off(Button.EventType.CLICK);

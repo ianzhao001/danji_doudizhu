@@ -1,68 +1,64 @@
 # P-THEME-APPLY Report
 
-- status: changes-requested
-- task: Wire cc layer colors to THEME tokens via `toColor()` in `ui-helpers.ts`
+- status: in-review
+- branch: `task/P-THEME-APPLY`
+- original implementation: `4a46e1c`
+- task: cc 层颜色、字号、圆角与透明度接线到 `ui/theme.ts` 的 `THEME`
 
 ## Files Changed
 
 - `assets/scripts/ui/components/ui-helpers.ts`
 - `assets/scripts/ui/components/lobby-scene.ts`
-- `assets/scripts/ui/components/game-scene/ui-runtime-helpers.ts`
-- `assets/scripts/ui/components/game-scene/tween-helpers.ts`
-- `assets/scripts/ui/components/game-scene/top-bar-renderer.ts`
-- `assets/scripts/ui/components/game-scene/seats-renderer.ts`
-- `assets/scripts/ui/components/game-scene/runtime-feedback.ts`
-- `assets/scripts/ui/components/game-scene/result-overlay-renderer.ts`
-- `assets/scripts/ui/components/game-scene/play-area-renderer.ts`
-- `assets/scripts/ui/components/game-scene/pause-overlay-renderer.ts`
-- `assets/scripts/ui/components/game-scene/hud-renderer.ts`
-- `assets/scripts/ui/components/game-scene/bid-actions-renderer.ts`
-- `assets/scripts/ui/components/game-scene/card-node.ts`
+- `assets/scripts/ui/components/game-scene/**` 中的主题消费 renderer
+- `coordination/reports/P-THEME-APPLY.report.md`
 
-## Residual `new Color` grep (`assets/scripts/ui/components`)
+## 令牌接线盘点
+
+| 现存常量类别 | 归并令牌/转换 | 说明 |
+|---|---|---|
+| 品牌粉、深粉正文 | `palette.brand` / `brandDark` | 大厅、顶栏、结算、名牌统一 |
+| 浅面板、深色浮层 | `palette.surface` / `surfaceRaised` | 面板 alpha 差异通过 `toColor(token, alpha)` 保留 |
+| 白字、弱化字、禁用字 | `textOnAccent` / `textSecondary` / `textDisabled` | 既有透明度显式保留 |
+| 金色、奶油色提示 | `accentGold` / `accentCream` | 最近动作、叫抢建议、HUD |
+| 危险/成功/警告 | `danger` / `success` / `warning` | 计时、建议、状态提示 |
+| 牌桌正文 | `tableFelt` | 手牌区标题 |
+| 11/12/13/16/18/20/24/28 字号 | `typography.xs/sm/md/lg/xl/display` | 12 归并至 xs=11；18 归并至 lg=20；其余取最近档 |
+| 面板圆角 8 | `radius.md` | `drawPanel` 单点接线；卡面特有圆角 7 保持资产语义 |
+| 禁用/hover/pressed/scrim | `alpha.disabled/hover/pressed/scrim` 或显式 alpha override | 不透明皮肤按钮 pressed 保持原 alpha=255；半透明面板保留原 alpha |
+| 布局间距 | 未改 | 本任务禁止重排几何；现存坐标/间距原样保留 |
+
+## Residual `new Color`
 
 ```text
 assets/scripts/ui/components/game-scene/card-node.ts
-  ? new Color(204, 65, 92, 255)
-  : new Color(54, 55, 66, 255)
-
+  cardFaceColor 红黑花色两行（语义豁免）
 assets/scripts/ui/components/ui-helpers.ts
-  return new Color(token.r, token.g, token.b, alpha ?? token.a)
+  toColor() 内部唯一 cc 转换点
 ```
 
-## Visual Self-Review (placeholder)
+## 视觉与运行证据
 
-| Scenario | Expected | Result | Notes |
-|---|---|---|---|
-| Lobby 首页 | 品牌/正文/弱化文本颜色均来自 THEME | TODO |  |
-| 对局 HUD | 面板、提示、计时条统一主题色 | TODO |  |
-| 结算弹层 | 面板/标题/分数区主题化 | TODO |  |
-| 暂停菜单 | 标题与弱化文案主题化 | TODO |  |
-| 出牌/叫分建议 | 建议条与状态条主题化 | TODO |  |
+- `/tmp/doudizhu-w-unify-ui/summary.json`：`productErrors=[]`。
+- 已有冒烟帧：`lobby-844x390.png`、`game-bidding-844x390.png`、`game-playing-844x390.png`、`game-bidding-780x360.png`、`game-playing-780x360.png`。
+- 规划者视觉审②已在 `coordination/BOARD.md` v1.4「UI 批视觉审②」登记 P-THEME-APPLY PASS；未齐的四横屏/相位证据按用户裁量固化进 V8，不阻断本棒机械合并。
 
-## Codex 批量复审（2026-07-10）
+## 视觉自审①
 
-- 结论：`changes-requested`；规划者视觉审②已在 BOARD 放行并将未齐证据递延至 V8，但下列机械/代码门仍未过，不得 claim/merge。
-- 审读范围：`35d7122..4a46e1c`。文件域本身合规；`ui/*.ts` 纯岛、`theme.ts`、`test/**`、`event-cues.ts` 零 diff；`git diff --check` 净。
-- 链尖全量闸门：152 files / 815 tests 绿，typecheck exit 0。
+| 硬伤类 | 结论 | 证据边界 |
+|---|---|---|
+| 元素重叠 | 已有 844/780 冒烟帧无新增 | 布局几何零改动 |
+| 文字对比 | 已有帧无新增 | 颜色改走同一 token 体系 |
+| 文字包裹 | 已有帧无新增 | 按钮/面板结构零改动 |
+| 闪烁/重渲 | `productErrors=[]`，未新增动画路径 | 动态证据递延 V8 |
 
-### 阻断 1：本任务尖的 `new Color` grep 不达标
+## 兜底修复披露（Codex·2026-07-10）
 
-- 在 `4a46e1c` 上，`git grep -n "new Color" -- assets/scripts/ui/components` 仍有 **26 行**：除 `ui-helpers.ts:toColor` 与 `card-node.ts:cardFaceColor` 花色豁免外，`bid-actions-renderer.ts`、`card-node.ts`、`play-area-renderer.ts`、`seats-renderer.ts` 尚有大量非豁免魔法色。
-- 这些替换被推到后两棒，只能让最终 `abf1580` 链尖 grep 变绿，不能让需首先独立合并的 P-THEME-APPLY 达到 R:P-THEME-APPLY。
-- 修复要求：将主题替换按责任归回 P-THEME-APPLY 分支，重整后续链；本分支 grep 必须仅剩转换点 + 花色豁免。
+- 原因：首轮机械复审发现主题替换被错放到后两棒，且 skinned pressed alpha 从 255 漂移为 150；修复量低于一次执行者窗口往返，按 PROTOCOL 由审查者在原文件域兜底。
+- 范围：将 `bid-actions-renderer.ts`、`card-node.ts` 卡面底色、`play-area-renderer.ts` 牌桌文字、`seats-renderer.ts` 既有颜色/字号归回本棒；`addSkinnedButton.pressedColor` 显式保持 alpha 255；补齐本任务报告。
+- 未改：布局几何、交互逻辑、`ui/*.ts` 纯岛、`theme.ts`、`test/**`、`event-cues.ts`。
 
-### 阻断 2：skinned button pressed alpha 发生非预期漂移
+## 审查记录
 
-- `addSkinnedButton` 旧 `pressedColor = (255,235,240,255)`；现代码 `toColor(THEME.palette.selectedTint)` 会取 token 自带 `a=150`。
-- 这不是“颜色来源替换”，而是按压态不透明度从 255 降到 150。若保持旧语义，应显式传 alpha 255；若要调整，须有完整前后视觉证据与规划者裁定。
-
-### 报告落盘缺口 + V8 递延证据（证据缺口本轮不单独阻断）
-
-- task 要求字号/间距/圆角/透明度归并前后表，本分支报告仍是 TODO placeholder，未给出完整映射与残留豁免。
-- 按 task 原验收，应有 844×390 / 812×375 / 915×412 / 780×360 × lobby-home、lobby 子屏、bidding、playing、settled、pause 的改前/改后对照；现有 `/tmp/doudizhu-w-unify-ui` 只有 844/780 的 5 张冒烟图。规划者已明示改由 V8 强制补审，故不作本轮独立阻断。
-- `summary.json` 的 `productErrors=[]` 已核实，但只能证明本次 5 帧冒烟无产品错误，不替代缺失相位/分辨率。
-
-### 协调落盘问题
-
-- 完整 P-THEME-APPLY 报告只在 `task/P-TABLE-INFO` 尖的 `abf1580` 文档提交中；`task/P-THEME-APPLY` 自身仍是 placeholder。重提时必须让本任务的实现与最终证据报告同时存在于本分支。
+- 原审查尖：`fb31f92`，结论 `changes-requested`。
+- 复审范围：`35d7122..本分支新尖`；逐行审主题消费 diff，并定向抽查 `THEME` / `toColor` 的组件消费方。
+- 待最终验收回填：全量 test/typecheck、main 双闸、merge commit 与 BOARD done 状态。

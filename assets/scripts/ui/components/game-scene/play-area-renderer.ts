@@ -1,4 +1,4 @@
-import { Color, Sprite } from 'cc';
+import { Sprite } from 'cc';
 import type { SeatIndex, TopPlay } from '../../../game';
 import type { Card } from '../../../rules';
 import { cardKey } from '../../../rules/guards';
@@ -8,12 +8,12 @@ import { t } from '../../strings';
 import type { Rect } from '../../table-layout';
 import type { TableZones } from '../../table-zones';
 import { RESOURCE_PATHS } from '../../asset-keys';
-import { addUiTransform } from '../ui-helpers';
+import { THEME, addUiTransform, toColor } from '../ui-helpers';
 import { dropZoneForSeat, visualSideForSeat } from './seat-display';
 import { CARD_SIZE, HAND_LIFT, cardsSignature } from './card-node';
 
 const HERO_SEAT: SeatIndex = 0;
-const TABLE_TEXT = new Color(74, 70, 72, 235);
+const TABLE_TEXT = toColor(THEME.palette.tableFelt);
 const GAME_TEXT = {
   playerHand: t('tutorial.playerHand'),
 };
@@ -202,7 +202,7 @@ export function renderHand(this: any,
   const handFrame = this.handLayoutFrame(canvas);
   if (hand.length === 0) {
     const title = this.screenPoint(canvas, handFrame.x + handFrame.width / 2, layout.heroHandLarge.y + Math.min(24, layout.heroHandLarge.height * 0.22));
-    this.addLabel(GAME_TEXT.playerHand, title.x, title.y, 16, this.uiRoot!, 140, 30, 'hand-title', TABLE_TEXT);
+    this.addLabel(GAME_TEXT.playerHand, title.x, title.y, THEME.typography.md, this.uiRoot!, 140, 30, 'hand-title', TABLE_TEXT);
   }
   const handSignature = cardsSignature(hand.map((slot) => slot.card));
   const animateDeal = this.settings.animation && handSignature !== this.lastHandSignature;
