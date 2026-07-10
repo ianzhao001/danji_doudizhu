@@ -59,6 +59,13 @@ npm --prefix test run typecheck → exit 0
 - 定向抽查：新导出 `ThemeColor` / `Theme` / `THEME` 尚无产品消费方（符合 P-THEME-APPLY 后置接线）；`ui/index.ts` 仅追加一行。
 - 闸门：定向 `theme.test.ts` 5/5 绿；链尖全量 `152 files / 807 tests` 绿；`npm --prefix test run typecheck` exit 0。
 
+## 验收披露（Codex 审查者）
+- 评审结论：`approved`；打回 0 轮；兜底修复：无。
+- 定向抽查：令牌现值对照通过，新导出尚无直接产品消费方，符合后续 P-THEME-APPLY 接线顺序。
+- 合并 commit：`eb6fcaf`（`merge task/T-THEME-TOKENS`）。
+- 合并前 main 双闸：149 files / 770 tests 绿，typecheck exit 0。
+- 合并后 main 基线：150 files / 775 tests 绿，typecheck exit 0。
+
 ## 自检（对照验收项）
 - [x] 测试全绿
 - [x] typecheck 无错
