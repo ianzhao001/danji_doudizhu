@@ -20,11 +20,13 @@ type SeatState = {
 
 export function deriveLastPlays(recentEvents: GameEvent[]): SeatLastPlay[] {
   const bySeat = new Map<SeatIndex, SeatState>();
+  let previous: GameEvent | null = null;
 
   for (const event of recentEvents) {
     if (event.type === 'win') continue;
     if (event.type === 'reset') {
       bySeat.clear();
+      previous = event;
       continue;
     }
     if (event.type === 'play') {
@@ -33,17 +35,24 @@ export function deriveLastPlays(recentEvents: GameEvent[]): SeatLastPlay[] {
         cards: event.pattern.cards,
         emphasis: null,
       });
+      previous = event;
       continue;
     }
     if (event.type === 'pass') {
       bySeat.set(event.seat, { kind: 'pass', cards: [], emphasis: null });
+      previous = event;
       continue;
     }
     if (event.type === 'bomb' || event.type === 'rocket') {
       const current = bySeat.get(event.seat);
-      if (current?.kind === 'play') {
+      if (
+        current?.kind === 'play' &&
+        previous?.type === 'play' &&
+        previous.seat === event.seat
+      ) {
         current.emphasis = event.type === 'bomb' ? 'bomb' : 'rocket';
       }
+      previous = event;
     }
   }
 

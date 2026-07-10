@@ -7,7 +7,7 @@ import {
   type Card,
   type HandPattern,
 } from '../../assets/scripts/rules';
-import { Side, type GameEvent } from '../../assets/scripts/game';
+import { type GameEvent, type SeatIndex } from '../../assets/scripts/game';
 import { deriveLastActions } from '../../assets/scripts/ui/last-action-view';
 import { deriveLastPlays } from '../../assets/scripts/ui/last-play-view';
 
@@ -17,6 +17,20 @@ function c(rank: Rank, suit: Suit = Suit.Spade): Card {
 
 function pattern(category: Category, cards: Card[], mainRank = cards[0].rank): HandPattern {
   return { category, mainRank, length: cards.length, cards };
+}
+
+function assertPlayRow(events: GameEvent[], seat: SeatIndex): void {
+  const playEvent = events.find(
+    (event): event is Extract<GameEvent, { type: 'play' }> =>
+      event.type === 'play' && event.seat === seat,
+  )!;
+  const row = deriveLastPlays(events).find((item) => item.seat === seat)!;
+  const textRow = deriveLastActions(events).find((item) => item.seat === seat)!;
+
+  expect(row.kind).toBe('play');
+  expect(row.cards).toBe(playEvent.pattern.cards);
+  expect(row.cards).toEqual(playEvent.pattern.cards);
+  expect(row.text).toBe(textRow.text);
 }
 
 describe('deriveLastPlays', () => {
@@ -36,11 +50,27 @@ describe('deriveLastPlays', () => {
     expect(rows.map((row) => row.seat)).toEqual([0, 1, 2]);
   });
 
-  it('单/对/顺子/三带一：cards 与 pattern.cards 全等，text 与 deriveLastActions 一致', () => {
-    const cases: GameEvent[] = [
-      { type: 'play', seat: 0, pattern: pattern(Category.Single, [c(Rank.K)]) },
-      { type: 'play', seat: 1, pattern: pattern(Category.Pair, [c(Rank.Q), c(Rank.Q, Suit.Heart)], Rank.Q) },
-      {
+  it('单张：cards 与 pattern.cards 全等，text 与 deriveLastActions 一致', () => {
+    assertPlayRow(
+      [{ type: 'play', seat: 0, pattern: pattern(Category.Single, [c(Rank.K)]) }],
+      0,
+    );
+  });
+
+  it('对子：cards 与 pattern.cards 全等，text 与 deriveLastActions 一致', () => {
+    assertPlayRow(
+      [{
+        type: 'play',
+        seat: 1,
+        pattern: pattern(Category.Pair, [c(Rank.Q), c(Rank.Q, Suit.Heart)], Rank.Q),
+      }],
+      1,
+    );
+  });
+
+  it('顺子：cards 与 pattern.cards 全等，text 与 deriveLastActions 一致', () => {
+    assertPlayRow(
+      [{
         type: 'play',
         seat: 2,
         pattern: pattern(
@@ -48,32 +78,24 @@ describe('deriveLastPlays', () => {
           [c(Rank.R3), c(Rank.R4), c(Rank.R5), c(Rank.R6), c(Rank.R7)],
           Rank.R7,
         ),
-      },
-      {
+      }],
+      2,
+    );
+  });
+
+  it('三带一：cards 与 pattern.cards 全等，text 与 deriveLastActions 一致', () => {
+    assertPlayRow(
+      [{
         type: 'play',
         seat: 0,
-        pattern: pattern(Category.TripsSingle, [c(Rank.R8), c(Rank.R8, Suit.Heart), c(Rank.R8, Suit.Club), c(Rank.R4)], Rank.R8),
-      },
-    ];
-
-    const plays = deriveLastPlays(cases);
-    const texts = deriveLastActions(cases);
-
-    for (const row of plays) {
-      const textRow = texts.find((t) => t.seat === row.seat)!;
-      expect(row.text).toBe(textRow.text);
-    }
-
-    const single = plays.find((row) => row.seat === 0)!;
-    expect(single.kind).toBe('play');
-    expect(single.cards).toBe(cases[3].type === 'play' ? cases[3].pattern.cards : []);
-    expect(single.cards).toEqual(cases[3].type === 'play' ? cases[3].pattern.cards : []);
-
-    const pair = plays.find((row) => row.seat === 1)!;
-    expect(pair.cards).toEqual((cases[1] as Extract<GameEvent, { type: 'play' }>).pattern.cards);
-
-    const straight = plays.find((row) => row.seat === 2)!;
-    expect(straight.cards).toEqual((cases[2] as Extract<GameEvent, { type: 'play' }>).pattern.cards);
+        pattern: pattern(
+          Category.TripsSingle,
+          [c(Rank.R8), c(Rank.R8, Suit.Heart), c(Rank.R8, Suit.Club), c(Rank.R4)],
+          Rank.R8,
+        ),
+      }],
+      0,
+    );
   });
 
   it('炸弹：play+bomb 相邻 → emphasis bomb、cards 4 张、text 炸弹', () => {
@@ -101,6 +123,18 @@ describe('deriveLastPlays', () => {
     expect(row.emphasis).toBe('rocket');
     expect(row.cards).toEqual(rocketCards);
     expect(row.text).toBe('火箭');
+  });
+
+  it('非相邻 bomb 不污染旧 play 的 emphasis', () => {
+    const events: GameEvent[] = [
+      { type: 'play', seat: 0, pattern: pattern(Category.Single, [c(Rank.R3)]) },
+      { type: 'pass', seat: 1 },
+      { type: 'bomb', seat: 0 },
+    ];
+    const row = deriveLastPlays(events).find((r) => r.seat === 0)!;
+    expect(row.kind).toBe('play');
+    expect(row.cards).toEqual([c(Rank.R3)]);
+    expect(row.emphasis).toBeNull();
   });
 
   it('pass 覆盖旧 play', () => {
