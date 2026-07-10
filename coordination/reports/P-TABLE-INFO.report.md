@@ -1,3 +1,56 @@
-# P-TABLE-INFO
+# P-TABLE-INFO Report
 
-Mini last-play card row per seat and last-one/last-two alert badges.
+- status: in-review
+- branch: `task/P-TABLE-INFO`
+- base: `task/P-PLAY-FEEL @ f819ad2`
+- original implementation: `278d0fe`（在新 PLAY 尖上重放）
+
+## 实现摘要
+
+1. `deriveLastPlays(recentRoundEvents)` 驱动三席最近动作；play 渲染迷你真实牌面，pass 保持文字药丸。
+2. bomb/rocket 使用既有 emphasis 资源；≤5 张常规间距，>5 张按最大宽度压缩，最长 12 张保持固定容器宽度。
+3. `deriveFollowUx().alerts` 每次 render 全量传入席位名牌，按状态渲染『报单』『报双』徽标。
+4. `deriveLastActions` 未删除：`deriveLastPlays` 内部继续复用它生成 text，pass/可达性文案只有一份真相源。
+5. 未新增 CueId，`event-cues.ts` 零 diff；settled 仍由 `showTransientHud` 阻止最近动作反馈透出。
+
+## Files Changed
+
+- `assets/scripts/ui/components/game-scene-skeleton.ts`
+- `assets/scripts/ui/components/game-scene/seats-renderer.ts`
+- `assets/scripts/ui/strings.ts`（只追加 `seat.lastOne` / `seat.lastTwo`）
+- `coordination/reports/P-TABLE-INFO.report.md`
+
+## 结构门禁
+
+- `ui/*.ts` 纯岛：除授权 strings 追加外零 diff。
+- `test/**`：零 diff。
+- `event-cues.ts`：零 diff，无新 CueId。
+- `deriveLastPlays` / `deriveLastActions`：前者为 renderer 消费入口，后者仍由前者内部复用。
+- alerts：每次 render 从当前 snapshot 重算并传入三席，无一次性本地状态。
+
+## 视觉与运行证据
+
+- `/tmp/doudizhu-w-unify-ui/summary.json`：`productErrors=[]`。
+- 现有 844/780 playing 帧仅作冒烟。
+- 12 张长顺子、报单+报双、resume 指定构造截图已由规划者视觉审②按用户裁量递延至 V8 强制补审，不作为本棒机械合并阻断。
+
+## 视觉自审①
+
+| 硬伤类 | 结论 | 证据边界 |
+|---|---|---|
+| 元素重叠 | 代码使用最大宽度与压缩间距 | 定向实拍递延 V8 |
+| 文字对比 | danger/warning + textOnAccent | 定向实拍递延 V8 |
+| 文字包裹 | 徽标/药丸固定容器 | 定向实拍递延 V8 |
+| 闪烁/重渲 | 状态驱动全量重算，`productErrors=[]` | 动态恢复局递延 V8 |
+
+## 兜底修复披露（Codex·2026-07-10）
+
+- 原因：首轮机械复审发现 P-TABLE 文档提交越域修改前两棒报告；同时上游链需要修复。按 PROTOCOL 在原文件域内重建链并归位报告。
+- 范围：把原产品 commit 重放在新 P-PLAY-FEEL 尖；本棒增量仅保留自身产品文件、strings 追加和自身报告。
+- 产品逻辑未另改；未改纯岛、测试、event cue 契约。
+
+## 审查记录
+
+- 原审查尖：`9f51160`，结论 `changes-requested`。
+- 复审范围：`f819ad2..本分支新尖`；逐行审 TABLE 增量，定向抽查 `deriveLastPlays`、`deriveLastActions`、`deriveFollowUx.alerts` 与 settled 门。
+- 待最终验收回填：全量 test/typecheck、main 双闸、merge commit 与 BOARD done 状态。
