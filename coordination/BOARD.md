@@ -1080,8 +1080,8 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ID | 类型 | 文件域（详见 spec） | 分支 | 状态 |
 |----|----|----|----|----|
 | T-THEME-TOKENS | 纯逻辑(纯岛·纯 spec) | 新 `ui/theme.ts` + index 桶一行 + 新 `test/ui/theme.test.ts` | `task/T-THEME-TOKENS`（已建） | done 59420e0 |
-| T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加（裁定：`InteractiveSlot` 加法字段 `hitRight`）+ 桶 + 新测试 | `task/T-INTERACT-VIEWS`（尖 `b7bfc3a`） | changes-requested |
-| T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建 | changes-requested |
+| T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加（裁定：`InteractiveSlot` 加法字段 `hitRight`）+ 桶 + 新测试 | `task/T-INTERACT-VIEWS`（尖 `d815ce3`） | approved |
+| T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建（尖 `0d79305`） | approved |
 | P-THEME-APPLY | UI(双层视觉预审) | `ui-helpers.ts` + `lobby-scene.ts` + `game-scene-skeleton.ts` + `game-scene/**` | 待纯逻辑批入 main 后建 | blocked |
 | P-PLAY-FEEL | UI(双层视觉预审) | `game-scene-skeleton.ts` + `game-scene/**` + strings 纯追加 | 批内自 P-THEME-APPLY 尖建 | blocked |
 | P-TABLE-INFO | UI(双层视觉预审) | `seats-renderer.ts` + `play-area-renderer.ts` + skeleton 接线 + strings 纯追加 | 批内自 P-PLAY-FEEL 尖建 | blocked |
