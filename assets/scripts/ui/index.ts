@@ -36,3 +36,4 @@ export * from './insight-view';
 export * from './strings';
 export * from './theme';
 export * from './follow-ux';
+export * from './last-play-view';
