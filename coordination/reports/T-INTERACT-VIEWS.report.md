@@ -58,6 +58,13 @@ npm --prefix test run typecheck
 - 摘要：非末张区间左边界按契约为闭，将 `slot.x < end` 改为 `slot.x <= end`；修复单点恰在首张/任一非末张 x 时返回空的边界缺口。
 - 证据：修前探针 `firstX=135, hit=[]`；修后同探针命中首张，定向 38/38 + 全量 802/802 + typecheck 绿。
 
+## 验收披露（Codex 审查者）
+- 复审结论：`approved`；历史打回 1 轮（转规划者裁定 A 后收敛）；兜底修复见上段。
+- 合并 commit：`dc94aad`（`merge task/T-INTERACT-VIEWS`）。
+- 合并前 main 双闸：150 files / 775 tests 绿，typecheck exit 0。
+- 合并后 main 基线：151 files / 802 tests 绿，typecheck exit 0。
+- Creator 元数据：运行中的 Cocos Creator 自动生成 `assets/scripts/ui/follow-ux.ts.meta`（UUID `c3a3d91a-de60-434c-a393-55e195980010`）；审查者仅提交编辑器原生产物，未手写 `.meta`。
+
 ## 自检
 - [x] `layoutHandInteractive` 仅追加 `hitRight` 产出，x/y/card/selected 语义未漂移
 - [x] `dragSelectCards` 无 Infinity 残留
