@@ -44,7 +44,7 @@ npm --prefix test run typecheck → exit 0
 
 ## 工作树状态
 ```
-仅声明文件域；`.meta` 未手写（待 P-THEME-APPLY 编辑器侧补）
+任务分支仅声明文件域，未手写 `.meta`。
 ```
 
 ## 与 spec 的偏差 / 关键决策
@@ -65,6 +65,7 @@ npm --prefix test run typecheck → exit 0
 - 合并 commit：`eb6fcaf`（`merge task/T-THEME-TOKENS`）。
 - 合并前 main 双闸：149 files / 770 tests 绿，typecheck exit 0。
 - 合并后 main 基线：150 files / 775 tests 绿，typecheck exit 0。
+- Creator 元数据：合并后运行中的 Cocos Creator 自动生成 `assets/scripts/ui/theme.ts.meta`（UUID `7b48bbbd-1836-451c-aa2c-0b1f14d386d7`）；审查者仅提交编辑器原生产物，未手写、未改产品逻辑。
 
 ## 自检（对照验收项）
 - [x] 测试全绿
