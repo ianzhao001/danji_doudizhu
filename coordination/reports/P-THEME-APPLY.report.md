@@ -1,6 +1,6 @@
 # P-THEME-APPLY Report
 
-- status: in-review
+- status: approved
 - branch: `task/P-THEME-APPLY`
 - original implementation: `4a46e1c`
 - task: cc 层颜色、字号、圆角与透明度接线到 `ui/theme.ts` 的 `THEME`
@@ -60,5 +60,8 @@ assets/scripts/ui/components/ui-helpers.ts
 ## 审查记录
 
 - 原审查尖：`fb31f92`，结论 `changes-requested`。
-- 复审范围：`35d7122..本分支新尖`；逐行审主题消费 diff，并定向抽查 `THEME` / `toColor` 的组件消费方。
-- 待最终验收回填：全量 test/typecheck、main 双闸、merge commit 与 BOARD done 状态。
+- 复审范围：`35d7122..8c75dd5`；逐行审主题消费 diff，并定向抽查 `THEME` / `toColor` 的组件消费方。
+- 结构结论：`new Color` 仅 `toColor` + `cardFaceColor` 两行花色豁免；纯岛/theme/test/event-cues 零 diff；布局与交互零改动。
+- 分支回归：152 files / 815 tests 绿；`npm --prefix test run typecheck` 绿；`git diff --check` 净。
+- 视觉结论：继承 BOARD「UI 批视觉审②」P-THEME-APPLY PASS；其余证据债转 V8。
+- 合并门：常规任务，批准进入 Codex `claim/merge/release`；main 双闸、merge commit 与 done 状态在合并后回填。
