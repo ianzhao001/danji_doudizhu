@@ -1,17 +1,17 @@
-import { Color, Graphics, director } from 'cc';
+import { Graphics, director } from 'cc';
 import type { FlowEvent } from '../../../flow/types';
 import { deriveAiThinking } from '../../ai-thinking-view';
 import { deriveTerminationFeedback } from '../../termination-feedback-view';
 import { t } from '../../strings';
 import type { TableRegions } from '../../table-layout';
 import { pushToast, tickToasts } from '../../toast-queue';
-import { addUiTransform } from '../ui-helpers';
+import { THEME, addUiTransform, toColor } from '../ui-helpers';
 import { seatDisplayName } from './seat-display';
 import { cardsSignature } from './card-node';
 
 const HERO_SEAT = 0;
 const TURN_TIMER_MS = 15_000;
-const BRIGHT_PANEL_TEXT = new Color(108, 46, 76, 255);
+const BRIGHT_PANEL_TEXT = toColor(THEME.palette.brandDark);
 const GAME_TEXT = {
   roundTerminated: t('game.roundTerminated'),
   backLobby: t('result.backLobby'),
@@ -59,11 +59,21 @@ export function renderTerminationFeedbackActions(this: any, _layout: TableRegion
   addUiTransform(backing, panelWidth - 18, panelHeight - 16);
   const graphics = backing.getComponent(Graphics) ?? backing.addComponent(Graphics);
   graphics.clear();
-  graphics.fillColor = new Color(255, 246, 250, 238);
+  graphics.fillColor = toColor(THEME.palette.surface);
   graphics.roundRect(-(panelWidth - 18) / 2, -(panelHeight - 16) / 2, panelWidth - 18, panelHeight - 16, 8);
   graphics.fill();
   backing.setSiblingIndex(1);
-  this.addLabel(this.terminationFeedbackText ?? GAME_TEXT.roundTerminated, 0, 28, 16, panel, panelWidth - 38, 30, 'termination-feedback-title', BRIGHT_PANEL_TEXT);
+  this.addLabel(
+    this.terminationFeedbackText ?? GAME_TEXT.roundTerminated,
+    0,
+    28,
+    THEME.typography.md,
+    panel,
+    panelWidth - 38,
+    30,
+    'termination-feedback-title',
+    BRIGHT_PANEL_TEXT,
+  );
   this.addButton(GAME_TEXT.backLobby, -72, -28, 126, 54, true, () => director.loadScene('lobby'), panel, 'termination-feedback-lobby');
   this.addButton(GAME_TEXT.restartShort, 72, -28, 126, 54, true, () => this.startGame(true), panel, 'termination-feedback-restart');
   panel.setSiblingIndex(this.uiRoot!.children.length - 1);

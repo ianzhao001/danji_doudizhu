@@ -1,9 +1,9 @@
-import { BlockInputEvents, Color, director, UIOpacity } from 'cc';
+import { BlockInputEvents, director, UIOpacity } from 'cc';
 import type { SeatIndex } from '../../../game';
 import { RESOURCE_PATHS } from '../../asset-keys';
 import { deriveScreenVM } from '../../screen-view';
 import type { TableZones } from '../../table-zones';
-import { addUiTransform, drawPanel } from '../ui-helpers';
+import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
 import type { GameSceneRendererContext } from './seats-renderer';
 import { seatDisplayName } from './seat-display';
 
@@ -11,12 +11,12 @@ function seatNameWithRole(seat: number, isLandlord: boolean): string {
   return `${seatDisplayName(seat)}${isLandlord ? '（地主）' : ''}`;
 }
 
-const PANEL_TEXT = new Color(108, 46, 76, 255);
-const PANEL_ACCENT = new Color(198, 68, 124, 255);
-const PANEL_FALLBACK = new Color(255, 237, 246, 238);
-const SCORE_FALLBACK = new Color(255, 255, 255, 116);
-const HEADING_BACKDROP = new Color(80, 38, 70, 196);
-const HEADING_TEXT = new Color(255, 248, 253, 255);
+const PANEL_TEXT = toColor(THEME.palette.brandDark);
+const PANEL_ACCENT = toColor(THEME.palette.brand);
+const PANEL_FALLBACK = toColor(THEME.palette.surface);
+const SCORE_FALLBACK = toColor(THEME.palette.textOnAccent, 116);
+const HEADING_BACKDROP = toColor(THEME.palette.brandDark, 196);
+const HEADING_TEXT = toColor(THEME.palette.textOnAccent);
 
 export function renderResult(
   ctx: GameSceneRendererContext,
@@ -65,10 +65,10 @@ export function renderResult(
   addUiTransform(headingBg, headingWidth, 28);
   drawPanel(headingBg, headingWidth, 28, HEADING_BACKDROP);
   ctx.addLabel('本局结算', 0, titleY + 1, 18, panel, headingWidth - 18, 24, 'result-heading', HEADING_TEXT);
-  ctx.addLabel(result.resultText, 0, bannerY - 1, 24, panel, bannerWidth - 42, bannerHeight - 12, 'result-title', PANEL_TEXT);
+  ctx.addLabel(result.resultText, 0, bannerY - 1, THEME.typography.xl, panel, bannerWidth - 42, bannerHeight - 12, 'result-title', PANEL_TEXT);
   const multiplierY = bannerY - bannerHeight / 2 - 15;
   const springNote = result.springText ? `  ${result.springText}` : '';
-  ctx.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}${springNote}`, 0, multiplierY, 16, panel, panelWidth - 60, 24, 'result-multiplier', PANEL_ACCENT);
+  ctx.addLabel(`倍数 ×${result.multiplier}  炸弹 ${result.bombs}${springNote}`, 0, multiplierY, THEME.typography.md, panel, panelWidth - 60, 24, 'result-multiplier', PANEL_ACCENT);
   const scoreText = result.scores
     .map((row) => `${seatNameWithRole(row.seat, row.isLandlord)}  ${formatScore(row.score)}  余牌 ${handCounts[row.seat as SeatIndex] ?? 0}`)
     .join('\n');
@@ -78,7 +78,7 @@ export function renderResult(
   const scorePanelHeight = 42;
   addUiTransform(scorePanel, scorePanelWidth, scorePanelHeight);
   drawPanel(scorePanel, scorePanelWidth, scorePanelHeight, SCORE_FALLBACK);
-  const scoreLabel = ctx.addLabel(scoreText, 0, 0, 12, scorePanel, scorePanelWidth - 18, scorePanelHeight - 4, 'result-scores', PANEL_TEXT);
+  const scoreLabel = ctx.addLabel(scoreText, 0, 0, THEME.typography.xs, scorePanel, scorePanelWidth - 18, scorePanelHeight - 4, 'result-scores', PANEL_TEXT);
   scoreLabel.lineHeight = 14;
 
   const buttonY = -panelHeight / 2 + 34;

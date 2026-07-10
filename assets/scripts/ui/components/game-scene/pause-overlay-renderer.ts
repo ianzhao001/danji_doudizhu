@@ -1,11 +1,11 @@
-import { BlockInputEvents, Color, Node, director } from 'cc';
+import { BlockInputEvents, Node, director } from 'cc';
 import { askQuit, cancelQuit, closeMenu, openMenu } from '../../pause-menu';
 import { t } from '../../strings';
 import type { TableRegions } from '../../table-layout';
-import { addUiTransform } from '../ui-helpers';
+import { THEME, addUiTransform, toColor } from '../ui-helpers';
 
-const BRIGHT_PANEL_TEXT = new Color(108, 46, 76, 255);
-const BRIGHT_PANEL_MUTED = new Color(142, 88, 108, 235);
+const BRIGHT_PANEL_TEXT = toColor(THEME.palette.brandDark);
+const BRIGHT_PANEL_MUTED = toColor(THEME.palette.textSecondary);
 const GAME_TEXT = {
   pause: t('game.pause'),
   progressKept: t('game.progressKept'),
@@ -41,7 +41,7 @@ export function renderPauseControl(this: any, layout: TableRegions, canvas: { wi
     this.uiRoot!,
     'pause-open-button',
   );
-  label.fontSize = 16;
+  label.fontSize = THEME.typography.md;
   label.lineHeight = 20;
 }
 
@@ -90,8 +90,28 @@ export function renderPauseMenu(this: any, panel: Node, panelWidth: number, pane
 }
 
 export function renderPauseConfirm(this: any, panel: Node, panelWidth: number, panelHeight: number): void {
-  this.addLabel(GAME_TEXT.quitTitle, 0, panelHeight / 2 - 48, 24, panel, panelWidth - 48, 48, 'pause-confirm-title', BRIGHT_PANEL_TEXT);
-  const hint = this.addLabel(GAME_TEXT.quitHint, 0, 14, 16, panel, panelWidth - 58, 36, 'pause-confirm-hint', BRIGHT_PANEL_MUTED);
+  this.addLabel(
+    GAME_TEXT.quitTitle,
+    0,
+    panelHeight / 2 - 48,
+    THEME.typography.xl,
+    panel,
+    panelWidth - 48,
+    48,
+    'pause-confirm-title',
+    BRIGHT_PANEL_TEXT,
+  );
+  const hint = this.addLabel(
+    GAME_TEXT.quitHint,
+    0,
+    14,
+    THEME.typography.md,
+    panel,
+    panelWidth - 58,
+    36,
+    'pause-confirm-hint',
+    BRIGHT_PANEL_MUTED,
+  );
   hint.color = BRIGHT_PANEL_MUTED;
   this.addButton(GAME_TEXT.confirm, -64, -64, 112, 60, true, () => director.loadScene('lobby'), panel, 'pause-confirm');
   this.addButton(GAME_TEXT.cancel, 64, -64, 112, 60, true, () => this.cancelPauseQuit(), panel, 'pause-cancel');

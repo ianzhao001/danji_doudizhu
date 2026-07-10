@@ -1,5 +1,6 @@
-import { Color, Graphics, Node, UIOpacity, Vec3, tween } from 'cc';
+import { Graphics, Node, UIOpacity, Vec3, tween } from 'cc';
 import { dealCardDelay, playFlyFromTo } from '../../animation-params';
+import { THEME, toColor } from '../ui-helpers';
 
 export function animateCardDeal(this: any, node: Node, x: number, y: number, index: number, total: number): void {
   const delay = dealCardDelay(index, total) / 1000;
@@ -49,7 +50,7 @@ export function prepareToastAnimation(this: any, node: Node, id: number): void {
 export function drawDimOverlay(this: any, parent: Node, width: number, height: number): void {
   const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
   graphics.clear();
-  graphics.fillColor = new Color(0, 0, 0, 218);
+  graphics.fillColor = toColor(THEME.palette.overlayScrim);
   graphics.rect(-width / 2, -height / 2, width, height);
   graphics.fill();
 }

@@ -5,7 +5,7 @@ import { deriveCardMemoryView } from '../../card-memory-view';
 import { deriveStrengthMeter } from '../../strength-meter-view';
 import { trackPlayed } from '../../../ai/cardMemory';
 import type { TableZones } from '../../table-zones';
-import { addUiTransform, drawPanel } from '../ui-helpers';
+import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
 import type { GameSceneRendererContext } from './seats-renderer';
 
 export function renderHud(
@@ -32,7 +32,7 @@ function renderStrengthMeter(
   const root = ctx.ensureNode('hud-strength-meter', ctx.uiRoot);
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, width, height);
-  drawPanel(root, width, height, new Color(48, 40, 58, 178));
+  drawPanel(root, width, height, toColor(THEME.palette.surfaceRaised));
 
   const barWidth = Math.max(24, width - 92);
   const barHeight = 6;
@@ -42,7 +42,7 @@ function renderStrengthMeter(
   addUiTransform(bar, barWidth, barHeight);
   const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
   graphics.clear();
-  graphics.fillColor = new Color(255, 255, 255, 42);
+  graphics.fillColor = toColor(THEME.palette.textOnAccent, 42);
   graphics.roundRect(-barWidth / 2, -barHeight / 2, barWidth, barHeight, 4);
   graphics.fill();
   graphics.fillColor = ctx.strengthColor(strength.tone);
@@ -50,7 +50,7 @@ function renderStrengthMeter(
   graphics.roundRect(-barWidth / 2, -barHeight / 2, filled, barHeight, 4);
   graphics.fill();
 
-  ctx.addLabel('强度', -width / 2 + 22, 3, 12, root, 42, 20, 'hud-strength-title');
+  ctx.addLabel('强度', -width / 2 + 22, 3, THEME.typography.xs, root, 42, 20, 'hud-strength-title');
   ctx.addLabel(`${strength.label}${strength.pct}%`, width / 2 - 34, 3, 11, root, 68, 20, 'hud-strength-value');
 }
 
@@ -69,9 +69,9 @@ export function renderCardMemory(
   const root = ctx.ensureNode('hud-card-memory', ctx.uiRoot);
   root.setPosition(pos.x, pos.y + verticalBreath, 0);
   addUiTransform(root, panelWidth, panelHeight);
-  drawPanel(root, panelWidth, panelHeight, new Color(42, 54, 62, 168));
+  drawPanel(root, panelWidth, panelHeight, toColor(THEME.palette.surfaceRaised, 168));
 
-  ctx.addLabel('剩牌', -panelWidth / 2 + 24, panelHeight / 2 - 18, 13, root, 42, 24, 'hud-memory-title');
+  ctx.addLabel('剩牌', -panelWidth / 2 + 24, panelHeight / 2 - 18, THEME.typography.sm, root, 42, 24, 'hud-memory-title');
   const toggleLabel = ctx.memoryExpanded ? '收起' : '展开';
   addCompactHudButton(ctx, root, toggleLabel, -panelWidth / 2 + 76, panelHeight / 2 - 18, () => {
     ctx.setMemoryExpanded(!ctx.memoryExpanded);
@@ -86,8 +86,8 @@ export function renderCardMemory(
     const x = -panelWidth / 2 + 16 + cellWidth / 2 + col * cellWidth;
     const y = panelHeight / 2 - 44 - line * 19;
     const text = `${row.rankLabel}${row.remaining}`;
-    const item = ctx.addLabel(text, x, y, 12, root, cellWidth, 22, `hud-memory-${index}`);
-    item.color = row.exhausted ? new Color(255, 255, 255, 112) : new Color(255, 250, 228, 255);
+    const item = ctx.addLabel(text, x, y, THEME.typography.xs, root, cellWidth, 22, `hud-memory-${index}`);
+    item.color = row.exhausted ? toColor(THEME.palette.textOnAccent, 112) : toColor(THEME.palette.accentCream);
   });
 }
 
@@ -104,18 +104,18 @@ function addCompactHudButton(
   const node = ctx.ensureNode('hud-memory-toggle', parent);
   node.setPosition(x, y, 0);
   addUiTransform(node, width, height);
-  drawPanel(node, width, height, new Color(255, 238, 198, 214));
+  drawPanel(node, width, height, toColor(THEME.palette.accentCream, 214));
   const button = node.getComponent(Button) ?? node.addComponent(Button);
   button.target = node;
   button.transition = Button.Transition.COLOR;
   button.interactable = true;
-  button.normalColor = new Color(255, 255, 255, 255);
-  button.pressedColor = new Color(255, 228, 176, 255);
-  button.hoverColor = new Color(255, 255, 255, 255);
-  button.disabledColor = new Color(255, 255, 255, 120);
+  button.normalColor = toColor(THEME.palette.textOnAccent);
+  button.pressedColor = toColor(THEME.palette.accentCream, 255);
+  button.hoverColor = toColor(THEME.palette.textOnAccent);
+  button.disabledColor = toColor(THEME.palette.textOnAccent, 120);
   node.off(Button.EventType.CLICK);
   node.on(Button.EventType.CLICK, cb);
-  const label = ctx.addLabel(text, 0, 1, 13, node, width - 8, height - 4, 'hud-memory-toggle-label');
-  label.color = new Color(95, 58, 36, 255);
+  const label = ctx.addLabel(text, 0, 1, THEME.typography.sm, node, width - 8, height - 4, 'hud-memory-toggle-label');
+  label.color = toColor(THEME.palette.brandDark);
   label.lineHeight = 17;
 }

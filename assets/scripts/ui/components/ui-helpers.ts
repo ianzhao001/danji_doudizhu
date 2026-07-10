@@ -1,5 +1,6 @@
 import { Button, Color, Graphics, Label, Node, Sprite, SpriteFrame, UITransform, resources } from 'cc';
 import { spriteFrameResourcePath, type ResourcePath } from '../asset-keys';
+import { THEME, type ThemeColor } from '../theme';
 
 type EnsureNode = (name: string, parent: Node) => Node;
 type SpriteLoader = (path: ResourcePath, sprite: Sprite | null) => void;
@@ -31,8 +32,13 @@ interface SkinnedButtonLayoutInput {
 }
 
 function labelColor(enabled: boolean): Color {
-  return enabled ? new Color(255, 255, 255, 255) : new Color(255, 255, 255, 120);
+  return enabled ? toColor(THEME.palette.textOnAccent) : toColor(THEME.palette.textOnAccent, 120);
 }
+
+export function toColor(token: ThemeColor, alpha?: number): Color {
+  return new Color(token.r, token.g, token.b, alpha ?? token.a);
+}
+export { THEME };
 
 export function addUiTransform(node: Node, width: number, height: number): UITransform {
   const transform = node.getComponent(UITransform) ?? node.addComponent(UITransform);
@@ -44,7 +50,7 @@ export function drawPanel(parent: Node, width: number, height: number, fill: Col
   const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
   graphics.clear();
   graphics.fillColor = fill;
-  graphics.roundRect(-width / 2, -height / 2, width, height, 8);
+  graphics.roundRect(-width / 2, -height / 2, width, height, THEME.radius.md);
   graphics.fill();
 }
 
@@ -61,11 +67,11 @@ function drawButtonBackground(
   const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
   graphics.clear();
   graphics.fillColor = selected
-    ? new Color(255, 224, 232, 150)
+    ? toColor(THEME.palette.selectedTint)
     : enabled
-      ? new Color(255, 255, 255, 70)
-      : new Color(255, 255, 255, 30);
-  graphics.roundRect(-width / 2, -height / 2, width, height, 8);
+      ? toColor(THEME.palette.textOnAccent, 70)
+      : toColor(THEME.palette.textOnAccent, 30);
+  graphics.roundRect(-width / 2, -height / 2, width, height, THEME.radius.md);
   graphics.fill();
   return node;
 }
@@ -94,7 +100,7 @@ export function addLabel(
   label.lineHeight = options.fontSize + (options.lineHeightOffset ?? 5);
   label.horizontalAlign = Label.HorizontalAlign.CENTER;
   label.verticalAlign = Label.VerticalAlign.CENTER;
-  label.color = options.color ?? new Color(255, 255, 255, 255);
+  label.color = options.color ?? toColor(THEME.palette.textOnAccent);
   return label;
 }
 
@@ -124,10 +130,10 @@ export function addButton(
   button.target = drawButtonBackground(ensureNode, node, options.width, options.height, options.enabled, selected);
   button.transition = Button.Transition.COLOR;
   button.interactable = options.enabled;
-  button.normalColor = selected ? new Color(255, 224, 232, 150) : new Color(255, 255, 255, 70);
-  button.pressedColor = new Color(255, 214, 226, selected ? 170 : 150);
-  button.hoverColor = new Color(255, 255, 255, 100);
-  button.disabledColor = new Color(255, 255, 255, 24);
+  button.normalColor = selected ? toColor(THEME.palette.selectedTint) : toColor(THEME.palette.textOnAccent, 70);
+  button.pressedColor = toColor(selected ? THEME.palette.selectedTint : THEME.palette.textOnAccent, selected ? 170 : 150);
+  button.hoverColor = toColor(THEME.palette.textOnAccent, 100);
+  button.disabledColor = toColor(THEME.palette.textOnAccent, 24);
   node.off(Button.EventType.CLICK);
   node.on(Button.EventType.CLICK, options.cb, options.owner);
 
@@ -242,10 +248,10 @@ export function addSkinnedButton(
   button.target = bg;
   button.transition = Button.Transition.COLOR;
   button.interactable = options.enabled;
-  button.normalColor = new Color(255, 255, 255, 255);
-  button.pressedColor = new Color(255, 235, 240, 255);
-  button.hoverColor = new Color(255, 255, 255, 255);
-  button.disabledColor = new Color(255, 255, 255, 255);
+  button.normalColor = toColor(THEME.palette.textOnAccent);
+  button.pressedColor = toColor(THEME.palette.selectedTint);
+  button.hoverColor = toColor(THEME.palette.textOnAccent);
+  button.disabledColor = toColor(THEME.palette.textOnAccent);
   node.off(Button.EventType.CLICK);
   node.on(Button.EventType.CLICK, options.cb, options.owner);
 
