@@ -1083,7 +1083,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加（裁定：`InteractiveSlot` 加法字段 `hitRight`）+ 桶 + 新测试 | `task/T-INTERACT-VIEWS`（尖 `d815ce3`） | done 4970a00 |
 | T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建（尖 `0d79305`） | done fa33a22 |
 | P-THEME-APPLY | UI(双层视觉预审) | `ui-helpers.ts` + `lobby-scene.ts` + `game-scene-skeleton.ts` + `game-scene/**` | `task/P-THEME-APPLY`（复审尖 `b523975`） | done 005422b |
-| P-PLAY-FEEL | UI(双层视觉预审) | `game-scene-skeleton.ts` + `game-scene/**` + strings 纯追加 | `task/P-PLAY-FEEL`（复审尖 `dcd6421`） | merge-claimed:P-PLAY-FEEL |
+| P-PLAY-FEEL | UI(双层视觉预审) | `game-scene-skeleton.ts` + `game-scene/**` + strings 纯追加 | `task/P-PLAY-FEEL`（复审尖 `dcd6421`） | done da343b3 |
 | P-TABLE-INFO | UI(双层视觉预审) | `seats-renderer.ts` + `play-area-renderer.ts` + skeleton 接线 + strings 纯追加 | `task/P-TABLE-INFO`（复审尖 `3e58ea7`） | approved |
 | V8 | verify-only 收口 + 补审②证据 | capture 脚本 + 六景四横屏 + 录屏 + 签收页（`tasks/V8.md`） | UI 批合并后执行者自 main 建（spec 授权） | ready |
 
