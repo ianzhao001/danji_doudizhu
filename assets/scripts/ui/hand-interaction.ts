@@ -12,6 +12,7 @@ export interface InteractiveSlot {
   x: number;
   y: number;
   selected: boolean;
+  hitRight: number;
 }
 
 export function layoutHandInteractive(args: {
@@ -29,11 +30,48 @@ export function layoutHandInteractive(args: {
 
   return sortedHand.map((card, index) => {
     const selected = isSelected(args.selected, card);
+    const x = baseSlots[index].x;
+    const hitRight = index < baseSlots.length - 1
+      ? baseSlots[index + 1].x
+      : x + args.cardWidth;
     return {
       card,
-      x: baseSlots[index].x,
+      x,
       y: selected ? -args.liftOffset : 0,
       selected,
+      hitRight,
     };
   });
+}
+
+function slotOverlapsDrag(slot: InteractiveSlot, isLast: boolean, start: number, end: number): boolean {
+  if (isLast) {
+    return slot.hitRight >= start && slot.x <= end;
+  }
+  return slot.hitRight > start && slot.x <= end;
+}
+
+export function dragSelectCards(slots: InteractiveSlot[], fromX: number, toX: number): Card[] {
+  if (slots.length === 0) return [];
+
+  let start = fromX;
+  let end = toX;
+  if (start > end) [start, end] = [end, start];
+
+  const firstLeft = slots[0].x;
+  const lastRight = slots[slots.length - 1].hitRight;
+
+  if (end < firstLeft || start > lastRight) return [];
+
+  start = Math.max(firstLeft, start);
+  end = Math.min(lastRight, end);
+
+  const selected: Card[] = [];
+  const lastIndex = slots.length - 1;
+  for (let index = 0; index < slots.length; index += 1) {
+    if (slotOverlapsDrag(slots[index], index === lastIndex, start, end)) {
+      selected.push(slots[index].card);
+    }
+  }
+  return selected;
 }
