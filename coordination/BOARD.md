@@ -1080,11 +1080,13 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | ID | 类型 | 文件域（详见 spec） | 分支 | 状态 |
 |----|----|----|----|----|
 | T-THEME-TOKENS | 纯逻辑(纯岛·纯 spec) | 新 `ui/theme.ts` + index 桶一行 + 新 `test/ui/theme.test.ts` | `task/T-THEME-TOKENS`（已建） | done 59420e0 |
-| T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加 + 桶 + 新测试 | 批内自 T-THEME-TOKENS 尖建 | ready |
-| T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建 | ready |
+| T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加 + 桶 + 新测试 | 批内自 T-THEME-TOKENS 尖建 | blocked |
+| T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建 | changes-requested |
 | P-THEME-APPLY | UI(双层视觉预审) | `ui-helpers.ts` + `lobby-scene.ts` + `game-scene-skeleton.ts` + `game-scene/**` | 待纯逻辑批入 main 后建 | blocked |
 | P-PLAY-FEEL | UI(双层视觉预审) | `game-scene-skeleton.ts` + `game-scene/**` + strings 纯追加 | 批内自 P-THEME-APPLY 尖建 | blocked |
 | P-TABLE-INFO | UI(双层视觉预审) | `seats-renderer.ts` + `play-area-renderer.ts` + skeleton 接线 + strings 纯追加 | 批内自 P-PLAY-FEEL 尖建 | blocked |
 | V8 | verify-only 收口 | 仅报告+证据（spec 波末出） | 待 UI 批 done | todo |
+
+> **纯逻辑批审查披露（Codex·2026-07-10）**：T-THEME-TOKENS 逐行 diff + 现值定向对照 + 双闸通过，已按 `claim/merge/release` 并入（merge `eb6fcaf`，后基线 150 files / 775 tests 绿）。T-INTERACT-VIEWS 定向探针确认重叠手牌末张全宽无法由现 `InteractiveSlot` 形状反推，且同点稳定序被反转，已 `blocked` 转规划者裁定 API/spec（详见报告）。T-LASTPLAY-CARDS 存在非相邻 bomb/rocket 污染旧 play 及单张用例被同席后续 play 覆盖的覆盖缺口，已 `changes-requested`。链尖全量 152 files / 807 tests 绿 + typecheck 净，但不替代上述契约阻断。
 
 > **依赖与红线摘要**：UI 批逐棒消费纯逻辑批产物（THEME→APPLY；INTERACT→PLAY-FEEL；LASTPLAY→TABLE-INFO）；「超时仅视觉、绝不自动出牌/过牌」契约在要不起态下仍然成立；**不新增 CueId**（G17 穷尽断言域）；v1.2/v1.3 成果（settled 门控/逆时针映射/暂停冻结/termination 面板/LASTACT 可读性）零回归。基线：main `0f21926` 起步，149 files / 770 tests 绿 + typecheck 净。
