@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 当前状态——动手写代码前必读
 
-M0-M6、v1.1 横屏化与 v1.2 七波 UI/流程/AI 打磨均已完成；v1.2 发布包已就绪（Creator 3.8.8 `web-mobile`，`launchScene=lobby.scene`，`designResolution=844×390`，`orientation=landscape`）。当前进入 v1.3 技术债清偿版，采用**多 AI 协作 + git worktree**：规划者派发任务，执行者在独立 worktree 实现，审查者按协议评审与合并——见 [coordination/PROTOCOL.md](coordination/PROTOCOL.md)。
+M0-M6、v1.1 横屏化、v1.2 七波 UI/流程/AI 打磨、v1.3 技术债清偿版（2026-07-09 终局收版）均已完成；发布包基线为 Creator 3.8.8 `web-mobile`（`launchScene=lobby.scene`，`designResolution=844×390`，`orientation=landscape`）。当前进入 **v1.4 UI 统一与交互优化版**，采用**多 AI 协作 + git worktree**（本版配置：规划者 Claude、审查者 Codex 兼疑难兜底与图像任务执行、执行者 Cursor）：规划者派发任务，执行者在独立 worktree 实现，卡壳一律先转审查者兜底，审查者按协议评审（diff + 定向抽查，无全仓回扫）与合并——见 [coordination/PROTOCOL.md](coordination/PROTOCOL.md)。
 
 - 最新的任务/里程碑与派发状态以 [docs/TASKS.md](docs/TASKS.md) 和 [coordination/BOARD.md](coordination/BOARD.md) 为准，**动手前先看**。
 - 仍然：不修改根 `package.json` / `tsconfig.json` / `cocos.config.json`；不手写 `.meta`（交给 Cocos 编辑器）；不手建 `.scene` / `.prefab`（属 M3）。

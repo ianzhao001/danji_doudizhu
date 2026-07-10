@@ -155,3 +155,15 @@
 - [x] AI 启发式一致性硬化（第四轮审查转化·第十六批）。〔M6-G21 已并 main `b0bbd41`·cardMemory 冻结 + straightLength 显式 reset + 权重具名·三项行为保持〕
 - [x] 发布验收记录。〔M6-D1 已收口·首版可发布；release 构建 `launchScene=lobby.scene`，证据见 `coordination/BOARD.md` 发布验收记录与 `coordination/reports/M6-D1-lobby-launch-rebuild.report.md`〕
 - [x] 已知债务登记（第四轮审查·暂不重构）。〔M6-D4 已补登 `docs/KNOWN_LIMITATIONS.md`：#1 上帝组件 `game-scene-skeleton.ts`/#10 `round-runtime.ts` 拆分 = 发布后重构里程碑；#4 `legalFollows` 剪枝 = profiling 触发再做；#6 `save.ts` 双序列化 = 后续数据层清理〕
+
+## v1.4 UI 统一与交互优化（2026-07-10 开版·派发状态见 coordination/BOARD.md「v1.4 第一波」）
+
+> 版本目标：① 统一 UI 风格（主题令牌真相源 + cc 层全面接线）；② 结合真实斗地主惯例优化交互（要不起、报单/报双、划选多张、降序理牌、最近出牌亮真实牌面）。协作配置本版起为：规划者 Claude、审查者 Codex（兼疑难兜底 + 图像任务执行）、执行者 Cursor（PROTOCOL v1.4 修订）。
+
+- [ ] 主题令牌纯岛（`ui/theme.ts`：palette/typography/spacing/radius/alpha，深冻结、禁 cc）。〔T-THEME-TOKENS〕
+- [ ] 真实交互纯逻辑基座（`follow-ux.ts` 要不起+报单报双；`dragSelectCards` 划选；`sortForDisplay` 降序）。〔T-INTERACT-VIEWS〕
+- [ ] 最近出牌牌面级派生（`last-play-view.ts`：cards/emphasis/text，复用 deriveLastActions 文案）。〔T-LASTPLAY-CARDS〕
+- [ ] 主题令牌全面接线（组件层消灭裸 Color/魔法字号，四横屏×六相位对照）。〔P-THEME-APPLY〕
+- [ ] 出牌手感真实化（划选接线、要不起呈现、降序理牌；不自动出牌/过牌契约不动）。〔P-PLAY-FEEL〕
+- [ ] 桌面信息真实化（迷你牌面最近出牌 + 炸弹/火箭强调底 + 报单报双徽标）。〔P-TABLE-INFO〕
+- [ ] V8 收口（verify-only 四横屏全链 + 用户签收）。〔V8·spec 波末出〕

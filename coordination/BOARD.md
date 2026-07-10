@@ -2,7 +2,7 @@
 
 架构维护的任务真相源。状态列使用精确机器态，禁止混入阶段说明或含 `approved` 的自然语言，避免 agentctl 误判。状态：`todo`(待出 spec) · `ready`(spec+测试就绪可认领) · `in-progress`(执行中或分阶段未完成) · `changes-requested` · `blocked` · `approved`(审查者批准，可由审查者进入合并双闸) · `approved-pending-planner`(高风险任务待规划者批量把关，不可合并) · `merge-claimed:<ID>`(单一 merge lane 锁，合并后清除) · `done <commit>`(终态)。
 
-## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批进行中**：A 线纯逻辑 7（L7-L12+M3-42）+ G 4（G9-G12）+ D2/D3 ✅ 已并 main（103 文件/507 绿）；M3-40/41/43/44 已并 main；C2/C3a/C3b 已并 main（C3b `b51dce5`），C4 ready；R 待用户视觉终审；新增桶整合 M6-I1 已并 main（见下「第十一批」+「验收记录」） · **第十二批已派发**（18 任务·P AI 纵深 / V 视图 / L 文案 / G 护栏 / C 编辑器 / D 文档 / R 美术·spec 全部入 main，见下「第十二批」） · **第十三批已派发**（10 任务·AI 模块组合/平衡度量/回放编码/剩余视图·M6-D5 已并 main·见下「第十三批」·纯逻辑尾部） · **第十四批 ✅ 已验收并并入 main**（G16 `d9cc851` round-runtime 生命周期/错误边界 + G17 `422411c` cue 编译期穷尽断言，128 文件 / 632 绿·typecheck 净） · **UI-REMAKE 新批次已开**（2026-07-04：保持 pink 风格，仅重造游戏内牌桌 + 结算；ART-GAME-REMAKE preview gate 等用户视觉终审）
+## 当前里程碑：M2 ✅ · M3/M4/M5 纯逻辑层推进 ✅ · 第三/四/优化/第五/第六批 ✅ 已并 main · M5-13/M5-14 已并 main · **第七批（编辑器集成 + 运行时桥接）✅ 已验收并并入 main**（85 文件 / 437 绿，2026-06-28；新脚本 .meta 编辑器已补全）· **第八批（交互层 + 文生图）✅ 已验收并并入 main**（`291b53b` 轨道 A 交互层 / `a181d45` 轨道 B ART-01 背景包，2026-06-29）· **第九批 ✅ 已验收并并入 main**（2026-06-29）：A 美术串行 ART-02→03→04（`6eb8995`，58 文件·预览包·未导入 assets/）· B M6 纯逻辑 L1-L4（`97b0895`/`7d93e65`/`99d13b8`/`c08de19`，462 绿·typecheck 净·零 cc 泄漏·桶冲突串行解）· C1-C4 编辑器串行待 L1/L2/L3 入 main 后 + D1 文档收尾 + L5 后置验证 · **第九批已通过架构验证（见下「第九批合并验证」），保持合并** · **第十批 ✅ 全部已并 main**：L5/L6（`20af2e9`/`4c840ed`）+ C1（`31b5668`·用户 Cocos Creator 验证编译/渲染/开关持久化通过），C2 解锁，见下「第十批」 · **第十一批进行中**：A 线纯逻辑 7（L7-L12+M3-42）+ G 4（G9-G12）+ D2/D3 ✅ 已并 main（103 文件/507 绿）；M3-40/41/43/44 已并 main；C2/C3a/C3b 已并 main（C3b `b51dce5`），C4 ready；R 待用户视觉终审；新增桶整合 M6-I1 已并 main（见下「第十一批」+「验收记录」） · **第十二批已派发**（18 任务·P AI 纵深 / V 视图 / L 文案 / G 护栏 / C 编辑器 / D 文档 / R 美术·spec 全部入 main，见下「第十二批」） · **第十三批已派发**（10 任务·AI 模块组合/平衡度量/回放编码/剩余视图·M6-D5 已并 main·见下「第十三批」·纯逻辑尾部） · **第十四批 ✅ 已验收并并入 main**（G16 `d9cc851` round-runtime 生命周期/错误边界 + G17 `422411c` cue 编译期穷尽断言，128 文件 / 632 绿·typecheck 净） · **UI-REMAKE 新批次已开**（2026-07-04：保持 pink 风格，仅重造游戏内牌桌 + 结算；ART-GAME-REMAKE preview gate 等用户视觉终审） · **v1.3 技术债清偿版 CLOSED**（2026-07-09·15/15+V7+用户轻签收·见文末终局裁定） · **v1.4 UI 统一与交互优化版已开**（2026-07-10·三 AI 配置换轨：规划 Claude／审查+兜底+图像 Codex／执行 Cursor·PROTOCOL v1.4 修订·任务表见文末「v1.4 第一波」）
 
 main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可发布**。当前 main 已含 M4-42 `641b6a8`、ART-IMPORT `4334e81`、M6-D1 文档收口 `ef0f93b` 与 M6-D1 发布打包返工；当前验证口径：**133 测试文件 / 653 用例全绿、typecheck 净、纯层零 cc**。Cocos Creator 3.8.8 `web-mobile` 构建在当前 main 复测生成 `build/web-mobile/`（47M / 202 文件），`launch.launchScene` 已改为 `db://assets/scene/lobby.scene`；D1 三档 Web Mobile 大厅烟测截图已落 `/tmp/doudizhu-d1-lobby-launch-smoke/`，390 档覆盖 lobby → game → pause quit → lobby 链路，三档 `errorEvents: []`。已知限制已归档到 `docs/KNOWN_LIMITATIONS.md`，均为发布后债务，不阻塞 v1。
 
@@ -1070,3 +1070,21 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 > - **用户轻签收通过**（2026-07-09·四卡「确认」·卡④接受 AI 现状）→ 落 `reports/V7-user-review.md`。
 > - **裁定：V7 done + 用户轻签收 = v1.3 CLOSED（规划者版本终局裁定）**。证据：`reports/V7.report.md` + `reports/V7-evidence/**`（截图/机读 JSON）+ `build/v7-signoff.html`（本地·gitignore）。
 > - **V7 row 状态**：ready → **done（2026-07-09·verify-only·用户轻签收通过）**。v1.3 技术债清偿版 **15/15 任务 + V7 收官 = 全线收版**。
+
+## v1.4 第一波（W-UNIFY·统一 UI 风格 + 真实斗地主交互优化 · 2026-07-10）
+
+> **开版裁定（规划者·2026-07-10·用户指令）**：v1.3 已终局收版，v1.4 目标 = ① 统一 UI 风格（令牌化真相源 + 全面接线）② 结合真实斗地主惯例优化界面交互（要不起／报单报双／划选多张／降序理牌／最近出牌亮真实牌面）。**同轮完成 PROTOCOL v1.4 修订（用户指定）**：规划者=Claude、审查者=Codex（兼执行者卡壳兜底 + ART-* 图像任务执行）、执行者=Cursor；执行者阻塞一律先转审查者兜底（规划者只收契约级问题）；**撤销审查者每任务全仓回扫义务**（改为 diff 逐行 + 直接消费方定向抽查，全仓安全网=全量测试套件+V* 收口）；分工按三 AI 特长与 token 经济重校准（详见 PROTOCOL「角色 × 模型能力校准」）。
+>
+> **批次结构**：纯逻辑批（Cursor 单窗链式连做，T-THEME-TOKENS 分支已建，后两棒自前棒尖建分支，批末一次交接）→ Codex 按 `tasks/R-WAVE10.md` 批量审、按序合并 → UI 批（同窗链式三棒，分支届时自最新 main 建）→ 规划者视觉审②爆发一次 → V8（verify-only + 用户签收，spec 波末出）。**纯 spec 派发**（本波均为覆盖级视图模型/UI 任务，无契约级种子；执行者按 spec「必须覆盖用例清单」自写测试——PROTOCOL 铁律 1 种子分级）。
+
+| ID | 类型 | 文件域（详见 spec） | 分支 | 状态 |
+|----|----|----|----|----|
+| T-THEME-TOKENS | 纯逻辑(纯岛·纯 spec) | 新 `ui/theme.ts` + index 桶一行 + 新 `test/ui/theme.test.ts` | `task/T-THEME-TOKENS`（已建） | ready |
+| T-INTERACT-VIEWS | 纯逻辑(纯岛·纯 spec) | 新 `ui/follow-ux.ts` + `hand-interaction.ts`/`selection.ts` 纯追加 + 桶 + 新测试 | 批内自 T-THEME-TOKENS 尖建 | ready |
+| T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建 | ready |
+| P-THEME-APPLY | UI(双层视觉预审) | `ui-helpers.ts` + `lobby-scene.ts` + `game-scene-skeleton.ts` + `game-scene/**` | 待纯逻辑批入 main 后建 | blocked |
+| P-PLAY-FEEL | UI(双层视觉预审) | `game-scene-skeleton.ts` + `game-scene/**` + strings 纯追加 | 批内自 P-THEME-APPLY 尖建 | blocked |
+| P-TABLE-INFO | UI(双层视觉预审) | `seats-renderer.ts` + `play-area-renderer.ts` + skeleton 接线 + strings 纯追加 | 批内自 P-PLAY-FEEL 尖建 | blocked |
+| V8 | verify-only 收口 | 仅报告+证据（spec 波末出） | 待 UI 批 done | todo |
+
+> **依赖与红线摘要**：UI 批逐棒消费纯逻辑批产物（THEME→APPLY；INTERACT→PLAY-FEEL；LASTPLAY→TABLE-INFO）；「超时仅视觉、绝不自动出牌/过牌」契约在要不起态下仍然成立；**不新增 CueId**（G17 穷尽断言域）；v1.2/v1.3 成果（settled 门控/逆时针映射/暂停冻结/termination 面板/LASTACT 可读性）零回归。基线：main `0f21926` 起步，149 files / 770 tests 绿 + typecheck 净。
