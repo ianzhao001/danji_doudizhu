@@ -2,7 +2,7 @@
 
 - 实现方标识：Cursor（执行者）
 - 分支：`task/T-THEME-TOKENS`
-- 状态：in-review
+- 状态：approved
 
 ## 改了哪些文件
 - 新 `assets/scripts/ui/theme.ts`（THEME 深冻结主题令牌）
@@ -50,6 +50,14 @@ npm --prefix test run typecheck → exit 0
 ## 与 spec 的偏差 / 关键决策
 - 增补 `palette.tableFelt`（play-area 桌面色，归并而非新配色方向）。
 - 本任务未接线任何 cc 消费方（留 P-THEME-APPLY）。
+
+## 评审证据（Codex 审查者·2026-07-10）
+- 结论：`approved`（常规任务，无打回、无兜底修复）。
+- diff 逐行审读：`a853fc8..0b6121f`；仅 `theme.ts` / 桶单行导出 / 新测试 / 本报告，无既有测试改动，`git diff --check` 净。
+- 契约核验：16 个色彩令牌（≤24）；分组/键集与 spec 一致；递归冻结；颜色通道为 0–255 整数；字号与间距严格递增；零 `cc` import。
+- 现值定向对照：`ui-helpers.ts` 的 `255,224,232,150`，`lobby-scene.ts` 的 `198,68,124,255` / `108,46,76,255`，`hud-renderer.ts` 的 `48,40,58,178`，`play-area-renderer.ts` 的 `74,70,72,235` 均与令牌相符。
+- 定向抽查：新导出 `ThemeColor` / `Theme` / `THEME` 尚无产品消费方（符合 P-THEME-APPLY 后置接线）；`ui/index.ts` 仅追加一行。
+- 闸门：定向 `theme.test.ts` 5/5 绿；链尖全量 `152 files / 807 tests` 绿；`npm --prefix test run typecheck` exit 0。
 
 ## 自检（对照验收项）
 - [x] 测试全绿
