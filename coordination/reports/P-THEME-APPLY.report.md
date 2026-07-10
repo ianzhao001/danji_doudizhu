@@ -42,7 +42,7 @@ assets/scripts/ui/components/ui-helpers.ts
 
 ## Codex 批量复审（2026-07-10）
 
-- 结论：`changes-requested`，未进入规划者视觉审②，不得 claim/merge。
+- 结论：`changes-requested`；规划者视觉审②已在 BOARD 放行并将未齐证据递延至 V8，但下列机械/代码门仍未过，不得 claim/merge。
 - 审读范围：`35d7122..4a46e1c`。文件域本身合规；`ui/*.ts` 纯岛、`theme.ts`、`test/**`、`event-cues.ts` 零 diff；`git diff --check` 净。
 - 链尖全量闸门：152 files / 815 tests 绿，typecheck exit 0。
 
@@ -57,10 +57,10 @@ assets/scripts/ui/components/ui-helpers.ts
 - `addSkinnedButton` 旧 `pressedColor = (255,235,240,255)`；现代码 `toColor(THEME.palette.selectedTint)` 会取 token 自带 `a=150`。
 - 这不是“颜色来源替换”，而是按压态不透明度从 255 降到 150。若保持旧语义，应显式传 alpha 255；若要调整，须有完整前后视觉证据与规划者裁定。
 
-### 阻断 3：令牌化报告与视觉证据不完整
+### 报告落盘缺口 + V8 递延证据（证据缺口本轮不单独阻断）
 
 - task 要求字号/间距/圆角/透明度归并前后表，本分支报告仍是 TODO placeholder，未给出完整映射与残留豁免。
-- 强制证据未齐：应有 844×390 / 812×375 / 915×412 / 780×360 × lobby-home、lobby 子屏、bidding、playing、settled、pause 的改前/改后对照；现有 `/tmp/doudizhu-w-unify-ui` 只有 844/780 的 5 张冒烟图。
+- 按 task 原验收，应有 844×390 / 812×375 / 915×412 / 780×360 × lobby-home、lobby 子屏、bidding、playing、settled、pause 的改前/改后对照；现有 `/tmp/doudizhu-w-unify-ui` 只有 844/780 的 5 张冒烟图。规划者已明示改由 V8 强制补审，故不作本轮独立阻断。
 - `summary.json` 的 `productErrors=[]` 已核实，但只能证明本次 5 帧冒烟无产品错误，不替代缺失相位/分辨率。
 
 ### 协调落盘问题
