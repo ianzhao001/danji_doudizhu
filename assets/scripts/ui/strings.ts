@@ -80,6 +80,8 @@ export const STRINGS: Readonly<Record<string, string>> = Object.freeze({
   'game.progressKept': '本局进度已保留',
   'game.quitTitle': '退出对局？',
   'game.quitHint': '确认后返回大厅',
+  'seat.lastOne': '报单',
+  'seat.lastTwo': '报双',
   'game.bidFailed': '叫抢失败',
   'game.playFailed': '出牌失败',
   'game.passFailed': '不能过牌',

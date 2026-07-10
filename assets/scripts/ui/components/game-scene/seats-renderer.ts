@@ -2,13 +2,18 @@ import { Color, Label, Node, Sprite, SpriteFrame } from 'cc';
 import type { Settings } from '../../../data/settings';
 import type { FlowEvent } from '../../../flow/types';
 import type { RoundRuntime } from '../../../flow/round-runtime';
+import type { Card } from '../../../rules';
 import type { GameEvent, SeatIndex } from '../../../game';
 import { deriveAiThinking } from '../../ai-thinking-view';
-import { deriveLastActions, type SeatLastAction } from '../../last-action-view';
+import type { SeatAlert } from '../../follow-ux';
+import type { SeatLastAction } from '../../last-action-view';
+import { deriveLastPlays, type SeatLastPlay } from '../../last-play-view';
 import { RESOURCE_PATHS, type ResourcePath } from '../../asset-keys';
 import type { Rect } from '../../table-layout';
 import type { TableZones } from '../../table-zones';
+import { t } from '../../strings';
 import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
+import { CARD_SIZE } from './card-node';
 import { dropZoneForSeat, seatDisplayName, visualSideForSeat } from './seat-display';
 
 export interface GameSceneRendererContext {
@@ -66,6 +71,7 @@ export interface GameSceneRendererContext {
   startGame(forceNew: boolean): void;
   animateScaleIn(node: Node, fromScale: number, durationMs: number): void;
   drawDimOverlay(parent: Node, width: number, height: number): void;
+  addDisplayCard(card: Card, x: number, y: number, parent: Node, name: string, animate: boolean): Node;
 }
 
 const HERO_SEAT: SeatIndex = 0;
@@ -78,6 +84,7 @@ export function renderSeats(
   landlord: number | null,
   layout: TableZones,
   canvas: { width: number; height: number },
+  alerts: SeatAlert[] = [],
 ): void {
   const heroBody = seatBodyVisualRect('seat-hero', layout.heroBody, canvas);
   const leftBody = seatBodyVisualRect('seat-left', layout.opponentLeftBody, canvas);
@@ -95,6 +102,7 @@ export function renderSeats(
     0,
     handCounts[0],
     landlord,
+    alerts,
   );
   renderSeatNameplate(
     ctx,
@@ -104,6 +112,7 @@ export function renderSeats(
     leftSeat,
     handCounts[leftSeat],
     landlord,
+    alerts,
   );
   renderSeatNameplate(
     ctx,
@@ -113,6 +122,7 @@ export function renderSeats(
     rightSeat,
     handCounts[rightSeat],
     landlord,
+    alerts,
   );
 }
 
@@ -208,6 +218,7 @@ function renderSeatNameplate(
   seat: SeatIndex,
   handCount: number,
   landlord: number | null,
+  alerts: SeatAlert[],
 ): void {
   const roleKnown = landlord !== null;
   const isLandlord = landlord === seat;
@@ -244,6 +255,26 @@ function renderSeatNameplate(
   label.lineHeight = 16;
   const role = ctx.addLabel(roleText, 0, compactHero ? -8 : -10, compactHero ? 10 : 12, root, labelWidth, 15, 'seat-role-label', NAMEPLATE_MUTED);
   role.lineHeight = compactHero ? 12 : 14;
+  const alert = alerts.find((item) => item.seat === seat);
+  if (alert) renderSeatAlertBadge(ctx, root, nameplate, alert);
+}
+
+function renderSeatAlertBadge(
+  ctx: GameSceneRendererContext,
+  parent: Node,
+  nameplate: Rect,
+  alert: SeatAlert,
+): void {
+  const text = alert.kind === 'lastOne' ? t('seat.lastOne') : t('seat.lastTwo');
+  const backdrop = alert.kind === 'lastOne' ? toColor(THEME.palette.danger) : toColor(THEME.palette.warning);
+  const width = 44;
+  const height = 18;
+  const badge = ctx.ensureNode('seat-alert-badge', parent);
+  badge.setPosition(nameplate.width / 2 - width / 2 - 2, nameplate.height / 2 + 8, 0);
+  addUiTransform(badge, width, height);
+  drawPanel(badge, width, height, backdrop);
+  const label = ctx.addLabel(text, 0, 0, 10, badge, width, height, 'seat-alert-label', toColor(THEME.palette.textOnAccent));
+  label.lineHeight = 12;
 }
 
 export function renderSeatFeedback(
@@ -261,16 +292,81 @@ function renderLastActions(
   canvas: { width: number; height: number },
 ): void {
   const recentRoundEvents = ctx.recentEvents.flatMap((event) => (event.type === 'round' ? [event.event] : []));
-  const rows = deriveLastActions(recentRoundEvents);
-  rows.forEach((row) => {
-    const pos = lastActionPosition(ctx, row.seat, layout, canvas);
-    const root = ctx.ensureNode(`last-action-pill-${row.seat}`, ctx.uiRoot);
-    root.setPosition(pos.x, pos.y, 0);
-    addUiTransform(root, pos.width, 28);
-    drawPanel(root, pos.width, 28, toColor(THEME.palette.surfaceRaised, 184));
+  const rows = deriveLastPlays(recentRoundEvents);
+  rows.forEach((row) => renderLastPlayRow(ctx, row, layout, canvas));
+}
 
-    const labelColor = row.text === '—' ? toColor(THEME.palette.textOnAccent, 145) : toColor(THEME.palette.accentGold);
-    ctx.addLabel(row.text, 0, 1, THEME.typography.xs, root, pos.width - 16, 22, `last-action-${row.seat}`, labelColor);
+function renderLastPlayRow(
+  ctx: GameSceneRendererContext,
+  row: SeatLastPlay,
+  layout: TableZones,
+  canvas: { width: number; height: number },
+): void {
+  const maxWidth = row.seat === HERO_SEAT ? 146 : 124;
+  const width = row.kind === 'play' && row.cards.length > 0
+    ? lastPlayCardsWidth(row.cards.length, maxWidth)
+    : maxWidth;
+  const pos = lastActionPosition(ctx, row.seat, layout, canvas, width);
+  const root = ctx.ensureNode(`last-action-pill-${row.seat}`, ctx.uiRoot);
+  root.setPosition(pos.x, pos.y, 0);
+  addUiTransform(root, width, 30);
+
+  if (row.kind === 'play' && row.cards.length > 0) {
+    renderMiniPlayCards(ctx, root, row.cards, width, row.emphasis);
+    return;
+  }
+
+  const fallbackText = row.kind === 'pass' ? (row.text || t('action.pass')) : row.text;
+  drawPanel(root, width, 28, toColor(THEME.palette.surfaceRaised, 184));
+  const labelColor = fallbackText === '—' ? toColor(THEME.palette.textOnAccent, 145) : toColor(THEME.palette.accentGold);
+  ctx.addLabel(fallbackText, 0, 1, THEME.typography.xs, root, width - 16, 22, `last-action-${row.seat}`, labelColor);
+}
+
+function miniCardMetrics(cardCount: number, maxWidth: number): { scale: number; spacing: number } {
+  const baseWidth = CARD_SIZE.width;
+  if (cardCount <= 1) return { scale: 0.34, spacing: 0 };
+  if (cardCount <= 5) {
+    const scale = 0.34;
+    return { scale, spacing: baseWidth * scale + 2 };
+  }
+  const scale = 0.28;
+  const span = maxWidth - 8;
+  const spacing = Math.max(2, (span - baseWidth * scale) / Math.max(1, cardCount - 1));
+  return { scale, spacing };
+}
+
+function lastPlayCardsWidth(cardCount: number, maxWidth: number): number {
+  const { scale, spacing } = miniCardMetrics(cardCount, maxWidth);
+  if (cardCount <= 1) return Math.min(maxWidth, Math.round(baseCardWidth(scale) + 8));
+  return Math.min(maxWidth, Math.round(spacing * (cardCount - 1) + baseCardWidth(scale) + 8));
+}
+
+function baseCardWidth(scale: number): number {
+  return CARD_SIZE.width * scale;
+}
+
+function renderMiniPlayCards(
+  ctx: GameSceneRendererContext,
+  root: Node,
+  cards: Card[],
+  maxWidth: number,
+  emphasis: SeatLastPlay['emphasis'],
+): void {
+  const { scale, spacing } = miniCardMetrics(cards.length, maxWidth);
+  const totalWidth = cards.length <= 1
+    ? baseCardWidth(scale)
+    : spacing * (cards.length - 1) + baseCardWidth(scale);
+
+  if (emphasis) {
+    const path = emphasis === 'bomb' ? RESOURCE_PATHS.emphasisBomb : RESOURCE_PATHS.emphasisRocket;
+    ctx.addSprite(path, 0, 0, totalWidth + 14, 30, root, 'last-play-emphasis', true);
+  }
+
+  const startX = -totalWidth / 2 + baseCardWidth(scale) / 2;
+  cards.forEach((card, index) => {
+    const x = startX + index * spacing;
+    const node = ctx.addDisplayCard(card, x, 0, root, `last-play-card-${index}`, false);
+    node.setScale(scale, scale, 1);
   });
 }
 
@@ -309,17 +405,18 @@ export function lastActionPosition(
   seat: SeatLastAction['seat'],
   layout: TableZones,
   canvas: { width: number; height: number },
+  width = seat === HERO_SEAT ? 146 : 124,
 ): { x: number; y: number; width: number } {
   if (seat === HERO_SEAT) {
     const minY = layout.playArea.y + layout.playArea.height + 12;
     const maxY = layout.heroHandLarge.y - 30;
     const screenY = clamp(layout.tableActionBar.y - 24, minY, maxY);
     const pos = ctx.screenPoint(canvas, canvas.width / 2, screenY);
-    return { ...pos, width: 146 };
+    return { ...pos, width };
   }
   const rect = dropZoneForSeat(layout, seat);
   const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(22, rect.y - 32));
-  return { ...pos, width: 124 };
+  return { ...pos, width };
 }
 
 export function aiThinkingPosition(
