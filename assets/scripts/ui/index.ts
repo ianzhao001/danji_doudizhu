@@ -34,3 +34,4 @@ export * from './strength-meter-view';
 export * from './card-memory-view';
 export * from './insight-view';
 export * from './strings';
+export * from './theme';
