@@ -1084,7 +1084,7 @@ main 现状：**代码/测试/文档/发布打包 gate 均已闭合，首版可�
 | T-LASTPLAY-CARDS | 纯逻辑(纯岛·纯 spec) | 新 `ui/last-play-view.ts` + 桶一行 + 新测试 | 批内自 T-INTERACT-VIEWS 尖建（尖 `0d79305`） | done fa33a22 |
 | P-THEME-APPLY | UI(双层视觉预审) | `ui-helpers.ts` + `lobby-scene.ts` + `game-scene-skeleton.ts` + `game-scene/**` | `task/P-THEME-APPLY`（复审尖 `b523975`） | done 005422b |
 | P-PLAY-FEEL | UI(双层视觉预审) | `game-scene-skeleton.ts` + `game-scene/**` + strings 纯追加 | `task/P-PLAY-FEEL`（复审尖 `dcd6421`） | done da343b3 |
-| P-TABLE-INFO | UI(双层视觉预审) | `seats-renderer.ts` + `play-area-renderer.ts` + skeleton 接线 + strings 纯追加 | `task/P-TABLE-INFO`（复审尖 `3e58ea7`） | merge-claimed:P-TABLE-INFO |
+| P-TABLE-INFO | UI(双层视觉预审) | `seats-renderer.ts` + `play-area-renderer.ts` + skeleton 接线 + strings 纯追加 | `task/P-TABLE-INFO`（复审尖 `3e58ea7`） | done 279dfd8 |
 | V8 | verify-only 收口 + 补审②证据 | capture 脚本 + 六景四横屏 + 录屏 + 签收页（`tasks/V8.md`） | UI 批合并后执行者自 main 建（spec 授权） | ready |
 
 > **纯逻辑批审查披露（Codex·2026-07-10）**：T-THEME-TOKENS 逐行 diff + 现值定向对照 + 双闸通过，已按 `claim/merge/release` 并入（merge `eb6fcaf`，后基线 150 files / 775 tests 绿）。T-INTERACT-VIEWS 定向探针确认重叠手牌末张全宽无法由现 `InteractiveSlot` 形状反推，且同点稳定序被反转，已 `blocked` 转规划者裁定 API/spec（详见报告）。T-LASTPLAY-CARDS 存在非相邻 bomb/rocket 污染旧 play 及单张用例被同席后续 play 覆盖的覆盖缺口，已 `changes-requested`。链尖全量 152 files / 807 tests 绿 + typecheck 净，但不替代上述契约阻断。
