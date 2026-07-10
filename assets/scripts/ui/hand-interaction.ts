@@ -48,7 +48,7 @@ function slotOverlapsDrag(slot: InteractiveSlot, isLast: boolean, start: number,
   if (isLast) {
     return slot.hitRight >= start && slot.x <= end;
   }
-  return slot.hitRight > start && slot.x < end;
+  return slot.hitRight > start && slot.x <= end;
 }
 
 export function dragSelectCards(slots: InteractiveSlot[], fromX: number, toX: number): Card[] {
