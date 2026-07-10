@@ -1,8 +1,10 @@
-import { Sprite } from 'cc';
+import { EventTouch, Sprite, UITransform, Vec3 } from 'cc';
 import type { SeatIndex, TopPlay } from '../../../game';
 import type { Card } from '../../../rules';
 import { cardKey } from '../../../rules/guards';
 import { dealCardDelay } from '../../animation-params';
+import { dragSelectCards, layoutHandInteractive, type InteractiveSlot } from '../../hand-interaction';
+import { isSelected, sortForDisplay } from '../../selection';
 import { deriveScreenVM } from '../../screen-view';
 import { t } from '../../strings';
 import type { Rect } from '../../table-layout';
@@ -32,6 +34,80 @@ interface PlayAreaLayout {
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+export function layoutDisplayHandSlots(args: {
+  hand: Card[];
+  selected: Card[];
+  containerWidth: number;
+  cardWidth: number;
+  liftOffset: number;
+}): InteractiveSlot[] {
+  const sortedHand = sortForDisplay(args.hand);
+  const geometrySlots = layoutHandInteractive({
+    hand: sortedHand,
+    selected: [],
+    containerWidth: args.containerWidth,
+    cardWidth: args.cardWidth,
+    liftOffset: args.liftOffset,
+  });
+  return sortedHand.map((card, index) => {
+    const selected = isSelected(args.selected, card);
+    return {
+      card,
+      x: geometrySlots[index].x,
+      y: selected ? -args.liftOffset : 0,
+      selected,
+      hitRight: geometrySlots[index].hitRight,
+    };
+  });
+}
+
+export function handLocalXFromTouch(this: any, event: EventTouch, handFrame: { x: number }, canvas: { width: number; height: number }): number {
+  const ui = event.getUILocation();
+  const uiTransform = this.uiRoot!.getComponent(UITransform)!;
+  const local = uiTransform.convertToNodeSpaceAR(new Vec3(ui.x, ui.y, 0));
+  return Math.round(local.x + canvas.width / 2 - handFrame.x);
+}
+
+export function bindHandDragHandlers(this: any): void {
+  this.onHandDragStart = (event: EventTouch) => {
+    if (!this.displayHandSlots?.length) return;
+    const canvas = this.canvasSize();
+    const handFrame = this.handLayoutFrame(canvas);
+    this.handDragActive = true;
+    this.handDragMoved = false;
+    this.handDragStartX = handLocalXFromTouch.call(this, event, handFrame, canvas);
+    this.handDragCurrentX = this.handDragStartX;
+  };
+  this.onHandDragMove = (event: EventTouch) => {
+    if (!this.handDragActive) return;
+    const canvas = this.canvasSize();
+    const handFrame = this.handLayoutFrame(canvas);
+    this.handDragCurrentX = handLocalXFromTouch.call(this, event, handFrame, canvas);
+    if (Math.abs(this.handDragCurrentX - this.handDragStartX) > 4) this.handDragMoved = true;
+  };
+  this.onHandDragEnd = (event: EventTouch) => {
+    if (!this.handDragActive) return false;
+    const canvas = this.canvasSize();
+    const handFrame = this.handLayoutFrame(canvas);
+    this.handDragCurrentX = handLocalXFromTouch.call(this, event, handFrame, canvas);
+    const moved = this.handDragMoved;
+    this.handDragActive = false;
+    this.handDragMoved = false;
+    if (!moved || !this.displayHandSlots?.length) return false;
+    const dragged = dragSelectCards(this.displayHandSlots, this.handDragStartX, this.handDragCurrentX);
+    this.selected = dragged.reduce(
+      (selected: Card[], card: Card) => (isSelected(selected, card) ? selected : [...selected, card]),
+      this.selected.slice(),
+    );
+    this.render();
+    return true;
+  };
+  this.onHandDragCancel = () => {
+    this.handDragActive = false;
+    this.handDragMoved = false;
+  };
 }
 
 export function renderBottomCardsDock(this: any, cards: Card[] | null, layout: TableZones, canvas: { width: number; height: number }): void {
