@@ -1,8 +1,8 @@
 # P-TABLE-INFO Report
 
-- status: in-review
+- status: approved
 - branch: `task/P-TABLE-INFO`
-- base: `task/P-PLAY-FEEL @ f819ad2`
+- base: `task/P-PLAY-FEEL @ dcd6421`
 - original implementation: `278d0fe`（在新 PLAY 尖上重放）
 
 ## 实现摘要
@@ -52,5 +52,8 @@
 ## 审查记录
 
 - 原审查尖：`9f51160`，结论 `changes-requested`。
-- 复审范围：`f819ad2..本分支新尖`；逐行审 TABLE 增量，定向抽查 `deriveLastPlays`、`deriveLastActions`、`deriveFollowUx.alerts` 与 settled 门。
-- 待最终验收回填：全量 test/typecheck、main 双闸、merge commit 与 BOARD done 状态。
+- 复审范围：`dcd6421..318ab26`；逐行审 TABLE 增量，定向抽查 `deriveLastPlays`、`deriveLastActions`、`deriveFollowUx.alerts` 与 settled 门。
+- 结构结论：迷你牌消费 `deriveLastPlays`，pass 文案链仍复用 `deriveLastActions`；alerts 每帧重算；settled 门保留；strings 只追加；纯岛/test/event-cues 零 diff。
+- 分支回归：152 files / 815 tests 绿；`npm --prefix test run typecheck` 绿；`git diff --check` 净。
+- 视觉结论：继承 BOARD「UI 批视觉审②」分级放行；长顺子/alerts/resume 证据债转 V8。
+- 合并门：常规任务，批准在前两棒合并后进入 `claim/merge/release`；main 双闸、merge commit 与 done 状态在合并后回填。
