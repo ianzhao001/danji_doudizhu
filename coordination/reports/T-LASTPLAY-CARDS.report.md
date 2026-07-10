@@ -53,6 +53,13 @@ npm --prefix test run typecheck
 - 摘要：`win` 对席位最近动作仍然忽略，但作为事件序列节点必须中断「紧邻」；在 `continue` 前设 `previous=event`，防止 `play → win → bomb` 误设 emphasis。
 - 证据：修前上述探针输出 `emphasis:'bomb'`；修后为 `null`，定向 20/20 + 全量 811/811 + typecheck 绿。
 
+## 验收披露（Codex 审查者）
+- 复审结论：`approved`；历史打回 1 轮；兜底修复见上段。
+- 合并 commit：`a5a1bd1`（`merge task/T-LASTPLAY-CARDS`），按依赖序位于 T-INTERACT-VIEWS `dc94aad` 之后，3-way 零冲突且保留 main 修复版 INTERACT。
+- 合并前 main 双闸：151 files / 802 tests 绿，typecheck exit 0。
+- 合并后 main 终态：152 files / 815 tests 绿，typecheck exit 0，`git diff --check` 净。
+- Creator 元数据：运行中的 Cocos Creator 自动生成 `assets/scripts/ui/last-play-view.ts.meta`（UUID `73efc652-7d84-4df3-8f6c-750428c36479`）；审查者仅提交编辑器原生产物，未手写 `.meta`。
+
 ## 自检
 - [x] `last-action-view.ts` 零 diff
 - [x] 未改既有测试
