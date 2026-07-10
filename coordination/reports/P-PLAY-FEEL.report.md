@@ -1,6 +1,6 @@
 # P-PLAY-FEEL Report
 
-- status: approved
+- status: done da343b3
 - branch: `task/P-PLAY-FEEL`
 - base: `task/P-THEME-APPLY @ b523975`
 - original implementation: `afad056`（在新 THEME 尖上重放）
@@ -59,3 +59,10 @@
 - 分支回归：152 files / 815 tests 绿；`npm --prefix test run typecheck` 绿；`git diff --check` 净。
 - 视觉结论：继承 BOARD「UI 批视觉审②」分级放行；动态证据债转 V8。
 - 合并门：常规任务，批准在 P-THEME-APPLY 合并后进入 `claim/merge/release`；main 双闸、merge commit 与 done 状态在合并后回填。
+
+## 验收披露
+
+- 评审结论：命中几何、mustPass 与降序身份链通过；首轮打回 1 次，随后由 Codex 在原文件域兜底收口。
+- 合并前 main 双闸：152 files / 815 tests 绿；typecheck 绿。
+- merge：`da343b3`（`--no-ff`）；BOARD：`done da343b3`；release 后任务分支已删除。
+- 终态批回归：152 files / 815 tests 绿；typecheck 与 `git diff --check` 净。

@@ -1,6 +1,6 @@
 # P-THEME-APPLY Report
 
-- status: approved
+- status: done 005422b
 - branch: `task/P-THEME-APPLY`
 - original implementation: `4a46e1c`
 - task: cc 层颜色、字号、圆角与透明度接线到 `ui/theme.ts` 的 `THEME`
@@ -65,3 +65,10 @@ assets/scripts/ui/components/ui-helpers.ts
 - 分支回归：152 files / 815 tests 绿；`npm --prefix test run typecheck` 绿；`git diff --check` 净。
 - 视觉结论：继承 BOARD「UI 批视觉审②」P-THEME-APPLY PASS；其余证据债转 V8。
 - 合并门：常规任务，批准进入 Codex `claim/merge/release`；main 双闸、merge commit 与 done 状态在合并后回填。
+
+## 验收披露
+
+- 评审结论：结构门与规划者视觉审②均满足，批准并完成合并；首轮打回 1 次，随后由 Codex 在原文件域兜底收口。
+- 合并前 main 双闸：152 files / 815 tests 绿；typecheck 绿。
+- merge：`005422b`（`--no-ff`）；BOARD：`done 005422b`；release 后任务分支已删除、关联 worktree 已清理。
+- 终态批回归：152 files / 815 tests 绿；typecheck 与 `git diff --check` 净。

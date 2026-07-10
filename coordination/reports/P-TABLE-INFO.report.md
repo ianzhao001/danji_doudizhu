@@ -1,6 +1,6 @@
 # P-TABLE-INFO Report
 
-- status: approved
+- status: done 279dfd8
 - branch: `task/P-TABLE-INFO`
 - base: `task/P-PLAY-FEEL @ dcd6421`
 - original implementation: `278d0fe`（在新 PLAY 尖上重放）
@@ -57,3 +57,10 @@
 - 分支回归：152 files / 815 tests 绿；`npm --prefix test run typecheck` 绿；`git diff --check` 净。
 - 视觉结论：继承 BOARD「UI 批视觉审②」分级放行；长顺子/alerts/resume 证据债转 V8。
 - 合并门：常规任务，批准在前两棒合并后进入 `claim/merge/release`；main 双闸、merge commit 与 done 状态在合并后回填。
+
+## 验收披露
+
+- 评审结论：最近出牌、pass 文案共存、alerts 状态驱动、settled 与 CueId 门均通过；首轮打回 1 次，Codex 仅重建链和归位报告，产品逻辑未另改。
+- 合并前 main 双闸：152 files / 815 tests 绿；typecheck 绿。
+- merge：`279dfd8`（`--no-ff`）；BOARD：`done 279dfd8`；release 后任务分支已删除。
+- 终态批回归：152 files / 815 tests 绿；typecheck 与 `git diff --check` 净。
