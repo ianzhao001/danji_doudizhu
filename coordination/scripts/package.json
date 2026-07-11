@@ -1,0 +1,8 @@
+{
+  "name": "doudizhu-v8-scripts",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}

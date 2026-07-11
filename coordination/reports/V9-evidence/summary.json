@@ -1,0 +1,261 @@
+{
+  "task": "V9",
+  "base": "http://127.0.0.1:7788/build/web-mobile/",
+  "seed": 20260705,
+  "capturedAt": "2026-07-11T07:48:37.227Z",
+  "flows": {
+    "lobbyClicks": {
+      "caps": [
+        {
+          "file": "screenshots/a-home-844x390.png",
+          "sha256": "faadf27f40b7bda0",
+          "step": "home"
+        },
+        {
+          "file": "screenshots/a-sub-tutorial-844x390.png",
+          "sha256": "bb93f8b21ccbb43c",
+          "step": "entry:教程"
+        },
+        {
+          "file": "screenshots/a-sub-help-844x390.png",
+          "sha256": "c5f797002fb5733d",
+          "step": "entry:帮助"
+        },
+        {
+          "file": "screenshots/a-sub-stats-844x390.png",
+          "sha256": "88345bea965537d1",
+          "step": "entry:战绩"
+        },
+        {
+          "file": "screenshots/a-sub-records-844x390.png",
+          "sha256": "b51ae1d3ab6db7d1",
+          "step": "entry:历史"
+        },
+        {
+          "file": "screenshots/a-home-after-subpages-844x390.png",
+          "sha256": "faadf27f40b7bda0",
+          "step": "back-home"
+        },
+        {
+          "file": "screenshots/a-difficulty-hard-844x390.png",
+          "sha256": "e68681b4d2df15a9",
+          "step": "difficulty-switch",
+          "persisted": "hard"
+        },
+        {
+          "file": "screenshots/a-game-entered-844x390.png",
+          "sha256": "49deedec3e252adc",
+          "step": "start-game+bid-to-playing"
+        },
+        {
+          "file": "screenshots/a-lobby-continue-available-844x390.png",
+          "sha256": "66bb904bd7b243b7",
+          "step": "reload-with-save"
+        },
+        {
+          "file": "screenshots/a-resumed-game-844x390.png",
+          "sha256": "1180fbde4a74d9c9",
+          "step": "continue-resume",
+          "handCount": 20
+        },
+        {
+          "file": "screenshots/a-pause-menu-844x390.png",
+          "sha256": "809698eb289f4d15",
+          "step": "pause"
+        },
+        {
+          "file": "screenshots/a-quit-cleared-844x390.png",
+          "sha256": "66bb904bd7b243b7",
+          "step": "quit-clears-save"
+        }
+      ],
+      "persistedDifficulty": "hard",
+      "resumedHand": 20
+    },
+    "regression": [
+      {
+        "viewport": "844x390",
+        "ascending": true,
+        "flags": {
+          "strength": false,
+          "memory": false
+        },
+        "caps": [
+          {
+            "file": "screenshots/b-lobby-844x390.png",
+            "sha256": "66bb904bd7b243b7",
+            "step": "unify-lobby"
+          },
+          {
+            "file": "screenshots/b-playing-844x390.png",
+            "sha256": "e0d8d679809e276b",
+            "step": "ascending+hidden",
+            "order": [
+              "3:S",
+              "4:S",
+              "5:S",
+              "6:S",
+              "7:S"
+            ],
+            "flags": {
+              "strength": false,
+              "memory": false
+            }
+          }
+        ],
+        "errors": []
+      },
+      {
+        "viewport": "812x375",
+        "ascending": true,
+        "flags": {
+          "strength": false,
+          "memory": false
+        },
+        "caps": [
+          {
+            "file": "screenshots/b-lobby-812x375.png",
+            "sha256": "7cb220c2632b6c76",
+            "step": "unify-lobby"
+          },
+          {
+            "file": "screenshots/b-playing-812x375.png",
+            "sha256": "ff9adf20216ebfc9",
+            "step": "ascending+hidden",
+            "order": [
+              "3:S",
+              "4:S",
+              "5:S",
+              "6:S",
+              "7:S"
+            ],
+            "flags": {
+              "strength": false,
+              "memory": false
+            }
+          }
+        ],
+        "errors": []
+      },
+      {
+        "viewport": "915x412",
+        "ascending": true,
+        "flags": {
+          "strength": false,
+          "memory": false
+        },
+        "caps": [
+          {
+            "file": "screenshots/b-lobby-915x412.png",
+            "sha256": "c221ade4ee446b77",
+            "step": "unify-lobby"
+          },
+          {
+            "file": "screenshots/b-playing-915x412.png",
+            "sha256": "4b7b4cafa768a020",
+            "step": "ascending+hidden",
+            "order": [
+              "3:S",
+              "4:S",
+              "5:S",
+              "6:S",
+              "7:S"
+            ],
+            "flags": {
+              "strength": false,
+              "memory": false
+            }
+          }
+        ],
+        "errors": []
+      },
+      {
+        "viewport": "780x360",
+        "ascending": true,
+        "flags": {
+          "strength": false,
+          "memory": false
+        },
+        "caps": [
+          {
+            "file": "screenshots/b-lobby-780x360.png",
+            "sha256": "d3d8909c7d4edd85",
+            "step": "unify-lobby"
+          },
+          {
+            "file": "screenshots/b-playing-780x360.png",
+            "sha256": "8cfefff2366ef09f",
+            "step": "ascending+hidden",
+            "order": [
+              "3:S",
+              "4:S",
+              "5:S",
+              "6:S",
+              "7:S"
+            ],
+            "flags": {
+              "strength": false,
+              "memory": false
+            }
+          }
+        ],
+        "errors": []
+      }
+    ],
+    "hintPlay": {
+      "entry": "real-clicks(difficulty-hard → start → bid → hero-turn)",
+      "sel1": [
+        "14:C",
+        "14:H"
+      ],
+      "sel2": [
+        "15:C",
+        "15:H"
+      ],
+      "played": [
+        "15:C",
+        "15:H"
+      ],
+      "caps": [
+        {
+          "file": "screenshots/c-hint-first-844x390.png",
+          "sha256": "d7fe2d05727ee909",
+          "step": "hint-1",
+          "selected": [
+            "14:C",
+            "14:H"
+          ]
+        },
+        {
+          "file": "screenshots/c-hint-cycle-844x390.png",
+          "sha256": "d749a8da283c80d0",
+          "step": "hint-2",
+          "selected": [
+            "15:C",
+            "15:H"
+          ]
+        },
+        {
+          "file": "screenshots/c-played-844x390.png",
+          "sha256": "de7dfdd5b77d0af2",
+          "step": "played",
+          "playedCards": [
+            "15:C",
+            "15:H"
+          ]
+        }
+      ],
+      "recording": {
+        "file": "recordings/record-hint-play-844x390.webm",
+        "sha256": "015d75dd1da52f32"
+      },
+      "captureFile": "hint-capture.json"
+    }
+  },
+  "errors": {
+    "lobbyClicks": [],
+    "hintPlay": []
+  },
+  "pageErrorTotal": 0,
+  "screenshotCount": 23
+}

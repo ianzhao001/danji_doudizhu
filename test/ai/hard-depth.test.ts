@@ -83,7 +83,7 @@ describe('M4-42 hard AI 纵深启发式', () => {
         expect(summary.landlord).toBe(0);
       }
 
-      // 规划者裁定（T-AI-1 验收披露 2026-07-04）：原「winRate/averageScore(Hard 地主) ≥ Normal 基线」
+      // 困难档相对普通档的胜率约束以单独质量门为准；
       // 是 12-seed 地主视角的小样本代理。T-AI-1 强化普通档（组合首出+农民配合）后，农民侧同步变强、
       // Hard 的跟牌仍是旧保守逻辑，该代理实测反转（Hard 0.5 vs Normal 0.667），不再成立。
       // 三档排序契约迁移至 test/selfplay/quality.test.ts 的 T-AI-2 质量门

@@ -1,0 +1,29 @@
+{
+  "seed": 20260705,
+  "heroSeat": 0,
+  "steps": [
+    {
+      "type": "to-playing"
+    },
+    {
+      "type": "hero-play-first-legal"
+    },
+    {
+      "type": "wait-until-pass-ready"
+    },
+    {
+      "type": "hero-pass"
+    },
+    {
+      "type": "sync-event-count",
+      "count": 6
+    }
+  ],
+  "resumeDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+  "liveDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+  "eventsDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+  "lastPlaysDigest": "0:pass:0:不要|1:play:1:出 7|2:play:1:出 8",
+  "phase": "playing",
+  "turn": 0,
+  "eventCount": 6
+}

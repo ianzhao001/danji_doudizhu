@@ -1,18 +1,5 @@
 /**
- * T-RESUME-REPLAY 失败测试（规划者种入·不可改）：断局恢复后三席"最近出牌"重建（BUG-03 可修部分）。
- * 契约见 coordination/tasks/T-RESUME-REPLAY.md（2026-07-07 规划者修订：重建收进纯岛 ui/resume-rebuild.ts）。
- * 规则钉死：
- *   新纯岛 `ui/resume-rebuild.ts` export `rebuildRecentEvents(events: GameEvent[]): FlowEvent[]`——
- *     把存档回放的 fullGameEvents 逐个包成 { type:'round', event } 并 slice(-12)（镜像 skeleton live 路径
- *     的 recentEvents 截断·game-scene-skeleton.ts:386），顺序保持；
- *   不伪造事件：输出只含 'round' 包装，不得出现 deal/bid/landlordDecided/bottomRevealed/settled
- *     （底牌保守牌背 = revealedBottomCards 保持 null·由 skeleton 接线 + 双层视觉预审截图验收·种子只钉纯变换）；
- *   消费等价：seats-renderer:261 的 round 解包 → deriveLastActions 链在重建输入上须给出与全量历史一致的
- *     三席末次动作（复用 last-action-view 纯函数·不重算规则）；
- *   skeleton 接线（恢复路径 this.recentEvents = rebuildRecentEvents(this.fullGameEvents)）由审查者逐行核 +
- *     视觉预审兜底——cc 组件不可入 vitest，故种子经动态 import 钉纯岛本体。
- * 今日红因：ui/resume-rebuild.ts 不存在 → 案例①②动态 import 失败；案例③为 deriveLastActions 既有语义绿锚。
- * 底牌面值恢复延后 = 用户裁决③（与叫抢存档一次升版），本任务不修、报告如实记录。
+ * 验证断局恢复后，最近出牌列表可由公开历史稳定重建。
  */
 import { describe, expect, it } from 'vitest';
 import { deriveLastActions } from '../../assets/scripts/ui/last-action-view';

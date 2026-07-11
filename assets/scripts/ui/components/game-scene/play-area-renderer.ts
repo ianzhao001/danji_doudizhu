@@ -1,10 +1,10 @@
-import { EventTouch, Sprite, UITransform, Vec3 } from 'cc';
+import { EventTouch, Sprite } from 'cc';
 import type { SeatIndex, TopPlay } from '../../../game';
 import type { Card } from '../../../rules';
 import { cardKey } from '../../../rules/guards';
 import { dealCardDelay } from '../../animation-params';
 import { dragSelectCards, layoutHandInteractive, type InteractiveSlot } from '../../hand-interaction';
-import { isSelected, sortForDisplay } from '../../selection';
+import { isSelected, sortByRank } from '../../selection';
 import { deriveScreenVM } from '../../screen-view';
 import { t } from '../../strings';
 import type { Rect } from '../../table-layout';
@@ -43,7 +43,9 @@ export function layoutDisplayHandSlots(args: {
   cardWidth: number;
   liftOffset: number;
 }): InteractiveSlot[] {
-  const sortedHand = sortForDisplay(args.hand);
+  // V8 用户签收意见①（2026-07-11）：手牌左→右依次增大（升序，王最右）——覆盖第一波降序判断。
+  // sortForDisplay（降序）保留导出与测试，仅此处不再消费。
+  const sortedHand = sortByRank(args.hand);
   const geometrySlots = layoutHandInteractive({
     hand: sortedHand,
     selected: [],
@@ -65,9 +67,10 @@ export function layoutDisplayHandSlots(args: {
 
 export function handLocalXFromTouch(this: any, event: EventTouch, handFrame: { x: number }, canvas: { width: number; height: number }): number {
   const ui = event.getUILocation();
-  const uiTransform = this.uiRoot!.getComponent(UITransform)!;
-  const local = uiTransform.convertToNodeSpaceAR(new Vec3(ui.x, ui.y, 0));
-  return Math.round(local.x + canvas.width / 2 - handFrame.x);
+  // uiRoot 是无 UITransform 的容器节点（getComponent 为 null，此前的非空断言在 TOUCH_START 首帧即抛错，
+  // 导致引擎不 claim 该 touch、MOVE/END 永不派发）。uiRoot scale=1 且无旋转，本地坐标 = UI 世界坐标 - 节点世界坐标。
+  const world = this.uiRoot!.worldPosition;
+  return Math.round(ui.x - world.x + canvas.width / 2 - handFrame.x);
 }
 
 export function bindHandDragHandlers(this: any): void {
@@ -87,11 +90,7 @@ export function bindHandDragHandlers(this: any): void {
     this.handDragCurrentX = handLocalXFromTouch.call(this, event, handFrame, canvas);
     if (Math.abs(this.handDragCurrentX - this.handDragStartX) > 4) this.handDragMoved = true;
   };
-  this.onHandDragEnd = (event: EventTouch) => {
-    if (!this.handDragActive) return false;
-    const canvas = this.canvasSize();
-    const handFrame = this.handLayoutFrame(canvas);
-    this.handDragCurrentX = handLocalXFromTouch.call(this, event, handFrame, canvas);
+  const settleHandDrag = (): boolean => {
     const moved = this.handDragMoved;
     this.handDragActive = false;
     this.handDragMoved = false;
@@ -104,9 +103,18 @@ export function bindHandDragHandlers(this: any): void {
     this.render();
     return true;
   };
+  this.onHandDragEnd = (event: EventTouch) => {
+    if (!this.handDragActive) return false;
+    const canvas = this.canvasSize();
+    const handFrame = this.handLayoutFrame(canvas);
+    this.handDragCurrentX = handLocalXFromTouch.call(this, event, handFrame, canvas);
+    return settleHandDrag();
+  };
   this.onHandDragCancel = () => {
-    this.handDragActive = false;
-    this.handDragMoved = false;
+    // 引擎对「触点移出起始节点后抬起」派发 TOUCH_CANCEL 而非 TOUCH_END——跨卡划选必然出界走此分支，
+    // 故 CANCEL 也按已划过区间结算（currentX 取最后一次 MOVE），否则划选永不生效。
+    if (!this.handDragActive) return;
+    settleHandDrag();
   };
 }
 

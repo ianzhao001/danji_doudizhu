@@ -47,7 +47,9 @@ const SAVE_KEY = STORAGE_KEYS.save;
 const STATS_KEY = STORAGE_KEYS.stats;
 const RECORDS_KEY = STORAGE_KEYS.records;
 const LANDSCAPE_CANVAS = { width: 844, height: 390 };
-const LOBBY_BACKGROUND_ASPECT = 1846 / 852;
+// V8 用户签收意见⑤（2026-07-11）：大厅与游戏画面视觉统一——背景改用牌桌同源
+// gameTableBgV13（纵横比随之取 game 侧 1688/780），面板浮于半透明 scrim 之上。
+const LOBBY_BACKGROUND_ASPECT = 1688 / 780;
 const LEGACY_LABEL_NODE_NAMES = [
   'title-label',
   'start-label',
@@ -360,24 +362,28 @@ export class LobbyScene extends Component {
     this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel(LOBBY_TEXT.difficulty, 0, panelHeight / 2 - 34, 22, panel, panelWidth - 34, 34, 'difficulty-title');
 
+    // V8 用户签收意见②（2026-07-11）文字重合修复：描述两行原溢出胶囊上下缘、
+    // 「当前」与描述同行紧贴压缘、标签压左端花纹——加高胶囊/收字号/错行放置。
     const rowWidth = panelWidth - 18;
     const rowPadding = 10;
     const titleWidth = 44;
-    const currentWidth = 40;
+    const currentWidth = 36;
     const gap = 8;
-    const descWidth = Math.max(104, rowWidth - rowPadding * 2 - titleWidth - currentWidth - gap * 2);
-    const titleX = -rowWidth / 2 + rowPadding + titleWidth / 2;
+    const rowHeight = 50;
+    const rowStep = 58;
+    const descWidth = Math.max(96, rowWidth - rowPadding * 2 - titleWidth - currentWidth - gap * 2 - 8);
+    const titleX = -rowWidth / 2 + rowPadding + titleWidth / 2 + 5;
     const descX = titleX + titleWidth / 2 + gap + descWidth / 2;
-    const currentX = rowWidth / 2 - rowPadding - currentWidth / 2;
+    const currentX = rowWidth / 2 - rowPadding - currentWidth / 2 - 2;
     const picker = deriveDifficultyPicker(current);
     picker.options.forEach((option, index) => {
-      const rowY = panelHeight / 2 - 84 - index * 54;
+      const rowY = panelHeight / 2 - 84 - index * rowStep;
       this.addButton(
         '',
         0,
         rowY,
         panelWidth - 18,
-        44,
+        rowHeight,
         true,
         () => this.persist(setDifficulty(loadSettings(cocosStorage(), SETTINGS_KEY), option.level)),
         panel,
@@ -396,17 +402,17 @@ export class LobbyScene extends Component {
         option.selected ? BUTTON_PRIMARY_TEXT : BUTTON_SECONDARY_TEXT,
       );
       title.lineHeight = 18;
-      const lines = wrapText(option.description, Math.max(8, Math.floor(descWidth / 12))).slice(0, 2);
+      const lines = wrapText(option.description, Math.max(8, Math.floor(descWidth / 11))).slice(0, 2);
       const single = lines.length === 1;
       lines.forEach((line, lineIndex) => {
         this.addLabel(
           line,
           descX,
-          rowY + (single ? 0 : 7 - lineIndex * 15),
-          12,
+          rowY + (single ? 0 : 8 - lineIndex * 14),
+          11,
           panel,
           descWidth,
-          16,
+          14,
           `difficulty-desc-${option.level}-${lineIndex}`,
           option.selected ? BUTTON_PRIMARY_TEXT : BUTTON_SECONDARY_TEXT,
         );
@@ -416,10 +422,10 @@ export class LobbyScene extends Component {
           LOBBY_TEXT.current,
           currentX,
           rowY,
-          12,
+          11,
           panel,
           currentWidth,
-          20,
+          16,
           `difficulty-current-${option.level}`,
           BUTTON_PRIMARY_TEXT,
         );
@@ -779,7 +785,18 @@ export class LobbyScene extends Component {
     const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
     sprite.type = Sprite.Type.SIMPLE;
     sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-    loadSprite(RESOURCE_PATHS.lobbyBg, sprite, this.spriteFrames);
+    loadSprite(RESOURCE_PATHS.gameTableBgV13, sprite, this.spriteFrames);
+
+    // 半透明 scrim：压暗桌景使三面板文字对比达标，同时保留与游戏内一致的场景氛围。
+    const scrim = this.ensureNode('lobby-background-scrim', this.node);
+    scrim.setSiblingIndex(1);
+    scrim.setPosition(0, 0, 0);
+    addUiTransform(scrim, width, height);
+    const scrimGraphics = scrim.getComponent(Graphics) ?? scrim.addComponent(Graphics);
+    scrimGraphics.clear();
+    scrimGraphics.fillColor = toColor(THEME.palette.overlayScrim, 96);
+    scrimGraphics.rect(-width / 2, -height / 2, width, height);
+    scrimGraphics.fill();
   }
 
   private canvasSize(): { width: number; height: number } {

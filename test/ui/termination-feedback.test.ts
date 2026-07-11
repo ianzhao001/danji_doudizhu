@@ -1,22 +1,5 @@
 /**
- * T-TERM-FEEDBACK 失败测试（规划者种入·不可改）：runtime 异常终止 UI 反馈——
- * 钉纯岛 `deriveTerminationFeedback` 的正向清单判定 + toast-queue 复用目标。
- *
- * 契约见 coordination/tasks/T-TERM-FEEDBACK.md（2026-07-07 规划者种子期修订：+纯岛 +暂停接线骑士）。
- * 规则钉死：
- *   新纯岛 `ui/termination-feedback-view.ts`（禁 import 'cc'）export
- *     `deriveTerminationFeedback(args: { phase: string; reason: RuntimeTerminationReason | null;
- *        alreadyNotified: boolean }): { text: string } | null`——
- *     仅当 `phase==='disposed'` 且 `reason` ∈ {'redealExhausted','error'} 且未通知过时返回文案；
- *     redealExhausted→'重发次数耗尽，本局已终止'·error→'对局发生内部错误，已终止'；
- *     settled / null（玩家主动退出 dispose）/非 disposed 相/已通知 → 一律 null。
- *   判定必须是正向清单 `reason ∈ {'redealExhausted','error'}`，**不得写 `!== 'settled'`**：
- *     玩家主动退出（返回大厅 dispose）时 terminationReason() 为 null，宽松写法会在每次正常退局弹"异常终止"。
- *   skeleton 接线（update 轮询 → pushToast + 去重 flag + 返回大厅/重开按钮；暂停接线骑士 openPauseMenu→pause/
- *     退出暂停→resume/返回大厅·重开走 dispose·startGame 不调 resume）由审查者逐行核 + CDP 行为证据 +
- *     双层视觉预审兜底——cc 组件不可入 vitest，故种子经动态 import 钉纯岛本体；toast-queue 复用目标为绿锚。
- * 今日红因：ui/termination-feedback-view.ts 不存在 → 案例①②③④动态 import 失败；案例⑤为 toast-queue 既有语义绿锚。
- * pause-wiring 无 vitest 种子（接线是 cc 组件内一行调用·无纯缝·同 T-RESUME-REPLAY 先例）——改由 CDP 行为证据验收。
+ * 验证 runtime 异常终止反馈的纯逻辑判定，以及 toast 队列复用语义。
  */
 import { describe, expect, it } from 'vitest';
 // 绿锚：toast-queue 既有语义钉死复用目标（静态 import · 已存在）

@@ -1,0 +1,135 @@
+{
+  "capturedAt": "2026-07-11T07:49:56.595Z",
+  "difficulty": "hard",
+  "capture": {
+    "snapshot": {
+      "phase": "playing",
+      "turn": 0,
+      "landlord": 0,
+      "top": null,
+      "handCounts": [
+        20,
+        17,
+        17
+      ],
+      "winner": null,
+      "bombsPlayed": 0,
+      "viewerHand": [
+        {
+          "rank": 6,
+          "suit": "H"
+        },
+        {
+          "rank": 8,
+          "suit": "C"
+        },
+        {
+          "rank": 11,
+          "suit": "C"
+        },
+        {
+          "rank": 6,
+          "suit": "C"
+        },
+        {
+          "rank": 15,
+          "suit": "H"
+        },
+        {
+          "rank": 15,
+          "suit": "C"
+        },
+        {
+          "rank": 9,
+          "suit": "H"
+        },
+        {
+          "rank": 14,
+          "suit": "H"
+        },
+        {
+          "rank": 11,
+          "suit": "S"
+        },
+        {
+          "rank": 10,
+          "suit": "C"
+        },
+        {
+          "rank": 9,
+          "suit": "C"
+        },
+        {
+          "rank": 7,
+          "suit": "D"
+        },
+        {
+          "rank": 12,
+          "suit": "H"
+        },
+        {
+          "rank": 3,
+          "suit": "C"
+        },
+        {
+          "rank": 11,
+          "suit": "D"
+        },
+        {
+          "rank": 16,
+          "suit": "J"
+        },
+        {
+          "rank": 5,
+          "suit": "H"
+        },
+        {
+          "rank": 8,
+          "suit": "D"
+        },
+        {
+          "rank": 14,
+          "suit": "C"
+        },
+        {
+          "rank": 5,
+          "suit": "C"
+        }
+      ],
+      "bidMultiplier": 8
+    },
+    "history": [],
+    "playerTurn": true,
+    "phase": "playing"
+  },
+  "sel1Cards": [
+    {
+      "rank": 14,
+      "suit": "H"
+    },
+    {
+      "rank": 14,
+      "suit": "C"
+    }
+  ],
+  "sel2Cards": [
+    {
+      "rank": 15,
+      "suit": "H"
+    },
+    {
+      "rank": 15,
+      "suit": "C"
+    }
+  ],
+  "playedCards": [
+    {
+      "rank": 15,
+      "suit": "H"
+    },
+    {
+      "rank": 15,
+      "suit": "C"
+    }
+  ]
+}

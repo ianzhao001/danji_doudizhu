@@ -1,7 +1,5 @@
 /**
- * T-VIEW-SEAT 改种（规划者·2026-07-06）：v1.2 P-G7 逆时针座位映射后，
- * 下家（offset 1）在【右】、上家（offset 2）在【左】——label 期望随 seat-display 语义翻转。
- * 今日红因：ai-thinking-view.ts 仍用旧映射（offset 1=左家）。
+ * 验证逆时针座位映射下，AI 思考提示会正确显示左右家标签。
  */
 import { describe, expect, it } from 'vitest';
 import { deriveAiThinking } from '../../assets/scripts/ui/ai-thinking-view';

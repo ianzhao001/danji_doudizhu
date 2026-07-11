@@ -37,7 +37,7 @@ describe('M4-05 hard 大牌压制（跟牌积极抢权 + 领出保守）', () =>
     if (n.type === 'play') expect(n.cards[0].rank).toBe(Rank.R5);
   });
 
-  // T-AI-2 契约改写（规划者·2026-07-04）：对手仅剩 1 张时不再「保守送低单」——低单等于送对手走人。
+  // 对手仅剩 1 张时，不再保守送出低单。
   // 无对子可封时领最大单压制（K）。原「仍出最小单 3」契约随 T-AI-2 废止。
   it('pressing 领出无炸弹无对子 → 领最大单 K 压制（不送低单）', () => {
     const a = hard(snap({ top: null, viewerHand: cards('3 4 5 9 K'), handCounts: [5, 1, 3] }), createRng(2));

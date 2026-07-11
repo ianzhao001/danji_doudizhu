@@ -1,6 +1,5 @@
 /**
- * T-AI-2 失败测试（规划者种入·不可改）：困难档压制领出 + 残局收割 + 不挥霍守卫。
- * 契约见 coordination/tasks/T-AI-2.md。红线：simple/normal/lead-score/compareMoves 不动。
+ * 验证困难档的压制领出、残局收割与资源保留时机。
  */
 import { describe, expect, it } from 'vitest';
 import { AiLevel, strategyFor } from '../../assets/scripts/ai';

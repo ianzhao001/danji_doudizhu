@@ -8,7 +8,7 @@
 - Decision: `rules`/`game`/`ai`/`flow`/`data` 保持无 `cc` import；Cocos 相关代码只留在 `ui/components/*` 与 `runtime/cocos-storage.ts` 等表现/桥接层。
 - Reason: 纯逻辑可在 Node 测试中快速回归，编辑器层只做薄渲染和事件接线。
 - Impact: 新纯模块必须通过零 `cc` 检查；编辑器任务单独按 Creator 验收模板提供截图和 Console 证据。
-- Trace: `coordination/PROTOCOL.md`；M5-14；第七批 M5-20/M5-21；第十一批验收记录。
+- Trace: M5-14；M5-20；M5-21；第十一批验收记录。
 
 ## ADR-002 CueId Is A Literal Union
 

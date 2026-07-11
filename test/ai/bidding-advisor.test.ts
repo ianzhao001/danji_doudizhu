@@ -1,12 +1,5 @@
 /**
- * P-BID-POLISH G3 阈值对齐失败测试（规划者预写种子·2026-07-08）。
- * 落位机制（压缩轮次·批次连做）：执行者开工 P-BID-POLISH 时将本文件**原样复制**到
- * `test/ai/bidding-advisor.test.ts`（覆盖旧版），作为独立 commit「seed(P-BID-POLISH): relocate planner seed」；
- * 内容一字不得改动，审查者对 seeds 源文件与落位文件做逐字节一致核。
- * 契约：adviseBid(hand, phase, level) 按 bidding-levels 的 thresholdFor(level) 取阈值
- * （Simple 3 / Normal 2 / Hard 1）——与三档 AI 叫牌同一真相源，不再硬编码 2。
- * 预期红因：现 adviseBid 为两参硬编码阈值 2（TS2554）+ thresholdFor 未导出（TS2305）；
- * P-BID-POLISH 实现后全绿、typecheck 须净。
+ * 验证叫牌建议与三档难度的阈值配置保持同一真相源。
  */
 import { describe, it, expect } from 'vitest';
 import { adviseBid } from '../../assets/scripts/ai/bidding-advisor';

@@ -1,9 +1,5 @@
 /**
- * T-MEMORY-REAL 失败测试（规划者种入·不可改）：flow 向 AI 策略传递累积对局事件。
- * 契约见 coordination/tasks/T-MEMORY-REAL.md：PlayPolicy 入参对象新增 history: GameEvent[]
- * （驱动方每次决策时传当前已累积的对局事件；driver 与 round-runtime 两条驱动路径都必须传）。
- * 今日红因：PlayPolicy 入参尚无 history 字段（probe 收到 undefined）。
- * runtime 路径（round-runtime.ts 调 decidePlayAction 处传 fullGameEvents）由审查者 diff 核 + V7 兜底。
+ * 验证 flow 在驱动 AI 决策时会持续传递累积历史事件。
  */
 import { describe, expect, it } from 'vitest';
 import { runHeadlessRound, type Clock, type PlayPolicy } from '../../assets/scripts/flow';

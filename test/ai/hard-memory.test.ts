@@ -1,10 +1,5 @@
 /**
- * T-MEMORY-REAL 失败测试（规划者种入·不可改）：困难档真记牌——「绝对最大单接管」契约。
- * 契约见 coordination/tasks/T-MEMORY-REAL.md。规则钉死：
- *   非 pressing、非队友顶、跟牌且存在「绝对最大单」（历史+自手证明其上位牌已全部现身）时，
- *   打出【最小的绝对最大单】接管牌权；空历史不触发（既有行为原样=回归锚）。
- * 红线：simple/normal/lead-score/compareMoves/_shared 语义不动；评分常数不动；确定性保持（不消费 rng）。
- * 今日红因：hardStrategy 尚无第三参 history，富历史用例仍出 J。
+ * 验证困难档在公开历史足够充分时，会用绝对最大单接管牌权。
  */
 import { describe, expect, it } from 'vitest';
 import { AiLevel, strategyFor } from '../../assets/scripts/ai';
@@ -13,7 +8,7 @@ import { GamePhase, type GameEvent, type GameSnapshot, type SeatIndex, type TopP
 import { cards } from '../rules/_util';
 
 const hard = strategyFor(AiLevel.Hard);
-// 目标签名 (snapshot, rng, history?) —— 宽化调用保 typecheck 绿；今日实现忽略第三参 → 富历史用例先红。
+// 宽化调用签名以覆盖 history 入参场景。
 type Rng = ReturnType<typeof createRng>;
 const hardWith = hard as unknown as (s: GameSnapshot, r: Rng, h?: GameEvent[]) => ReturnType<typeof hard>;
 

@@ -1,15 +1,5 @@
 /**
- * T-HUD-LIVE 失败测试（规划者种入·不可改）：顶栏实时倍数/炸弹数 VM 取数分相（BUG-02 显示端·消费 T-LIVE-MULT 口子）。
- * 契约见 coordination/tasks/T-HUD-LIVE.md（2026-07-07 规划者种子期修订：优先级 + bidding 零值语义）。规则钉死：
- *   优先级 settlement > snapshot > bidding > 缺省；
- *   bidding 相：multiplier = bidding.multiplier > 0 ? bidding.multiplier : 1（未叫时 createBidding 的 multiplier=0
- *     须显 1——不可用 `??`，0 不是 undefined）；bombs 恒 0；
- *   playing 相：multiplier = snapshot.bidMultiplier ?? 1；bombs = snapshot.bombsPlayed ?? 0（旧快照缺字段回退）；
- *   settled 相：settlement.multiplier / settlement.bombs（既有·优先级最高·不回退）；
- *   UI 不重算结算公式、不自行统计事件、不自行算 2**bombs；landlordSeat 透传语义不动。
- *   「顶栏 bombs label 存在」是 cc 渲染·不入种子——归审查者逐行核（skeleton:433/:495-511 已全相消费 vm.topBar·
- *     只需新增 bombs label）+ 双层视觉预审（cc 组件不可入 vitest·同 T-RESUME-REPLAY 先例）。
- * 今日红因：screen-view.ts:61-65 topBar 只读 settlement（bidding/playing 相恒 1/0）→ 案例①②失败；案例③为绿锚。
+ * 验证顶栏实时倍数与炸弹数在 bidding、playing、settled 三个阶段的取值优先级。
  */
 import { describe, expect, it } from 'vitest';
 import { deriveScreenVM } from '../../assets/scripts/ui/screen-view';

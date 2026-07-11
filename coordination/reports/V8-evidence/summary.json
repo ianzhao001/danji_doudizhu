@@ -1,0 +1,200 @@
+{
+  "task": "V8",
+  "seed": 20260705,
+  "baseUrl": "http://127.0.0.1:7788/",
+  "viewports": [
+    "844x390",
+    "812x375",
+    "915x412",
+    "780x360"
+  ],
+  "scenarios": [
+    "a-mini-regular",
+    "b-must-pass",
+    "c-straight-12",
+    "d-alerts",
+    "e-resume-live",
+    "f-settled-pause"
+  ],
+  "productErrors": [],
+  "productErrorsCount": 0,
+  "captures": [
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/a-mini-regular-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/b-must-pass-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/c-straight-12-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/d-alerts-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/e-resume-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/e-live-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/f-settled-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/f-pause-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-lobby-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-game-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-playing-844x390.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/a-mini-regular-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/b-must-pass-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/c-straight-12-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/d-alerts-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/e-resume-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/e-live-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/f-settled-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/f-pause-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-lobby-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-game-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-playing-812x375.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/a-mini-regular-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/b-must-pass-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/c-straight-12-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/d-alerts-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/e-resume-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/e-live-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/f-settled-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/f-pause-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-lobby-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-game-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-playing-915x412.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/a-mini-regular-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/b-must-pass-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/c-straight-12-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/d-alerts-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/e-resume-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/e-live-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/f-settled-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/f-pause-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-lobby-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-game-780x360.png",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/screenshots/chain-playing-780x360.png"
+  ],
+  "recordings": [
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/recordings/record-drag-select-844x390.webm",
+    "/Users/admin/Documents/Cocos/斗地主.worktrees/V8/coordination/reports/V8-evidence/recordings/record-must-pass-844x390.webm"
+  ],
+  "straight12Assertions": [
+    {
+      "viewport": "844x390",
+      "topCardsLength": 12,
+      "lastPlayCardsLength": 12,
+      "pass": true
+    },
+    {
+      "viewport": "812x375",
+      "topCardsLength": 12,
+      "lastPlayCardsLength": 12,
+      "pass": true
+    },
+    {
+      "viewport": "915x412",
+      "topCardsLength": 12,
+      "lastPlayCardsLength": 12,
+      "pass": true
+    },
+    {
+      "viewport": "780x360",
+      "topCardsLength": 12,
+      "lastPlayCardsLength": 12,
+      "pass": true
+    }
+  ],
+  "dragSelectAssertion": {
+    "selectedBefore": 0,
+    "selectedAfter": 5,
+    "selectedDelta": 5,
+    "synthesized": false,
+    "touchVia": "mouse-precise-cardline",
+    "dragLine": {
+      "ok": true,
+      "from": {
+        "x": 310,
+        "y": 350
+      },
+      "to": {
+        "x": 558,
+        "y": 350
+      },
+      "cardCount": 5
+    },
+    "pass": true
+  },
+  "mustPassAssertion": {
+    "beforeTurn": 0,
+    "afterTurn": 1,
+    "passEventCount": 1,
+    "turnAdvanced": true,
+    "clickedViaButton": true,
+    "buttonCoords": {
+      "x": 422,
+      "y": 271
+    },
+    "touchVia": "cdp-dispatchTouchEvent",
+    "pass": true
+  },
+  "mustPassRecordingClicked": true,
+  "recordingRawErrors": {
+    "dragSelect": [],
+    "mustPass": []
+  },
+  "resumeLivePairs": [
+    {
+      "viewport": "844x390",
+      "resumeSha256": "aaa9900a75d5db8c03147c924f5a1dacceb1a1ca47485708bdc4f4c65d5fc9cf",
+      "liveSha256": "9b33996784dc4a4bfcc2ac4f00a2d60010c789e51eb576c11dc6d6ec5fcb43d2",
+      "resumeDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+      "liveDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+      "screenshotsIdentical": false
+    },
+    {
+      "viewport": "812x375",
+      "resumeSha256": "157110efb1258fdf3a2a4822ee218703d5a8c6f453545eed71689a108c309192",
+      "liveSha256": "0b22133837f6c9dc8625722e694c6c5bda398dd387fc3a340a61f9b0ff39e41b",
+      "resumeDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+      "liveDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+      "screenshotsIdentical": false
+    },
+    {
+      "viewport": "915x412",
+      "resumeSha256": "8701642c7ddbac5cc371a3e5f36d3cac0520f46b0822f3b19c2eac650c56afba",
+      "liveSha256": "83e904c6a379ef8eaf81cf3b944dc44716af6a89277b70a22de0a27ca9316476",
+      "resumeDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+      "liveDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+      "screenshotsIdentical": false
+    },
+    {
+      "viewport": "780x360",
+      "resumeSha256": "439264348fe744cd832f520e8b0d946570e90eebf98c91ae0f0f9cde7460e84c",
+      "liveSha256": "9de083474b5c639b8de5b88fca3f7c3a3f75ad9b841653d292bf69bddb8094cc",
+      "resumeDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+      "liveDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+      "screenshotsIdentical": false
+    }
+  ],
+  "resumeLivePlan": {
+    "seed": 20260705,
+    "heroSeat": 0,
+    "steps": [
+      {
+        "type": "to-playing"
+      },
+      {
+        "type": "hero-play-first-legal"
+      },
+      {
+        "type": "wait-until-pass-ready"
+      },
+      {
+        "type": "hero-pass"
+      },
+      {
+        "type": "sync-event-count",
+        "count": 6
+      }
+    ],
+    "resumeDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+    "liveDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+    "eventsDigest": "play:0:0:1|play:1:0:1|play:2:0:1|pass:0|play:1:0:1|play:2:0:1",
+    "lastPlaysDigest": "0:pass:0:不要|1:play:1:出 7|2:play:1:出 8",
+    "phase": "playing",
+    "turn": 0,
+    "eventCount": 6
+  },
+  "capturedAt": "2026-07-10T18:39:52.907Z",
+  "harnessNoiseNote": "Interaction recordings keep raw error logs; filtered productErrors ignore favicon/ERR_ABORTED navigation only."
+}

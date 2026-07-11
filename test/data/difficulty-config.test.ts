@@ -40,8 +40,7 @@ describe('M5-15 难度配置纯数据', () => {
     expect(difficultyConfig('x' as AiLevel)).toBe(DIFFICULTY_CONFIGS[AiLevel.Normal]);
   });
 
-  // T-AI-2 文案契约（规划者种入·不可改）：描述与三档真实行为对齐（简单=直接单张锚点；
-  // 普通=组合+农民配合[T-AI-1]；困难=控权/时机/压制[T-AI-2]）。当前旧文案 → 应先红。
+  // 文案需与三档真实行为对齐。
   it('T-AI-2：三档 description 与行为对齐（精确文案）', () => {
     expect(DIFFICULTY_CONFIGS[AiLevel.Simple].description).toBe('出牌直接，一次一张，适合新手熟悉规则。');
     expect(DIFFICULTY_CONFIGS[AiLevel.Normal].description).toBe('会拆牌打组合、农民互相配合，适合日常对局。');

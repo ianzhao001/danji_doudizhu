@@ -19,12 +19,18 @@ export function renderHud(
   renderCardMemory(ctx, hand, layout, canvas);
 }
 
+// V8 用户签收意见③（2026-07-11）：记牌器与强度条前端不可见——仅渲染短路，
+// 纯岛/评估逻辑/设置/测试全部保留，后续版本翻 true 即可重开。
+const SHOW_STRENGTH_METER = false;
+const SHOW_MEMORY_DOCK = false;
+
 function renderStrengthMeter(
   ctx: GameSceneRendererContext,
   hand: Card[],
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
+  if (!SHOW_STRENGTH_METER) return;
   const strength = deriveStrengthMeter(evaluateHand(hand));
   const pos = ctx.rectPoint(layout.strengthMeter, canvas, 0.5, 0.5);
   const width = layout.strengthMeter.width;
@@ -60,6 +66,7 @@ export function renderCardMemory(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
+  if (!SHOW_MEMORY_DOCK) return;
   const memory = deriveCardMemoryView(trackPlayed(ctx.fullGameEvents, hand));
   const rows = ctx.memoryExpanded ? memory.rows : memory.rows.slice(0, 6);
   const panelWidth = ctx.memoryExpanded ? Math.min(204, layout.memoryDock.width + 86) : layout.memoryDock.width;

@@ -1,14 +1,5 @@
 /**
- * T-ADVANCE-REENTRY 失败测试（规划者种入·不可改）：advance 循环防重入——resume 双循环并发窗口收口。
- * 契约见 coordination/tasks/T-ADVANCE-REENTRY.md（背景：T-PAUSE-GATE 三闸把关拿不准项裁定·BOARD「C 波把关记录 ①」）。
- * 规则钉死：
- *   resume() 在旧 AI sleep 未醒时调用 → 不得启动第二个 advance 循环（旧循环续跑·恰一循环·不多一次 sleep）；
- *   旧循环已因 paused 退出后 resume() → 必须正常重启新循环（无丢唤醒·防重入不得吞掉合法重启）；
- *   player-gate 处 submitPlayerAction 的推进链路不受防重入影响（彼时无活循环·await advance 照常执行）。
- * 今日红因：runtimeResume 清 gate 后无条件 scheduleRuntimeAdvance——旧 sleep 未醒即 resume 会双循环并发：
- *   旧循环推进一手到 hero gate 后，新循环 sleep 醒来只查 disposed/paused、不复查 player-gate，
- *   decidePlayAction 会替 hero 决策（自动过牌/出牌·违反「绝不自动出牌/过牌」硬契约）→ 案例①失败。
- * 红线：不改 RoundRuntime 公共接口（零新增方法）；不改 paused/disposed 既有 gate 语义；game/rules 零触碰。
+ * 验证 runtime advance 循环在 pause / resume 场景下不会发生并发重入。
  */
 import { describe, expect, it } from 'vitest';
 import { AiLevel } from '../../assets/scripts/ai';

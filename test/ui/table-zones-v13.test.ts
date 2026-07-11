@@ -92,7 +92,7 @@ describe('T-LAYOUT3 v13 pink game-scene remake zones', () => {
   }
 });
 
-// T-LAYOUT4 收紧（规划者种入·不可改）：用户视觉终审「元素不可重叠」硬约束。
+// v13 布局硬约束：元素不可发生可见重叠。
 // 早先 T-LAYOUT3「名字牌贴附 body 允许重叠」裁定被推翻（用户 2026-07-05）；遗留 HUD 停靠点
 // (strengthMeter/memoryDock/advisorDock) 用 T-LAYOUT2 旧坐标撞上 v13 大立绘。现应先红，
 // T-LAYOUT4 把名字牌与 HUD 移到与立绘不重叠的落点（角色外移腾出空间）后转绿。

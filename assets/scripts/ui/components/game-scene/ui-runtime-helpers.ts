@@ -60,7 +60,7 @@ export function addButton(this: any,
   name?: string,
 ): Label {
   const nodeName = name ?? `button-${text}-${x}-${y}`;
-  return addSkinnedButton(this.ensureNode.bind(this), this.loadSprite.bind(this), {
+  const label = addSkinnedButton(this.ensureNode.bind(this), this.loadSprite.bind(this), {
     text,
     x,
     y,
@@ -99,6 +99,16 @@ export function addButton(this: any,
       };
     },
   });
+  // V8 用户签收意见②：decorated 装饰底座（宝石顶饰/金属纹）与按钮文字叠糊——
+  // 统一加细描边把文字从底纹上分离；描边色按文字明度自适应（浅字配深边、深字配浅边）。
+  if (this.isDecoratedButton(nodeName)) {
+    const c = label.color;
+    const brightText = (c.r + c.g + c.b) / 3 > 150;
+    label.enableOutline = true;
+    label.outlineColor = brightText ? toColor(THEME.palette.brandDark) : toColor(THEME.palette.accentCream);
+    label.outlineWidth = 2;
+  }
+  return label;
 }
 
 export function isDecoratedButton(this: any, name: string): boolean {
@@ -131,7 +141,9 @@ export function buttonSkinPath(this: any, name: string, enabled: boolean): Resou
 }
 
 export function buttonTextColor(this: any, name: string, enabled: boolean): Color {
-  if (!enabled) return BUTTON_DISABLED_TEXT;
+  // V8 用户签收意见②（2026-07-11）：decorated 底座纹样 × 半透明灰字叠糊——禁用态改实白，
+  // 禁用感交由暗态皮肤表达；文字与底纹的分离由 addButton 的描边兜底。
+  if (!enabled) return this.isDecoratedButton(name) ? BUTTON_SECONDARY_TEXT : BUTTON_DISABLED_TEXT;
   if (name === 'action-must-pass') return toColor(THEME.palette.accentGold);
   if (this.isPauseToggleButton(name)) return BUTTON_PAUSE_TOGGLE_TEXT;
   if (this.isPauseActionButton(name)) return BUTTON_PAUSE_ACTION_TEXT;

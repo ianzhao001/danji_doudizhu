@@ -1,8 +1,5 @@
 /**
- * T-AI-1 失败测试（架构种入·不可改）：自对弈质量门。
- * 当前普通档=最小单+无配合 → 组合首出率≈0、压队友率高、与 Simple 胜率无差 → 应先红，实现到绿。
- * 阈值依据：Wave 0 基线实测（当前实现）comboLeadRate Simple≈Normal≈0、详见 T-AI-1 report 对照表；
- * 全链确定性（固定 QUALITY_SEEDS），非统计检验。
+ * 自对弈质量门：验证普通档和困难档相对简单档具备稳定的策略分层。
  */
 import { describe, expect, it } from 'vitest';
 import { AiLevel } from '../../assets/scripts/ai';
@@ -29,8 +26,7 @@ describe('T-AI-1 自对弈质量门（确定性 seed 回归）', () => {
   }, 120_000);
 });
 
-// T-AI-2 门（规划者种入·不可改）：三档排序契约的正式家（自 hard-depth 小样本代理迁移而来，
-// 裁定 2026-07-04）。当前 Hard 跟牌仍是旧保守回退 → Hard−Normal 门应先红，T-AI-2 实现到绿。
+// 三档排序质量门：困难档与普通档需要维持既定分层。
 describe('T-AI-2 三档排序质量门（确定性 seed 回归）', () => {
   it('Hard 组合首出率 ≥0.50 且 ≥ Normal−5pp（同带不回落）；压队友率 ≤0.08', async () => {
     const normal = await measureLevelPlay(AiLevel.Normal, QUALITY_SEEDS);

@@ -1,12 +1,5 @@
 /**
- * T-PAUSE-GATE 失败测试（规划者种入·不可改）：runtime 暂停门——对局冻结（非仅 UI）。
- * 契约见 coordination/tasks/T-PAUSE-GATE.md。规则钉死：
- *   pause() 后 AI 不再推进任何叫抢/出牌（in-flight sleep 醒来不提交该步）；
- *   resume() 重新调度推进；isPaused() 反映态；
- *   submitPlayerAction 在暂停态仍接受（暂停只冻 AI 自驱动·玩家主动出牌是玩家选择·非对局自走）；
- *   disposed 后 pause/resume 幂等。
- * 红线：既有 RoundRuntime 方法签名一字不动；game/rules 零触碰；flow/types/driver/policies/clock 零 diff。
- * 今日红因：RoundRuntime 接口尚无 pause/resume/isPaused——暂停后 AI 仍推进。
+ * 验证 runtime 的 pause / resume 只冻结自动推进，不影响主动玩家输入。
  */
 import { describe, expect, it } from 'vitest';
 import { AiLevel } from '../../assets/scripts/ai';

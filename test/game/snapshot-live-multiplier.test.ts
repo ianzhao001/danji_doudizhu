@@ -1,14 +1,5 @@
 /**
- * T-LIVE-MULT 失败测试（规划者种入·不可改）：GameSnapshot 上线实时倍数/炸弹数数据口（BUG-02）。
- * 契约见 coordination/tasks/T-LIVE-MULT.md。规则钉死：
- *   GameSnapshot 加可选 bombsPlayed?——game 层 snapshot() 从 state.bombsPlayed 复制（game 自有数据）；
- *   GameSnapshot 加可选 bidMultiplier?——由 flow 层 runtimeSnapshot enrich 自 runtime.bidMultiplier，
- *     不得取 bidding.multiplier 作源：resume 恢复局无 bidding、runtime.bidMultiplier 有存档回填值（本文件案例②后半钉此点）；
- *   纯 game snapshot() 不填 bidMultiplier（倍数在 flow 层·game 不知·依赖方向 game 不 import flow，案例③钉此点）；
- *   snapshot() 保持 (state, viewer?) 两参签名，既有字段（phase/turn/landlord/top/handCounts/winner/viewerHand）语义零改动。
- * 今日红因：GameSnapshot（game/types.ts）无 bombsPlayed/bidMultiplier 二字段 → 案例①②断言 undefined 失败；案例③为绿锚。
- * SEED=11 前提与 test/flow/bidding-visibility.test.ts 相同：hero(0) 每逢 gate 取 positive → landlord=0；
- *   叫抢结束后 landlord=hero 领出即 player-gate，快照冻结可断言（用例内有前提断言，前提失效属回归）。
+ * 验证 GameSnapshot 暴露实时倍数与炸弹计数，并区分 game 层与 flow 层的数据来源。
  */
 import { describe, expect, it } from 'vitest';
 import { AiLevel } from '../../assets/scripts/ai';
