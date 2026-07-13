@@ -234,4 +234,20 @@ node scripts/push-with-readme.mjs
 - 摘要：发布 v1.6，完成视觉收光、交互打磨、横屏适配和验证证据收口。
 - 验证：Cocos Creator 3.8.8 `web-mobile`，启动场景 `lobby.scene`。
 
-<!-- readme-changelog-covered-through: 063017ab2dd5a0c1397370686316d7af9e346992 -->
+### 2026-07-13 21:29:06 +08:00
+
+- 目标：`origin/main`
+- 覆盖提交：`c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c`
+- 受影响模块：AGENTS.md、AI、验证与发布资料、文档、状态机、测试、工程工具、界面
+- 变更统计：68 个文件，新增 2266 行，删除 120 行，二进制文件 0 个
+- 提交摘要：
+  - feat(A-DESIGN-GATES): land five architecture gates, scene assertions, rollback key isolation
+  - feat(A-SAVE-MIGRATION): explicit save migration chain + frozen v1 golden tripwire
+  - docs(W-AUDIT-AI): record four audit rulings and AI upgrade batch opening
+  - feat(W-AUDIT-AI/B1): exact hand decomposition engine (minimal move count + partition)
+  - feat(W-AUDIT-AI/B3): RoundState v2 public bottom cards + first real migration
+  - feat(W-AUDIT-AI/B2): decomposition-driven hard AI + structural bidding + tightened strength gates
+  - docs(W-AUDIT-AI): close out batch — strength gate numbers and disclosures on BOARD/KL
+  - docs(readme): add bilingual guide and push log automation
+
+<!-- readme-changelog-covered-through: c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c -->

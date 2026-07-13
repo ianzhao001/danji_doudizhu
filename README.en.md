@@ -234,4 +234,20 @@ The update log starts at the formal v1.6 release baseline and does not backfill 
 - Summary: released v1.6 with final visual polish, interaction refinements, landscape adaptation, and verification evidence.
 - Verification: Cocos Creator 3.8.8 `web-mobile`, launch scene `lobby.scene`.
 
-<!-- readme-changelog-covered-through: 063017ab2dd5a0c1397370686316d7af9e346992 -->
+### 2026-07-13 21:29:06 +08:00
+
+- Target: `origin/main`
+- Covered commit: `c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c`
+- Affected modules: AGENTS.md, AI, verification and release material, documentation, state machine, tests, tooling, UI
+- Diff statistics: 68 files, 2266 insertions, 120 deletions, 0 binary files
+- Commit summary:
+  - feat(A-DESIGN-GATES): land five architecture gates, scene assertions, rollback key isolation
+  - feat(A-SAVE-MIGRATION): explicit save migration chain + frozen v1 golden tripwire
+  - docs(W-AUDIT-AI): record four audit rulings and AI upgrade batch opening
+  - feat(W-AUDIT-AI/B1): exact hand decomposition engine (minimal move count + partition)
+  - feat(W-AUDIT-AI/B3): RoundState v2 public bottom cards + first real migration
+  - feat(W-AUDIT-AI/B2): decomposition-driven hard AI + structural bidding + tightened strength gates
+  - docs(W-AUDIT-AI): close out batch — strength gate numbers and disclosures on BOARD/KL
+  - docs(readme): add bilingual guide and push log automation
+
+<!-- readme-changelog-covered-through: c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c -->
