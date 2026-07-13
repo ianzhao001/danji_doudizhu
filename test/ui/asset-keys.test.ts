@@ -9,6 +9,7 @@ import {
   spriteFrameResourcePath,
   suitAssetPath,
 } from '../../assets/scripts/ui/asset-keys';
+import { ROLLBACK_RESOURCE_PATHS } from '../../assets/scripts/ui/asset-keys-rollback';
 import { createDeck, Rank, Suit } from '../../assets/scripts/rules';
 import { Side } from '../../assets/scripts/game';
 
@@ -125,12 +126,24 @@ describe('ART-IMPORT-UIKIT 新键', () => {
   });
 });
 
-// v1.6 ART-V16-IMPORT/P-RESULT-SKIN(纯增量):结算三键指向 v15 资源;v13 键保留仅作回滚。
-describe('ART-V16 结算 v15 键', () => {
-  it('settlement panel/banner 三键指向 v15 资源路径,v13 键仍在', () => {
+// v1.6 审计裁决 P1-2 契约改写(披露):退役键物理隔离至 asset-keys-rollback.ts——
+// 旧断言「v15 横幅/v13 键在 RESOURCE_PATHS 里」正是审计点名的软约束(退役键混在活跃表,
+// 靠人工 grep 守零消费)。改断言:活跃键仍在 RESOURCE_PATHS,回滚键在隔离文件且路径不变。
+describe('ART-V16 结算键与回滚隔离', () => {
+  it('活跃结算面板键仍指向 v15 资源路径', () => {
     expect(RESOURCE_PATHS.settlementPanelV15).toBe('art/ui/settlement-panel-v15');
-    expect(RESOURCE_PATHS.settlementBannerWinV15).toBe('art/ui/settlement-banner-win-v15');
-    expect(RESOURCE_PATHS.settlementBannerLoseV15).toBe('art/ui/settlement-banner-lose-v15');
-    expect(RESOURCE_PATHS.settlementPanelV13).toBe('art/ui/settlement-panel-v13');
+  });
+
+  it('回滚键在隔离文件中路径不变(回滚可用),且与活跃表零重名', () => {
+    expect(ROLLBACK_RESOURCE_PATHS.settlementBannerWinV15).toBe('art/ui/settlement-banner-win-v15');
+    expect(ROLLBACK_RESOURCE_PATHS.settlementBannerLoseV15).toBe('art/ui/settlement-banner-lose-v15');
+    expect(ROLLBACK_RESOURCE_PATHS.settlementPanelV13).toBe('art/ui/settlement-panel-v13');
+    expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryV15).toBe('art/ui/btn-primary-v15');
+    expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryV17).toBe('art/ui/btn-primary-v17');
+    expect(ROLLBACK_RESOURCE_PATHS.pauseBtnToggle).toBe('art/ui/pause-btn-toggle');
+    const activeKeys = new Set(Object.keys(RESOURCE_PATHS));
+    for (const key of Object.keys(ROLLBACK_RESOURCE_PATHS)) {
+      expect(activeKeys.has(key), `回滚键「${key}」不得同时存在于活跃表`).toBe(false);
+    }
   });
 });
