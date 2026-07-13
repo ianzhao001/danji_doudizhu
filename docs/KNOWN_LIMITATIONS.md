@@ -25,6 +25,10 @@
 - `RoundState` 目前重点覆盖 Playing 与 Settled 路径。
 - bidding 阶段的恢复不是当前重点场景。
 - 存档损坏按 data 层约定抛错或降级处理。
+- **存档版本化走显式迁移链(v1.6 审计 P1-3)**:老版本经 `game/serialize.ts` 的 `MIGRATIONS` 逐级 N→N+1 升到当前版;**高于当前版本仍硬拒,只升不降**;同版本内新增可选字段经 `CURRENT_VERSION_ADDITIVE_DEFAULTS` 补默认。外层槽位信封(`data/save.ts` `SAVE_VERSION`)暂仍为版本硬拒,升信封版时需另配链。
+- v1 存档格式已冻结为 golden 绊线(`test/game/fixtures/round-save.v1.golden.json`,由真实 `serializeRound` 一次性生成,**永不重新生成**):任何使 v1 存档不可加载或语义漂移的改动都会先撞 `test/game/serialize-golden-v1.test.ts`——去写迁移器,不许改 fixture。
+- **存档格式通则**:改 `RoundState`/存档字段=先想迁移——新增可选字段登记默认值,其余一律升版本+写迁移器+golden 绊线转绿,禁止原地重定义既有版本字段含义。
+- resume 不回传 RNG seed(v1.6 审计登记·低优先):生产 seed 默认时间戳、三档 AI 出牌不消费 rng,断局恢复后「同种子复现同局」本就不成立,与该姿态自洽;未来若需复现,把 seed 纳入 `ResumePayload` 即可。
 
 ## Assets And Audio
 
@@ -38,7 +42,7 @@
 - ~~结算面板底皮肤仍为 v13~~ **已结案(v1.6 ART-V16+P-RESULT-SKIN)**:面板底/胜败横幅全套 v15(capInsets 56 实测,横幅 640×108 原生比修掉 v13 压扁 1.67× 暗伤),入场编排/彩带/星光零改动;v13 三键保留仅作回滚。
 - **12 个音频键 12 个文件全部接活(v1.6 T-CUE-AUDIO 补齐三哑 cue)**:redeal/reset/landlordDecided 同配方合成接线,合成器 `coordination/scripts/v16-audio-synth.py` 可复现;死资产保持清零。
 - 当前音频基线为 WAV(占位级合成),后续可再做音质重制与体积/平台优化。
-- **场景 @property 绑定在冷构建后会失效(v1.6 二次终审·严重·可复现)**:`game.scene`/`lobby.scene` 里的 `background`、`cardTemplate` 是 `@property` 绑定,`onLoad` 靠它们关闭场景内的**静态旧背景**。**冷构建(清 library 后全量重导)实测两者双双变 `null`**——旧的 `game-table-bg`(绿桌)/`lobby-bg` 便盖在运行时 v13 粉桌之上,城市远景与压暗幕整个消失(截图实锤)。这与 `hideStrayPlaceholderLabels` 注释所述是**同一类缺陷**(v1.5 已在 label 上踩过一次)。**规矩:任何依赖场景 @property 绑定的隐藏/引用,一律加「按节点名兜底」**——本仓已把 `game-table-bg`/`card-template` 并入 `SCAFFOLD_NODE_NAMES`、`lobby-bg` 并入 `hideLegacyScaffold`,不再依赖场景序列化。**冷构建后必须肉眼复核首屏截图**,机检门不覆盖"背景换了张图"这类整体退化。
+- **场景 @property 绑定在冷构建后会失效(v1.6 二次终审·严重·可复现)**:`game.scene`/`lobby.scene` 里的 `background`、`cardTemplate` 是 `@property` 绑定,`onLoad` 靠它们关闭场景内的**静态旧背景**。**冷构建(清 library 后全量重导)实测两者双双变 `null`**——旧的 `game-table-bg`(绿桌)/`lobby-bg` 便盖在运行时 v13 粉桌之上,城市远景与压暗幕整个消失(截图实锤)。这与 `hideStrayPlaceholderLabels` 注释所述是**同一类缺陷**(v1.5 已在 label 上踩过一次)。**规矩:任何依赖场景 @property 绑定的隐藏/引用,一律加「按节点名兜底」**——本仓已把 `game-table-bg`/`card-template` 并入 `SCAFFOLD_NODE_NAMES`、`lobby-bg` 并入 `hideLegacyScaffold`,不再依赖场景序列化。**v1.6 审计起测试锚死(P1-1)**:`test/architecture-gates.test.ts` 给 ui/components 的 `@property` 上棘轮(基线 14,只减不增,新场景引用一律按名兜底);`test/ui/scene-structure.test.ts` 解析 `.scene` JSON 断言兜底名单节点名真实在场(Creator 里改名/删节点先撞测试;运行时创建的瞬时 HUD 名不在断言范围)。冷构建根因疑与 W3-A R3「冷导入把存量数据打回 importer 默认」同源(引擎机制层),登记不追。**冷构建后仍建议肉眼抽查首屏**——"背景整体换了张图"这类退化门与结构测试都不覆盖。
 - `.scene`、`.prefab`、`.meta` 仍要求由 Cocos Creator 维护;CLI 构建三坑与 meta 冷导入注意事项见 BOARD v1.5 段运维注记。
 
 ## Release Gates
@@ -67,3 +71,4 @@
 - **空气泡不常驻(v1.6 用户追加②)**:`deriveLastPlays` 无消息时返回 `kind=null / text='—'`,视图层原先照样铺一个空药丸常驻三席。改为 `kind===null` 直接不渲染(旧节点由 render prune 自动销毁)。**view-model 与其测试零改动**——`'—'` 仍是它的空值语义,只是视图层不再展示。
 - **v15 结算横幅零产品消费(v1.6·Codex S4 审查阻断)**:换肤时只改了 `result-overlay-renderer` 的消费点,**漏了 `RUNTIME_PRELOAD_SPRITES` 预载表**——`onLoad` 仍会实际加载。已移出预载。**规矩:退役任何资产,除消费点外必须同查预载表**(`game-scene-skeleton.ts` 的 `RUNTIME_PRELOAD_SPRITES`),否则「零消费」的披露不成立。
 - **机检门计数口径**:门A 是**全扫**(13 屏 323 个 Label);门C 是**有效数**(202,排除模态黑幕遮挡下的字——幕后字色被压暗,声明字色不再等于屏上字色)。两者数字不同是正常的,不要混用。
+- **退役键物理隔离(v1.6 审计 P1-2)**:仅作回滚的 17 键(v15 异形按钮族/v17 描边按钮族/v15 信息条与名牌/胜负横幅 v15/结算 v13 三键/pause 专皮)已移入 `ui/asset-keys-rollback.ts`;`test/architecture-gates.test.ts` 门④断言其在产品代码零消费(含预载表)——S4 R1「预载表漏项」一类回归由门堵死,不再靠人工 grep。更老的 v1/v13 代键仍留在活跃表(部分仍被消费、部分被测试重钉),未纳入本轮隔离。

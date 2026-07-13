@@ -243,3 +243,13 @@
 > **写进 KNOWN_LIMITATIONS 的常驻教训**:① 盖字设计原则 + 六门(换任何盖字皮或字色前先跑这两个脚本);② 换皮 = 换字色(v15 深底→v18 浅底,浅字压浅底只剩 1.22:1);③ icon 变形通则(判据是「rect 比 vs 显示框比」,不是「rect 比 vs 原图比」);④ **场景 `@property` 绑定冷构建后会失效**——依赖它的隐藏/引用一律加按名兜底,且**冷构建后必须肉眼复核首屏**(这类整体退化任何自动门都查不出);⑤ 退役资产除消费点外必须同查预载表;⑥ 门的判据本身也会有 bug,先自证门再信门。
 >
 > **v1.7 素材(登记不修)**:9 个存量音效为占位级合成可整体重制;顶栏小徽标 v18 化;卡面/头像重绘;结算横幅若要恢复"缎带"观感需出规则形状的新图。
+
+## v1.6 审计加固 + AI 升级批 W-AUDIT-AI(2026-07-13 开批)
+
+> **审计裁决(2026-07-13·规划者·尖 `063017a`)**:独立第三方只读审计提出 4 项结构性脆弱,证据复核属实(两处修正:lobby-scene 实为 7 个 @property;v15 后缀≠退役,dock/popup/panel 三个 V15 键是活跃皮肤)。经用户拍板走**全量爆发**,本批一次落地:
+> **P1-1 场景 @property 冷构建失效**:走②机检门——`test/architecture-gates.test.ts` 门⑤ @property 棘轮(基线 14 只减不增)+ 新增 `test/ui/scene-structure.test.ts` 把按名兜底名单与 .scene 序列化锚死(game 16 名精确、lobby-bg 精确、4 占位 label 前缀,瞬时 HUD 19 名排除,双向防漂移);①根因疑与 W3-A R3「冷导入打回 importer 默认」同源(引擎机制层),登记 KL 不追,肉眼复核降级为抽查。
+> **P1-2 退役资产零消费无门**:17 个 rollback-only 键(v15 花瓣按钮/v17 描边按钮/v15 信息条名牌/横幅 v15/结算 v13 三键/pause 专皮)物理隔离至 `ui/asset-keys-rollback.ts`,门④断言除定义文件外零出现(含预载表)——S4 R1 一类阻断永久机检化;落点选 vitest 架构门而非 s4-evidence(每批 test 必跑、链路更靠前)。更老的 v1/v13 代键未纳入本轮(部分仍被消费、部分被测试重钉)。
+> **P1-3 存档 version:1 硬 fail 无迁移**:`game/serialize.ts` 落显式迁移链(MIGRATIONS N→N+1、高于当前版本仍硬拒、同版本加法字段补默认),混合 A 口径;v1 存档以真实 serializeRound 输出冻结为 golden 绊线(`test/game/fixtures/round-save.v1.golden.json`,永不重生成),忘写迁移器先撞测试。外层 data/save.ts 信封版本硬拒本批不动,KL 披露。
+> **P1-4 红线靠人工 grep**:architecture-gates 五门固化——①纯层零 Math.random/Date.now/performance.now ②全产品零 Math.random ③纯层零 import 'cc' ④rollback 键零消费 ⑤@property 棘轮;白名单只许落测试文件内(违规文件不能自我豁免);AGENTS.md 红线成文。审计另两项排除意见照准;resume 不传 seed 登记 KL 低优先。
+>
+> **AI 升级开批(2026-07-13·用户裁决)**:用户点名「大幅度强化AI的困难模式和提示能力,目前的AI能力太差了」。量化实证:Hard 作地主 0.5 < Normal 0.667(hard-depth.test.ts 登记过渡态),重型门 G3 容忍 Hard 弱 Normal 12pp。方案:B1 新建 `ai/decompose.ts` 精确拆牌(最少手数,memo+节点预算,零时基);B3 `RoundState` v2 补公开底牌字段(UI 本就明牌展示,AI 快照缺失——迁移框架实战首用,migrateV1ToV2 补 bottom:null);B2 hard 决策阶梯换拆牌内核(领出按最优分解组件+最坏情形不可压;跟牌=结构代价+牌权价值;叫分强度模型),提示按钮经 adviseBestMove 委托 hard 自动升级,SHOW_ADVISOR 隐藏件冻结不迭代。收口强度门:T-AI-2 收紧 Hard−Normal ≥ +0.05、Hard−Simple ≥ +0.15,重型门 G3 收到 ≥0,新增地主角色门消灭反转;bench 60 局 ≤30s 保绿。

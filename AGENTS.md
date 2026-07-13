@@ -40,6 +40,14 @@ Keep pure game logic separate from Cocos presentation code.
 
 Pure layers (`rules`, `game`, `ai`, `flow`, `data`) must not import `cc`.
 
+Red lines added by the v1.6 audit ruling (machine-enforced):
+
+- Pure layers must not call `Math.random`, `Date.now`, or `performance.now`; determinism comes from `createRng(seed)` in `rules/rng.ts`, with seeds injected by the UI shell.
+- `Math.random` is banned in all product code under `assets/scripts` (UI included). UI may use `Date.now` for presentation-only timing.
+- Rollback-only asset keys live in `ui/asset-keys-rollback.ts` and must have zero consumption outside that file (preload tables included).
+- Scene-component `@property` decorators are capped by a decrease-only ratchet (currently 14). New scene references must use by-name fallback — cold builds break `@property` bindings.
+- These rules are enforced by `test/architecture-gates.test.ts` (plus `test/ui/scene-structure.test.ts` for by-name fallback lists). Relaxing any of them means editing those tests in the same review.
+
 ## Project Notes
 
 - Use Cocos Creator 3.8.8 to open, run, and build the project.
