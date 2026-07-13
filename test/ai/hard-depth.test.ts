@@ -83,12 +83,11 @@ describe('M4-42 hard AI 纵深启发式', () => {
         expect(summary.landlord).toBe(0);
       }
 
-      // 困难档相对普通档的胜率约束以单独质量门为准；
-      // 是 12-seed 地主视角的小样本代理。T-AI-1 强化普通档（组合首出+农民配合）后，农民侧同步变强、
-      // Hard 的跟牌仍是旧保守逻辑，该代理实测反转（Hard 0.5 vs Normal 0.667），不再成立。
-      // 三档排序契约迁移至 test/selfplay/quality.test.ts 的 T-AI-2 质量门
-      // （对称三席轮换 90 局/侧：Hard−Normal ≥ +0.03、Hard−Simple ≥ +0.10）。
-      // T-AI-2 落地前，main 上 Normal>Hard 为 BOARD 登记的已知过渡态；本用例保留 selfplay 不变量。
+      // 困难档相对普通档的胜率约束以单独质量门为准（test/selfplay/quality.test.ts T-AI-2）。
+      // 历史注记：T-AI-1 强化普通档后曾出现 12-seed 代理反转（Hard 0.5 vs Normal 0.667），
+      // 登记为过渡态。W-AUDIT-AI（2026-07-13）拆解内核+结构化叫分落地后过渡态关闭：
+      // T-AI-2 实测 Hard−Normal=+0.117、Hard−Simple=+0.567，门槛已收紧至 ≥+0.05/≥+0.15。
+      // 本用例只保留 selfplay 不变量。
     },
     60000,
   );

@@ -55,6 +55,8 @@ describe('bid dispatch single source', () => {
       chooseBid(cards('2 2 3 4 5'), state),
     );
     expect(chooseBidByLevel(cards('2 2 3 4 5'), state, AiLevel.Simple).type).toBe('pass');
-    expect(chooseBidByLevel(cards('2 3 4 5 6'), state, AiLevel.Hard).type).toBe('call');
+    // W-AUDIT-AI 契约改写(披露):Hard 弃「1 高牌即抢」,单控牌散手 → pass(见 bidding-hard.ts)。
+    expect(chooseBidByLevel(cards('2 3 4 5 6'), state, AiLevel.Hard).type).toBe('pass');
+    expect(chooseBidByLevel(cards('2 2 3 4 5'), state, AiLevel.Hard).type).toBe('call');
   });
 });

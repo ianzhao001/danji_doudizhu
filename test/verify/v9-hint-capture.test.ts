@@ -29,10 +29,15 @@ describe.skipIf(!existsSync(CAPTURE))('V9 提示流程采证精确对照', () =>
     expect(data.capture.snapshot.turn).toBe(0);
   });
 
-  it('首点提示 === adviseBestMove(捕获快照+历史) 的推荐（逐张）', () => {
+  it('升级后引擎对捕获现场推荐非空且合法；首点逐张等对照退役（披露）', () => {
+    // W-AUDIT-AI 契约改写(披露):hint-capture.json 采于 v1.6 引擎,sel1Cards 是彼时 hardStrategy
+    // 的推荐;引擎升级后逐张相等不可重放(重采需重跑 V9 流程)。「UI 首点 === adviseBestMove」的
+    // 委托链由 test/ai/hint-advisor.test.ts 的 adviseBestMove≡hardStrategy 深相等契约持续把守;
+    // 本处保留可离线复核的部分:升级后推荐对捕获现场仍非空、合法。
     const advised = adviseBestMove({ snapshot: data.capture.snapshot, history: data.capture.history });
     expect(advised).not.toBeNull();
-    expect(keysOf(advised!.cards)).toEqual(keysOf(data.sel1Cards));
+    const top = data.capture.snapshot.top?.pattern ?? null;
+    expect(validatePlay(advised!.cards, top).ok).toBe(true);
   });
 
   it('再点提示 === nextHint(prev=首点) 的循环产物（逐张），且与首点不同', () => {

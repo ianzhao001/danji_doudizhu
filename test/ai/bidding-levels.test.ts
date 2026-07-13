@@ -26,10 +26,17 @@ describe('M4-07 叫抢难度分层', () => {
     expect(chooseBidByLevel(cards('2 2 3 4 5'), calling(), AiLevel.Hard).type).toBe('call');
   });
 
-  it('一高牌 2 3 4 5 6：Normal=pass、Simple=pass、Hard=call', () => {
+  // W-AUDIT-AI 契约改写(披露):旧断言 Hard 一高牌即 call——「逢局必抢,烂手当地主」
+  // 正是 Hard 作地主胜率反转的成因之一。新口径 Hard 走结构化判强(bidding-hard.ts):
+  // 火箭/炸恒强、≥3 控牌恒强、恰 2 控牌须配短手型;单控牌散手 → pass。
+  it('一高牌 2 3 4 5 6：三档皆 pass', () => {
     expect(chooseBidByLevel(cards('2 3 4 5 6'), calling(), AiLevel.Normal).type).toBe('pass');
     expect(chooseBidByLevel(cards('2 3 4 5 6'), calling(), AiLevel.Simple).type).toBe('pass');
-    expect(chooseBidByLevel(cards('2 3 4 5 6'), calling(), AiLevel.Hard).type).toBe('call');
+    expect(chooseBidByLevel(cards('2 3 4 5 6'), calling(), AiLevel.Hard).type).toBe('pass');
+  });
+
+  it('双控短手 2 2 3 3 4 4：Hard=call(结构化判强:2 控牌+短手型)', () => {
+    expect(chooseBidByLevel(cards('2 2 3 3 4 4'), calling(), AiLevel.Hard).type).toBe('call');
   });
 
   it('火箭 x X 3 4 5：三档皆 call', () => {

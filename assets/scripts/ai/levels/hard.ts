@@ -2,6 +2,12 @@
  * M4-03 困难 AI（积极控权 + 择时炸弹·确定性）。实现方：实现 hardStrategy 函数体，
  * 使 test/ai/hard.test.ts 转绿。规则见 coordination/tasks/M4-03-ai-hard.md。
  * 仅依赖 rules + 只读快照，禁止 import `cc`，禁止改签名。
+ *
+ * W-AUDIT-AI B2 内核升级：
+ * - 精确拆解驱动（ai/decompose）——领出按「最优分解组件」白出，跟牌按结构代价定压/过；
+ * - 公开底牌归因（snapshot.bottom,v2）——农民侧推「确定仍在地主手」的点数下界；
+ * - 必胜看破上限 12→17；无安全跟法时不再无脑烧炸（对手告急才烧，否则过牌保结构）。
+ * 决策仍为纯公开信息 + 确定性（_rng 不消费,G14 不作弊）。
  */
 
 import {
@@ -16,13 +22,13 @@ import {
 import type { GameEvent } from '../../game';
 import { cardKey } from '../../rules/guards';
 import { trackPlayed } from '../cardMemory';
+import { Decomposer } from '../decompose';
 import { canFinishInOneMove, finishingFollow } from '../endgame';
-import { ALL_RANKS, evaluateHand } from '../handStrength';
+import { ALL_RANKS } from '../handStrength';
 import type { AiStrategy } from '../strategy';
 import {
   bombLikeMoves,
   compareMoves,
-  conservativeAction,
   isTeammateTop,
   pickLargest,
   pickSmallest,
@@ -79,17 +85,56 @@ function removeMoveCards(hand: Card[], move: Move): Card[] {
   return remaining;
 }
 
-function roughTurnCount(cards: Card[]): number {
-  if (cards.length === 0) return 0;
-  if (canFinishInOneMove(cards)) return 1;
+/** 单局决策帧上下文：共享拆解器与记牌，候选间大量复用子状态。 */
+type HardContext = Readonly<{
+  decomposer: Decomposer;
+  remainingByRank: Readonly<Record<number, number>> | null;
+  certainLandlordByRank: Readonly<Record<number, number>> | null;
+}>;
 
-  const counts = rankCounts(cards);
-  const groups = Array.from(counts.values()).filter((count) => count > 0).length;
-  const { bombs, longestStraight, rockets } = evaluateHand(cards);
-  const straightReduction = Math.max(0, longestStraight - 4);
-  const controlGroups = bombs + rockets;
+function buildHardContext(snapshot: Parameters<AiStrategy>[0], hand: Card[], history: GameEvent[]): HardContext {
+  return {
+    decomposer: new Decomposer({ nodeBudget: 200_000 }),
+    remainingByRank: history.length > 0 ? trackPlayed(history, hand).remainingByRank : null,
+    certainLandlordByRank: certainLandlord(snapshot, history),
+  };
+}
 
-  return Math.max(1, groups - straightReduction - controlGroups);
+/**
+ * 公开底牌归因（v2 W-AUDIT-AI B3）：底牌三张全场明牌并入地主手。
+ * 对农民视角，逐点数扣除地主此后打出的张数，余量即「确定仍在地主手」的下界
+ * （地主出的牌可能来自原 17 张,扣除只会低估,保守且 sound）。
+ */
+function certainLandlord(
+  snapshot: Parameters<AiStrategy>[0],
+  history: GameEvent[],
+): Readonly<Record<number, number>> | null {
+  if (snapshot.turn === snapshot.landlord) return null;
+  const bottom = snapshot.bottom;
+  if (!bottom || bottom.length === 0) return null;
+  const certain: Record<number, number> = {};
+  for (const card of bottom) certain[card.rank] = (certain[card.rank] ?? 0) + 1;
+  for (const event of history) {
+    if (event.type === 'play' && event.seat === snapshot.landlord) {
+      for (const card of event.pattern.cards) {
+        if ((certain[card.rank] ?? 0) > 0) certain[card.rank] -= 1;
+      }
+    }
+  }
+  return certain;
+}
+
+/** 地主是否「确定」能压过 size 张同点(单/对)——仅基于底牌归因下界。 */
+function certainlyBeaten(
+  certain: Readonly<Record<number, number>>,
+  rank: Rank,
+  size: number,
+): boolean {
+  for (const key of Object.keys(certain)) {
+    const candidate = Number(key);
+    if (candidate > rank && (certain[candidate] ?? 0) >= size) return true;
+  }
+  return false;
 }
 
 type MemoryPressure = Readonly<{
@@ -145,18 +190,6 @@ function highCardSpendPenalty(move: Move, pressure: MemoryPressure): number {
   }, 0);
 }
 
-function scoreLeadMove(hand: Card[], move: Move, pressure: MemoryPressure): number {
-  const remaining = removeMoveCards(hand, move);
-  const remainingStrength = evaluateHand(remaining);
-  return (
-    roughTurnCount(remaining) * 120 +
-    remainingStrength.score * 0.35 -
-    move.cards.length * 10 -
-    categoryShapingBonus(move) +
-    highCardSpendPenalty(move, pressure)
-  );
-}
-
 function chooseByLowestScore(moves: readonly Move[], score: (move: Move) => number): Move {
   return moves.slice().sort((left, right) => {
     const byScore = score(left) - score(right);
@@ -177,7 +210,18 @@ function chooseFinishingMove(
   return finishingFollow(hand, snapshot.top.pattern);
 }
 
-function chooseLeadMove(hand: Card[], moves: Move[], history: GameEvent[]): Move {
+/**
+ * W-AUDIT-AI B2 领出：精确拆解驱动。
+ * 结构代价(拆整为零的手数惩罚)为主项——最优分解里的整组件代价为 0(白出);
+ * 同代价里偏好多脱牌、先小后大、保留成型组合;控牌(A/2/王)按记牌压力计罚;
+ * 农民侧对「地主确定压死的 ≥K 单/对」加罚(白送控牌)。
+ */
+function chooseLeadMove(
+  ctx: HardContext,
+  hand: Card[],
+  moves: Move[],
+  history: GameEvent[],
+): Move {
   const protectedSet = protectedCards(hand);
   const pressure = estimateMemoryPressure(hand, history);
   const shapingCandidates = moves.filter(
@@ -185,7 +229,22 @@ function chooseLeadMove(hand: Card[], moves: Move[], history: GameEvent[]): Move
   );
 
   if (shapingCandidates.length === 0) return pickSmallest(moves);
-  return chooseByLowestScore(shapingCandidates, (move) => scoreLeadMove(hand, move, pressure));
+  return chooseByLowestScore(shapingCandidates, (move) => {
+    let score =
+      ctx.decomposer.structureCost(hand, move.cards) * 400 +
+      highCardSpendPenalty(move, pressure) -
+      move.cards.length * 12 +
+      move.pattern.mainRank * 2 -
+      categoryShapingBonus(move) * 0.3;
+    if (ctx.certainLandlordByRank && move.pattern.mainRank >= Rank.K) {
+      const size =
+        move.pattern.category === Category.Single ? 1 : move.pattern.category === Category.Pair ? 2 : 0;
+      if (size > 0 && certainlyBeaten(ctx.certainLandlordByRank, move.pattern.mainRank, size)) {
+        score += 60;
+      }
+    }
+    return score;
+  });
 }
 
 /**
@@ -240,14 +299,13 @@ function isSafeNonBombMove(move: Move, hand: Card[]): boolean {
   return !isBombLike(move.pattern.category) && !usesProtectedCards(move, protectedSet);
 }
 
-function choosePressingLeadMove(hand: Card[], moves: Move[]): Move {
+function choosePressingLeadMove(ctx: HardContext, hand: Card[], moves: Move[]): Move {
   const safeMoves = moves.filter((move) => isSafeNonBombMove(move, hand));
   const candidates = safeMoves.length > 0 ? safeMoves : moves;
   const blockers = candidates.filter((move) => move.cards.length >= 2);
   if (blockers.length > 0) {
     return chooseByLowestScore(blockers, (move) => {
-      const remaining = removeMoveCards(hand, move);
-      return roughTurnCount(remaining) * 100 - move.cards.length * 18 - categoryShapingBonus(move);
+      return ctx.decomposer.structureCost(hand, move.cards) * 100 - move.cards.length * 18 - categoryShapingBonus(move);
     });
   }
 
@@ -289,7 +347,8 @@ function chooseAbsoluteTopSingleFollow(
  * 每一手要么直接清手，要么外部（含队友，保守）不可能压过且剩余仍可保证。
  * 触发限 hand ≤ GUARANTEE_MAX_HAND，带 memo；纯公开信息（G14 不作弊）。
  */
-const GUARANTEE_MAX_HAND = 12;
+// W-AUDIT-AI B2:12→17——全程可看破。分支只走「不可压中继」,状态数天然收敛,memo 兜底。
+const GUARANTEE_MAX_HAND = 17;
 
 function externalBombThreat(remainingByRank: Readonly<Record<number, number>>): boolean {
   if (ALL_RANKS.some((rank) => rank <= Rank.R2 && (remainingByRank[rank] ?? 0) === 4)) return true;
@@ -373,24 +432,52 @@ function chooseGuaranteedTakeover(
 }
 
 /**
- * T-AI-DEPTH2：结构保护跟牌——跟单/对/三时优先出「恰好整组用尽」的候选
- * （孤张/纯对/纯三），避免无谓拆散对子、三张与炸弹坯；组内取最小。
- * 高位孤张（A 及以上）不因“成组”而优先烧掉——此时回落保守最小跟。
+ * W-AUDIT-AI B2:结构化跟牌(替代旧 chooseCleanFollow + conservativeAction 尾部)。
+ * 结构代价定压/过:
+ *   代价 ≤0(整组件白跟,含最优分解里的顺子/对/三带整手)→ 必跟最小;
+ *   代价 =1(拆一手)→ 小牌位(<A)随手跟;高牌位只在冲刺期(自己 ≤3 手)才烧;
+ *   代价 ≥2(碎结构)→ 只有对手阵营临近跑完(≤4 张)才硬拆压制,否则过牌保结构;
+ *   无安全跟法 → 对手告急(≤2 张)才烧最小炸,否则过牌(不再无脑烧炸)。
  */
-function chooseCleanFollow(hand: Card[], moves: Move[]): Move | null {
-  const counts = rankCounts(hand);
-  const clean = moves.filter((move) => {
-    const category = move.pattern.category;
-    if (category !== Category.Single && category !== Category.Pair && category !== Category.Trips) return false;
-    return (counts.get(move.pattern.mainRank) ?? 0) === move.cards.length;
-  });
-  if (clean.length === 0) return null;
-  const best = pickSmallest(clean);
-  if (best.pattern.mainRank >= Rank.A) return null;
-  return best;
+function chooseStructuredFollow(
+  ctx: HardContext,
+  snapshot: Parameters<AiStrategy>[0],
+  hand: Card[],
+  moves: Move[],
+): Move | 'pass' {
+  const protectedSet = protectedCards(hand);
+  const safe = moves.filter(
+    (move) => !isBombLike(move.pattern.category) && !usesProtectedCards(move, protectedSet),
+  );
+  const opponentMin = Math.min(
+    ...opponentSeats(snapshot).map((seat) => snapshot.handCounts[seat]),
+  );
+
+  if (safe.length === 0) {
+    const bombs = bombLikeMoves(moves);
+    if (bombs.length > 0 && opponentMin <= 2) return pickSmallestBombLike(bombs);
+    return 'pass';
+  }
+
+  const scored = safe.map((move) => ({
+    move,
+    cost: ctx.decomposer.structureCost(hand, move.cards),
+  }));
+  const free = scored.filter((entry) => entry.cost <= 0);
+  if (free.length > 0) return pickSmallest(free.map((entry) => entry.move));
+
+  const cheap = scored.filter((entry) => entry.cost === 1);
+  if (cheap.length > 0) {
+    const pick = pickSmallest(cheap.map((entry) => entry.move));
+    if (pick.pattern.mainRank < Rank.A) return pick;
+    if (ctx.decomposer.decompose(hand).moveCount <= 3) return pick;
+  }
+
+  if (opponentMin <= 4) return pickSmallest(safe);
+  return 'pass';
 }
 
-/** 积极控权策略桩：实现见 M4-03。 */
+/** 积极控权策略：拆解驱动内核（W-AUDIT-AI B2），纯公开信息、确定性。 */
 export const hardStrategy: AiStrategy = (snapshot, _rng, history = []) => {
   const hand = requireHand(snapshot);
   const moves = snapshot.top ? legalFollows(hand, snapshot.top.pattern) : enumerateMoves(hand);
@@ -400,12 +487,13 @@ export const hardStrategy: AiStrategy = (snapshot, _rng, history = []) => {
   const finishingMove = chooseFinishingMove(hand, moves, snapshot);
   if (finishingMove !== null) return toPlay(snapshot, finishingMove);
 
+  const ctx = buildHardContext(snapshot, hand, history);
+
   // T-AI-DEPTH2：终局必胜看破（纯公开信息）——lead 走保证序列；follow 用不可压候选夺权收官。
-  const memoryRemaining = history.length > 0 ? trackPlayed(history, hand).remainingByRank : null;
-  if (memoryRemaining) {
+  if (ctx.remainingByRank) {
     const guaranteed = snapshot.top === null
-      ? chooseGuaranteedLead(hand, moves, memoryRemaining)
-      : chooseGuaranteedTakeover(hand, moves, memoryRemaining);
+      ? chooseGuaranteedLead(hand, moves, ctx.remainingByRank)
+      : chooseGuaranteedTakeover(hand, moves, ctx.remainingByRank);
     if (guaranteed !== null) return toPlay(snapshot, guaranteed);
   }
 
@@ -415,13 +503,13 @@ export const hardStrategy: AiStrategy = (snapshot, _rng, history = []) => {
     const bombs = bombLikeMoves(moves);
     if (bombs.length > 0) return toPlay(snapshot, pickSmallestBombLike(bombs));
     if (snapshot.top) return toPlay(snapshot, pickLargest(moves));
-    return toPlay(snapshot, choosePressingLeadMove(hand, moves));
+    return toPlay(snapshot, choosePressingLeadMove(ctx, hand, moves));
   }
 
   if (!snapshot.top) {
     const feed = chooseFeedTeammateLead(snapshot, hand, moves);
     if (feed !== null) return toPlay(snapshot, feed);
-    return toPlay(snapshot, chooseLeadMove(hand, moves, history));
+    return toPlay(snapshot, chooseLeadMove(ctx, hand, moves, history));
   }
 
   const controlFollow = chooseControlFollow(hand, moves);
@@ -433,8 +521,7 @@ export const hardStrategy: AiStrategy = (snapshot, _rng, history = []) => {
   const upstreamPress = chooseUpstreamPressFollow(snapshot, hand, moves);
   if (upstreamPress !== null) return toPlay(snapshot, upstreamPress);
 
-  const cleanFollow = chooseCleanFollow(hand, moves);
-  if (cleanFollow !== null) return toPlay(snapshot, cleanFollow);
-
-  return conservativeAction(snapshot, hand, moves);
+  const structured = chooseStructuredFollow(ctx, snapshot, hand, moves);
+  if (structured === 'pass') return { type: 'pass', seat: snapshot.turn };
+  return toPlay(snapshot, structured);
 };

@@ -57,8 +57,12 @@ describe.skipIf(!GATE)('T-AI-DEPTH2 selfplay 验收门（三门）', () => {
     };
     // eslint-disable-next-line no-console
     console.log(JSON.stringify(gates));
+    // W-AUDIT-AI 门槛收紧(2026-07-13):拆解内核+结构化叫分落地后,
+    // G2 从「容忍 −0.03」升为「地主角色正差 ≥ +0.03」(消灭登记过的地主角色反转),
+    // G3 从「容忍 Hard 弱 12pp 的过渡态」收为「Hard 不得弱于 Normal(≥0)」。
+    // 跌破即强度回归,不许调低门槛消红。
     expect(gates.g1HardSimpleDiff).toBeGreaterThanOrEqual(0.4);
-    expect(gates.g2LandlordDiff).toBeGreaterThanOrEqual(-0.03);
-    expect(gates.g3HardNormalDiff).toBeGreaterThanOrEqual(-0.12);
+    expect(gates.g2LandlordDiff).toBeGreaterThanOrEqual(0.03);
+    expect(gates.g3HardNormalDiff).toBeGreaterThanOrEqual(0);
   }, 1800000);
 });
