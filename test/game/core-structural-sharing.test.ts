@@ -17,6 +17,7 @@ function playing(hands: [string, string, string], opts: Partial<RoundState> = {}
     passesInARow: 0,
     winner: null,
     bombsPlayed: 0,
+    bottom: null,
     ...opts,
   };
 }

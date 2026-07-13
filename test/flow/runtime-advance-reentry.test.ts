@@ -28,6 +28,7 @@ function playingState(args: { turn: SeatIndex; hands: [Card[], Card[], Card[]] }
     passesInARow: 0,
     winner: null,
     bombsPlayed: 0,
+    bottom: null,
   };
 }
 

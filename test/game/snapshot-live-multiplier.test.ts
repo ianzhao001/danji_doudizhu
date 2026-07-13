@@ -32,6 +32,7 @@ function playingState(args: {
     passesInARow: 0,
     winner: null,
     bombsPlayed: args.bombsPlayed ?? 0,
+    bottom: null,
   };
 }
 

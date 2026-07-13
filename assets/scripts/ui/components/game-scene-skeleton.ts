@@ -400,6 +400,9 @@ export class GameSceneSkeleton extends Component {
 
     this.fullGameEvents = resume?.events.slice() ?? [];
     this.recentEvents = rebuildRecentEvents(this.fullGameEvents);
+    // v2(W-AUDIT-AI B3):断局恢复时底牌从存档公开字段直读——bottomRevealed 事件不会重放;
+    // v1 旧档迁移后 bottom=null,维持既有牌背降级。
+    if (resume?.state.bottom) this.revealedBottomCards = resume.state.bottom.slice();
     this.runtime = resume ? resumeRoundRuntime(resume, config) : startRoundRuntime(config);
     this.unsubscribe = this.runtime.onEvent((event) => {
       if (event.type === 'deal' || event.type === 'redeal') {

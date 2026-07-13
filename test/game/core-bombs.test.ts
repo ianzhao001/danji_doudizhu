@@ -18,6 +18,7 @@ function round(hand = '3 3 3 3 6 7 x X'): RoundState {
     passesInARow: 0,
     winner: null,
     bombsPlayed: 0,
+    bottom: null,
   };
 }
 

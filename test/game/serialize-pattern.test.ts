@@ -21,6 +21,7 @@ function validState(): RoundState {
     passesInARow: 0,
     winner: null,
     bombsPlayed: 0,
+    bottom: null,
   };
 }
 

@@ -14,7 +14,7 @@ import { hasOwn, isRecord } from '../rules/guards';
 import { isSeat } from './seat';
 import { GamePhase, Side, type RoundState } from './types';
 
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
 const REQUIRED_STATE_FIELDS = [
   'phase',
   'landlord',
@@ -24,6 +24,7 @@ const REQUIRED_STATE_FIELDS = [
   'passesInARow',
   'winner',
   'bombsPlayed',
+  'bottom', // v2(W-AUDIT-AI B3):三张公开底牌;null=v1 旧档迁移而来
 ];
 
 const SEATS = [0, 1, 2] as const;
@@ -95,6 +96,13 @@ function assertTop(value: unknown): void {
   }
 }
 
+function assertBottom(value: unknown): void {
+  if (value === null) return; // v1 旧档迁移:底牌未知
+  if (!Array.isArray(value)) fail('bottom must be null or an array');
+  if (value.length !== 3) fail('bottom length must be 3');
+  value.forEach((card, index) => assertCard(card, `bottom[${index}]`));
+}
+
 function assertRoundState(value: Record<string, unknown>): RoundState {
   for (const field of REQUIRED_STATE_FIELDS) {
     if (!hasOwn(value, field)) fail(`missing ${field}`);
@@ -108,6 +116,7 @@ function assertRoundState(value: Record<string, unknown>): RoundState {
   assertNonNegativeInteger(value.passesInARow, 'passesInARow');
   if (value.winner !== null && !SIDES.has(value.winner as Side)) fail('winner is invalid');
   assertNonNegativeInteger(value.bombsPlayed, 'bombsPlayed');
+  assertBottom(value.bottom);
 
   return value as unknown as RoundState;
 }
@@ -121,7 +130,11 @@ export interface VersionedSave {
 export type SaveMigration = (save: VersionedSave) => VersionedSave;
 
 // 键=源版本 N，值=N→N+1；必须连续覆盖到 CURRENT_VERSION-1，缺链即 fail。
-const MIGRATIONS: Readonly<Record<number, SaveMigration>> = {};
+const MIGRATIONS: Readonly<Record<number, SaveMigration>> = {
+  // v1→v2:补公开底牌字段。旧档发牌信息已不可考,置 null(=未知),
+  // AI 记牌与 UI 底牌托盘对 null 优雅降级(维持 v1 行为)。
+  1: (save) => ({ version: 2, state: { ...save.state, bottom: null } }),
+};
 
 // 同版本加法可选字段默认值：老存档缺字段时补齐（已有字段永远赢过默认值）。
 // 必填字段增删/语义变化不许走这里，必须升版本并配迁移器。

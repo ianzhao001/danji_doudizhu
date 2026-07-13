@@ -29,6 +29,7 @@ function playing(opts: Partial<RoundState> = {}): RoundState {
     passesInARow: 0,
     winner: null,
     bombsPlayed: 0,
+    bottom: null,
     ...opts,
   };
 }

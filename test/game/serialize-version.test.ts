@@ -4,7 +4,8 @@ import { GamePhase, type RoundState } from '../../assets/scripts/game';
 import { recognize } from '../../assets/scripts/rules';
 import { cards } from '../rules/_util';
 
-const CURRENT_VERSION = 1;
+// v2(W-AUDIT-AI B3):+bottom 公开底牌;v1 旧档经 MIGRATIONS[1] 就地升级(见 golden 绊线)。
+const CURRENT_VERSION = 2;
 
 function sample(): RoundState {
   return {
@@ -20,6 +21,7 @@ function sample(): RoundState {
     passesInARow: 0,
     winner: null,
     bombsPlayed: 0,
+    bottom: null,
   };
 }
 

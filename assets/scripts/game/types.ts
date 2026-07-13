@@ -42,6 +42,11 @@ export interface RoundState {
   passesInARow: number; // 连续过牌计数
   winner: Side | null;
   bombsPlayed: number; // 炸弹/火箭累计（供 settlement）
+  /**
+   * 三张公开底牌(v2,W-AUDIT-AI B3):地主确定后全场明牌(UI 底牌托盘正面展示),
+   * 属公开信息,进快照供 AI 记牌归因。null = v1 旧档迁移而来,未知。
+   */
+  bottom: Card[] | null;
 }
 
 /** 断局恢复所需的纯数据负载（不含 savedAt/version 等 IO 元数据）。 */
@@ -71,6 +76,7 @@ export interface GameSnapshot {
   bidMultiplier?: number;
   bombsPlayed?: number;
   viewerHand?: Card[]; // 指定 viewer 时附其手牌
+  bottom?: Card[] | null; // 公开底牌(对所有 viewer 可见;undefined/null=未知,旧档或未填)
 }
 
 export interface ApplyResult {

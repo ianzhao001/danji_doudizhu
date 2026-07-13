@@ -20,6 +20,7 @@ function settledRound(): RoundState {
     passesInARow: 0,
     winner: Side.Landlord,
     bombsPlayed: 1,
+    bottom: null,
   };
 }
 
@@ -51,6 +52,7 @@ describe('M5-12a Settled 终局态往返', () => {
         },
       },
       bombsPlayed: 2,
+      bottom: null,
     };
     expect(deserializeRound(serializeRound(r))).toEqual(r);
   });

@@ -28,6 +28,7 @@ function expectedState(): RoundState {
     passesInARow: 1,
     winner: null,
     bombsPlayed: 1,
+    bottom: null,
   };
 }
 

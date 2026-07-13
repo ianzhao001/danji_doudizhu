@@ -82,6 +82,7 @@ export function createPlayingRound(deal: Deal, landlord: SeatIndex): RoundState 
     passesInARow: 0,
     winner: null,
     bombsPlayed: 0,
+    bottom: deal.bottom.slice(),
   };
 }
 
@@ -175,6 +176,7 @@ export function snapshot(state: RoundState, viewer?: SeatIndex): GameSnapshot {
     handCounts,
     winner: state.winner,
     bombsPlayed: state.bombsPlayed,
+    bottom: state.bottom ? state.bottom.slice() : state.bottom,
   };
 
   if (viewer !== undefined) {

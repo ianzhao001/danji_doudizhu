@@ -48,6 +48,7 @@ function settledState(landlord: SeatIndex = 0, winner: Side = Side.Landlord): Ro
     passesInARow: 0,
     winner,
     bombsPlayed: 0,
+    bottom: null,
   };
 }
 

@@ -65,6 +65,7 @@ function playingState(args: {
     passesInARow: 0,
     winner: null,
     bombsPlayed: 0,
+    bottom: null,
   };
 }
 
@@ -82,6 +83,7 @@ function settledState(landlord: SeatIndex = 0): RoundState {
     passesInARow: 0,
     winner: Side.Landlord,
     bombsPlayed: 0,
+    bottom: null,
   };
 }
 

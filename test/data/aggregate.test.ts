@@ -29,6 +29,7 @@ function result(overrides: Partial<FlowResult> = {}): FlowResult {
       passesInARow: 0,
       winner: Side.Landlord,
       bombsPlayed: 0,
+      bottom: null,
     },
     ...overrides,
   };
