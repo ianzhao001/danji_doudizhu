@@ -2,6 +2,11 @@
  * M2-04 RoundState 序列化/反序列化（为 M5 断局重开铺垫）。
  * 实现方：实现两个函数体，使 test/game/serialize.test.ts 转绿。
  * 规则见 coordination/tasks/M2-04-serialization.md。纯函数，禁止 import `cc`，禁止改签名。
+ *
+ * v1.6 审计裁决 P1-3——存档格式通则：改 RoundState/存档字段 = 先想迁移。
+ * 新增「可选」字段登记 CURRENT_VERSION_ADDITIVE_DEFAULTS 补默认；其余一律升
+ * CURRENT_VERSION + 写 MIGRATIONS 迁移器 + golden 绊线转绿（test/game/serialize-golden-*.test.ts），
+ * 禁止原地重定义既有版本字段含义。高于当前版本仍硬拒（只升不降）。
  */
 
 import { Category, Rank, Suit, recognize } from '../rules';
@@ -107,17 +112,43 @@ function assertRoundState(value: Record<string, unknown>): RoundState {
   return value as unknown as RoundState;
 }
 
-function assertVersionedSave(value: unknown): RoundState {
+export interface VersionedSave {
+  version: number;
+  state: Record<string, unknown>;
+}
+
+/** 单步迁移器：输入 version=N 的完整存档，返回 version=N+1 的新对象；纯函数，禁止就地改入参。 */
+export type SaveMigration = (save: VersionedSave) => VersionedSave;
+
+// 键=源版本 N，值=N→N+1；必须连续覆盖到 CURRENT_VERSION-1，缺链即 fail。
+const MIGRATIONS: Readonly<Record<number, SaveMigration>> = {};
+
+// 同版本加法可选字段默认值：老存档缺字段时补齐（已有字段永远赢过默认值）。
+// 必填字段增删/语义变化不许走这里，必须升版本并配迁移器。
+const CURRENT_VERSION_ADDITIVE_DEFAULTS: Readonly<Record<string, unknown>> = {};
+
+function migrateToCurrent(value: unknown): Record<string, unknown> {
   if (!isRecord(value)) fail('expected versioned save object');
   if (!hasOwn(value, 'version')) fail('missing version');
-  if (value.version !== CURRENT_VERSION) {
+  if (typeof value.version !== 'number' || !Number.isInteger(value.version) || value.version > CURRENT_VERSION) {
     fail(`unsupported version: ${String(value.version)}`);
   }
   if (!hasOwn(value, 'state') || !isRecord(value.state)) {
     fail('missing state');
   }
 
-  return assertRoundState(value.state);
+  let save: VersionedSave = { version: value.version, state: value.state };
+  while (save.version < CURRENT_VERSION) {
+    const step = MIGRATIONS[save.version];
+    if (!step) fail(`no migration from version ${save.version}`);
+    const next = step(save);
+    if (!isRecord(next) || next.version !== save.version + 1 || !isRecord(next.state)) {
+      fail(`migration from version ${save.version} produced invalid save`);
+    }
+    save = next;
+  }
+
+  return { ...CURRENT_VERSION_ADDITIVE_DEFAULTS, ...save.state };
 }
 
 /** 序列化为字符串（往返一致、纯 JSON）。 */
@@ -125,7 +156,7 @@ export function serializeRound(state: RoundState): string {
   return JSON.stringify({ version: CURRENT_VERSION, state });
 }
 
-/** 反序列化；对非法 JSON 抛错。 */
+/** 反序列化；对非法 JSON 抛错。旧版本先经迁移链升到当前版，再做完整结构断言。 */
 export function deserializeRound(json: string): RoundState {
-  return assertVersionedSave(JSON.parse(json));
+  return assertRoundState(migrateToCurrent(JSON.parse(json)));
 }
