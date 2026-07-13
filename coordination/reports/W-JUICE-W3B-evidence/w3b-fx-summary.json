@@ -1,0 +1,180 @@
+{
+  "task": "W3B-fx",
+  "base": "http://127.0.0.1:7789/build/web-mobile/",
+  "capturedAt": "2026-07-11T17:26:04.875Z",
+  "flows": {
+    "bombWin": {
+      "seed": 14,
+      "captures": [
+        {
+          "file": "bomb-burst-frame1.png",
+          "sha256": "059fda2196c8e193"
+        },
+        {
+          "file": "bomb-burst-frame2.png",
+          "sha256": "8f0d34d143c80016"
+        },
+        {
+          "file": "win-confetti-frame1.png",
+          "sha256": "930ff286e351f52e"
+        },
+        {
+          "file": "win-confetti-frame2.png",
+          "sha256": "f7a3c2a16b3b4228"
+        },
+        {
+          "file": "restart-fx-cleared.png",
+          "sha256": "352c5e04a40b97f5"
+        }
+      ],
+      "rippleCensus": {
+        "peak": {
+          "fx-ripple": 1
+        },
+        "firstAt": {
+          "fx-ripple": 1783790771185
+        },
+        "seenSample": [
+          "fx-ripple-T"
+        ]
+      },
+      "bombPlay": {
+        "acted": true,
+        "kind": "bomb",
+        "count": 4
+      },
+      "bombCensus": {
+        "peak": {
+          "fx-ripple": 1,
+          "emphasis-bomb": 1,
+          "fx-bomb-ring": 1,
+          "fx-bomb-spark": 6
+        },
+        "firstAt": {
+          "fx-ripple": 1783790774941,
+          "emphasis-bomb": 1783790774942,
+          "fx-bomb-ring": 1783790774942,
+          "fx-bomb-spark": 1783790774942
+        },
+        "seenSample": [
+          "fx-ripple-T",
+          "emphasis-bomb-T",
+          "fx-bomb-ring-T",
+          "fx-bomb-spark-T-0",
+          "fx-bomb-spark-T-1",
+          "fx-bomb-spark-T-2",
+          "fx-bomb-spark-T-3",
+          "fx-bomb-spark-T-4",
+          "fx-bomb-spark-T-5"
+        ]
+      },
+      "winCensus": {
+        "peak": {
+          "result-fx-star": 3,
+          "result-fx-confetti": 14
+        },
+        "firstAt": {
+          "result-fx-star": 1783790829490,
+          "result-fx-confetti": 1783790829490
+        },
+        "seenSample": [
+          "result-fx-star-0",
+          "result-fx-star-1",
+          "result-fx-star-2",
+          "result-fx-confetti-0",
+          "result-fx-confetti-1",
+          "result-fx-confetti-2",
+          "result-fx-confetti-3",
+          "result-fx-confetti-4",
+          "result-fx-confetti-5",
+          "result-fx-confetti-6",
+          "result-fx-confetti-7",
+          "result-fx-confetti-8",
+          "result-fx-confetti-9",
+          "result-fx-confetti-10",
+          "result-fx-confetti-11",
+          "result-fx-confetti-12",
+          "result-fx-confetti-13"
+        ]
+      },
+      "settledScores": [
+        4,
+        -2,
+        -2
+      ],
+      "confettiFramesDiffer": true,
+      "fxAfterRestart": []
+    },
+    "rocket": {
+      "seed": 15,
+      "captures": [
+        {
+          "file": "rocket-burst-frame1.png",
+          "sha256": "cdb33d5129652ea0"
+        },
+        {
+          "file": "rocket-burst-frame2.png",
+          "sha256": "a37a85187fe71398"
+        }
+      ],
+      "rocketPlay": {
+        "acted": true,
+        "kind": "rocket",
+        "count": 2
+      },
+      "rocketCensus": {
+        "peak": {
+          "fx-ripple": 1,
+          "emphasis-rocket": 1,
+          "fx-rocket-trail": 1,
+          "fx-rocket-star": 4
+        },
+        "firstAt": {
+          "fx-ripple": 1783790842116,
+          "emphasis-rocket": 1783790842116,
+          "fx-rocket-trail": 1783790842116,
+          "fx-rocket-star": 1783790842116
+        },
+        "seenSample": [
+          "fx-ripple-T",
+          "emphasis-rocket-T",
+          "fx-rocket-trail-T",
+          "fx-rocket-star-T-0",
+          "fx-rocket-star-T-1",
+          "fx-rocket-star-T-2",
+          "fx-rocket-star-T-3"
+        ]
+      }
+    },
+    "animationOff": {
+      "seed": 14,
+      "offCensus": {
+        "peak": {},
+        "firstAt": {},
+        "seenSample": []
+      },
+      "capture": {
+        "file": "bomb-animation-off.png",
+        "sha256": "7b5f220f987f5976"
+      }
+    }
+  },
+  "pageErrorsByFlow": {
+    "bombWin": [],
+    "rocket": [],
+    "animationOff": []
+  },
+  "verdict": {
+    "rippleSeen": true,
+    "bombRing": true,
+    "bombSparks6": true,
+    "rocketTrail": true,
+    "rocketStars4": true,
+    "confetti14": true,
+    "stars3": true,
+    "confettiFramesDiffer": true,
+    "restartCleared": true,
+    "animationOffZeroFx": true,
+    "pageErrorsTotal": 0
+  }
+}

@@ -79,3 +79,19 @@
 - 与游戏功能直接相关的“AI 难度”“提示策略”“困难档增强”属于产品能力，继续保留。
 - 本仓库不包含联网、账号、支付、广告、匹配、排行榜或云存档。
 - 后续限制与技术债见 [docs/KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)。
+
+## v1.5 视觉与动画升级(W-JUICE·2026-07-11 开版·2026-07-12 用户终审全部通过收版·档案见 BOARD「v1.5 第一波」)
+- [x] ART-V15 生图批(按钮四态/信息件/dock/面板/特效贴图·双 gate 签收 13 图)。〔accepted〕
+- [x] W1-B 代码批(动画参数纯岛/音效映射修 win 误播/游离 Label 结案/提示键位调整·终态为提示恢复)。〔done 3e2c587〕
+- [x] W2 重绘接线(导入+按钮/信息条/dock/lobby 统一·删描边 hack)。〔done 66dbf70〕
+- [x] W3 动效声触(fx 层修早剪 bug/结算编排/出牌真飞行/炸弹火箭光效/按压涟漪/转场/音震/胜局彩带星光)。〔done 944374d+e2f1b77〕
+- [x] V10 收口(录屏组 8+2 段+四横屏+签收页+用户终审整改:提示三键回归、建议隐藏)。〔done 496ad5f→终局裁定 1595dee〕
+
+## v1.6 收光打磨(W-SHINE·2026-07-12 开版·2026-07-13 用户终审通过收版·档案见 BOARD「v1.6 W-SHINE」)
+- [x] ART-V16 生图批(结算面板底+胜/败横幅三张 v15 族·单 gate)。〔Codex·单 gate 签收 accepted〕
+- [x] W-SHINE-S1 代码批(三哑 cue 补音/「当前」角标修复/走查 punch 八条)。〔accepted 4aadfb5〕
+- [x] W-SHINE-S2 代码批(v16 导入/结算换肤+可读性微调/V11 收口采证)。〔accepted 2f0a30c〕
+- [x] W-SHINE-S3 代码批(用户终审整改六条:v17 规则按钮/文字 SHRINK/AI 保底 1s/大厅单区域+难度切换/去四入口/零新功能)。〔accepted 93b2d64〕
+- [x] ART-V18 生图批(极简族六件:按钮四态+info-pill+seat-nameplate,单一填充+一条细描边)。〔Codex·单 gate 签收 accepted〕
+- [x] W-SHINE-S4 代码批(二次终审整改四条 + 设计原则「举一反三」七处 + 用户追加两条 + 六道机检门)。〔accepted 62beeb9〕
+- [x] 终局裁定收版:Codex R1 approved、用户终审七项签收全过、main 冷构建复验全绿。〔v1.6 收版〕

@@ -63,8 +63,10 @@ const themeData: Theme = {
     // tween-helpers scrim
     overlayScrim: color(0, 0, 0, 218),
     textPrimary: color(108, 46, 76),
-    // lobby PANEL_MUTED / pause BRIGHT_PANEL_MUTED
-    textSecondary: color(142, 88, 108, 235),
+    // lobby PANEL_MUTED / pause BRIGHT_PANEL_MUTED / 席位副行 / 药丸弱化档
+    // v1.6 二次终审:原 (142,88,108,235) 压奶油底仅 4.40:1(差 AA 一线,s4-image-gates.py 门C 实测);
+    // 加深并去半透 → 奶油底 5.6:1、v18 浅粉药丸 4.9:1,仍明显弱于正文深莓 (108,46,76)。
+    textSecondary: color(138, 78, 102),
     // lobby BUTTON_DISABLED_TEXT
     textDisabled: color(118, 108, 114, 180),
     // ui-helpers labelColor enabled / BUTTON_SECONDARY_TEXT

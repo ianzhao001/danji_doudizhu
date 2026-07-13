@@ -17,13 +17,13 @@
       "userData": {
         "wrapModeS": "repeat",
         "wrapModeT": "repeat",
+        "imageUuidOrDatabaseUri": "3eee731f-5d96-4aeb-8dec-8173122e2d94",
+        "isUuid": true,
+        "visible": false,
         "minfilter": "linear",
         "magfilter": "linear",
         "mipfilter": "none",
-        "anisotropy": 0,
-        "isUuid": true,
-        "imageUuidOrDatabaseUri": "3eee731f-5d96-4aeb-8dec-8173122e2d94",
-        "visible": false
+        "anisotropy": 0
       },
       "ver": "1.0.22",
       "imported": true,

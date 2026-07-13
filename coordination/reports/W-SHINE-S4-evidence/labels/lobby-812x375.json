@@ -1,0 +1,390 @@
+{
+ "labels": [
+  {
+   "node": "button-label",
+   "text": "动效开",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 20,
+   "lines": 1,
+   "w": 91,
+   "h": 29,
+   "ink": [
+    70,
+    25,
+    50,
+    255
+   ],
+   "rect": [
+    473,
+    291,
+    88,
+    28
+   ],
+   "sprName": "btn-primary-v18",
+   "sprType": "SLICED",
+   "sprW": 107,
+   "sprH": 36,
+   "sprFullBleed": false,
+   "sprRect": [
+    465,
+    288,
+    103,
+    35
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "震动关",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 20,
+   "lines": 1,
+   "w": 91,
+   "h": 29,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    362,
+    291,
+    88,
+    28
+   ],
+   "sprName": "btn-secondary-v18",
+   "sprType": "SLICED",
+   "sprW": 107,
+   "sprH": 36,
+   "sprFullBleed": false,
+   "sprRect": [
+    355,
+    288,
+    103,
+    35
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "音效关",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 20,
+   "lines": 1,
+   "w": 91,
+   "h": 29,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    252,
+    291,
+    88,
+    28
+   ],
+   "sprName": "btn-secondary-v18",
+   "sprType": "SLICED",
+   "sprW": 107,
+   "sprH": 36,
+   "sprFullBleed": false,
+   "sprRect": [
+    244,
+    288,
+    103,
+    35
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "难度 普通",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 20,
+   "lines": 1,
+   "w": 211,
+   "h": 32,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    305,
+    232,
+    203,
+    31
+   ],
+   "sprName": "btn-secondary-v18",
+   "sprType": "SLICED",
+   "sprW": 248,
+   "sprH": 40,
+   "sprFullBleed": false,
+   "sprRect": [
+    287,
+    228,
+    238,
+    38
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "暂无存档",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 20,
+   "lines": 1,
+   "w": 211,
+   "h": 34,
+   "ink": [
+    118,
+    108,
+    114,
+    180
+   ],
+   "rect": [
+    305,
+    183,
+    203,
+    33
+   ],
+   "sprName": "btn-disabled-v18",
+   "sprType": "SLICED",
+   "sprW": 248,
+   "sprH": 42,
+   "sprFullBleed": false,
+   "sprRect": [
+    287,
+    179,
+    238,
+    40
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "开始新局",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 20,
+   "lines": 1,
+   "w": 211,
+   "h": 35,
+   "ink": [
+    70,
+    25,
+    50,
+    255
+   ],
+   "rect": [
+    305,
+    134,
+    203,
+    34
+   ],
+   "sprName": "btn-primary-v18",
+   "sprType": "SLICED",
+   "sprW": 248,
+   "sprH": 44,
+   "sprFullBleed": false,
+   "sprRect": [
+    287,
+    130,
+    238,
+    42
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "home-summary-line",
+   "text": "局数 0    胜率 0%    净分 0",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 19,
+   "lines": 1,
+   "w": 336,
+   "h": 22,
+   "ink": [
+    138,
+    78,
+    102,
+    255
+   ],
+   "rect": [
+    244,
+    100,
+    323,
+    21
+   ],
+   "sprName": "panel-popup-v15",
+   "sprType": "SLICED",
+   "sprW": 380,
+   "sprH": 312,
+   "sprFullBleed": false,
+   "sprRect": [
+    223,
+    38,
+    365,
+    300
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "home-title",
+   "text": "斗地主",
+   "overflow": "SHRINK",
+   "fontSize": 28,
+   "lineHeight": 34,
+   "lines": 1,
+   "w": 320,
+   "h": 40,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    252,
+    57,
+    308,
+    38
+   ],
+   "sprName": "panel-popup-v15",
+   "sprType": "SLICED",
+   "sprW": 380,
+   "sprH": 312,
+   "sprFullBleed": false,
+   "sprRect": [
+    223,
+    38,
+    365,
+    300
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  }
+ ],
+ "sprites": [
+  {
+   "node": "button-bg",
+   "spr": "btn-primary-v18",
+   "type": "SLICED",
+   "box": [
+    107,
+    36
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-secondary-v18",
+   "type": "SLICED",
+   "box": [
+    107,
+    36
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-secondary-v18",
+   "type": "SLICED",
+   "box": [
+    107,
+    36
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-secondary-v18",
+   "type": "SLICED",
+   "box": [
+    248,
+    40
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-disabled-v18",
+   "type": "SLICED",
+   "box": [
+    248,
+    42
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-primary-v18",
+   "type": "SLICED",
+   "box": [
+    248,
+    44
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "panel-skin",
+   "spr": "panel-popup-v15",
+   "type": "SLICED",
+   "box": [
+    380,
+    312
+   ],
+   "rect": [
+    710,
+    402
+   ]
+  },
+  {
+   "node": "lobby-background-runtime",
+   "spr": "game-table-bg-v13",
+   "type": "SIMPLE",
+   "box": [
+    844,
+    390
+   ],
+   "rect": [
+    1688,
+    780
+   ]
+  }
+ ]
+}

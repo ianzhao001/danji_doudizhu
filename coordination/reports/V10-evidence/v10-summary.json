@@ -1,0 +1,218 @@
+{
+  "task": "V10",
+  "base": "http://127.0.0.1:7789/build/web-mobile/",
+  "capturedAt": "2026-07-11T18:32:42.155Z",
+  "seeds": {
+    "winBomb": 14,
+    "rocket": 15,
+    "lose": 1
+  },
+  "screens": {
+    "844x390": [
+      {
+        "file": "screenshots/a-lobby-844x390.png",
+        "sha256": "9dc210d894bf4d0f",
+        "step": "lobby"
+      },
+      {
+        "file": "screenshots/b-bidding-844x390.png",
+        "sha256": "8dbcedf3780be739",
+        "step": "bidding"
+      },
+      {
+        "file": "screenshots/c-playing-844x390.png",
+        "sha256": "cd4955d35ab28696",
+        "step": "playing"
+      },
+      {
+        "file": "screenshots/d-settled-844x390.png",
+        "sha256": "f44b8f7cb1a6f024",
+        "step": "settled-win",
+        "scores": [
+          4,
+          -2,
+          -2
+        ]
+      }
+    ],
+    "812x375": [
+      {
+        "file": "screenshots/a-lobby-812x375.png",
+        "sha256": "f57b9929c0118158",
+        "step": "lobby"
+      },
+      {
+        "file": "screenshots/b-bidding-812x375.png",
+        "sha256": "b09b856942475138",
+        "step": "bidding"
+      },
+      {
+        "file": "screenshots/c-playing-812x375.png",
+        "sha256": "752187711dec8a99",
+        "step": "playing"
+      },
+      {
+        "file": "screenshots/d-settled-812x375.png",
+        "sha256": "988c76e197254acf",
+        "step": "settled-win",
+        "scores": [
+          4,
+          -2,
+          -2
+        ]
+      }
+    ],
+    "915x412": [
+      {
+        "file": "screenshots/a-lobby-915x412.png",
+        "sha256": "adebaa8fc7aaf3d4",
+        "step": "lobby"
+      },
+      {
+        "file": "screenshots/b-bidding-915x412.png",
+        "sha256": "61e7a887f32c5645",
+        "step": "bidding"
+      },
+      {
+        "file": "screenshots/c-playing-915x412.png",
+        "sha256": "d9872e7e692de6a8",
+        "step": "playing"
+      },
+      {
+        "file": "screenshots/d-settled-915x412.png",
+        "sha256": "89d05f45514bc0ee",
+        "step": "settled-win",
+        "scores": [
+          4,
+          -2,
+          -2
+        ]
+      }
+    ],
+    "780x360": [
+      {
+        "file": "screenshots/a-lobby-780x360.png",
+        "sha256": "1e80d5a649d278a7",
+        "step": "lobby"
+      },
+      {
+        "file": "screenshots/b-bidding-780x360.png",
+        "sha256": "5fc3b6cda8906d07",
+        "step": "bidding"
+      },
+      {
+        "file": "screenshots/c-playing-780x360.png",
+        "sha256": "b6c60bc019463f40",
+        "step": "playing"
+      },
+      {
+        "file": "screenshots/d-settled-780x360.png",
+        "sha256": "defd92bea113336b",
+        "step": "settled-win",
+        "scores": [
+          4,
+          -2,
+          -2
+        ]
+      }
+    ]
+  },
+  "recordings": {
+    "files": [
+      {
+        "file": "recordings/rec-1-deal.webm",
+        "sha256": "a83e463a4a01f3da",
+        "bytes": 622562
+      },
+      {
+        "file": "recordings/rec-2-flight.webm",
+        "sha256": "5aaf432e08af676a",
+        "bytes": 1018299
+      },
+      {
+        "file": "recordings/rec-3-bomb.webm",
+        "sha256": "568493c5e357235c",
+        "bytes": 963247
+      },
+      {
+        "file": "recordings/rec-4-rocket.webm",
+        "sha256": "093e81537c129693",
+        "bytes": 988186
+      },
+      {
+        "file": "recordings/rec-5-win-confetti.webm",
+        "sha256": "03f8699e495508ff",
+        "bytes": 5005679
+      },
+      {
+        "file": "recordings/rec-6-lose-vignette.webm",
+        "sha256": "9503f001eefbc6fd",
+        "bytes": 4453712
+      },
+      {
+        "file": "recordings/rec-7-transitions.webm",
+        "sha256": "3bc2fc3205de8fe6",
+        "bytes": 1030437
+      },
+      {
+        "file": "recordings/rec-8-ripple.webm",
+        "sha256": "280b90da4c376fe5",
+        "bytes": 1005071
+      },
+      {
+        "file": "recordings/rec-9-animation-off.webm",
+        "sha256": "86d8f1ceeb69515a",
+        "bytes": 767873
+      },
+      {
+        "file": "recordings/rec-10-sound-off.webm",
+        "sha256": "07dcc3bb585d42df",
+        "bytes": 974406
+      }
+    ],
+    "bombCensus": 7,
+    "rocketCensus": 5,
+    "winConfetti": 14,
+    "loseNoConfetti": true,
+    "animationOffFxEmpty": true
+  },
+  "audio": {
+    "keys": 9,
+    "files": 9,
+    "missing": [],
+    "unreferenced": [],
+    "table": [
+      "audio/deal",
+      "audio/select",
+      "audio/play",
+      "audio/pass",
+      "audio/bomb",
+      "audio/rocket",
+      "audio/win",
+      "audio/lose",
+      "audio/button"
+    ]
+  },
+  "pageErrors": {
+    "screens-844x390": [],
+    "screens-812x375": [],
+    "screens-915x412": [],
+    "screens-780x360": [],
+    "rec-deal": [],
+    "rec-flight": [],
+    "rec-bomb": [],
+    "rec-rocket": [],
+    "rec-win": [],
+    "rec-lose": [],
+    "rec-transitions": [],
+    "rec-ripple": [],
+    "rec-animation-off": [],
+    "rec-sound-off": []
+  },
+  "pageErrorsTotal": 0,
+  "mediaGate": {
+    "pngs": 16,
+    "webms": 10,
+    "problems": []
+  }
+}

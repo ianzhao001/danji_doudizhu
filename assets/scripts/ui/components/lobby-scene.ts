@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UITransform } from 'cc';
+import { _decorator, AudioClip, AudioSource, Color, Component, Graphics, Label, Node, Sprite, SpriteFrame, UIOpacity, UITransform, Vec3, resources, tween } from 'cc';
 import { AiLevel } from '../../ai';
 import {
   deserializeStats,
@@ -28,14 +28,17 @@ import { deriveDifficultyPicker } from '../difficulty-picker-view';
 import { helpSections } from '../help-content';
 import { setDifficulty, toggleSetting, type ToggleKey } from '../settings-view';
 import { nextStep, tutorialSteps, type TutorialStep } from '../tutorial-steps';
+import { buttonRipple } from '../animation-params';
 import { RESOURCE_PATHS, type ResourcePath } from '../asset-keys';
 import { t } from '../strings';
+import { fadeInOnLoad, fadeThenLoad } from './scene-transition';
 import {
   THEME,
   addLabel as addUiLabel,
   addSkinnedButton,
   addSkinnedSprite,
   addUiTransform,
+  drawPanel,
   drawPanelSkin as drawUiPanelSkin,
   loadSprite,
   toColor,
@@ -61,9 +64,12 @@ const PANEL_MUTED = toColor(THEME.palette.textSecondary);
 const PANEL_ACCENT = toColor(THEME.palette.brand);
 const PANEL_GOOD = toColor(THEME.palette.success);
 const PANEL_BAD = toColor(THEME.palette.danger);
-const BUTTON_PRIMARY_TEXT = toColor(THEME.palette.brandDark);
+// v1.6 二次终审:v18 primary 亮莓粉底 → 专用更深莓字(对比 4.66→6.83)。
+const BUTTON_PRIMARY_TEXT = toColor({ r: 70, g: 25, b: 50, a: 255 });
 const BUTTON_SECONDARY_TEXT = toColor(THEME.palette.brandDark);
 const BUTTON_DISABLED_TEXT = toColor(THEME.palette.textDisabled);
+// v1.6 P-BADGE-CLIP:「当前」角标白底小片(置于行钮端头饰上仍可读)。
+const CURRENT_CHIP_BG = toColor(THEME.palette.textOnAccent);
 
 const TOGGLE_LABELS: Record<ToggleKey, string> = {
   sound: t('settings.sound'),
@@ -207,6 +213,8 @@ export class LobbyScene extends Component {
     this.hideLegacyScaffold();
     this.controlsRoot = this.ensureNode('lobby-runtime-root', this.node);
     this.render();
+    // v1.5 P-SCENE-FADE:入场自黑幕淡出(动效关闭时不铺幕)。
+    fadeInOnLoad(this.node, loadSettings(cocosStorage(), SETTINGS_KEY).animation);
   }
 
   private render(): void {
@@ -270,88 +278,102 @@ export class LobbyScene extends Component {
     const runtime = globalThis as typeof globalThis & {
       cc?: { director?: { loadScene(sceneName: string): void } };
     };
-    runtime.cc?.director?.loadScene('game');
+    // v1.5 P-SCENE-FADE:黑幕淡入后再切场景(动效关闭时直切)。
+    const animated = loadSettings(storage, SETTINGS_KEY).animation;
+    fadeThenLoad(this.node, animated, () => {
+      runtime.cc?.director?.loadScene('game');
+    });
   }
 
+  // v1.6 终审整改④⑤:大厅三区(战绩/难度/设置)合一为单居中面板——
+  // 难度改单切换按钮(点击循环 简单→普通→困难);去教程/帮助入口;隐藏战绩/历史入口(渲染方法保留不迭代)。
   private renderHomeScreen(settings: Settings, home: HomeViewData): void {
     if (!this.controlsRoot) return;
     const settingsView = deriveSettingsView(settings);
     const canvas = this.canvasSize();
-    const contentWidth = Math.min(canvas.width - 40, 804);
-    const panelHeight = Math.min(292, canvas.height - 66);
-    const summaryWidth = Math.min(232, Math.max(214, contentWidth * 0.29));
-    const difficultyWidth = Math.min(292, Math.max(258, contentWidth * 0.34));
-    const settingsWidth = summaryWidth;
-    const leftX = -contentWidth * 0.335;
-    const centerX = 0;
-    const rightX = contentWidth * 0.335;
+    const panelWidth = Math.min(380, canvas.width - 72);
+    const panelHeight = Math.min(312, canvas.height - 52);
+    const half = panelHeight / 2;
+    const btnWidth = Math.min(248, panelWidth - 76);
 
-    const summary = this.ensureNode('home-summary-panel', this.controlsRoot);
-    summary.setPosition(leftX, 0, 0);
-    addUiTransform(summary, summaryWidth, panelHeight);
-    this.drawPanelSkin(summary, summaryWidth, panelHeight);
+    const panel = this.ensureNode('home-panel', this.controlsRoot);
+    panel.setPosition(0, 0, 0);
+    addUiTransform(panel, panelWidth, panelHeight);
+    this.drawPanelSkin(panel, panelWidth, panelHeight);
+
+    this.addLabel(LOBBY_TEXT.title, 0, half - 40, THEME.typography.display, panel, panelWidth - 60, 40, 'home-title');
     this.addLabel(
-      LOBBY_TEXT.title,
+      `${home.rounds}    ${home.winRate}    ${home.netScore}`,
       0,
-      panelHeight / 2 - 38,
-      THEME.typography.display,
-      summary,
-      summaryWidth - 34,
-      40,
-      'home-title',
+      half - 76,
+      13,
+      panel,
+      panelWidth - 44,
+      22,
+      'home-summary-line',
+      PANEL_MUTED,
     );
+
     this.addButton(
       LOBBY_TEXT.startNewGame,
       0,
-      panelHeight / 2 - 88,
-      summaryWidth - 38,
-      40,
+      half - 118,
+      btnWidth,
+      44,
       true,
       () => this.openGameScene({ forceNew: true }),
-      summary,
+      panel,
       false,
       'home-start-button',
     );
     this.addButton(
       home.hasSavedGame ? LOBBY_TEXT.continueGame : LOBBY_TEXT.noSave,
       0,
-      panelHeight / 2 - 138,
-      summaryWidth - 38,
-      40,
+      half - 168,
+      btnWidth,
+      42,
       home.hasSavedGame,
       () => this.openGameScene({ requireSave: true }),
-      summary,
+      panel,
       false,
       'home-continue-button',
     );
-    this.addLabel(home.rounds, -42, -36, 14, summary, 96, 24, 'home-rounds', PANEL_MUTED);
-    this.addLabel(home.winRate, 48, -36, 14, summary, 100, 24, 'home-win-rate', PANEL_MUTED);
-    this.addLabel(home.netScore, 0, -68, 15, summary, summaryWidth - 40, 26, 'home-net-score', PANEL_ACCENT);
-    this.addLabel(home.latestRecord, 0, -102, 13, summary, summaryWidth - 40, 24, 'home-latest-record', PANEL_MUTED);
 
-    this.renderDifficultyPanel(settingsView.difficulty, centerX, 0, difficultyWidth, panelHeight);
+    // 难度单切换按钮:显示当前档,点击切到下一档(循环)。
+    const levels: AiLevel[] = [AiLevel.Simple, AiLevel.Normal, AiLevel.Hard];
+    const curLabel = deriveDifficultyPicker(settingsView.difficulty).options.find((o) => o.selected)?.label
+      ?? LOBBY_TEXT.normalDifficulty;
+    const nextLevel = levels[(levels.indexOf(settingsView.difficulty) + 1) % levels.length];
+    this.addButton(
+      `${LOBBY_TEXT.difficulty} ${curLabel}`,
+      0,
+      half - 218,
+      btnWidth,
+      40,
+      true,
+      () => this.persist(setDifficulty(loadSettings(cocosStorage(), SETTINGS_KEY), nextLevel)),
+      panel,
+      false,
+      'home-difficulty-toggle',
+    );
 
-    const settingsPanel = this.ensureNode('home-settings-panel', this.controlsRoot);
-    settingsPanel.setPosition(rightX, 0, 0);
-    addUiTransform(settingsPanel, settingsWidth, panelHeight);
-    this.drawPanelSkin(settingsPanel, settingsWidth, panelHeight);
-    this.addSprite(RESOURCE_PATHS.iconSettings, -settingsWidth / 2 + 34, panelHeight / 2 - 34, 24, 24, settingsPanel, 'home-settings-icon');
-    this.addLabel(t('lobby.settings'), 0, panelHeight / 2 - 34, 22, settingsPanel, settingsWidth - 34, 34, 'home-settings-title');
+    // 音效/动效/震动 三开关一行。
+    const toggleWidth = Math.min(112, Math.floor((panelWidth - 40) / 3) - 6);
+    const toggleStep = toggleWidth + 8;
     settingsView.toggles.forEach((toggle, index) => {
       this.addButton(
-        `${TOGGLE_LABELS[toggle.key]} ${toggleText(toggle.on)}`,
-        0,
-        panelHeight / 2 - 82 - index * 40,
-        settingsWidth - 46,
+        `${TOGGLE_LABELS[toggle.key]}${toggleText(toggle.on)}`,
+        (index - 1) * toggleStep,
+        -half + 34,
+        toggleWidth,
         36,
         true,
         () => this.persist(toggleSetting(loadSettings(cocosStorage(), SETTINGS_KEY), toggle.key)),
-        settingsPanel,
+        panel,
         toggle.on,
         `home-toggle-${toggle.key}`,
       );
     });
-    this.renderLobbyEntries(settingsPanel, settingsWidth, panelHeight);
   }
 
   private renderDifficultyPanel(current: AiLevel, x: number, y: number, panelWidth: number, panelHeight: number): void {
@@ -418,16 +440,23 @@ export class LobbyScene extends Component {
         );
       });
       if (option.selected) {
+        // v1.6 P-BADGE-CLIP:v15 行钮端头饰画进中央拉伸区,窄按钮上会盖住右缘角标——
+        // 角标自带白底小片垫底,任意视口保持完整可读;descWidth 不动,描述两行零回流。
+        const chipWidth = currentWidth + 8;
+        const chip = this.ensureNode(`difficulty-current-chip-${option.level}`, panel);
+        chip.setPosition(currentX - 1, rowY, 0);
+        addUiTransform(chip, chipWidth, 20);
+        drawPanel(chip, chipWidth, 20, CURRENT_CHIP_BG);
         this.addLabel(
           LOBBY_TEXT.current,
-          currentX,
+          currentX - 1,
           rowY,
           11,
           panel,
           currentWidth,
           16,
           `difficulty-current-${option.level}`,
-          BUTTON_PRIMARY_TEXT,
+          PANEL_ACCENT,
         );
       }
     });
@@ -478,18 +507,20 @@ export class LobbyScene extends Component {
     addUiTransform(panel, panelWidth, panelHeight);
     this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel(LOBBY_TEXT.tutorialHeading, 0, panelHeight / 2 - 34, 22, panel, 240, 34, 'tutorial-heading');
-    this.addLabel(`${currentIndex + 1}/${steps.length}`, panelWidth / 2 - 58, panelHeight / 2 - 34, 13, panel, 54, 24, 'tutorial-progress');
+    // v1.6 PL-04:页码内收,脱离右上角饰。
+    this.addLabel(`${currentIndex + 1}/${steps.length}`, panelWidth / 2 - 84, panelHeight / 2 - 34, 13, panel, 54, 24, 'tutorial-progress', PANEL_MUTED);
     this.addLabel(current.title, 0, panelHeight / 2 - 80, 24, panel, panelWidth - 96, 42, 'tutorial-title');
     wrapText(current.body, Math.max(18, Math.floor((panelWidth - 132) / 16))).slice(0, 3).forEach((line, index) => {
       this.addLabel(line, 0, 42 - index * 25, 16, panel, panelWidth - 128, 24, `tutorial-body-${index}`);
     });
     if (current.highlight) this.addLabel(`${LOBBY_TEXT.focusPrefix}${highlightLabel(current)}`, 0, -42, 14, panel, panelWidth - 160, 28, 'tutorial-highlight');
 
-    this.addButton(LOBBY_TEXT.previous, -96, -panelHeight / 2 + 34, 78, 36, this.tutorialIndex > 0, () => {
+    // v1.6 PL-03:78 宽下 v15 端头饰吞三字钮首字——加宽到 100(78 为拉伸模拟下限,三字钮需更多中央区)。
+    this.addButton(LOBBY_TEXT.previous, -110, -panelHeight / 2 + 34, 100, 36, this.tutorialIndex > 0, () => {
       this.tutorialIndex = Math.max(0, this.tutorialIndex - 1);
       this.render();
     }, panel, false, 'tutorial-prev-button');
-    this.addButton(this.tutorialIndex >= steps.length - 1 ? LOBBY_TEXT.finish : LOBBY_TEXT.next, 0, -panelHeight / 2 + 34, 78, 36, true, () => {
+    this.addButton(this.tutorialIndex >= steps.length - 1 ? LOBBY_TEXT.finish : LOBBY_TEXT.next, 0, -panelHeight / 2 + 34, 100, 36, true, () => {
       if (this.tutorialIndex >= steps.length - 1) {
         this.screen = 'home';
       } else {
@@ -497,7 +528,7 @@ export class LobbyScene extends Component {
       }
       this.render();
     }, panel, false, 'tutorial-next-button');
-    this.addButton(LOBBY_TEXT.skip, 96, -panelHeight / 2 + 34, 78, 36, true, () => {
+    this.addButton(LOBBY_TEXT.skip, 110, -panelHeight / 2 + 34, 100, 36, true, () => {
       this.screen = 'home';
       this.render();
     }, panel, false, 'tutorial-skip-button');
@@ -519,7 +550,8 @@ export class LobbyScene extends Component {
     addUiTransform(panel, panelWidth, panelHeight);
     this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel(LOBBY_TEXT.help, 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'help-heading');
-    this.addLabel(`${start + 1}-${Math.min(rows.length, start + visibleRows)}/${rows.length}`, panelWidth / 2 - 64, panelHeight / 2 - 34, 12, panel, 72, 22, 'help-progress', PANEL_MUTED);
+    // v1.6 PL-04:页码内收,脱离右上角饰。
+    this.addLabel(`${start + 1}-${Math.min(rows.length, start + visibleRows)}/${rows.length}`, panelWidth / 2 - 92, panelHeight / 2 - 34, 12, panel, 72, 22, 'help-progress', PANEL_MUTED);
 
     visible.forEach((row, index) => {
       const y = panelHeight / 2 - 72 - index * 24;
@@ -537,15 +569,16 @@ export class LobbyScene extends Component {
       );
     });
 
-    this.addButton(LOBBY_TEXT.upScroll, -98, -panelHeight / 2 + 34, 78, 36, start > 0, () => {
+    // v1.6 PL-03:同教程页——78 宽端头吞字,加宽到 100。
+    this.addButton(LOBBY_TEXT.upScroll, -110, -panelHeight / 2 + 34, 100, 36, start > 0, () => {
       this.helpScrollIndex = Math.max(0, start - 5);
       this.render();
     }, panel, false, 'help-scroll-up-button');
-    this.addButton(LOBBY_TEXT.downScroll, 0, -panelHeight / 2 + 34, 78, 36, start < maxStart, () => {
+    this.addButton(LOBBY_TEXT.downScroll, 0, -panelHeight / 2 + 34, 100, 36, start < maxStart, () => {
       this.helpScrollIndex = Math.min(maxStart, start + 5);
       this.render();
     }, panel, false, 'help-scroll-down-button');
-    this.addButton(LOBBY_TEXT.back, 98, -panelHeight / 2 + 34, 78, 36, true, () => {
+    this.addButton(LOBBY_TEXT.back, 110, -panelHeight / 2 + 34, 100, 36, true, () => {
       this.screen = 'home';
       this.render();
     }, panel, false, 'help-back-button');
@@ -562,16 +595,22 @@ export class LobbyScene extends Component {
     addUiTransform(panel, panelWidth, panelHeight);
     this.drawPanelSkin(panel, panelWidth, panelHeight);
     this.addLabel(LOBBY_TEXT.stats, 0, panelHeight / 2 - 34, 22, panel, 220, 34, 'stats-heading');
+    // v1.6 PL-02:空态与数据行互斥(原双重渲染互相叠压);12 行改双列 6+6,
+    // 行带收进 y∈[77,-53],不再穿底部按钮线(-107)也不溢出面板。
     if (view.empty) {
-      this.addSprite(RESOURCE_PATHS.emptyRecords, 0, 22, 72, 72, panel, 'stats-empty-art');
-      this.addLabel(LOBBY_TEXT.noCompletedRecords, 0, -34, 13, panel, 150, 24, 'stats-empty', PANEL_MUTED);
+      this.addSprite(RESOURCE_PATHS.emptyRecords, 0, 26, 72, 72, panel, 'stats-empty-art');
+      this.addLabel(LOBBY_TEXT.noCompletedRecords, 0, -34, 14, panel, 220, 24, 'stats-empty', PANEL_MUTED);
+    } else {
+      view.rows.forEach((row, index) => {
+        const column = index < 6 ? 0 : 1;
+        const rowInCol = index % 6;
+        const y = panelHeight / 2 - 82 - rowInCol * 26;
+        const labelX = column === 0 ? -212 : 58;
+        const valueX = column === 0 ? -92 : 208;
+        this.addLabel(row.label, labelX, y, 13, panel, 132, 22, `stats-label-${index}`, PANEL_TEXT);
+        this.addLabel(row.value, valueX, y, 13, panel, 128, 22, `stats-value-${index}`, PANEL_ACCENT);
+      });
     }
-
-    view.rows.forEach((row, index) => {
-      const y = panelHeight / 2 - 78 - index * 28;
-      this.addLabel(row.label, -86, y, 13, panel, 140, 22, `stats-label-${index}`, PANEL_TEXT);
-      this.addLabel(row.value, 92, y, 14, panel, 150, 22, `stats-value-${index}`, PANEL_ACCENT);
-    });
 
     this.addButton(LOBBY_TEXT.records, -72, -panelHeight / 2 + 34, 96, 36, true, () => {
       this.screen = 'records';
@@ -611,6 +650,7 @@ export class LobbyScene extends Component {
         this.render();
       },
       'records-outcome',
+      t('records.filterOutcome'),
     );
     this.renderFilterGroup(
       panel,
@@ -626,6 +666,7 @@ export class LobbyScene extends Component {
         this.render();
       },
       'records-role',
+      t('records.filterRole'),
     );
     this.renderFilterGroup(
       panel,
@@ -640,15 +681,18 @@ export class LobbyScene extends Component {
         this.render();
       },
       'records-order',
+      t('records.filterOrder'),
     );
 
-    this.addLabel(view.filterLabel, 0, -14, 13, panel, 260, 22, 'records-filter-label', PANEL_MUTED);
+    // v1.6 PL-02(同类扩展披露):历史屏第 4 行(y=-128)原也穿底部按钮(顶缘 -107)——
+    // 行带上移收紧 + 按钮下移,4 行与按钮零交叠。
+    this.addLabel(view.filterLabel, 0, -12, 13, panel, 260, 22, 'records-filter-label', PANEL_MUTED);
     if (view.empty) {
-      this.addSprite(RESOURCE_PATHS.emptyRecords, 0, -34, 68, 68, panel, 'records-empty-art');
-      this.addLabel(LOBBY_TEXT.noMatchedRecords, 0, -88, 16, panel, 180, 30, 'records-empty', PANEL_MUTED);
+      this.addSprite(RESOURCE_PATHS.emptyRecords, 0, -40, 68, 68, panel, 'records-empty-art');
+      this.addLabel(LOBBY_TEXT.noMatchedRecords, 0, -92, 16, panel, 180, 30, 'records-empty', PANEL_MUTED);
     } else {
       view.rows.forEach((row, index) => {
-        const y = -50 - index * 26;
+        const y = -38 - index * 21;
         const tags = row.tags.length > 0 ? ` ${row.tags.join(' ')}` : '';
         this.addLabel(
           `${row.outcomeLabel} ${row.roleLabel} ${row.scoreLabel} ${row.multiplierLabel}${tags}`,
@@ -664,11 +708,11 @@ export class LobbyScene extends Component {
       });
     }
 
-    this.addButton(LOBBY_TEXT.stats, -72, -panelHeight / 2 + 34, 96, 36, true, () => {
+    this.addButton(LOBBY_TEXT.stats, -72, -panelHeight / 2 + 26, 96, 36, true, () => {
       this.screen = 'stats';
       this.render();
     }, panel, false, 'records-stats-button');
-    this.addButton(LOBBY_TEXT.back, 72, -panelHeight / 2 + 34, 96, 36, true, () => {
+    this.addButton(LOBBY_TEXT.back, 72, -panelHeight / 2 + 26, 96, 36, true, () => {
       this.screen = 'home';
       this.render();
     }, panel, false, 'records-back-button');
@@ -681,8 +725,14 @@ export class LobbyScene extends Component {
     current: T,
     select: (value: T) => void,
     name: string,
+    caption?: string,
   ): void {
-    const spacing = options.length === 2 ? 86 : 76;
+    // v1.6 PL-05:行首加分组小标(结果/身份/排序),两个「全部」不再歧义;
+    // v1.6 PL-03:chip 66/78→78/86 宽,给 v15 端头饰留中央区。
+    if (caption) {
+      this.addLabel(caption, -170, y, 12, panel, 44, 20, `${name}-caption`, PANEL_MUTED);
+    }
+    const spacing = options.length === 2 ? 96 : 88;
     const startX = -((options.length - 1) * spacing) / 2;
     options.forEach((option, index) => {
       const selected = option.value === current;
@@ -690,7 +740,7 @@ export class LobbyScene extends Component {
         option.label,
         startX + index * spacing,
         y,
-        options.length === 2 ? 78 : 66,
+        options.length === 2 ? 86 : 78,
         30,
         true,
         () => select(option.value),
@@ -707,7 +757,8 @@ export class LobbyScene extends Component {
       if (sectionIndex > 0) rows.push({ text: '', kind: 'spacer' });
       rows.push({ text: section.title, kind: 'title' });
       section.lines.forEach((line) => {
-        wrapText(line, 20).forEach((text) => rows.push({ text: text.trim(), kind: 'body' }));
+        // v1.6 PL-06:预折行 20→30 字符——700 宽面板正文列宽约 390px,行长更接近阅读习惯。
+        wrapText(line, 30).forEach((text) => rows.push({ text: text.trim(), kind: 'body' }));
       });
     });
     return rows;
@@ -751,6 +802,33 @@ export class LobbyScene extends Component {
     if (label) label.string = text;
   }
 
+  /** v1.5 P-BTN-FEEL:大厅按钮点击音(经 sound 开关;AudioSource 惰性挂载)。 */
+  private spawnRipple(worldPos: Vec3, sizeBase: number): void {
+    const params = buttonRipple();
+    const local = this.node.getComponent(UITransform)?.convertToNodeSpaceAR(worldPos) ?? new Vec3(0, 0, 0);
+    const dia = sizeBase * params.sizeRatio;
+    const node = this.addSprite(RESOURCE_PATHS.fxRing, local.x, local.y, dia, dia, this.node, `fx-ripple-${Date.now()}`);
+    node.setScale(params.scaleFrom, params.scaleFrom, 1);
+    const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+    opacity.opacity = params.alphaFrom;
+    tween(node).to(params.ms / 1000, { scale: new Vec3(params.scaleTo, params.scaleTo, 1) }, { easing: 'quadOut' }).start();
+    tween(opacity)
+      .to(params.ms / 1000, { opacity: 0 })
+      .call(() => {
+        node.removeFromParent();
+        node.destroy();
+      })
+      .start();
+  }
+
+  private playButtonSound(): void {
+    if (!loadSettings(cocosStorage(), STORAGE_KEYS.settings).sound) return;
+    const source = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
+    resources.load(RESOURCE_PATHS.audioButton, AudioClip, (error, clip) => {
+      if (!error && clip && source.isValid) source.playOneShot(clip);
+    });
+  }
+
   private setHomeLabelsVisible(visible: boolean): void {
     this.setLabelVisible(this.continueLabel, visible);
     this.setLabelVisible(this.roundsLabel, visible);
@@ -770,7 +848,30 @@ export class LobbyScene extends Component {
         child.active = false;
       }
     }
+    // v1.6 二次终审:静态背景 lobby-bg 原只靠 @property(background) 在 onLoad 关闭——与
+    // hideStrayPlaceholderLabels 所述同一类「场景 @property 绑定失效」缺陷。冷构建(rm -rf library
+    // 后全量重导)实测 background 变 null,旧 lobby-bg 便盖在运行时 v13 桌景+压暗幕之上(截图实锤:
+    // 城市远景整个消失)。按名兜底,不依赖场景序列化——任何人冷构建都能得到一致画面。
+    const staticBg = this.node.getChildByName('lobby-bg');
+    if (staticBg) staticBg.active = false;
     this.setHomeLabelsVisible(false);
+    this.hideStrayPlaceholderLabels();
+  }
+
+  /**
+   * v1.5 P-STRAY-LABEL2:lobby.scene 内含 6 个 `string:"label"` 占位 Label(经 @property 绑定隐藏),
+   * 绑定失效/时序缝隙时会在底缘漏出游离「label」字样(V8 帧即存在的存量缺陷)。
+   * 兜底:遍历场景子树,凡 Label 组件文本为占位值一律隐藏其节点;不动 .scene。
+   * 真实文案(按钮/标题/战绩数字)均非字面 "label",不会误伤。
+   */
+  private hideStrayPlaceholderLabels(): void {
+    const stack: Node[] = [this.node];
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      const label = current.getComponent(Label);
+      if (label && /^label$/i.test(label.string.trim())) current.active = false;
+      for (const child of current.children) stack.push(child);
+    }
   }
 
   private renderPlaceholderBackground(canvas: { width: number; height: number }): void {
@@ -857,20 +958,30 @@ export class LobbyScene extends Component {
       name: nodeName,
       owner: this,
       selected,
+      feel: {
+        animated: loadSettings(cocosStorage(), STORAGE_KEYS.settings).animation,
+        onClickSound: () => this.playButtonSound(),
+        // W3-B P-BTN-FEEL-B:lobby 无 render 剪枝循环,涟漪直接挂场景根。
+        rippleAt: (worldPos, sizeBase) => this.spawnRipple(worldPos, sizeBase),
+      },
       skinPath: (buttonName, isEnabled, isSelected) => this.buttonSkinPath(buttonName, isEnabled, isSelected),
       textColor: (buttonName, isEnabled, isSelected) => this.buttonTextColor(buttonName, isEnabled, isSelected),
       iconPath: (buttonName) => this.buttonIconPath(buttonName),
       layout: ({ iconPath: buttonIconPath, width: buttonWidth, height: buttonHeight }) => {
         const showIcon = Boolean(buttonIconPath) && buttonWidth >= 72;
+        // v1.6 二次终审:v18 按钮实测净区 94.6%×83.8%(s4-image-gates.py 门B)。文字盒宽 0.85 早已达标,
+        // 但高度一直取按钮全高 → 撑出净区、字脚压到描边线(用户「btn文字和图像的线条重合」)。改 0.80。
+        // ≤100 宽小按钮字号降 14。
+        const compact = buttonWidth <= 100;
         return {
           renderHeight: buttonHeight,
           label: {
             x: showIcon ? 8 : 0,
             y: 0,
-            width: showIcon ? buttonWidth - 32 : buttonWidth,
-            height: buttonHeight,
-            fontSize: THEME.typography.md,
-            lineHeight: THEME.typography.lg,
+            width: showIcon ? buttonWidth - 28 : Math.round(buttonWidth * 0.85),
+            height: Math.max(22, Math.round(buttonHeight * 0.80)),
+            fontSize: compact ? 14 : THEME.typography.md,
+            lineHeight: compact ? 18 : THEME.typography.lg,
           },
           icon: showIcon
             ? {
@@ -885,9 +996,10 @@ export class LobbyScene extends Component {
   }
 
   private buttonSkinPath(name: string, enabled: boolean, selected: boolean): ResourcePath {
-    if (!enabled) return RESOURCE_PATHS.buttonDisabled;
-    if (selected || name === 'home-start-button' || name === 'home-continue-button') return RESOURCE_PATHS.buttonPrimary;
-    return RESOURCE_PATHS.buttonSecondary;
+    // v1.6 二次终审整改:大厅按钮切 v18 极简族(单一填充+一条细描边,与 game 同族);v17/v15 键保留仅作回滚。
+    if (!enabled) return RESOURCE_PATHS.btnDisabledV18;
+    if (selected || name === 'home-start-button' || name === 'home-continue-button') return RESOURCE_PATHS.btnPrimaryV18;
+    return RESOURCE_PATHS.btnSecondaryV18;
   }
 
   private buttonTextColor(name: string, enabled: boolean, selected: boolean): Color {
@@ -925,8 +1037,9 @@ export class LobbyScene extends Component {
   }
 
   private drawPanelSkin(parent: Node, width: number, height: number, name = 'panel-skin'): Node {
+    // v1.5 P-LOBBY-UNIFY2:两场景弹窗面板统一 v15 皮肤。
     return drawUiPanelSkin(this.ensureNode.bind(this), this.loadSprite.bind(this), {
-      path: RESOURCE_PATHS.panelPopup,
+      path: RESOURCE_PATHS.panelPopupV15,
       parent,
       width,
       height,

@@ -1,0 +1,3745 @@
+{
+ "skinGeometry": {
+  "ui/btn-disabled-v18": {
+   "rect": [
+    474,
+    154
+   ],
+   "cap": [
+    96,
+    96,
+    64,
+    64
+   ],
+   "margin": [
+    8,
+    9,
+    8,
+    9
+   ]
+  },
+  "ui/btn-primary-v18": {
+   "rect": [
+    474,
+    154
+   ],
+   "cap": [
+    96,
+    96,
+    64,
+    64
+   ],
+   "margin": [
+    8,
+    9,
+    8,
+    9
+   ]
+  },
+  "ui/btn-secondary-v18": {
+   "rect": [
+    474,
+    154
+   ],
+   "cap": [
+    96,
+    96,
+    64,
+    64
+   ],
+   "margin": [
+    8,
+    9,
+    8,
+    9
+   ]
+  },
+  "ui/btn-tertiary-v18": {
+   "rect": [
+    474,
+    154
+   ],
+   "cap": [
+    96,
+    96,
+    64,
+    64
+   ],
+   "margin": [
+    8,
+    9,
+    8,
+    9
+   ]
+  },
+  "ui/info-pill-v18": {
+   "rect": [
+    358,
+    94
+   ],
+   "cap": [
+    26,
+    26,
+    26,
+    26
+   ],
+   "margin": [
+    6,
+    7,
+    6,
+    7
+   ]
+  },
+  "ui/panel-popup-v15": {
+   "rect": [
+    710,
+    402
+   ],
+   "cap": [
+    56,
+    56,
+    56,
+    56
+   ],
+   "margin": [
+    19,
+    20,
+    19,
+    20
+   ]
+  },
+  "ui/seat-nameplate-v18": {
+   "rect": [
+    474,
+    134
+   ],
+   "cap": [
+    120,
+    120,
+    56,
+    56
+   ],
+   "margin": [
+    8,
+    9,
+    8,
+    9
+   ]
+  }
+ },
+ "overrun": [],
+ "contrast": [
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "K♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    247,
+    244
+   ],
+   "contrast": 4.99,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "Q♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    247,
+    244
+   ],
+   "contrast": 4.99,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "10♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    247,
+    244
+   ],
+   "contrast": 4.99,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "8♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    247,
+    244
+   ],
+   "contrast": 4.99,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "K♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "K♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "Q♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "10♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "8♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "8♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "5♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "4♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "K♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "K♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "Q♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "10♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "8♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "8♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "5♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "4♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "K♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "8♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "5♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "4♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "K♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "K♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "Q♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "10♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    244
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "8♥",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "8♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "5♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "4♦",
+   "ink": [
+    196,
+    52,
+    82
+   ],
+   "bg": [
+    252,
+    248,
+    245
+   ],
+   "contrast": 5.02,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "settled-780x360",
+   "node": "result-heading",
+   "text": "本局结算",
+   "ink": [
+    255,
+    255,
+    255
+   ],
+   "bg": [
+    142,
+    93,
+    115
+   ],
+   "contrast": 5.3,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "settled-844x390",
+   "node": "result-heading",
+   "text": "本局结算",
+   "ink": [
+    255,
+    255,
+    255
+   ],
+   "bg": [
+    142,
+    93,
+    115
+   ],
+   "contrast": 5.3,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "settled-win-844x390",
+   "node": "result-heading",
+   "text": "本局结算",
+   "ink": [
+    255,
+    255,
+    255
+   ],
+   "bg": [
+    142,
+    93,
+    115
+   ],
+   "contrast": 5.3,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "settled-780x360",
+   "node": "result-multiplier",
+   "text": "倍数 ×8  炸弹 1",
+   "ink": [
+    176,
+    52,
+    106
+   ],
+   "bg": [
+    253,
+    242,
+    239
+   ],
+   "contrast": 5.39,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "settled-844x390",
+   "node": "result-multiplier",
+   "text": "倍数 ×16  炸弹 1",
+   "ink": [
+    176,
+    52,
+    106
+   ],
+   "bg": [
+    253,
+    242,
+    239
+   ],
+   "contrast": 5.39,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "settled-win-844x390",
+   "node": "result-multiplier",
+   "text": "倍数 ×4  炸弹 0",
+   "ink": [
+    176,
+    52,
+    106
+   ],
+   "bg": [
+    253,
+    242,
+    239
+   ],
+   "contrast": 5.39,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "seat-role-label",
+   "text": "待定",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "seat-role-label",
+   "text": "待定",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "seat-role-label",
+   "text": "待定",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "seat-role-label",
+   "text": "待定",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "seat-role-label",
+   "text": "待定",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "seat-role-label",
+   "text": "待定",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "seat-role-label",
+   "text": "农民",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "seat-role-label",
+   "text": "农民",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "seat-role-label",
+   "text": "地主",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "seat-role-label",
+   "text": "农民",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "seat-role-label",
+   "text": "农民",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "seat-role-label",
+   "text": "地主",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    255,
+    241,
+    228
+   ],
+   "contrast": 5.64,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "lobby-780x360",
+   "node": "home-summary-line",
+   "text": "局数 0    胜率 0%    净分 0",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    253,
+    244,
+    240
+   ],
+   "contrast": 5.76,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "lobby-812x375",
+   "node": "home-summary-line",
+   "text": "局数 0    胜率 0%    净分 0",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    253,
+    244,
+    240
+   ],
+   "contrast": 5.76,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "lobby-844x390",
+   "node": "home-summary-line",
+   "text": "局数 0    胜率 0%    净分 0",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    253,
+    244,
+    240
+   ],
+   "contrast": 5.76,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "lobby-915x412",
+   "node": "home-summary-line",
+   "text": "局数 0    胜率 0%    净分 0",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    253,
+    244,
+    240
+   ],
+   "contrast": 5.76,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "pause-780x360",
+   "node": "pause-hint",
+   "text": "本局进度已保留",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    253,
+    244,
+    240
+   ],
+   "contrast": 5.76,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "pause-844x390",
+   "node": "pause-hint",
+   "text": "本局进度已保留",
+   "ink": [
+    138,
+    78,
+    102
+   ],
+   "bg": [
+    253,
+    244,
+    240
+   ],
+   "contrast": 5.76,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "button-label",
+   "text": "叫地主",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "button-label",
+   "text": "叫地主",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "lobby-780x360",
+   "node": "button-label",
+   "text": "动效开",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "lobby-780x360",
+   "node": "button-label",
+   "text": "开始新局",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "lobby-812x375",
+   "node": "button-label",
+   "text": "动效开",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "lobby-812x375",
+   "node": "button-label",
+   "text": "开始新局",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "lobby-844x390",
+   "node": "button-label",
+   "text": "动效开",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "lobby-844x390",
+   "node": "button-label",
+   "text": "开始新局",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "lobby-915x412",
+   "node": "button-label",
+   "text": "动效开",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "lobby-915x412",
+   "node": "button-label",
+   "text": "开始新局",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "pause-780x360",
+   "node": "button-label",
+   "text": "退出",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "pause-780x360",
+   "node": "button-label",
+   "text": "重开",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "pause-780x360",
+   "node": "button-label",
+   "text": "继续",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "pause-844x390",
+   "node": "button-label",
+   "text": "退出",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "pause-844x390",
+   "node": "button-label",
+   "text": "重开",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "pause-844x390",
+   "node": "button-label",
+   "text": "继续",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "settled-780x360",
+   "node": "button-label",
+   "text": "返回大厅",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "settled-780x360",
+   "node": "button-label",
+   "text": "再来一局",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "settled-844x390",
+   "node": "button-label",
+   "text": "返回大厅",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "settled-844x390",
+   "node": "button-label",
+   "text": "再来一局",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "settled-win-844x390",
+   "node": "button-label",
+   "text": "返回大厅",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "settled-win-844x390",
+   "node": "button-label",
+   "text": "再来一局",
+   "ink": [
+    70,
+    25,
+    50
+   ],
+   "bg": [
+    241,
+    150,
+    187
+   ],
+   "contrast": 6.79,
+   "spr": "btn-primary-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "top-phase",
+   "text": "叫地主",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    244,
+    208,
+    221
+   ],
+   "contrast": 6.99,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "top-phase",
+   "text": "对局中",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    244,
+    208,
+    222
+   ],
+   "contrast": 7.0,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "top-phase",
+   "text": "叫地主",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    245,
+    209,
+    222
+   ],
+   "contrast": 7.06,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "top-phase",
+   "text": "对局中",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    245,
+    209,
+    222
+   ],
+   "contrast": 7.06,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "turn-timer-label",
+   "text": "计时 14s",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    246,
+    209,
+    221
+   ],
+   "contrast": 7.07,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "turn-timer-label",
+   "text": "计时 14s",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    246,
+    209,
+    221
+   ],
+   "contrast": 7.07,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "top-hand-count",
+   "text": "手牌20",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    246,
+    212,
+    224
+   ],
+   "contrast": 7.23,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "top-hand-count",
+   "text": "手牌17",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    247,
+    212,
+    225
+   ],
+   "contrast": 7.25,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "top-hand-count",
+   "text": "手牌20",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    247,
+    212,
+    225
+   ],
+   "contrast": 7.25,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "top-multiplier",
+   "text": "倍数×1",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    244,
+    213,
+    227
+   ],
+   "contrast": 7.26,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "turn-timer-label",
+   "text": "计时 14s",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    248,
+    212,
+    224
+   ],
+   "contrast": 7.26,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "top-multiplier",
+   "text": "倍数×1",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    244,
+    213,
+    228
+   ],
+   "contrast": 7.26,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "top-multiplier",
+   "text": "倍数×4",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    244,
+    213,
+    227
+   ],
+   "contrast": 7.26,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "turn-timer-label",
+   "text": "计时 14s",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    248,
+    212,
+    224
+   ],
+   "contrast": 7.26,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "top-multiplier",
+   "text": "倍数×8",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    244,
+    213,
+    228
+   ],
+   "contrast": 7.26,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "top-hand-count",
+   "text": "手牌17",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    247,
+    213,
+    226
+   ],
+   "contrast": 7.3,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "bidding-prompt-text",
+   "text": "轮到你叫地主",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    244,
+    215,
+    226
+   ],
+   "contrast": 7.34,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "bidding-prompt-text",
+   "text": "轮到你叫地主",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    245,
+    215,
+    225
+   ],
+   "contrast": 7.36,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "top-bombs",
+   "text": "炸弹×0",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    243,
+    218,
+    230
+   ],
+   "contrast": 7.49,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "top-bombs",
+   "text": "炸弹×0",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    243,
+    218,
+    230
+   ],
+   "contrast": 7.49,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "top-bombs",
+   "text": "炸弹×0",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    243,
+    218,
+    230
+   ],
+   "contrast": 7.49,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "top-bombs",
+   "text": "炸弹×0",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    243,
+    218,
+    230
+   ],
+   "contrast": 7.49,
+   "spr": "info-pill-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "button-label",
+   "text": "提示",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    245,
+    225,
+    183
+   ],
+   "contrast": 7.66,
+   "spr": "btn-tertiary-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "button-label",
+   "text": "提示",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    245,
+    225,
+    183
+   ],
+   "contrast": 7.66,
+   "spr": "btn-tertiary-v18"
+  },
+  {
+   "scene": "settled-win-844x390",
+   "node": "result-title",
+   "text": "胜利",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    245,
+    225,
+    183
+   ],
+   "contrast": 7.66,
+   "spr": "btn-tertiary-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "大王★",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    249,
+    215,
+    195
+   ],
+   "contrast": 8.72,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "大王★",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    250,
+    216,
+    195
+   ],
+   "contrast": 8.8,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "seat-name-label",
+   "text": "右家  17张",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "seat-name-label",
+   "text": "左家  17张",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "seat-name-label",
+   "text": "你",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "top-landlord",
+   "text": "地主待定",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "seat-name-label",
+   "text": "右家  17张",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "seat-name-label",
+   "text": "左家  17张",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "seat-name-label",
+   "text": "你",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "top-landlord",
+   "text": "地主待定",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "seat-name-label",
+   "text": "右家  17张",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "seat-name-label",
+   "text": "左家  17张",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "seat-name-label",
+   "text": "你",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "top-landlord",
+   "text": "地主你",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "seat-name-label",
+   "text": "右家  17张",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "seat-name-label",
+   "text": "左家  17张",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "seat-name-label",
+   "text": "你",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "top-landlord",
+   "text": "地主你",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    241,
+    228
+   ],
+   "contrast": 8.87,
+   "spr": "seat-nameplate-v18"
+  },
+  {
+   "scene": "lobby-780x360",
+   "node": "home-title",
+   "text": "斗地主",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    252,
+    244,
+    240
+   ],
+   "contrast": 9.07,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "lobby-812x375",
+   "node": "home-title",
+   "text": "斗地主",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    252,
+    244,
+    240
+   ],
+   "contrast": 9.07,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "lobby-844x390",
+   "node": "home-title",
+   "text": "斗地主",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    252,
+    244,
+    240
+   ],
+   "contrast": 9.07,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "lobby-915x412",
+   "node": "home-title",
+   "text": "斗地主",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    252,
+    244,
+    240
+   ],
+   "contrast": 9.07,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "pause-780x360",
+   "node": "pause-title",
+   "text": "暂停",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    252,
+    244,
+    240
+   ],
+   "contrast": 9.07,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "pause-844x390",
+   "node": "pause-title",
+   "text": "暂停",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    252,
+    244,
+    240
+   ],
+   "contrast": 9.07,
+   "spr": "panel-popup-v15"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "button-label",
+   "text": "暂停",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "button-label",
+   "text": "不叫",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "button-label",
+   "text": "暂停",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "button-label",
+   "text": "不叫",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-780x360",
+   "node": "button-label",
+   "text": "震动关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-780x360",
+   "node": "button-label",
+   "text": "音效关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-780x360",
+   "node": "button-label",
+   "text": "难度 普通",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-812x375",
+   "node": "button-label",
+   "text": "震动关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-812x375",
+   "node": "button-label",
+   "text": "音效关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-812x375",
+   "node": "button-label",
+   "text": "难度 普通",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-844x390",
+   "node": "button-label",
+   "text": "震动关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-844x390",
+   "node": "button-label",
+   "text": "音效关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-844x390",
+   "node": "button-label",
+   "text": "难度 普通",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-915x412",
+   "node": "button-label",
+   "text": "震动关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-915x412",
+   "node": "button-label",
+   "text": "音效关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "lobby-915x412",
+   "node": "button-label",
+   "text": "难度 普通",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "pause-780x360",
+   "node": "button-label",
+   "text": "震动关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "pause-780x360",
+   "node": "button-label",
+   "text": "动效开",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "pause-780x360",
+   "node": "button-label",
+   "text": "音效关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "pause-844x390",
+   "node": "button-label",
+   "text": "震动关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "pause-844x390",
+   "node": "button-label",
+   "text": "动效开",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "pause-844x390",
+   "node": "button-label",
+   "text": "音效关",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "button-label",
+   "text": "暂停",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "button-label",
+   "text": "暂停",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "settled-780x360",
+   "node": "result-title",
+   "text": "失败",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "settled-844x390",
+   "node": "result-title",
+   "text": "失败",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    254,
+    246,
+    238
+   ],
+   "contrast": 9.2,
+   "spr": "btn-secondary-v18"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "大王★",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    223,
+    204
+   ],
+   "contrast": 9.28,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "大王★",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    223,
+    204
+   ],
+   "contrast": 9.28,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "settled-780x360",
+   "node": "result-scores",
+   "text": "你（地主）  -16  余牌 1 右家  +8 ",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    253,
+    247,
+    246
+   ],
+   "contrast": 9.29,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "settled-844x390",
+   "node": "result-scores",
+   "text": "你（地主）  -32  余牌 1 右家  +16",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    253,
+    247,
+    246
+   ],
+   "contrast": 9.29,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "settled-win-844x390",
+   "node": "result-scores",
+   "text": "你（地主）  +8  余牌 0 右家  -4  ",
+   "ink": [
+    108,
+    46,
+    76
+   ],
+   "bg": [
+    253,
+    247,
+    246
+   ],
+   "contrast": 9.29,
+   "spr": "settlement-panel-v15"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "9♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    245,
+    242
+   ],
+   "contrast": 10.91,
+   "spr": "bottom-cards-dock-v15"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "3♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "2♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "2♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "10♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "9♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "8♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "8♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "5♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "4♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "3♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    243
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "9♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "bottom-cards-dock-v15"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "8♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "bottom-cards-dock-v15"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "3♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "8♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "bottom-cards-dock-v15"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "9♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    247,
+    244
+   ],
+   "contrast": 11.06,
+   "spr": "bottom-cards-dock-v15"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "J♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "10♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "8♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "5♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "3♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "J♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "card-rank-label",
+   "text": "9♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "2♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "10♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "9♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "8♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "4♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "9♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    244
+   ],
+   "contrast": 11.13,
+   "spr": "bottom-cards-dock-v15"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "2♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "2♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-780x360",
+   "node": "card-rank-label",
+   "text": "4♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "2♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "2♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "J♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "10♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "8♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "5♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "bidding-844x390",
+   "node": "card-rank-label",
+   "text": "4♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "2♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "J♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "9♣",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "8♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "card-rank-label",
+   "text": "5♠",
+   "ink": [
+    54,
+    55,
+    66
+   ],
+   "bg": [
+    251,
+    248,
+    245
+   ],
+   "contrast": 11.14,
+   "spr": "game-table-bg-v13"
+  }
+ ],
+ "contrastExempt": [
+  {
+   "scene": "lobby-780x360",
+   "node": "button-label",
+   "text": "暂无存档",
+   "ink": [
+    148,
+    137,
+    143
+   ],
+   "bg": [
+    221,
+    206,
+    211
+   ],
+   "contrast": 2.22,
+   "spr": "btn-disabled-v18"
+  },
+  {
+   "scene": "lobby-812x375",
+   "node": "button-label",
+   "text": "暂无存档",
+   "ink": [
+    148,
+    137,
+    143
+   ],
+   "bg": [
+    221,
+    206,
+    211
+   ],
+   "contrast": 2.22,
+   "spr": "btn-disabled-v18"
+  },
+  {
+   "scene": "lobby-844x390",
+   "node": "button-label",
+   "text": "暂无存档",
+   "ink": [
+    148,
+    137,
+    143
+   ],
+   "bg": [
+    221,
+    206,
+    211
+   ],
+   "contrast": 2.22,
+   "spr": "btn-disabled-v18"
+  },
+  {
+   "scene": "lobby-915x412",
+   "node": "button-label",
+   "text": "暂无存档",
+   "ink": [
+    148,
+    137,
+    143
+   ],
+   "bg": [
+    221,
+    206,
+    211
+   ],
+   "contrast": 2.22,
+   "spr": "btn-disabled-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "button-label",
+   "text": "不要",
+   "ink": [
+    148,
+    137,
+    143
+   ],
+   "bg": [
+    221,
+    206,
+    211
+   ],
+   "contrast": 2.22,
+   "spr": "btn-disabled-v18"
+  },
+  {
+   "scene": "playing-780x360",
+   "node": "button-label",
+   "text": "出牌",
+   "ink": [
+    148,
+    137,
+    143
+   ],
+   "bg": [
+    221,
+    206,
+    211
+   ],
+   "contrast": 2.22,
+   "spr": "btn-disabled-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "button-label",
+   "text": "不要",
+   "ink": [
+    148,
+    137,
+    143
+   ],
+   "bg": [
+    221,
+    206,
+    211
+   ],
+   "contrast": 2.22,
+   "spr": "btn-disabled-v18"
+  },
+  {
+   "scene": "playing-844x390",
+   "node": "button-label",
+   "text": "出牌",
+   "ink": [
+    148,
+    137,
+    143
+   ],
+   "bg": [
+    221,
+    206,
+    211
+   ],
+   "contrast": 2.22,
+   "spr": "btn-disabled-v18"
+  }
+ ],
+ "shape": {
+  "ui/btn-disabled-v18": {
+   "rowMin": 0.9957,
+   "colMin": 1.0
+  },
+  "ui/btn-primary-v18": {
+   "rowMin": 0.9957,
+   "colMin": 1.0
+  },
+  "ui/btn-secondary-v18": {
+   "rowMin": 0.9957,
+   "colMin": 1.0
+  },
+  "ui/btn-tertiary-v18": {
+   "rowMin": 0.9957,
+   "colMin": 1.0
+  },
+  "ui/info-pill-v18": {
+   "rowMin": 0.9886,
+   "colMin": 1.0
+  },
+  "ui/panel-popup-v15": {
+   "rowMin": 0.9986,
+   "colMin": 0.9975
+  },
+  "ui/seat-nameplate-v18": {
+   "rowMin": 0.9957,
+   "colMin": 1.0
+  }
+ },
+ "lines": {
+  "ui/btn-disabled-v18": 0.0,
+  "ui/btn-primary-v18": 0.0,
+  "ui/btn-secondary-v18": 0.0,
+  "ui/btn-tertiary-v18": 0.0,
+  "ui/info-pill-v18": 0.0,
+  "ui/panel-popup-v15": 0.0,
+  "ui/seat-nameplate-v18": 0.0
+ },
+ "aspect_skew": []
+}

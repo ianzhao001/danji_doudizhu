@@ -3,6 +3,7 @@ import { askQuit, cancelQuit, closeMenu, openMenu } from '../../pause-menu';
 import { t } from '../../strings';
 import type { TableRegions } from '../../table-layout';
 import { THEME, addUiTransform, toColor } from '../ui-helpers';
+import { fadeThenLoad } from '../scene-transition';
 
 const BRIGHT_PANEL_TEXT = toColor(THEME.palette.brandDark);
 const BRIGHT_PANEL_MUTED = toColor(THEME.palette.textSecondary);
@@ -28,7 +29,9 @@ function compactToggleText(label: string, on: boolean): string {
 }
 
 export function renderPauseControl(this: any, layout: TableRegions, canvas: { width: number; height: number }): void {
-  const screenY = Math.max(28, layout.topBar.y + layout.topBar.height * 0.52);
+  // v1.6 PL-01:原 topBar 行位与右侧倍数/炸弹/手牌徽标群(占位至 width-52)同排叠压,
+  // 按钮 64 宽(跨 width-74..width-10)被压底只露端头饰——移到顶栏下一行右侧空区。
+  const screenY = Math.max(52, layout.topBar.y + layout.topBar.height + 24);
   const pos = this.screenPoint(canvas, canvas.width - 42, screenY);
   const label = this.addButton(
     GAME_TEXT.pause,
@@ -76,7 +79,8 @@ export function renderPauseMenu(this: any, panel: Node, panelWidth: number, pane
   this.addLabel(GAME_TEXT.pause, 0, panelHeight / 2 - 46, 26, panel, panelWidth - 48, 48, 'pause-title', BRIGHT_PANEL_TEXT);
   const hint = this.addLabel(GAME_TEXT.progressKept, 0, panelHeight / 2 - 82, 14, panel, panelWidth - 58, 30, 'pause-hint', BRIGHT_PANEL_MUTED);
   hint.color = BRIGHT_PANEL_MUTED;
-  const buttonWidth = Math.min(88, Math.max(82, Math.floor((panelWidth - 56) / 3)));
+  // v1.6 PL-03 rider:六钮 88→92 宽,给 pause-btn 皮端头多让些中央区(320 面板下仍留 14px 边距)。
+  const buttonWidth = Math.min(92, Math.max(86, Math.floor((panelWidth - 44) / 3)));
   const buttonStep = buttonWidth + 8;
   const buttonHeight = 60;
   const leftX = -buttonStep;
@@ -113,7 +117,10 @@ export function renderPauseConfirm(this: any, panel: Node, panelWidth: number, p
     BRIGHT_PANEL_MUTED,
   );
   hint.color = BRIGHT_PANEL_MUTED;
-  this.addButton(GAME_TEXT.confirm, -64, -64, 112, 60, true, () => director.loadScene('lobby'), panel, 'pause-confirm');
+  this.addButton(GAME_TEXT.confirm, -64, -64, 112, 60, true, () => {
+    // v1.5 P-SCENE-FADE:黑幕淡入后切场景(动效关闭时直切)。
+    fadeThenLoad(this.uiRoot, this.settings.animation, () => director.loadScene('lobby'));
+  }, panel, 'pause-confirm');
   this.addButton(GAME_TEXT.cancel, 64, -64, 112, 60, true, () => this.cancelPauseQuit(), panel, 'pause-cancel');
 }
 

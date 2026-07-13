@@ -106,3 +106,33 @@
 - [ ] 可被 Cocos Creator 正常导入。
 - [ ] 资源授权明确。
 - [ ] 替换占位资源时不影响代码接口。
+
+## v1.5 · ART-V15 包(2026-07-12 入库)
+
+生成:Codex(方向稿 v3 用户签收→检查点 B 委托代验);导入:`assets/resources/art/ui`(8)+新 `assets/resources/art/fx`(5);meta=Creator CLI 生成后翻 sprite-frame,9-slice 薄环校准(btn L/R18·T/B14,pill 14/10,panel 四向 56)。
+
+| 键 | 路径 | 用途 |
+|---|---|---|
+| btnPrimaryV15/btnSecondaryV15/btnTertiaryV15/btnDisabledV15 | art/ui/btn-*-v15 | 两场景按钮四态(中央 64%×56% 纯净文字盘硬门) |
+| infoPillV15 | art/ui/info-pill-v15 | 状态条/AI 思考/过牌行药丸 |
+| seatNameplateV15 | art/ui/seat-nameplate-v15 | 三席名牌 |
+| bottomCardsDockV15 | art/ui/bottom-cards-dock-v15 | 底牌三槽托盘(槽距 71.5/313,消费端反推 131×56) |
+| panelPopupV15 | art/ui/panel-popup-v15 | 两场景弹窗/大厅面板 |
+| fxSpark/fxRing/fxStar/fxTrail | art/fx/fx-* | 程序化特效贴图(涟漪/爆点/星爆;packable=false) |
+| fxConfetti | art/fx/fx-confetti | 胜局彩带 4×2 图集(trimType=none 保 128px 格,运行时裁格) |
+
+预览包与 manifest(SHA-256)存 `asset-previews/v15-visual-upgrade/`(gitignored,本机);v13/v1 键全保留可回滚。
+
+## v1.6 · ART-V16 结算包 + 三补音(2026-07-12 入库)
+
+生成:Codex(单 gate,用户委托规划执行者复核 approved);导入:`assets/resources/art/ui`(3);meta=CLI 生成+手改+重导三趟法(面板 capInsets 四向 56·trim auto 以可见缘 744×364 计;双横幅 trimType=none 保 640×108 全框,恰为显示框 320×54 的 2×,零几何失真)。
+
+| 键 | 路径 | 用途 |
+|---|---|---|
+| settlementPanelV15 | art/ui/settlement-panel-v15 | 结算面板底 760×380(sliced,胜败共用;中央纯净供代码叠加标题/横幅/分数板/按钮) |
+| settlementBannerWinV15 | art/ui/settlement-banner-win-v15 | 胜利横幅 640×108(原生 5.93:1 修 v13 压扁;右端 15% 让位春天 stamp) |
+| settlementBannerLoseV15 | art/ui/settlement-banner-lose-v15 | 失败横幅 640×108(与胜同构,低饱和灰蓝紫) |
+
+音频(T-CUE-AUDIO,音频解禁裁决 2026-07-12):`assets/resources/audio/` 增 redeal.wav(0.35s)/reset.wav(0.22s)/landlord.wav(0.55s),44.1kHz mono Int16 峰值 23592 与存量归一一致,landlord RMS 压 win 之下;合成器 `coordination/scripts/v16-audio-synth.py`(标准库+LCG 定值种子,重跑逐字节一致)。音频键 12:12。
+
+预览包与 manifest(SHA-256)存 `asset-previews/v16-settlement/`(gitignored,本机);v13 结算三键保留仅作回滚。

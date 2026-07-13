@@ -10,10 +10,12 @@ import { t } from '../../strings';
 import type { TableZones } from '../../table-zones';
 import { deriveTurnTimer } from '../../turn-timer';
 import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
-import type { GameSceneRendererContext } from './seats-renderer';
+import { applyPillSkin, PILL_TEXT, type GameSceneRendererContext } from './seats-renderer';
 
-const STATUS_TEXT = toColor(THEME.palette.accentCream);
-const STATUS_BACKDROP = toColor(THEME.palette.surfaceRaised, 186);
+// v1.6 二次终审:药丸皮 v15 深底→v18 浅底,浅奶油字随之只剩 1.22:1(ASCII 亮度图实测:字比底还亮)。深莓字 = 7.7:1。
+const STATUS_TEXT = PILL_TEXT;
+// 告急字色:palette.danger (176,72,88) 压 v18 浅药丸只有 4.20:1(差 AA),加深到 6.2:1。
+const TIMER_URGENT_TEXT = toColor({ r: 150, g: 40, b: 60, a: 255 });
 const BID_ADVICE_BACKDROP = toColor(THEME.palette.surfaceRaised, 190);
 const BID_ADVICE_STRONG_BACKDROP = toColor(THEME.palette.warning, 198);
 const BID_ADVICE_TEXT = toColor(THEME.palette.accentCream);
@@ -43,6 +45,14 @@ export function renderBidding(
   renderBiddingAdvisor(ctx, layout, canvas);
 }
 
+// V9 后用户裁决(2026-07-11·v1.5):提示功能前端隐藏——不删除只隐藏,隐藏后不迭代。
+// 逻辑(applyHint/adviseBestMove/nextHint)与桥测试全保留(对齐 SHOW_MEMORY_DOCK 先例)。
+// V10 用户终审整改(2026-07-12):恢复提示按钮;当初 v1.5 裁决②所指为「建议」功能——见 SHOW_ADVISOR。
+const SHOW_HINT_ACTION = true;
+// V10 用户终审整改:隐藏「建议开/关」功能(对局内建议 dock+叫抢建议)——只隐藏不删除,隐藏期间不迭代;
+// adviseAction/adviseBid 与既有测试全保留,翻 true 即可重开。
+const SHOW_ADVISOR = false;
+
 export function renderActions(
   ctx: GameSceneRendererContext,
   play: boolean,
@@ -57,24 +67,29 @@ export function renderActions(
   const buttonWidth = Math.min(94, Math.max(78, (layout.tableActionBar.width - 20) / 3));
   const step = buttonWidth + 8;
   const center = layout.tableActionBar.x + layout.tableActionBar.width / 2;
-  const playPos = ctx.screenPoint(canvas, center - step, y);
-  const passPos = ctx.screenPoint(canvas, center, y);
-  const hintPos = ctx.screenPoint(canvas, center + step, y);
   const playEnabled = mustPass ? false : play;
   const hintEnabled = mustPass ? false : hint;
-  ctx.addButton(t('action.play'), playPos.x, playPos.y, buttonWidth, buttonHeight, playEnabled, () => void ctx.submitPlay(), ctx.uiRoot, 'action-play');
-  ctx.addButton(
-    mustPass ? t('action.mustPass') : t('action.pass'),
-    passPos.x,
-    passPos.y,
-    buttonWidth,
-    buttonHeight,
-    pass,
-    () => void ctx.submitPass(),
-    ctx.uiRoot,
-    mustPass ? 'action-must-pass' : 'action-pass',
-  );
-  ctx.addButton(t('action.hint'), hintPos.x, hintPos.y, buttonWidth, buttonHeight, hintEnabled, () => ctx.applyHint(), ctx.uiRoot, 'action-hint');
+
+  type ActionSpec = { text: string; enabled: boolean; cb: () => void; name: string };
+  const actions: ActionSpec[] = [
+    { text: t('action.play'), enabled: playEnabled, cb: () => void ctx.submitPlay(), name: 'action-play' },
+    {
+      text: mustPass ? t('action.mustPass') : t('action.pass'),
+      enabled: pass,
+      cb: () => void ctx.submitPass(),
+      name: mustPass ? 'action-must-pass' : 'action-pass',
+    },
+  ];
+  if (SHOW_HINT_ACTION) {
+    actions.push({ text: t('action.hint'), enabled: hintEnabled, cb: () => ctx.applyHint(), name: 'action-hint' });
+  }
+
+  // 可见按钮数组居中布点:2 键 = center ∓ step/2,3 键 = center-step / center / center+step。
+  const startX = center - ((actions.length - 1) * step) / 2;
+  actions.forEach((action, index) => {
+    const pos = ctx.screenPoint(canvas, startX + index * step, y);
+    ctx.addButton(action.text, pos.x, pos.y, buttonWidth, buttonHeight, action.enabled, action.cb, ctx.uiRoot, action.name);
+  });
 }
 
 export function renderStatus(
@@ -101,25 +116,22 @@ export function renderTurnTimer(
   const root = ctx.ensureNode('turn-timer-runtime', ctx.uiRoot);
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, width, height);
-  drawPanel(root, width, height, toColor(THEME.palette.surfaceRaised, 166));
-  ctx.addSprite(RESOURCE_PATHS.badgeTimerV13, -width / 2 + 14, 0, 20, 20, root, 'turn-timer-badge');
+  // v1.6 二次终审「举一反三」——倒计时条原是三重违规:
+  //  ① 深炭紫底(surfaceRaised 48,40,58)是全 UI 唯一的深色残留(旧深色主题遗物),粉系里极突兀;
+  //  ② urgent 时暗红字压深底只有 1.6:1,几乎读不出;
+  //  ③ 进度条(4px 细线)就画在字脚下 —— 正是用户所指「盖字的设计不宜出现很多线条」。
+  // 改法:换 v18 浅药丸皮(单一填充+一条细描边,与 pill/名牌同族),去掉压字的进度条,
+  // 只留「计时 Ns」+ 告急时字转深红(浅底上 6.2:1)。倒计时语义由数字本身承载,更简洁。
+  applyPillSkin(ctx, root, width, height);
+  ctx.ensureNode('turn-timer-bar', root).getComponent(Graphics)?.clear();
+  ctx.addSprite(RESOURCE_PATHS.badgeTimerV13, -width / 2 + 14, 0, 18, 18, root, 'turn-timer-badge');
 
-  const barWidth = width - 54;
-  const barHeight = 4;
-  const bar = ctx.ensureNode('turn-timer-bar', root);
-  bar.setPosition(-10, -3, 0);
-  addUiTransform(bar, barWidth, barHeight);
-  const graphics = bar.getComponent(Graphics) ?? bar.addComponent(Graphics);
-  graphics.clear();
-  graphics.fillColor = toColor(THEME.palette.textOnAccent, 42);
-  graphics.roundRect(-barWidth / 2, -barHeight / 2, barWidth, barHeight, 3);
-  graphics.fill();
-  graphics.fillColor = timer.urgent ? toColor(THEME.palette.danger, 235) : toColor(THEME.palette.success, 230);
-  graphics.roundRect(-barWidth / 2, -barHeight / 2, Math.round((barWidth * timer.pct) / 100), barHeight, 3);
-  graphics.fill();
-
-  const label = ctx.addLabel(`计时 ${timer.label}`, width / 2 - 31, 1, THEME.typography.xs, root, 56, 20, 'turn-timer-label');
-  label.color = timer.urgent ? toColor(THEME.palette.danger) : toColor(THEME.palette.textOnAccent);
+  // 门B:文字盒排在徽标右侧的剩余净区内(原 x=w/2-31、盒宽 56 会向右越出净区 4px);
+  // 药丸仅 22 高,默认行高 16 也会让字形带越出净区(15)→ 行高压到 13。
+  const label = ctx.addLabel(`计时 ${timer.label}`, 12, 0, THEME.typography.xs, root,
+    Math.max(44, width - 64), Math.max(13, height - 8), 'turn-timer-label');
+  label.lineHeight = 13;
+  label.color = timer.urgent ? TIMER_URGENT_TEXT : STATUS_TEXT;
 }
 
 export function renderAdvisor(
@@ -128,6 +140,7 @@ export function renderAdvisor(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
+  if (!SHOW_ADVISOR) return;
   if (!snapshot?.viewerHand || !ctx.runtime?.isPlayerTurn() || ctx.runtime.phase() !== 'playing') return;
   const togglePos = ctx.rectPoint(layout.advisorDock, canvas, 0.5, 0.5);
   ctx.addButton(
@@ -176,8 +189,9 @@ function renderStatusPill(
   const root = ctx.ensureNode(name, ctx.uiRoot);
   root.setPosition(x, y, 0);
   addUiTransform(root, width, height);
-  drawPanel(root, width, height, STATUS_BACKDROP);
-  const label = ctx.addLabel(text, 0, 1, fontSize, root, width - 18, height - 4, `${name}-text`);
+  applyPillSkin(ctx, root, width, height);
+  // 门B:文字盒收进药丸净区,且 y 归 0——原来 y=+1 的偏移让字形带上缘越出净区顶。
+  const label = ctx.addLabel(text, 0, 0, fontSize, root, width - 18, Math.round(height * 0.78), `${name}-text`);
   label.color = STATUS_TEXT;
 }
 
@@ -186,6 +200,7 @@ function renderBiddingAdvisor(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
+  if (!SHOW_ADVISOR) return;
   const state = ctx.runtime?.currentBidding();
   const hand = ctx.runtime?.biddingDeal()?.viewerHand;
   if (

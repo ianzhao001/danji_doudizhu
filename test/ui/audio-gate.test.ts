@@ -60,3 +60,28 @@ describe('M6-L1 audio-gate 决策', () => {
     }
   });
 });
+
+// ---- v1.5 T-AUDIO-MAP 增量:vibrationPattern 分级 + VIBRATION_CUES 扩展(纯增量,不改上方既有断言) ----
+import { vibrationPattern } from '../../assets/scripts/ui/audio-gate';
+
+describe('v1.5 vibrationPattern 震动分级', () => {
+  it('bomb=45 / rocket=[30,40,80] / settled=20 / 其余 null', () => {
+    expect(vibrationPattern('bomb')).toBe(45);
+    expect(vibrationPattern('rocket')).toEqual([30, 40, 80]);
+    expect(vibrationPattern('settled')).toBe(20);
+    expect(vibrationPattern('play')).toBeNull();
+    expect(vibrationPattern('deal')).toBeNull();
+    expect(vibrationPattern('win')).toBeNull();
+  });
+
+  it('扩展后的 VIBRATION_CUES 语义:vibration 开 + rocket/settled 触发 vibrate', () => {
+    const on = { sound: true, vibration: true, animation: true, difficulty: 'simple' } as Parameters<typeof decideCuePlayback>[0];
+    expect(decideCuePlayback(on, 'rocket').vibrate).toBe(true);
+    expect(decideCuePlayback(on, 'settled').vibrate).toBe(true);
+    expect(decideCuePlayback(on, 'play').vibrate).toBe(false);
+  });
+
+  it('确定性:vibrationPattern 两次调用深相等', () => {
+    expect(vibrationPattern('rocket')).toEqual(vibrationPattern('rocket'));
+  });
+});

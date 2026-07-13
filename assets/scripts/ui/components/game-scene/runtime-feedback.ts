@@ -6,6 +6,7 @@ import { t } from '../../strings';
 import type { TableRegions } from '../../table-layout';
 import { pushToast, tickToasts } from '../../toast-queue';
 import { THEME, addUiTransform, toColor } from '../ui-helpers';
+import { fadeThenLoad } from '../scene-transition';
 import { seatDisplayName } from './seat-display';
 import { cardsSignature } from './card-node';
 
@@ -74,7 +75,10 @@ export function renderTerminationFeedbackActions(this: any, _layout: TableRegion
     'termination-feedback-title',
     BRIGHT_PANEL_TEXT,
   );
-  this.addButton(GAME_TEXT.backLobby, -72, -28, 126, 54, true, () => director.loadScene('lobby'), panel, 'termination-feedback-lobby');
+  this.addButton(GAME_TEXT.backLobby, -72, -28, 126, 54, true, () => {
+    // v1.5 P-SCENE-FADE:黑幕淡入后切场景(动效关闭时直切)。
+    fadeThenLoad(this.uiRoot, this.settings.animation, () => director.loadScene('lobby'));
+  }, panel, 'termination-feedback-lobby');
   this.addButton(GAME_TEXT.restartShort, 72, -28, 126, 54, true, () => this.startGame(true), panel, 'termination-feedback-restart');
   panel.setSiblingIndex(this.uiRoot!.children.length - 1);
 }

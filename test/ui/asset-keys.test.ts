@@ -82,23 +82,35 @@ describe('asset keys', () => {
     expect(suitAssetPath('joker')).toBeNull();
   });
 
-  it('maps direct event cues to audio and leaves context cues unresolved', () => {
-    const direct: CueId[] = ['deal', 'play', 'pass', 'bomb', 'rocket', 'win'];
+  // v1.5 T-AUDIO-MAP 契约改写(披露):胜负音归 settled 单点分流;win cue 音频退役
+  //(修「AI 赢也播胜利音」旧 bug 并防 win/settled 双响)。旧断言 "win→audioWin" 即被修的 bug 行为。
+  it('maps direct event cues to audio; settled routes by heroWon; win cue audio retired', () => {
+    const direct: CueId[] = ['deal', 'play', 'pass', 'bomb', 'rocket'];
     for (const cue of direct) expect(cueAudioPath(cue)).not.toBeNull();
+
+    expect(cueAudioPath('bid')).toBe(RESOURCE_PATHS.audioSelect);
+    expect(cueAudioPath('bottomRevealed')).toBe(RESOURCE_PATHS.audioDeal);
 
     const settledCue = cueForFlowEvent({
       type: 'settled',
       settlement: { multiplier: 1, spring: 'none', bombs: 0, scores: [2, -1, -1] },
     });
+    expect(cueAudioPath(settledCue!)).toBeNull(); // 缺 context 保守静音
+    expect(cueAudioPath(settledCue!, { heroWon: true })).toBe(RESOURCE_PATHS.audioWin);
+    expect(cueAudioPath(settledCue!, { heroWon: false })).toBe(RESOURCE_PATHS.audioLose);
+
+    // v1.6 T-CUE-AUDIO 契约改写(披露):音频解禁,三哑 cue 补音——
+    // 旧断言 landlordDecided/reset→null 即 v1.5「零新增音频」约束下的登记缺口,本版清零。
     const landlordCue = cueForFlowEvent({ type: 'landlordDecided', landlord: 0, bidMultiplier: 1 });
     const resetCue = cueForFlowEvent({ type: 'round', event: { type: 'reset', leader: 0 } });
+    const redealCue = cueForFlowEvent({ type: 'redeal', attempt: 1 });
+    expect(cueAudioPath(landlordCue!)).toBe(RESOURCE_PATHS.audioLandlord);
+    expect(cueAudioPath(resetCue!)).toBe(RESOURCE_PATHS.audioReset);
+    expect(cueAudioPath(redealCue!)).toBe(RESOURCE_PATHS.audioRedeal);
 
-    expect(cueAudioPath(settledCue!)).toBeNull();
-    expect(cueAudioPath(landlordCue!)).toBeNull();
-    expect(cueAudioPath(resetCue!)).toBeNull();
-    expect(cueAudioPath(cueForFlowEvent({ type: 'round', event: { type: 'win', seat: 0, side: Side.Landlord } })!)).toBe(
-      RESOURCE_PATHS.audioWin,
-    );
+    expect(
+      cueAudioPath(cueForFlowEvent({ type: 'round', event: { type: 'win', seat: 0, side: Side.Landlord } })!),
+    ).toBeNull();
   });
 });
 
@@ -110,5 +122,15 @@ describe('ART-IMPORT-UIKIT 新键', () => {
     const paths = RESOURCE_PATHS as unknown as Record<string, string>;
     expect(paths['seatNameplate']).toBe('art/ui/seat-nameplate');
     expect(paths['bottomCardsDock']).toBe('art/ui/bottom-cards-dock');
+  });
+});
+
+// v1.6 ART-V16-IMPORT/P-RESULT-SKIN(纯增量):结算三键指向 v15 资源;v13 键保留仅作回滚。
+describe('ART-V16 结算 v15 键', () => {
+  it('settlement panel/banner 三键指向 v15 资源路径,v13 键仍在', () => {
+    expect(RESOURCE_PATHS.settlementPanelV15).toBe('art/ui/settlement-panel-v15');
+    expect(RESOURCE_PATHS.settlementBannerWinV15).toBe('art/ui/settlement-banner-win-v15');
+    expect(RESOURCE_PATHS.settlementBannerLoseV15).toBe('art/ui/settlement-banner-lose-v15');
+    expect(RESOURCE_PATHS.settlementPanelV13).toBe('art/ui/settlement-panel-v13');
   });
 });

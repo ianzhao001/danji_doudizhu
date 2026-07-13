@@ -1,0 +1,2273 @@
+{
+ "labels": [
+  {
+   "node": "button-label",
+   "text": "退出",
+   "overflow": "SHRINK",
+   "fontSize": 17,
+   "lineHeight": 21,
+   "lines": 1,
+   "w": 78,
+   "h": 37,
+   "ink": [
+    70,
+    25,
+    50,
+    255
+   ],
+   "rect": [
+    483,
+    223,
+    78,
+    37
+   ],
+   "sprName": "btn-primary-v18",
+   "sprType": "SLICED",
+   "sprW": 92,
+   "sprH": 60,
+   "sprFullBleed": false,
+   "sprRect": [
+    476,
+    211,
+    92,
+    60
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "重开",
+   "overflow": "SHRINK",
+   "fontSize": 17,
+   "lineHeight": 21,
+   "lines": 1,
+   "w": 78,
+   "h": 37,
+   "ink": [
+    70,
+    25,
+    50,
+    255
+   ],
+   "rect": [
+    383,
+    223,
+    78,
+    37
+   ],
+   "sprName": "btn-primary-v18",
+   "sprType": "SLICED",
+   "sprW": 92,
+   "sprH": 60,
+   "sprFullBleed": false,
+   "sprRect": [
+    376,
+    211,
+    92,
+    60
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "继续",
+   "overflow": "SHRINK",
+   "fontSize": 17,
+   "lineHeight": 21,
+   "lines": 1,
+   "w": 78,
+   "h": 37,
+   "ink": [
+    70,
+    25,
+    50,
+    255
+   ],
+   "rect": [
+    283,
+    223,
+    78,
+    37
+   ],
+   "sprName": "btn-primary-v18",
+   "sprType": "SLICED",
+   "sprW": 92,
+   "sprH": 60,
+   "sprFullBleed": false,
+   "sprRect": [
+    276,
+    211,
+    92,
+    60
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "震动关",
+   "overflow": "SHRINK",
+   "fontSize": 17,
+   "lineHeight": 21,
+   "lines": 1,
+   "w": 78,
+   "h": 37,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    483,
+    145,
+    78,
+    37
+   ],
+   "sprName": "btn-secondary-v18",
+   "sprType": "SLICED",
+   "sprW": 92,
+   "sprH": 60,
+   "sprFullBleed": false,
+   "sprRect": [
+    476,
+    133,
+    92,
+    60
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "动效开",
+   "overflow": "SHRINK",
+   "fontSize": 17,
+   "lineHeight": 21,
+   "lines": 1,
+   "w": 78,
+   "h": 37,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    383,
+    145,
+    78,
+    37
+   ],
+   "sprName": "btn-secondary-v18",
+   "sprType": "SLICED",
+   "sprW": 92,
+   "sprH": 60,
+   "sprFullBleed": false,
+   "sprRect": [
+    376,
+    133,
+    92,
+    60
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "音效关",
+   "overflow": "SHRINK",
+   "fontSize": 17,
+   "lineHeight": 21,
+   "lines": 1,
+   "w": 78,
+   "h": 37,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    283,
+    145,
+    78,
+    37
+   ],
+   "sprName": "btn-secondary-v18",
+   "sprType": "SLICED",
+   "sprW": 92,
+   "sprH": 60,
+   "sprFullBleed": false,
+   "sprRect": [
+    276,
+    133,
+    92,
+    60
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "pause-hint",
+   "text": "本局进度已保留",
+   "overflow": "SHRINK",
+   "fontSize": 14,
+   "lineHeight": 19,
+   "lines": 1,
+   "w": 262,
+   "h": 30,
+   "ink": [
+    138,
+    78,
+    102,
+    255
+   ],
+   "rect": [
+    291,
+    97,
+    262,
+    30
+   ],
+   "sprName": "panel-popup-v15",
+   "sprType": "SLICED",
+   "sprW": 320,
+   "sprH": 306,
+   "sprFullBleed": false,
+   "sprRect": [
+    262,
+    30,
+    320,
+    306
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "pause-title",
+   "text": "暂停",
+   "overflow": "SHRINK",
+   "fontSize": 26,
+   "lineHeight": 31,
+   "lines": 1,
+   "w": 272,
+   "h": 48,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    286,
+    52,
+    272,
+    48
+   ],
+   "sprName": "panel-popup-v15",
+   "sprType": "SLICED",
+   "sprW": 320,
+   "sprH": 306,
+   "sprFullBleed": false,
+   "sprRect": [
+    262,
+    30,
+    320,
+    306
+   ],
+   "graphicsBackdrop": false,
+   "occluded": false
+  },
+  {
+   "node": "button-label",
+   "text": "暂停",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 20,
+   "lines": 1,
+   "w": 54,
+   "h": 24,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    775,
+    41,
+    54,
+    24
+   ],
+   "sprName": "btn-secondary-v18",
+   "sprType": "SLICED",
+   "sprW": 64,
+   "sprH": 30,
+   "sprFullBleed": false,
+   "sprRect": [
+    770,
+    38,
+    64,
+    30
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "turn-timer-label",
+   "text": "计时 14s",
+   "overflow": "SHRINK",
+   "fontSize": 11,
+   "lineHeight": 13,
+   "lines": 1,
+   "w": 46,
+   "h": 14,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    605,
+    192,
+    46,
+    14
+   ],
+   "sprName": "info-pill-v18",
+   "sprType": "SLICED",
+   "sprW": 110,
+   "sprH": 22,
+   "sprFullBleed": false,
+   "sprRect": [
+    561,
+    188,
+    110,
+    22
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "button-label",
+   "text": "不叫",
+   "overflow": "SHRINK",
+   "fontSize": 20,
+   "lineHeight": 24,
+   "lines": 1,
+   "w": 100,
+   "h": 37,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    436,
+    253,
+    100,
+    37
+   ],
+   "sprName": "btn-secondary-v18",
+   "sprType": "SLICED",
+   "sprW": 118,
+   "sprH": 60,
+   "sprFullBleed": false,
+   "sprRect": [
+    427,
+    241,
+    118,
+    60
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "button-label",
+   "text": "叫地主",
+   "overflow": "SHRINK",
+   "fontSize": 20,
+   "lineHeight": 24,
+   "lines": 1,
+   "w": 100,
+   "h": 37,
+   "ink": [
+    70,
+    25,
+    50,
+    255
+   ],
+   "rect": [
+    308,
+    253,
+    100,
+    37
+   ],
+   "sprName": "btn-primary-v18",
+   "sprType": "SLICED",
+   "sprW": 118,
+   "sprH": 60,
+   "sprFullBleed": false,
+   "sprRect": [
+    299,
+    241,
+    118,
+    60
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "bidding-prompt-text",
+   "text": "轮到你叫地主",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 21,
+   "lines": 1,
+   "w": 201,
+   "h": 25,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    323,
+    150,
+    201,
+    25
+   ],
+   "sprName": "info-pill-v18",
+   "sprType": "SLICED",
+   "sprW": 219,
+   "sprH": 32,
+   "sprFullBleed": false,
+   "sprRect": [
+    314,
+    146,
+    219,
+    32
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "大王★",
+   "overflow": "SHRINK",
+   "fontSize": 11,
+   "lineHeight": 13,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    704,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "2♣",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    665,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "2♠",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    626,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "K♦",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    196,
+    52,
+    82,
+    255
+   ],
+   "rect": [
+    586,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "K♥",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    196,
+    52,
+    82,
+    255
+   ],
+   "rect": [
+    547,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "Q♥",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    196,
+    52,
+    82,
+    255
+   ],
+   "rect": [
+    508,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "J♣",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    469,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "10♥",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    196,
+    52,
+    82,
+    255
+   ],
+   "rect": [
+    429,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "10♣",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    390,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "8♠",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    351,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "8♥",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    196,
+    52,
+    82,
+    255
+   ],
+   "rect": [
+    312,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "8♦",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    196,
+    52,
+    82,
+    255
+   ],
+   "rect": [
+    272,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "5♠",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    233,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "5♦",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    196,
+    52,
+    82,
+    255
+   ],
+   "rect": [
+    194,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "4♣",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    155,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "4♦",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    196,
+    52,
+    82,
+    255
+   ],
+   "rect": [
+    115,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "card-rank-label",
+   "text": "3♣",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 38,
+   "h": 22,
+   "ink": [
+    54,
+    55,
+    66,
+    255
+   ],
+   "rect": [
+    76,
+    315,
+    38,
+    22
+   ],
+   "sprName": "game-table-bg-v13",
+   "sprType": "SIMPLE",
+   "sprW": 844,
+   "sprH": 390,
+   "sprFullBleed": true,
+   "sprRect": [
+    0,
+    0,
+    844,
+    390
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "seat-role-label",
+   "text": "待定",
+   "overflow": "SHRINK",
+   "fontSize": 12,
+   "lineHeight": 13,
+   "lines": 1,
+   "w": 127,
+   "h": 12,
+   "ink": [
+    138,
+    78,
+    102,
+    255
+   ],
+   "rect": [
+    696,
+    195,
+    127,
+    12
+   ],
+   "sprName": "seat-nameplate-v18",
+   "sprType": "SLICED",
+   "sprW": 143,
+   "sprH": 33,
+   "sprFullBleed": false,
+   "sprRect": [
+    688,
+    178,
+    143,
+    33
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "seat-name-label",
+   "text": "右家  17张",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 15,
+   "lines": 1,
+   "w": 127,
+   "h": 13,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    696,
+    182,
+    127,
+    13
+   ],
+   "sprName": "seat-nameplate-v18",
+   "sprType": "SLICED",
+   "sprW": 143,
+   "sprH": 33,
+   "sprFullBleed": false,
+   "sprRect": [
+    688,
+    178,
+    143,
+    33
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "seat-role-label",
+   "text": "待定",
+   "overflow": "SHRINK",
+   "fontSize": 12,
+   "lineHeight": 13,
+   "lines": 1,
+   "w": 127,
+   "h": 12,
+   "ink": [
+    138,
+    78,
+    102,
+    255
+   ],
+   "rect": [
+    23,
+    195,
+    127,
+    12
+   ],
+   "sprName": "seat-nameplate-v18",
+   "sprType": "SLICED",
+   "sprW": 143,
+   "sprH": 33,
+   "sprFullBleed": false,
+   "sprRect": [
+    16,
+    178,
+    143,
+    33
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "seat-name-label",
+   "text": "左家  17张",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 15,
+   "lines": 1,
+   "w": 127,
+   "h": 13,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    23,
+    182,
+    127,
+    13
+   ],
+   "sprName": "seat-nameplate-v18",
+   "sprType": "SLICED",
+   "sprW": 143,
+   "sprH": 33,
+   "sprFullBleed": false,
+   "sprRect": [
+    16,
+    178,
+    143,
+    33
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "seat-role-label",
+   "text": "待定",
+   "overflow": "SHRINK",
+   "fontSize": 10,
+   "lineHeight": 12,
+   "lines": 1,
+   "w": 40,
+   "h": 12,
+   "ink": [
+    138,
+    78,
+    102,
+    255
+   ],
+   "rect": [
+    120,
+    268,
+    40,
+    12
+   ],
+   "sprName": "seat-nameplate-v18",
+   "sprType": "SLICED",
+   "sprW": 51,
+   "sprH": 33,
+   "sprFullBleed": false,
+   "sprRect": [
+    115,
+    251,
+    51,
+    33
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "seat-name-label",
+   "text": "你",
+   "overflow": "SHRINK",
+   "fontSize": 13,
+   "lineHeight": 15,
+   "lines": 1,
+   "w": 40,
+   "h": 13,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    120,
+    255,
+    40,
+    13
+   ],
+   "sprName": "seat-nameplate-v18",
+   "sprType": "SLICED",
+   "sprW": 51,
+   "sprH": 33,
+   "sprFullBleed": false,
+   "sprRect": [
+    115,
+    251,
+    51,
+    33
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "top-hand-count",
+   "text": "手牌17",
+   "overflow": "SHRINK",
+   "fontSize": 11,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 58,
+   "h": 20,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    734,
+    5,
+    58,
+    20
+   ],
+   "sprName": "info-pill-v18",
+   "sprType": "SLICED",
+   "sprW": 279,
+   "sprH": 26,
+   "sprFullBleed": false,
+   "sprRect": [
+    521,
+    2,
+    279,
+    26
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "top-bombs",
+   "text": "炸弹×0",
+   "overflow": "SHRINK",
+   "fontSize": 11,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 74,
+   "h": 20,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    646,
+    5,
+    74,
+    20
+   ],
+   "sprName": "info-pill-v18",
+   "sprType": "SLICED",
+   "sprW": 279,
+   "sprH": 26,
+   "sprFullBleed": false,
+   "sprRect": [
+    521,
+    2,
+    279,
+    26
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "top-multiplier",
+   "text": "倍数×1",
+   "overflow": "SHRINK",
+   "fontSize": 11,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 74,
+   "h": 20,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    546,
+    5,
+    74,
+    20
+   ],
+   "sprName": "info-pill-v18",
+   "sprType": "SLICED",
+   "sprW": 279,
+   "sprH": 26,
+   "sprFullBleed": false,
+   "sprRect": [
+    521,
+    2,
+    279,
+    26
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "top-landlord",
+   "text": "地主待定",
+   "overflow": "SHRINK",
+   "fontSize": 11,
+   "lineHeight": 16,
+   "lines": 1,
+   "w": 84,
+   "h": 19,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    136,
+    6,
+    84,
+    19
+   ],
+   "sprName": "seat-nameplate-v18",
+   "sprType": "SLICED",
+   "sprW": 92,
+   "sprH": 24,
+   "sprFullBleed": false,
+   "sprRect": [
+    132,
+    3,
+    92,
+    24
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  },
+  {
+   "node": "top-phase",
+   "text": "叫地主",
+   "overflow": "SHRINK",
+   "fontSize": 16,
+   "lineHeight": 21,
+   "lines": 1,
+   "w": 72,
+   "h": 20,
+   "ink": [
+    108,
+    46,
+    76,
+    255
+   ],
+   "rect": [
+    38,
+    5,
+    72,
+    20
+   ],
+   "sprName": "info-pill-v18",
+   "sprType": "SLICED",
+   "sprW": 110,
+   "sprH": 26,
+   "sprFullBleed": false,
+   "sprRect": [
+    7,
+    2,
+    110,
+    26
+   ],
+   "graphicsBackdrop": false,
+   "occluded": true
+  }
+ ],
+ "sprites": [
+  {
+   "node": "button-bg",
+   "spr": "btn-primary-v18",
+   "type": "SLICED",
+   "box": [
+    92,
+    60
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-primary-v18",
+   "type": "SLICED",
+   "box": [
+    92,
+    60
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-primary-v18",
+   "type": "SLICED",
+   "box": [
+    92,
+    60
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-secondary-v18",
+   "type": "SLICED",
+   "box": [
+    92,
+    60
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-secondary-v18",
+   "type": "SLICED",
+   "box": [
+    92,
+    60
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-secondary-v18",
+   "type": "SLICED",
+   "box": [
+    92,
+    60
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "panel-skin",
+   "spr": "panel-popup-v15",
+   "type": "SLICED",
+   "box": [
+    320,
+    306
+   ],
+   "rect": [
+    710,
+    402
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-secondary-v18",
+   "type": "SLICED",
+   "box": [
+    64,
+    30
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "turn-timer-badge",
+   "spr": "badge-timer-v13",
+   "type": "SIMPLE",
+   "box": [
+    18,
+    18
+   ],
+   "rect": [
+    180,
+    180
+   ]
+  },
+  {
+   "node": "pill-skin",
+   "spr": "info-pill-v18",
+   "type": "SLICED",
+   "box": [
+    110,
+    22
+   ],
+   "rect": [
+    358,
+    94
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-secondary-v18",
+   "type": "SLICED",
+   "box": [
+    118,
+    60
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "button-bg",
+   "spr": "btn-primary-v18",
+   "type": "SLICED",
+   "box": [
+    118,
+    60
+   ],
+   "rect": [
+    474,
+    154
+   ]
+  },
+  {
+   "node": "pill-skin",
+   "spr": "info-pill-v18",
+   "type": "SLICED",
+   "box": [
+    219,
+    32
+   ],
+   "rect": [
+    358,
+    94
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "joker-big-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    261
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-club-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-spade-v13",
+   "type": "SIMPLE",
+   "box": [
+    18,
+    21
+   ],
+   "rect": [
+    98,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-diamond-v13",
+   "type": "SIMPLE",
+   "box": [
+    17,
+    21
+   ],
+   "rect": [
+    96,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-heart-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    114
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-heart-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    114
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-club-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-heart-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    114
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-club-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-spade-v13",
+   "type": "SIMPLE",
+   "box": [
+    18,
+    21
+   ],
+   "rect": [
+    98,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-heart-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    114
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-diamond-v13",
+   "type": "SIMPLE",
+   "box": [
+    17,
+    21
+   ],
+   "rect": [
+    96,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-spade-v13",
+   "type": "SIMPLE",
+   "box": [
+    18,
+    21
+   ],
+   "rect": [
+    98,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-diamond-v13",
+   "type": "SIMPLE",
+   "box": [
+    17,
+    21
+   ],
+   "rect": [
+    96,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-club-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-diamond-v13",
+   "type": "SIMPLE",
+   "box": [
+    17,
+    21
+   ],
+   "rect": [
+    96,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "card-suit-icon",
+   "spr": "suit-club-v13",
+   "type": "SIMPLE",
+   "box": [
+    21,
+    21
+   ],
+   "rect": [
+    116,
+    116
+   ]
+  },
+  {
+   "node": "card-bg",
+   "spr": "card-template-v13",
+   "type": "SIMPLE",
+   "box": [
+    56,
+    72
+   ],
+   "rect": [
+    204,
+    262
+   ]
+  },
+  {
+   "node": "bottom-card-back-2",
+   "spr": "card-back-v13",
+   "type": "SIMPLE",
+   "box": [
+    26,
+    35
+   ],
+   "rect": [
+    204,
+    272
+   ]
+  },
+  {
+   "node": "bottom-card-back-1",
+   "spr": "card-back-v13",
+   "type": "SIMPLE",
+   "box": [
+    26,
+    35
+   ],
+   "rect": [
+    204,
+    272
+   ]
+  },
+  {
+   "node": "bottom-card-back-0",
+   "spr": "card-back-v13",
+   "type": "SIMPLE",
+   "box": [
+    26,
+    35
+   ],
+   "rect": [
+    204,
+    272
+   ]
+  },
+  {
+   "node": "bottom-cards-dock-skin",
+   "spr": "bottom-cards-dock-v15",
+   "type": "SIMPLE",
+   "box": [
+    131,
+    56
+   ],
+   "rect": [
+    313,
+    134
+   ]
+  },
+  {
+   "node": "seat-nameplate",
+   "spr": "seat-nameplate-v18",
+   "type": "SLICED",
+   "box": [
+    143,
+    33
+   ],
+   "rect": [
+    474,
+    134
+   ]
+  },
+  {
+   "node": "seat-nameplate",
+   "spr": "seat-nameplate-v18",
+   "type": "SLICED",
+   "box": [
+    143,
+    33
+   ],
+   "rect": [
+    474,
+    134
+   ]
+  },
+  {
+   "node": "seat-nameplate",
+   "spr": "seat-nameplate-v18",
+   "type": "SLICED",
+   "box": [
+    51,
+    33
+   ],
+   "rect": [
+    474,
+    134
+   ]
+  },
+  {
+   "node": "seat-body",
+   "spr": "right-ai-body-v13",
+   "type": "SIMPLE",
+   "box": [
+    88,
+    147
+   ],
+   "rect": [
+    311,
+    520
+   ]
+  },
+  {
+   "node": "seat-body",
+   "spr": "left-ai-body-v13",
+   "type": "SIMPLE",
+   "box": [
+    95,
+    144
+   ],
+   "rect": [
+    342,
+    520
+   ]
+  },
+  {
+   "node": "seat-body",
+   "spr": "hero-body-v13",
+   "type": "SIMPLE",
+   "box": [
+    88,
+    144
+   ],
+   "rect": [
+    220,
+    360
+   ]
+  },
+  {
+   "node": "top-hand-badge",
+   "spr": "badge-timer-v13",
+   "type": "SIMPLE",
+   "box": [
+    20,
+    20
+   ],
+   "rect": [
+    180,
+    180
+   ]
+  },
+  {
+   "node": "top-bombs-badge",
+   "spr": "badge-multiplier-v13",
+   "type": "SIMPLE",
+   "box": [
+    20,
+    20
+   ],
+   "rect": [
+    168,
+    165
+   ]
+  },
+  {
+   "node": "top-multiplier-badge",
+   "spr": "badge-multiplier-v13",
+   "type": "SIMPLE",
+   "box": [
+    20,
+    20
+   ],
+   "rect": [
+    168,
+    165
+   ]
+  },
+  {
+   "node": "top-landlord-nameplate",
+   "spr": "seat-nameplate-v18",
+   "type": "SLICED",
+   "box": [
+    92,
+    24
+   ],
+   "rect": [
+    474,
+    134
+   ]
+  },
+  {
+   "node": "top-phase-badge",
+   "spr": "badge-timer-v13",
+   "type": "SIMPLE",
+   "box": [
+    22,
+    22
+   ],
+   "rect": [
+    180,
+    180
+   ]
+  },
+  {
+   "node": "top-stats-pill",
+   "spr": "info-pill-v18",
+   "type": "SLICED",
+   "box": [
+    279,
+    26
+   ],
+   "rect": [
+    358,
+    94
+   ]
+  },
+  {
+   "node": "top-phase-pill",
+   "spr": "info-pill-v18",
+   "type": "SLICED",
+   "box": [
+    110,
+    26
+   ],
+   "rect": [
+    358,
+    94
+   ]
+  },
+  {
+   "node": "game-table-background-runtime",
+   "spr": "game-table-bg-v13",
+   "type": "SIMPLE",
+   "box": [
+    844,
+    390
+   ],
+   "rect": [
+    1688,
+    780
+   ]
+  }
+ ]
+}

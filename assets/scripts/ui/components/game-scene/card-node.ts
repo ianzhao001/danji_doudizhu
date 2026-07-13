@@ -1,9 +1,9 @@
-import { Color, EventTouch, Graphics, Node, Sprite, UIOpacity, UITransform, Vec3, tween } from 'cc';
+import { Color, EventTouch, Node, Sprite, SpriteFrame, UIOpacity, UITransform, Vec3, resources, tween } from 'cc';
 import { Rank, Suit, type Card } from '../../../rules';
 import { cardKey } from '../../../rules/guards';
 import { cardView } from '../../card-view';
-import { RESOURCE_PATHS, type ResourcePath } from '../../asset-keys';
-import { THEME, addUiTransform, toColor } from '../ui-helpers';
+import { RESOURCE_PATHS, spriteFrameResourcePath, type ResourcePath } from '../../asset-keys';
+import { addUiTransform } from '../ui-helpers';
 
 export const CARD_SIZE = { width: 56, height: 82 };
 const CARD_SUIT_ICON_SIZE = 21;
@@ -57,9 +57,18 @@ export function addCard(this: any,
   }
 }
 
-export function addDisplayCard(this: any, card: Card, x: number, y: number, parent: Node, name: string, animate: boolean): Node {
+export function addDisplayCard(
+  this: any,
+  card: Card,
+  x: number,
+  y: number,
+  parent: Node,
+  name: string,
+  animate: boolean,
+  flyFrom?: { dx: number; dy: number },
+): Node {
   const node = this.addCardNode(card, x, y, parent, name, false);
-  if (this.settings.animation && animate) this.animateCardPlay(node, x, y);
+  if (this.settings.animation && animate) this.animateCardPlay(node, x, y, flyFrom);
   return node;
 }
 
@@ -73,19 +82,15 @@ export function addCardNode(this: any, card: Card, x: number, y: number, parent:
   const parentSprite = node.getComponent(Sprite);
   if (parentSprite) parentSprite.destroy();
   const view = cardView(card);
-  const fillNode = this.ensureNode('card-fill', node);
-  fillNode.setPosition(0, 0, 0);
-  fillNode.setSiblingIndex(0);
-  addUiTransform(fillNode, CARD_SIZE.width, CARD_SIZE.height);
-  this.drawCardBase(fillNode, CARD_SIZE.width, CARD_SIZE.height);
-
+  // v1.6 用户追加①「去掉卡牌背景的那个面板」:原先每张牌先画一层 `card-fill`(Graphics 的 surface 圆角面板
+  // + brand 描边)当卡面图的兜底,再把卡面图盖上去。卡面图一旦带透明边,这层兜底就从边缘露出来——
+  // 17 张并排时连成一整条"面板"(用户截图所指)。删掉兜底层:卡面图本身就是完整的牌面,不需要底板。
+  // 未 ensureNode 的旧 `card-fill` 子节点由 render prune 自动销毁。
   const bgNode = this.ensureNode('card-bg', node);
   bgNode.setPosition(0, 0, 0);
-  bgNode.setSiblingIndex(1);
-  addUiTransform(bgNode, CARD_SIZE.width, CARD_SIZE.height);
-  const sprite = bgNode.getComponent(Sprite) ?? bgNode.addComponent(Sprite);
-  this.configureCardSprite(sprite);
-  this.loadSprite(this.cardSpritePath(card), sprite);
+  bgNode.setSiblingIndex(0);
+  // 等比内接:卡面/王牌裁后比例各不相同(204:262 / 204:261 / 204:277),直接给 56×82 会拉伸(门E)。
+  this.fitSpriteInBox(bgNode, this.cardSpritePath(card), CARD_SIZE.width, CARD_SIZE.height);
   node.off(Node.EventType.TOUCH_START);
   node.off(Node.EventType.TOUCH_MOVE);
   node.off(Node.EventType.TOUCH_END);
@@ -128,18 +133,45 @@ export function addCardNode(this: any, card: Card, x: number, y: number, parent:
     if (suitPath) {
       const suitNode = this.ensureNode('card-suit-icon', node);
       suitNode.setPosition(0, -7, 0);
-      addUiTransform(suitNode, CARD_SUIT_ICON_SIZE, CARD_SUIT_ICON_SIZE);
-      const suitSprite = suitNode.getComponent(Sprite) ?? suitNode.addComponent(Sprite);
-      this.configureCardSprite(suitSprite);
-      this.loadSprite(suitPath, suitSprite);
+      // 花色裁后比例也非正方(黑桃 98:116、方块 96:116),塞进 21×21 方框会拉伸 15~17%(门E,用户②)。
+      this.fitSpriteInBox(suitNode, suitPath, CARD_SUIT_ICON_SIZE, CARD_SUIT_ICON_SIZE);
     }
   }
   return node;
 }
 
+/**
+ * 等比内接:按 SpriteFrame 的真实 rect 比例,最大化地把精灵放进 (boxW × boxH),不拉伸。
+ * 与 `ui-runtime-helpers.addSpriteContain` 同一原理,但直接作用于既有节点(卡牌节点树已建好)。
+ * 帧异步加载,故在帧落位后定尺寸;命中缓存时同帧生效。
+ */
+export function fitSpriteInBox(this: any, node: Node, path: ResourcePath, boxW: number, boxH: number): void {
+  addUiTransform(node, boxW, boxH);
+  const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
+  this.configureCardSprite(sprite);
+  this.loadSprite(path, sprite);
+  const fit = (frame: SpriteFrame): void => {
+    // 异步回调落地时,节点可能已被 render prune 销毁(出牌/换局)——必须查 isValid,否则 use-after-destroy。
+    if (!node.isValid) return;
+    const rect = frame.rect;
+    if (!rect || !rect.width || !rect.height) return;
+    const k = Math.min(boxW / rect.width, boxH / rect.height);
+    addUiTransform(node, Math.round(rect.width * k), Math.round(rect.height * k));
+  };
+  const cached: SpriteFrame | undefined = this.spriteFrames.get(path);
+  if (cached) {
+    fit(cached);
+    return;
+  }
+  resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
+    if (!error && frame) fit(frame);
+  });
+}
+
 export function cardFaceColor(this: any, suit: Suit | 'joker'): Color {
+  // v1.6 二次终审:红花色原 (204,65,92) 压奶白卡面仅 4.27:1(门C 实测,差 AA 一线)——加深到 5.3:1,仍是明确的红。
   return suit === Suit.Heart || suit === Suit.Diamond
-    ? new Color(204, 65, 92, 255)
+    ? new Color(196, 52, 82, 255)
     : new Color(54, 55, 66, 255);
 }
 
@@ -169,16 +201,6 @@ export function configureCardSprite(this: any, sprite: Sprite): void {
   sprite.sizeMode = Sprite.SizeMode.CUSTOM;
 }
 
-export function drawCardBase(this: any, parent: Node, width: number, height: number): void {
-  const graphics = parent.getComponent(Graphics) ?? parent.addComponent(Graphics);
-  graphics.clear();
-  graphics.fillColor = toColor(THEME.palette.surface, 248);
-  graphics.strokeColor = toColor(THEME.palette.brand, 230);
-  graphics.lineWidth = 1.5;
-  graphics.roundRect(-width / 2, -height / 2, width, height, 7);
-  graphics.fill();
-  graphics.stroke();
-}
 
 export function setCardPressed(this: any, node: Node, pressed: boolean): void {
   const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);

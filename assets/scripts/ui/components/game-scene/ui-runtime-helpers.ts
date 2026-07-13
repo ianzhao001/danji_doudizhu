@@ -19,6 +19,12 @@ const SCAFFOLD_NODE_NAMES = [
   'card-template-002',
   'card-template-003',
   'card-template-004',
+  // v1.6 二次终审:这两个原本靠 @property(background / cardTemplate)在 onLoad 里关掉。
+  // 但场景 @property 绑定依赖场景序列化 —— 冷构建(rm -rf library 后全量重导)实测两者双双变 null,
+  // 于是场景里的旧静态背景 game-table-bg(绿桌)不再被关闭,直接盖在运行时 v13 粉桌之上(截图实锤)。
+  // 任何人冷构建都会中招,故改为按名兜底(与其余脚手架节点同一机制),不再依赖序列化。
+  'game-table-bg',
+  'card-template',
 ];
 const SETTLEMENT_TRANSIENT_HUD_NODE_NAMES = [
   'status-label',
@@ -41,8 +47,11 @@ const SETTLEMENT_TRANSIENT_HUD_NODE_NAMES = [
   'ai-thinking-1',
   'ai-thinking-2',
 ];
-const BUTTON_PRIMARY_TEXT = toColor(THEME.palette.brandDark);
-const BUTTON_SECONDARY_TEXT = toColor(THEME.palette.textOnAccent);
+// v1.6 二次终审:v18 primary 为亮莓粉实底 rgb(242,151,188),与标准深莓 rgb(108,46,76) 仅 4.66:1(余量薄);
+// primary 专用更深莓字 rgb(70,25,50) → 对比 6.83:1。其余态底色浅,沿用标准深莓。
+const BUTTON_PRIMARY_TEXT = toColor({ r: 70, g: 25, b: 50, a: 255 });
+// v1.5 P-BTN-SKIN:v15 secondary 为暖奶油盘面,白字不可读——统一深莓文字。
+const BUTTON_SECONDARY_TEXT = toColor(THEME.palette.brandDark);
 const BUTTON_TERTIARY_TEXT = toColor(THEME.palette.brandDark);
 const BUTTON_DISABLED_TEXT = toColor(THEME.palette.textDisabled);
 const BUTTON_PAUSE_TOGGLE_TEXT = toColor(THEME.palette.brandDark);
@@ -71,85 +80,71 @@ export function addButton(this: any,
     parent,
     name: nodeName,
     owner: this,
+    feel: {
+      animated: Boolean(this.settings?.animation),
+      onClickSound: () => this.playUiSound?.(RESOURCE_PATHS.audioButton),
+      // W3-B P-BTN-FEEL-B:涟漪挂 fx 层(prune 豁免),世界坐标由 renderButtonRipple 换算。
+      rippleAt: (worldPos, sizeBase) => this.renderButtonRipple?.(worldPos, sizeBase),
+    },
     skinPath: (buttonName, isEnabled) => this.buttonSkinPath(buttonName, isEnabled),
     textColor: (buttonName, isEnabled) => this.buttonTextColor(buttonName, isEnabled),
     iconPath: (buttonName) => this.buttonIconPath(buttonName),
-    layout: ({ name: buttonName, iconPath, width: buttonWidth, height: buttonHeight }) => {
-      const decorated = this.isDecoratedButton(buttonName);
-      const renderHeight = decorated ? Math.max(buttonHeight, 62) : buttonHeight;
+    layout: ({ iconPath, width: buttonWidth, height: buttonHeight }) => {
+      // v1.5 P-BTN-SKIN:v15 皮肤中央即纯净文字盘(源图 64%×56% 硬规范),
+      // v13 装饰底座的三项补偿(renderHeight 抬高/labelY 下移/明度自适应描边)随皮肤退役。
       const showIcon = Boolean(iconPath) && buttonWidth >= 136;
-      const labelY = decorated ? -8 : 0;
+      const compact = buttonWidth < 110;
       return {
-        renderHeight,
+        renderHeight: buttonHeight,
         label: {
           x: showIcon ? 10 : 0,
-          y: labelY,
-          width: showIcon ? buttonWidth - 38 : buttonWidth - (decorated ? 14 : 0),
-          height: decorated ? Math.max(30, renderHeight - 26) : renderHeight,
-          fontSize: decorated ? 17 : 20,
-          lineHeight: decorated ? 21 : 24,
+          y: 0,
+          width: showIcon ? buttonWidth - 30 : Math.round(buttonWidth * 0.85),
+          height: Math.max(24, Math.round(buttonHeight * 0.62)),
+          fontSize: compact ? 17 : 20,
+          lineHeight: compact ? 21 : 24,
         },
         icon: showIcon
           ? {
               x: -buttonWidth / 2 + 23,
-              y: labelY,
-              size: Math.min(22, Math.max(16, renderHeight - 40)),
+              y: 0,
+              size: Math.min(22, Math.max(16, buttonHeight - 40)),
             }
           : undefined,
       };
     },
   });
-  // V8 用户签收意见②：decorated 装饰底座（宝石顶饰/金属纹）与按钮文字叠糊——
-  // 统一加细描边把文字从底纹上分离；描边色按文字明度自适应（浅字配深边、深字配浅边）。
-  if (this.isDecoratedButton(nodeName)) {
-    const c = label.color;
-    const brightText = (c.r + c.g + c.b) / 3 > 150;
-    label.enableOutline = true;
-    label.outlineColor = brightText ? toColor(THEME.palette.brandDark) : toColor(THEME.palette.accentCream);
-    label.outlineWidth = 2;
-  }
   return label;
 }
 
-export function isDecoratedButton(this: any, name: string): boolean {
-  return (
-    name.startsWith('action-') ||
-    name.startsWith('bid-') ||
-    name.startsWith('result-') ||
-    name.startsWith('termination-feedback-') ||
-    name === 'advisor-toggle'
-  );
-}
-
 export function buttonSkinPath(this: any, name: string, enabled: boolean): ResourcePath {
-  if (!enabled) return RESOURCE_PATHS.btnDisabledV13;
-  if (this.isPauseToggleButton(name)) return RESOURCE_PATHS.pauseBtnToggle;
-  if (this.isPauseActionButton(name)) return RESOURCE_PATHS.pauseBtnAction;
-  if (name === 'action-hint') return RESOURCE_PATHS.btnTertiaryV13;
-  if (name === 'action-must-pass') return RESOURCE_PATHS.btnPrimaryV13;
+  // v1.6 二次终审整改:全部按钮统一 v18 极简族(单一填充+一条细描边),弃 v17 多层描边(键保留回滚)。
+  if (!enabled) return RESOURCE_PATHS.btnDisabledV18;
+  if (this.isPauseToggleButton(name)) return RESOURCE_PATHS.btnSecondaryV18;
+  if (name === 'action-hint') return RESOURCE_PATHS.btnTertiaryV18;
   if (
+    this.isPauseActionButton(name) ||
+    name === 'action-must-pass' ||
     name === 'action-play' ||
     name === 'bid-call' ||
     name === 'bid-grab' ||
     name === 'result-new' ||
-    name === 'result-lobby' ||
-    name === 'pause-continue'
+    name === 'result-lobby'
   ) {
-    return RESOURCE_PATHS.btnPrimaryV13;
+    return RESOURCE_PATHS.btnPrimaryV18;
   }
-  return RESOURCE_PATHS.btnSecondaryV13;
+  return RESOURCE_PATHS.btnSecondaryV18;
 }
 
 export function buttonTextColor(this: any, name: string, enabled: boolean): Color {
-  // V8 用户签收意见②（2026-07-11）：decorated 底座纹样 × 半透明灰字叠糊——禁用态改实白，
-  // 禁用感交由暗态皮肤表达；文字与底纹的分离由 addButton 的描边兜底。
-  if (!enabled) return this.isDecoratedButton(name) ? BUTTON_SECONDARY_TEXT : BUTTON_DISABLED_TEXT;
-  if (name === 'action-must-pass') return toColor(THEME.palette.accentGold);
+  // v1.5 P-BTN-SKIN:v15 全族按钮中央为浅色纯净文字盘(对 brandDark 对比 ≥4.5:1 出厂硬门),
+  // 文字统一深莓色;v13 时代的「禁用白字/要不起金字」补偿随皮肤退役。
+  if (!enabled) return BUTTON_DISABLED_TEXT;
   if (this.isPauseToggleButton(name)) return BUTTON_PAUSE_TOGGLE_TEXT;
-  if (this.isPauseActionButton(name)) return BUTTON_PAUSE_ACTION_TEXT;
+  if (this.isPauseActionButton(name)) return BUTTON_PRIMARY_TEXT; // v18: pause action 用 primary 皮(亮莓底)→同用深莓字
   const skin = this.buttonSkinPath(name, enabled);
-  if (skin === RESOURCE_PATHS.btnPrimaryV13) return BUTTON_PRIMARY_TEXT;
-  if (skin === RESOURCE_PATHS.btnTertiaryV13) return BUTTON_TERTIARY_TEXT;
+  if (skin === RESOURCE_PATHS.btnPrimaryV18) return BUTTON_PRIMARY_TEXT;
+  if (skin === RESOURCE_PATHS.btnTertiaryV18) return BUTTON_TERTIARY_TEXT;
   return BUTTON_SECONDARY_TEXT;
 }
 
@@ -200,6 +195,42 @@ export function addSprite(this: any,
   });
 }
 
+/**
+ * v1.6 二次终审整改②(icon 变形):等比内接——按 SpriteFrame 的真实 rect 比例,最大化地放进 (width × height) 框内。
+ *
+ * SIMPLE 精灵直接给宽高 = 按框拉伸。图源经 trimType=auto 削掉透明边后,rect 比例常常已不等于原图比例,
+ * 塞进按原图比例配的框里就会变形(s4-image-gates.py 门E 实测:hero 立绘偏 10.2%、右家 7.5%)。
+ * 帧是异步加载的,故在帧落位后再定尺寸;命中缓存时同帧生效。
+ */
+export function addSpriteContain(this: any,
+  path: ResourcePath,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  parent: Node,
+  name: string,
+): Node {
+  const node: Node = this.addSprite(path, x, y, width, height, parent, name);
+  const fit = (frame: SpriteFrame): void => {
+    // 异步回调落地时,节点可能已被 render prune 销毁(换局/切相位)——必须查 isValid,否则 use-after-destroy。
+    if (!node.isValid) return;
+    const rect = frame.rect;
+    if (!rect || !rect.width || !rect.height) return;
+    const k = Math.min(width / rect.width, height / rect.height);
+    addUiTransform(node, Math.round(rect.width * k), Math.round(rect.height * k));
+  };
+  const cached: SpriteFrame | undefined = this.spriteFrames.get(path);
+  if (cached) {
+    fit(cached);
+    return node;
+  }
+  resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
+    if (!error && frame) fit(frame);
+  });
+  return node;
+}
+
 export function loadSprite(this: any, path: ResourcePath, sprite: Sprite | null): void {
   if (!sprite) return;
   const cached = this.spriteFrames.get(path);
@@ -224,8 +255,9 @@ export function applySpriteFrame(this: any, sprite: Sprite, frame: SpriteFrame):
 }
 
 export function drawPanelSkin(this: any, parent: Node, width: number, height: number, name = 'panel-skin'): Node {
+  // v1.5 P-LOBBY-UNIFY2:两场景弹窗面板统一 v15 皮肤(与 lobby 同键,v12/v13 分裂结案)。
   return drawUiPanelSkin(this.ensureNode.bind(this), this.loadSprite.bind(this), {
-    path: RESOURCE_PATHS.panelPopup,
+    path: RESOURCE_PATHS.panelPopupV15,
     parent,
     width,
     height,

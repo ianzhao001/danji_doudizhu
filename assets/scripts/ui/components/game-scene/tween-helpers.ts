@@ -1,23 +1,44 @@
 import { Graphics, Node, UIOpacity, Vec3, tween } from 'cc';
-import { dealCardDelay, playFlyFromTo } from '../../animation-params';
+import { dealCardDelay, dealFlight, playFlyArc, playFlyFromTo } from '../../animation-params';
 import { THEME, toColor } from '../ui-helpers';
 
 export function animateCardDeal(this: any, node: Node, x: number, y: number, index: number, total: number): void {
+  // v1.5 P-CARD-FLIGHT:发牌自上方中央「散开落位」轨迹(替代原地 42px 升起),带 0.85→1 缩放。
   const delay = dealCardDelay(index, total) / 1000;
+  const flight = dealFlight();
   const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
   opacity.opacity = 0;
-  node.setPosition(x, y - 42, 0);
-  tween(node).delay(delay).to(0.18, { position: new Vec3(x, y, 0) }).start();
+  node.setPosition(x * 0.15, y + 120, 0);
+  node.setScale(flight.fromScale, flight.fromScale, 1);
+  tween(node)
+    .delay(delay)
+    .to(flight.durationMs / 1000, { position: new Vec3(x, y, 0), scale: new Vec3(1, 1, 1) }, { easing: 'quadOut' })
+    .start();
   tween(opacity).delay(delay).to(0.12, { opacity: 255 }).start();
 }
 
-export function animateCardPlay(this: any, node: Node, x: number, y: number): void {
-  const fly = playFlyFromTo();
+export function animateCardPlay(this: any, node: Node, x: number, y: number, fromDir?: { dx: number; dy: number }): void {
   const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
   opacity.opacity = 0;
-  node.setPosition(x, y + fly.fromY, 0);
-  tween(node).to(fly.durationMs / 1000, { position: new Vec3(x, y + fly.toY, 0) }).start();
-  tween(opacity).to(Math.min(0.14, fly.durationMs / 1000), { opacity: 255 }).start();
+  if (!fromDir) {
+    // 无方向(断局恢复重建/兜底):保持既有自下方淡入语义。
+    const fly = playFlyFromTo();
+    node.setPosition(x, y + fly.fromY, 0);
+    tween(node).to(fly.durationMs / 1000, { position: new Vec3(x, y + fly.toY, 0) }).start();
+    tween(opacity).to(Math.min(0.14, fly.durationMs / 1000), { opacity: 255 }).start();
+    return;
+  }
+  // v1.5 P-CARD-FLIGHT:方向化弧线飞入(hero 自下、左右家自侧翼),两段缓动+轻旋转回正。
+  const arc = playFlyArc();
+  const dur = arc.durationMs / 1000;
+  const tilt = fromDir.dx === 0 ? arc.rotateDeg : arc.rotateDeg * Math.sign(fromDir.dx);
+  node.setPosition(x + fromDir.dx, y + fromDir.dy, 0);
+  node.angle = tilt;
+  tween(node)
+    .to(dur * 0.55, { position: new Vec3(x + fromDir.dx * 0.3, y + arc.liftY, 0) }, { easing: 'quadOut' })
+    .to(dur * 0.45, { position: new Vec3(x, y, 0), angle: 0 }, { easing: 'quadIn' })
+    .start();
+  tween(opacity).to(Math.min(0.14, dur), { opacity: 255 }).start();
 }
 
 export function animateScaleIn(this: any, node: Node, fromScale: number, durationMs: number): void {

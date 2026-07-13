@@ -2,7 +2,7 @@ import { EventTouch, Sprite } from 'cc';
 import type { SeatIndex, TopPlay } from '../../../game';
 import type { Card } from '../../../rules';
 import { cardKey } from '../../../rules/guards';
-import { dealCardDelay } from '../../animation-params';
+import { dealCardDelay, dealFlight } from '../../animation-params';
 import { dragSelectCards, layoutHandInteractive, type InteractiveSlot } from '../../hand-interaction';
 import { isSelected, sortByRank } from '../../selection';
 import { deriveScreenVM } from '../../screen-view';
@@ -100,6 +100,8 @@ export function bindHandDragHandlers(this: any): void {
       (selected: Card[], card: Card) => (isSelected(selected, card) ? selected : [...selected, card]),
       this.selected.slice(),
     );
+    // v1.5 P-AUDIO-WIRE:划选结算即时音(与单点 toggle 同 select.wav)。
+    if (dragged.length > 0) this.playUiSound?.(RESOURCE_PATHS.audioSelect);
     this.render();
     return true;
   };
@@ -123,11 +125,13 @@ export function renderBottomCardsDock(this: any, cards: Card[] | null, layout: T
   const pos = this.rectPoint(layout.bottomCardsDock, canvas, 0.5, 0.5);
   dock.setPosition(pos.x, pos.y, 0);
   addUiTransform(dock, layout.bottomCardsDock.width, layout.bottomCardsDock.height);
-  const skinWidth = Math.max(150, Math.min(220, layout.bottomCardsDock.width + 18));
-  const skinHeight = Math.max(48, layout.bottomCardsDock.height + 20);
-  this.addSprite(RESOURCE_PATHS.bottomCardsDockV13, 0, 0, skinWidth, skinHeight, dock, 'bottom-cards-dock-skin', true);
-
+  // v1.5 P-DOCK-SKIN:v15 三槽托盘按源图槽几何反推尺寸——槽距/内容宽=71.5/313,
+  // 迷你牌间距 30 时托盘 131×56 恰好三槽对位;整图等比拉伸(不切片)保槽形与 220:320 牌比。
   const spacing = 30;
+  const skinWidth = Math.round(spacing * (313 / 71.5));
+  const skinHeight = Math.round(skinWidth * (134 / 313));
+  this.addSprite(RESOURCE_PATHS.bottomCardsDockV15, 0, 0, skinWidth, skinHeight, dock, 'bottom-cards-dock-skin');
+
   const startX = -spacing;
   const signature = cards ? cardsSignature(cards) : 'backs';
   const animateReveal = Boolean(cards) && this.settings.animation && signature !== this.lastBottomCardsSignature;
@@ -141,11 +145,9 @@ export function renderBottomCardsDock(this: any, cards: Card[] | null, layout: T
     }
     const back = this.ensureNode(`bottom-card-back-${index}`, dock);
     back.setPosition(x, 0, 0);
-    addUiTransform(back, 26, 38);
-    const sprite = back.getComponent(Sprite) ?? back.addComponent(Sprite);
-    sprite.type = Sprite.Type.SIMPLE;
-    sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-    this.loadSprite(RESOURCE_PATHS.cardBackV13, sprite);
+    // v1.6 用户追加①同治:暗牌走的是这条独立路径(不经 addCardNode),原先直接给 26×38 会把
+    // 204:272 的牌背拉伸 9.6%(门E)。改等比内接,与手牌/花色同一口径。
+    this.fitSpriteInBox(back, RESOURCE_PATHS.cardBackV13, 26, 38);
   }
 }
 
@@ -169,9 +171,17 @@ export function renderPlayArea(this: any, top: TopPlay | null, layout: TableZone
   const signature = `${top.seat}:${cardsSignature(cards)}`;
   const animate = this.settings.animation && signature !== this.lastPlayAreaSignature;
   this.lastPlayAreaSignature = signature;
+  // v1.5 P-CARD-FLIGHT(R2):方向飞入只随真实 play 事件触发——事件回调预置 pendingPlayFlightSeat,
+  // 此处一次性消费;断局恢复首帧无 play 事件(pending=null)→flyFrom=undefined→旧无方向淡入。
+  const flightSeat = this.pendingPlayFlightSeat;
+  this.pendingPlayFlightSeat = null;
+  const side = top.seat === HERO_SEAT ? 'hero' : visualSideForSeat(top.seat);
+  const flyFrom = animate && flightSeat === top.seat
+    ? side === 'hero' ? { dx: 0, dy: -140 } : side === 'left' ? { dx: -180, dy: 40 } : { dx: 180, dy: 40 }
+    : undefined;
   cards.forEach((card, index) => {
     const position = this.playCardPosition(index, cards.length, playLayout);
-    const node = this.addDisplayCard(card, position.x, position.y, area, `play-card-${index}`, animate);
+    const node = this.addDisplayCard(card, position.x, position.y, area, `play-card-${index}`, animate, flyFrom);
     node.setScale(playLayout.cardScale, playLayout.cardScale, 1);
   });
 }
@@ -284,7 +294,8 @@ export function renderHand(this: any,
   canvas: { width: number; height: number },
 ): void {
   const handFrame = this.handLayoutFrame(canvas);
-  if (hand.length === 0) {
+  // v1.6 PL-08:空手牌占位字只在对局进行中显示——结算态(打完最后一手)不再于 scrim 下露出「玩家手牌」游离字。
+  if (hand.length === 0 && !this.runtime?.settlement?.()) {
     const title = this.screenPoint(canvas, handFrame.x + handFrame.width / 2, layout.heroHandLarge.y + Math.min(24, layout.heroHandLarge.height * 0.22));
     this.addLabel(GAME_TEXT.playerHand, title.x, title.y, THEME.typography.md, this.uiRoot!, 140, 30, 'hand-title', TABLE_TEXT);
   }
@@ -315,5 +326,5 @@ export function armDealAnimationLock(this: any, phase: string, hand: ReturnType<
   if (!this.settings.animation || phase !== 'bidding' || hand.length === 0) return;
   const handSignature = cardsSignature(hand.map((slot) => slot.card));
   if (handSignature === this.lastHandSignature) return;
-  this.dealAnimationLockMs = Math.max(this.dealAnimationLockMs, dealCardDelay(hand.length - 1, hand.length) + 180);
+  this.dealAnimationLockMs = Math.max(this.dealAnimationLockMs, dealCardDelay(hand.length - 1, hand.length) + dealFlight().durationMs);
 }

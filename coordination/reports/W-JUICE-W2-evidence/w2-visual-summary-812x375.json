@@ -1,0 +1,30 @@
+{
+  "task": "W2-visual",
+  "viewport": "812x375",
+  "base": "http://127.0.0.1:7789/build/web-mobile/",
+  "seed": 20260705,
+  "capturedAt": "2026-07-11T16:01:23.161Z",
+  "caps": [
+    {
+      "file": "a-lobby-home-812x375.png",
+      "sha256": "12b4dbac1c3d80a0"
+    },
+    {
+      "file": "b-lobby-tutorial-panel-812x375.png",
+      "sha256": "a39df6061d38607c"
+    },
+    {
+      "file": "c-bidding-812x375.png",
+      "sha256": "5ea8b1f66ade7f3f"
+    },
+    {
+      "file": "d-playing-actions-812x375.png",
+      "sha256": "64379c77b264f415"
+    },
+    {
+      "file": "e-pause-panel-812x375.png",
+      "sha256": "06e9300f47d84478"
+    }
+  ],
+  "pageErrors": []
+}

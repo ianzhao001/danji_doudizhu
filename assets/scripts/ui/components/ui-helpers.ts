@@ -1,4 +1,5 @@
-import { Button, Color, Graphics, Label, Node, Sprite, SpriteFrame, UITransform, resources } from 'cc';
+import { Button, Color, Graphics, Label, Node, Sprite, SpriteFrame, UITransform, Vec3, resources } from 'cc';
+import { pressFeedback } from '../animation-params';
 import { spriteFrameResourcePath, type ResourcePath } from '../asset-keys';
 import { THEME, type ThemeColor } from '../theme';
 
@@ -100,6 +101,8 @@ export function addLabel(
   label.lineHeight = options.fontSize + (options.lineHeightOffset ?? 5);
   label.horizontalAlign = Label.HorizontalAlign.CENTER;
   label.verticalAlign = Label.VerticalAlign.CENTER;
+  // v1.6 终审整改②:所有文字 SHRINK——超出容器自动缩字号,永不溢出(务必解决文字溢出)。
+  label.overflow = Label.Overflow.SHRINK;
   label.color = options.color ?? toColor(THEME.palette.textOnAccent);
   return label;
 }
@@ -145,6 +148,7 @@ export function addButton(
   label.lineHeight = options.lineHeight;
   label.horizontalAlign = Label.HorizontalAlign.CENTER;
   label.verticalAlign = Label.VerticalAlign.CENTER;
+  label.overflow = Label.Overflow.SHRINK;
   label.color = labelColor(options.enabled);
   return label;
 }
@@ -218,6 +222,9 @@ export function addSkinnedButton(
     textColor(name: string, enabled: boolean, selected: boolean): Color;
     iconPath?(name: string): ResourcePath | null;
     layout(input: SkinnedButtonLayoutInput): SkinnedButtonLayout;
+    /** v1.5 P-BTN-FEEL:按压手感——animated 时用 SCALE 过渡;点击音由调用方注入(经 sound 开关)。
+     * W3-B:rippleAt 由场景方注入涟漪挂点(game=fx 层免剪/lobby=场景根),仅 animated 时触发。 */
+    feel?: { animated: boolean; onClickSound?: () => void; rippleAt?: (worldPos: Vec3, sizeBase: number) => void };
   },
 ): Label {
   const selected = options.selected ?? false;
@@ -246,14 +253,31 @@ export function addSkinnedButton(
   });
   bg.setSiblingIndex(0);
   button.target = bg;
-  button.transition = Button.Transition.COLOR;
+  // v1.5 P-BTN-FEEL:动效开=SCALE 按压(参数出自 pressFeedback());动效关=保持既有 COLOR 过渡。
+  if (options.feel?.animated) {
+    const press = pressFeedback();
+    button.transition = Button.Transition.SCALE;
+    button.zoomScale = press.scale;
+    button.duration = press.ms / 1000;
+  } else {
+    button.transition = Button.Transition.COLOR;
+    button.normalColor = toColor(THEME.palette.textOnAccent);
+    button.pressedColor = toColor(THEME.palette.selectedTint, 255);
+    button.hoverColor = toColor(THEME.palette.textOnAccent);
+    button.disabledColor = toColor(THEME.palette.textOnAccent);
+  }
   button.interactable = options.enabled;
-  button.normalColor = toColor(THEME.palette.textOnAccent);
-  button.pressedColor = toColor(THEME.palette.selectedTint, 255);
-  button.hoverColor = toColor(THEME.palette.textOnAccent);
-  button.disabledColor = toColor(THEME.palette.textOnAccent);
   node.off(Button.EventType.CLICK);
-  node.on(Button.EventType.CLICK, options.cb, options.owner);
+  const feel = options.feel;
+  if (feel?.onClickSound || (feel?.animated && feel?.rippleAt)) {
+    node.on(Button.EventType.CLICK, function wrappedClick(this: unknown) {
+      feel.onClickSound?.();
+      if (feel.animated) feel.rippleAt?.(node.worldPosition.clone(), layout.renderHeight);
+      (options.cb as () => void).call(options.owner ?? this);
+    }, options.owner);
+  } else {
+    node.on(Button.EventType.CLICK, options.cb, options.owner);
+  }
 
   if (iconPath && layout.icon) {
     addSkinnedSprite(ensureNode, load, {

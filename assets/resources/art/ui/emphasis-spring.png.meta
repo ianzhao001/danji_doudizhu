@@ -17,13 +17,13 @@
       "userData": {
         "wrapModeS": "repeat",
         "wrapModeT": "repeat",
+        "imageUuidOrDatabaseUri": "43dd3ea0-2334-46c4-a162-f41245d7ec83",
+        "isUuid": true,
+        "visible": false,
         "minfilter": "linear",
         "magfilter": "linear",
         "mipfilter": "none",
-        "anisotropy": 0,
-        "isUuid": true,
-        "imageUuidOrDatabaseUri": "43dd3ea0-2334-46c4-a162-f41245d7ec83",
-        "visible": false
+        "anisotropy": 0
       },
       "ver": "1.0.22",
       "imported": true,
@@ -41,12 +41,12 @@
       "userData": {
         "trimThreshold": 1,
         "rotated": false,
-        "offsetX": -1,
+        "offsetX": 0,
         "offsetY": 0,
-        "trimX": 19,
-        "trimY": 40,
-        "width": 88,
-        "height": 48,
+        "trimX": 0,
+        "trimY": 0,
+        "width": 128,
+        "height": 128,
         "rawWidth": 128,
         "rawHeight": 128,
         "borderTop": 0,
@@ -60,17 +60,17 @@
         "meshType": 0,
         "vertices": {
           "rawPosition": [
-            -44,
-            -24,
+            -64,
+            -64,
             0,
-            44,
-            -24,
+            64,
+            -64,
             0,
-            -44,
-            24,
+            -64,
+            64,
             0,
-            44,
-            24,
+            64,
+            64,
             0
           ],
           "indexes": [
@@ -82,40 +82,40 @@
             3
           ],
           "uv": [
-            19,
-            88,
-            107,
-            88,
-            19,
-            40,
-            107,
-            40
+            0,
+            128,
+            128,
+            128,
+            0,
+            0,
+            128,
+            0
           ],
           "nuv": [
-            0.1484375,
-            0.3125,
-            0.8359375,
-            0.3125,
-            0.1484375,
-            0.6875,
-            0.8359375,
-            0.6875
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1
           ],
           "minPos": [
-            -44,
-            -24,
+            -64,
+            -64,
             0
           ],
           "maxPos": [
-            44,
-            24,
+            64,
+            64,
             0
           ]
         },
         "isUuid": true,
         "imageUuidOrDatabaseUri": "43dd3ea0-2334-46c4-a162-f41245d7ec83@6c48a",
         "atlasUuid": "",
-        "trimType": "auto"
+        "trimType": "none"
       },
       "ver": "1.0.12",
       "imported": true,

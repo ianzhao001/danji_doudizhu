@@ -42,6 +42,7 @@ import {
   renderTurnTimer as renderTurnTimerSection,
 } from './game-scene/bid-actions-renderer';
 import { renderCardMemory as renderCardMemorySection, renderHud as renderHudSection } from './game-scene/hud-renderer';
+import { fadeInOnLoad } from './scene-transition';
 import { renderResult as renderResultSection } from './game-scene/result-overlay-renderer';
 import {
   renderSeatFeedback as renderSeatFeedbackSection,
@@ -58,7 +59,7 @@ import {
   cardSpritePath as cardSpritePathImpl,
   suitSpritePath as suitSpritePathImpl,
   configureCardSprite as configureCardSpriteImpl,
-  drawCardBase as drawCardBaseImpl,
+  fitSpriteInBox as fitSpriteInBoxImpl,
   sameCard,
   setCardPressed as setCardPressedImpl,
 } from './game-scene/card-node';
@@ -98,7 +99,14 @@ import {
   renderEmphasis as renderEmphasisImpl,
   toggleRuntimeSetting as toggleRuntimeSettingImpl,
   vibrate as vibrateImpl,
+  playUiSound as playUiSoundImpl,
 } from './game-scene/audio-vibration';
+import {
+  clearFxLayer as clearFxLayerImpl,
+  renderBombBurst as renderBombBurstImpl,
+  renderButtonRipple as renderButtonRippleImpl,
+  renderRocketBurst as renderRocketBurstImpl,
+} from './game-scene/fx-program';
 import {
   animateCardDeal as animateCardDealImpl,
   animateCardPlay as animateCardPlayImpl,
@@ -123,13 +131,13 @@ import {
 } from './game-scene/runtime-feedback';
 import {
   addButton as addButtonImpl,
-  isDecoratedButton as isDecoratedButtonImpl,
   buttonSkinPath as buttonSkinPathImpl,
   buttonTextColor as buttonTextColorImpl,
   isPauseToggleButton as isPauseToggleButtonImpl,
   isPauseActionButton as isPauseActionButtonImpl,
   buttonIconPath as buttonIconPathImpl,
   addSprite as addSpriteImpl,
+  addSpriteContain as addSpriteContainImpl,
   loadSprite as loadSpriteImpl,
   applySpriteFrame as applySpriteFrameImpl,
   drawPanelSkin as drawPanelSkinImpl,
@@ -176,15 +184,18 @@ const RUNTIME_PRELOAD_SPRITES: readonly ResourcePath[] = [
   RESOURCE_PATHS.suitDiamondV13,
   RESOURCE_PATHS.jokerSmallV13,
   RESOURCE_PATHS.jokerBigV13,
-  RESOURCE_PATHS.btnPrimaryV13,
-  RESOURCE_PATHS.btnSecondaryV13,
-  RESOURCE_PATHS.btnTertiaryV13,
-  RESOURCE_PATHS.btnDisabledV13,
-  RESOURCE_PATHS.seatNameplateV13,
-  RESOURCE_PATHS.bottomCardsDockV13,
-  RESOURCE_PATHS.settlementBannerWinV13,
-  RESOURCE_PATHS.settlementBannerLoseV13,
-  RESOURCE_PATHS.settlementPanelV13,
+  RESOURCE_PATHS.btnPrimaryV18,
+  RESOURCE_PATHS.btnSecondaryV18,
+  RESOURCE_PATHS.btnTertiaryV18,
+  RESOURCE_PATHS.btnDisabledV18,
+  RESOURCE_PATHS.infoPillV18,
+  RESOURCE_PATHS.seatNameplateV18,
+  RESOURCE_PATHS.bottomCardsDockV15,
+  RESOURCE_PATHS.panelPopupV15,
+  // v1.6 二次终审整改③(Codex S4 审查阻断):v15 胜/负横幅是异形燕尾缎带,已由 v18 规则牌匾取代。
+  // 换肤时只改了 result-overlay 的消费点,漏了这张预载表——onLoad 仍会实际加载它们,
+  // 与「旧横幅零产品消费、仅保留 asset key 供回滚」的披露不符。已移出预载;键与文件保留。
+  RESOURCE_PATHS.settlementPanelV15,
   RESOURCE_PATHS.badgeMultiplierV13,
   RESOURCE_PATHS.badgeTimerV13,
   RESOURCE_PATHS.iconPlay,
@@ -249,6 +260,12 @@ export class GameSceneSkeleton extends Component {
   private readonly spriteFrames = new Map<string, SpriteFrame>();
   private lastHandSignature = '';
   private lastPlayAreaSignature = '';
+  /**
+   * v1.5 P-CARD-FLIGHT(R2):方向化飞入的触发闸——仅当真实 play 事件（round/play）到达时
+   * 记下出牌席位，renderPlayArea 一次性消费后清零。断局恢复首帧没有 play 事件，
+   * 该值为 null → flyFrom=undefined → 保持旧无方向淡入。
+   */
+  private pendingPlayFlightSeat: number | null = null;
   private lastBottomCardsSignature = '';
   private renderedSelectedCardKeys = new Set<string>();
   private animatedToastIds = new Set<number>();
@@ -258,6 +275,7 @@ export class GameSceneSkeleton extends Component {
   private handDragMoved = false;
   private handDragStartX = 0;
   private handDragCurrentX = 0;
+  private animatedResultKeyValue: string | null = null;
 
   onLoad(): void {
     if (this.background) this.background.node.active = false;
@@ -268,6 +286,8 @@ export class GameSceneSkeleton extends Component {
     bindHandDragHandlersImpl.call(this);
     this.preloadRuntimeSprites();
     this.startGame(false);
+    // v1.5 P-SCENE-FADE:入场自黑幕淡出(动效关闭时不铺幕);挂 this.node 不受 render prune 影响。
+    fadeInOnLoad(this.node, this.settings.animation);
   }
 
   onDestroy(): void {
@@ -317,6 +337,7 @@ export class GameSceneSkeleton extends Component {
     this.runtime?.dispose();
     this.unsubscribe = null;
     this.selected = clearSelection();
+    this.animatedResultKeyValue = null;
     this.recentEvents = [];
     this.fullGameEvents = [];
     this.toasts = emptyToasts;
@@ -339,12 +360,16 @@ export class GameSceneSkeleton extends Component {
     this.lastHandSignature = '';
     this.lastPlayAreaSignature = '';
     this.lastBottomCardsSignature = '';
+    this.pendingPlayFlightSeat = null;
+    // v1.5 W3-B:跨局清空 fx 层(彩带 repeatForever 等循环特效不能残留到新局)。
+    this.clearFxLayer();
     this.renderedSelectedCardKeys.clear();
 
     const storage = cocosStorage();
     this.settings = loadSettings(storage, SETTINGS_KEY);
     const difficulty = difficultyConfig(this.settings.difficulty);
-    const thinkingDelayMs = Math.round((difficulty.thinkDelayMs.min + difficulty.thinkDelayMs.max) / 2);
+    // v1.6 终审整改③:AI 出牌节奏保底 1s(原困难档均值 375ms 偏快),各档均 ≥1000ms。
+    const thinkingDelayMs = Math.max(1000, Math.round((difficulty.thinkDelayMs.min + difficulty.thinkDelayMs.max) / 2));
     const levels: [AiLevel, AiLevel, AiLevel] = [
       this.settings.difficulty,
       this.settings.difficulty,
@@ -383,6 +408,7 @@ export class GameSceneSkeleton extends Component {
       }
       if (event.type === 'bottomRevealed') this.revealedBottomCards = event.cards.slice();
       if (event.type === 'round') this.fullGameEvents.push(event.event);
+      if (event.type === 'round' && event.event.type === 'play') this.pendingPlayFlightSeat = event.event.seat;
       this.recentEvents.push(event);
       this.recentEvents = this.recentEvents.slice(-12);
       this.pushEventToast(event);
@@ -465,6 +491,7 @@ export class GameSceneSkeleton extends Component {
       if (phase !== 'disposed') this.renderPauseControl(layout, canvas);
       this.renderPauseOverlay(canvas);
     }
+    this.markLiveSubtree(this.ensureFxLayer());
     this.endRenderDiff();
   }
 
@@ -488,12 +515,18 @@ export class GameSceneSkeleton extends Component {
       addLabel: this.addLabel.bind(this),
       addButton: this.addButton.bind(this),
       addSprite: this.addSprite.bind(this),
+      addSpriteContain: this.addSpriteContain.bind(this),
       loadSprite: this.loadSprite.bind(this),
       drawPanelSkin: this.drawPanelSkin.bind(this),
       render: this.render.bind(this),
       setMemoryExpanded: (value) => {
         this.memoryExpanded = value;
       },
+      animatedResultKey: () => this.animatedResultKeyValue,
+      setAnimatedResultKey: (key) => {
+        this.animatedResultKeyValue = key;
+      },
+      fxLayer: () => this.ensureFxLayer(),
       toggleAdvisor: this.toggleAdvisor.bind(this),
       toggleBiddingAdvisor: this.toggleBiddingAdvisor.bind(this),
       submitBid: this.submitBid.bind(this),
@@ -698,7 +731,7 @@ export class GameSceneSkeleton extends Component {
 
   private configureCardSprite = configureCardSpriteImpl;
 
-  private drawCardBase = drawCardBaseImpl;
+  private fitSpriteInBox = fitSpriteInBoxImpl;
 
   private animateCardDeal = animateCardDealImpl;
 
@@ -709,12 +742,12 @@ export class GameSceneSkeleton extends Component {
   private toggleCard(card: Card): void {
     if (!this.runtime?.isPlayerTurn() || this.runtime.phase() !== 'playing') return;
     this.selected = toggle(this.selected, card);
+    // v1.5 P-AUDIO-WIRE:选牌即时音(select.wav 接活,经 sound 开关)。
+    this.playUiSound(RESOURCE_PATHS.audioSelect);
     this.render();
   }
 
   private addButton = addButtonImpl;
-
-  private isDecoratedButton = isDecoratedButtonImpl;
 
   private buttonSkinPath = buttonSkinPathImpl;
 
@@ -727,6 +760,8 @@ export class GameSceneSkeleton extends Component {
   private buttonIconPath = buttonIconPathImpl;
 
   private addSprite = addSpriteImpl;
+
+  private addSpriteContain = addSpriteContainImpl;
 
   private loadSprite = loadSpriteImpl;
 
@@ -766,9 +801,19 @@ export class GameSceneSkeleton extends Component {
 
   private renderEmphasis = renderEmphasisImpl;
 
+  private renderButtonRipple = renderButtonRippleImpl;
+
+  private renderBombBurst = renderBombBurstImpl;
+
+  private renderRocketBurst = renderRocketBurstImpl;
+
+  private clearFxLayer = clearFxLayerImpl;
+
   private toggleRuntimeSetting = toggleRuntimeSettingImpl;
 
   private vibrate = vibrateImpl;
+
+  private playUiSound = playUiSoundImpl;
 
   private ensureNode = ensureNodeImpl;
 
@@ -781,6 +826,18 @@ export class GameSceneSkeleton extends Component {
   private markLiveSubtree = markLiveSubtreeImpl;
 
   private endRenderDiff = endRenderDiffImpl;
+
+  /**
+   * v1.5 P-FX-LAYER:常驻特效层。瞬时特效(强调贴图/涟漪/爆点/彩带)一律挂此层——
+   * render() 每 pass 将整棵子树 mark 进 liveRenderNodes 豁免 prune,
+   * 修复既有「先 render 后 playCue,特效节点被下一次 render 剪除」的早剪 bug;
+   * 特效节点由各自 tween 完成时自毁,不依赖 render 生命周期。
+   */
+  private ensureFxLayer(): Node {
+    const layer = this.ensureNode('fx-layer-runtime', this.uiRoot!);
+    layer.setSiblingIndex(this.uiRoot!.children.length - 1);
+    return layer;
+  }
 
   private pruneInactiveChildren = pruneInactiveChildrenImpl;
 
