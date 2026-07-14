@@ -250,4 +250,13 @@ node scripts/push-with-readme.mjs
   - docs(W-AUDIT-AI): close out batch — strength gate numbers and disclosures on BOARD/KL
   - docs(readme): add bilingual guide and push log automation
 
-<!-- readme-changelog-covered-through: c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c -->
+### 2026-07-14 16:04:36 +08:00
+
+- 目标：`origin/main`
+- 覆盖提交：`601252026ab73156caa8e0be5a24c032f5cf9a01`
+- 受影响模块：AI、验证与发布资料、文档、测试、界面
+- 变更统计：17 个文件，新增 975 行，删除 19 行，二进制文件 4 个
+- 提交摘要：
+  - fix(hint): harden runtime delegation and audit gates
+
+<!-- readme-changelog-covered-through: 601252026ab73156caa8e0be5a24c032f5cf9a01 -->

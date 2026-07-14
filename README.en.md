@@ -250,4 +250,13 @@ The update log starts at the formal v1.6 release baseline and does not backfill 
   - docs(W-AUDIT-AI): close out batch — strength gate numbers and disclosures on BOARD/KL
   - docs(readme): add bilingual guide and push log automation
 
-<!-- readme-changelog-covered-through: c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c -->
+### 2026-07-14 16:04:36 +08:00
+
+- Target: `origin/main`
+- Covered commit: `601252026ab73156caa8e0be5a24c032f5cf9a01`
+- Affected modules: AI, verification and release material, documentation, tests, UI
+- Diff statistics: 17 files, 975 insertions, 19 deletions, 4 binary files
+- Commit summary:
+  - fix(hint): harden runtime delegation and audit gates
+
+<!-- readme-changelog-covered-through: 601252026ab73156caa8e0be5a24c032f5cf9a01 -->
