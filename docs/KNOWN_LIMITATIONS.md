@@ -19,6 +19,7 @@
 - 三档难度属于启发式策略，不承诺最优解。
 - **困难档 v2(W-AUDIT-AI,2026-07-13)**:精确拆牌引擎驱动(`ai/decompose.ts`,最少手数+最优分解,默认炸弹保护)——领出按分解组件白出、跟牌按结构代价定压/过(无安全跟法不再无脑烧炸)、必胜看破全程(≤17 张)、叫分弃「1 高牌即抢」换结构化判强(`ai/bidding-hard.ts`);农民侧用公开底牌归因(RoundState v2 `bottom`)。强度门:T-AI-2 胜率差 Hard−Normal ≥ +0.05(实测 +0.117)、Hard−Simple ≥ +0.15(实测 +0.567);重型门(100 seeds)G2 地主角色差 ≥ +0.03(实测 +0.16,历史「Hard 作地主弱于 Normal」反转已消灭)、G3 ≥ 0。**跌破门槛即强度回归,不许调低门槛消红。**
 - 提示按钮 = `adviseBestMove` 委托困难档最优推荐(同信息面,不作弊),随困难档升级自动升级;`SHOW_ADVISOR` 隐藏件(对局建议 dock/叫抢建议面板)冻结未迭代。
+- **静态门的能力边界与运行时闭合(W-AUDIT-AI R1–R7 对抗复审结论·常驻判据)**:提示委托链(按钮→ctx 绑定→applyHint→pickHint→hard)有两层门。**静态层**=纯岛行为契约 + TypeScript AST 源码契约(真身唯一/规范体逐字/负向不变式:禁遮蔽·禁字符串访问·禁成员赋值/使能量与守卫链全锁),七轮红队注入(注释假方法抢占、barrel 别名进口、吞历史、结果覆盖、实例属性遮蔽、使能量常量化、假守卫、上游实参强制、上游中间变量改写)逐一封堵——**但静态门原理上无法穷尽一个 import `cc` 的大组件里任意一行的运行时颠覆**,只作「疏漏级改写」的拦截器。**运行时层(完备证据)**=`coordination/scripts/w-audit-hint-probe.mjs`:冷构建产物上走真实链路(大厅→难度切困难→开始新局→真实叫抢→hero 回合)后 **CDP 真点击 action-hint**,录下选中与当时快照+历史入 `coordination/reports/W-AUDIT-AI-evidence/hint-capture.json`;`test/verify/hint-runtime-capture.test.ts` 离线复算 `adviseBestMove` 逐张对照 —— **「点击 → 选中 == 困难档最优推荐」端到端闭合**。**规矩:凡改提示链路(applyHint / hint-flow / 按钮注册 / ctx 绑定 / hard 决策),冷构建收版时必须重跑该探针刷新证据**,否则运行时门守的是旧引擎。
 - turn timer 仅作提示，不会超时自动代打。
 
 ## Save And Resume

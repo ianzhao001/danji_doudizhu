@@ -53,6 +53,23 @@ describe('decompose 最少手数', () => {
     expect(decompose(cards('9 9 9 9 3 4'), { spendBombs: true }).moveCount).toBe(1);
     expect(decompose(cards('9 9 9 9 3 4')).moveCount).toBe(3);
   });
+
+  it('默认火箭保护:双王只许整出火箭,不作单/翼(Codex R1 阻断②回归)', () => {
+    // 曾漏报:飞机带双王翼被算成一手 → hard 结构代价失真(裸飞机 cost=1、单5 cost=0 → 先出单5)。
+    const plane = decompose(cards('3 3 3 4 4 4 x X'));
+    expect(plane.moveCount).toBe(2); // 裸飞机 + 火箭
+    expect(plane.components.some((c) => c.pattern.category === Category.Rocket)).toBe(true);
+    const planeFive = decompose(cards('3 3 3 4 4 4 5 x X'));
+    expect(planeFive.moveCount).toBe(3); // 裸飞机 + 单5 + 火箭
+    expect(planeFive.components.some((c) => c.pattern.category === Category.Rocket)).toBe(true);
+    // 单王在手(火箭不成立)仍是普通大单
+    expect(decompose(cards('3 3 3 X')).moveCount).toBe(1); // 三带一(大王翼)
+  });
+
+  it('spendBombs=true 允许双王作翼', () => {
+    expect(decompose(cards('3 3 3 4 4 4 x X'), { spendBombs: true }).moveCount).toBe(1);
+    expect(decompose(cards('3 3 3 4 4 4 5 x X'), { spendBombs: true }).moveCount).toBe(2);
+  });
 });
 
 describe('decompose 分解合法性与确定性', () => {

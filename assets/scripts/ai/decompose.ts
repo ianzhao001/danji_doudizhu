@@ -144,9 +144,11 @@ export class Decomposer {
     const c = counts[r];
     const spend = this.spendBombs;
 
-    // 火箭(仅当最低点已是小王)。
+    // 火箭(仅当最低点已是小王)。Codex R1 阻断②修正:火箭保护下(!spendBombs)
+    // 双王只许整出火箭——与四张炸同款早返回,否则王会漏成单牌/翼。
     if (r === Rank.SmallJoker && counts[Rank.BigJoker] > 0) {
       out.push([[Rank.SmallJoker, 1], [Rank.BigJoker, 1]]);
+      if (!spend) return out;
     }
 
     // 四张炸:spendBombs=false 时强制整出(不许被顺子/翼/三带拆用)。
@@ -300,10 +302,18 @@ function lowestRank(counts: number[]): number {
   return -1;
 }
 
-/** spendBombs=false 时,四张点只允许被「整炸」消耗——对其他组件视作不可用。 */
+/**
+ * spendBombs=false 时,四张点只允许被「整炸」消耗、双王在手时王只允许整出火箭——
+ * 对其他组件(单/对/翼/顺子取用)一律视作不可用。单王在手(火箭不成立)是普通大单,不受限。
+ * Codex R1 阻断②修正:此前王被豁免出保护,双王会漏成飞机翼/单牌,违背声明并影响 hard 结构代价。
+ */
 function available(counts: number[], rank: number, spendBombs: boolean): number {
-  if (!isSequenceable(rank) && rank > Rank.R2) return counts[rank]; // 王不受炸弹保护语义影响
-  if (!spendBombs && counts[rank] === 4) return 0;
+  if (spendBombs) return counts[rank];
+  if ((rank === Rank.SmallJoker || rank === Rank.BigJoker)
+    && counts[Rank.SmallJoker] > 0 && counts[Rank.BigJoker] > 0) {
+    return 0;
+  }
+  if (rank <= Rank.R2 && counts[rank] === 4) return 0;
   return counts[rank];
 }
 

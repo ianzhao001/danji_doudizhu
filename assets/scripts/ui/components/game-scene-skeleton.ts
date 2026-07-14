@@ -9,7 +9,7 @@ import {
   resources,
 } from 'cc';
 import { AiLevel } from '../../ai';
-import { adviseBestMove, nextHint } from '../../ai/hint';
+import { pickHint } from '../hint-flow';
 import { commitFinishedRound, persistRound, restoreRound, type SessionKeys } from '../../data/session';
 import { difficultyConfig } from '../../data/difficultyConfig';
 import { STORAGE_KEYS } from '../../data/storage-keys';
@@ -698,13 +698,10 @@ export class GameSceneSkeleton extends Component {
     if (!this.runtime) return;
     const snapshot = this.runtime.currentSnapshot();
     if (!snapshot?.viewerHand || !this.runtime.isPlayerTurn()) return;
-    // V8 签收意见④：首点（无选中）= AI 最优推荐；已有选中时沿既有 legalFollows 循环换下一手。
-    // 提示只改 selected，绝不代提交。
-    const advised = this.selected.length === 0
-      ? adviseBestMove({ snapshot, history: this.fullGameEvents })
-      : null;
-    const move = advised
-      ?? nextHint(snapshot.viewerHand, snapshot.top?.pattern ?? null, this.selected.length > 0 ? this.selected : undefined);
+    // V8 签收意见④：首点（无选中）= AI 最优推荐；已有选中时沿既有排序循环换下一手。
+    // 提示只改 selected，绝不代提交。W-AUDIT-AI R2：选择逻辑收进纯岛 pickHint
+    //（行为契约在 test/ui/hint-delegation.test.ts），本壳禁止直接调用提示原语。
+    const move = pickHint({ snapshot, history: this.fullGameEvents, selected: this.selected });
     if (!move) return;
     this.selected = move.cards.slice();
     this.render();
