@@ -275,4 +275,13 @@ node scripts/push-with-readme.mjs
 - 提交摘要：
   - fix(hint): harden runtime delegation and audit gates
 
-<!-- readme-changelog-covered-through: 601252026ab73156caa8e0be5a24c032f5cf9a01 -->
+### 2026-07-18 03:10:45 +08:00
+
+- 目标：`origin/main`
+- 覆盖提交：`639edf65510743cff9e7ab600e61b1c4a7f567cf`
+- 受影响模块：AI、资源、验证与发布资料、本地数据、文档、测试、界面
+- 变更统计：266 个文件，新增 21909 行，删除 2335 行，二进制文件 53 个
+- 提交摘要：
+  - release(v1.9): upgrade AI, visuals, and public documentation
+
+<!-- readme-changelog-covered-through: 639edf65510743cff9e7ab600e61b1c4a7f567cf -->

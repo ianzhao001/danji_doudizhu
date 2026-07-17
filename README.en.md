@@ -275,4 +275,13 @@ The update log starts at the formal v1.6 release baseline and does not backfill 
 - Commit summary:
   - fix(hint): harden runtime delegation and audit gates
 
-<!-- readme-changelog-covered-through: 601252026ab73156caa8e0be5a24c032f5cf9a01 -->
+### 2026-07-18 03:10:45 +08:00
+
+- Target: `origin/main`
+- Covered commit: `639edf65510743cff9e7ab600e61b1c4a7f567cf`
+- Affected modules: AI, assets, verification and release material, local data, documentation, tests, UI
+- Diff statistics: 266 files, 21909 insertions, 2335 deletions, 53 binary files
+- Commit summary:
+  - release(v1.9): upgrade AI, visuals, and public documentation
+
+<!-- readme-changelog-covered-through: 639edf65510743cff9e7ab600e61b1c4a7f567cf -->
