@@ -21,10 +21,13 @@ import {
 } from '../../rules';
 import type { GameEvent } from '../../game';
 import { cardKey } from '../../rules/guards';
-import { trackPlayed } from '../cardMemory';
+import { certainLandlordByRank, trackPlayed } from '../cardMemory';
 import { Decomposer } from '../decompose';
 import { canFinishInOneMove, finishingFollow } from '../endgame';
+import { solveForcedWin } from '../endgameSolver';
+import { moveOutcomeScore, type PressureContext } from '../handWeight';
 import { ALL_RANKS } from '../handStrength';
+import { HARD_PIMC, pimcArbitrate, type PimcProfile } from '../pimc';
 import type { AiStrategy } from '../strategy';
 import {
   bombLikeMoves,
@@ -96,45 +99,8 @@ function buildHardContext(snapshot: Parameters<AiStrategy>[0], hand: Card[], his
   return {
     decomposer: new Decomposer({ nodeBudget: 200_000 }),
     remainingByRank: history.length > 0 ? trackPlayed(history, hand).remainingByRank : null,
-    certainLandlordByRank: certainLandlord(snapshot, history),
+    certainLandlordByRank: certainLandlordByRank(snapshot, history),
   };
-}
-
-/**
- * 公开底牌归因（v2 W-AUDIT-AI B3）：底牌三张全场明牌并入地主手。
- * 对农民视角，逐点数扣除地主此后打出的张数，余量即「确定仍在地主手」的下界
- * （地主出的牌可能来自原 17 张,扣除只会低估,保守且 sound）。
- */
-function certainLandlord(
-  snapshot: Parameters<AiStrategy>[0],
-  history: GameEvent[],
-): Readonly<Record<number, number>> | null {
-  if (snapshot.turn === snapshot.landlord) return null;
-  const bottom = snapshot.bottom;
-  if (!bottom || bottom.length === 0) return null;
-  const certain: Record<number, number> = {};
-  for (const card of bottom) certain[card.rank] = (certain[card.rank] ?? 0) + 1;
-  for (const event of history) {
-    if (event.type === 'play' && event.seat === snapshot.landlord) {
-      for (const card of event.pattern.cards) {
-        if ((certain[card.rank] ?? 0) > 0) certain[card.rank] -= 1;
-      }
-    }
-  }
-  return certain;
-}
-
-/** 地主是否「确定」能压过 size 张同点(单/对)——仅基于底牌归因下界。 */
-function certainlyBeaten(
-  certain: Readonly<Record<number, number>>,
-  rank: Rank,
-  size: number,
-): boolean {
-  for (const key of Object.keys(certain)) {
-    const candidate = Number(key);
-    if (candidate > rank && (certain[candidate] ?? 0) >= size) return true;
-  }
-  return false;
 }
 
 type MemoryPressure = Readonly<{
@@ -156,29 +122,6 @@ function estimateMemoryPressure(hand: Card[], history: GameEvent[] = []): Memory
     unseenHighCards,
     possibleBombRanks,
   };
-}
-
-function categoryShapingBonus(move: Move): number {
-  switch (move.pattern.category) {
-    case Category.Straight:
-      return 90;
-    case Category.Airplane:
-    case Category.AirplaneSingles:
-    case Category.AirplanePairs:
-      return 100;
-    case Category.ConsecutivePairs:
-      return 94;
-    case Category.TripsPair:
-      return 70;
-    case Category.TripsSingle:
-      return 65;
-    case Category.Trips:
-      return 50;
-    case Category.Pair:
-      return 32;
-    default:
-      return 0;
-  }
 }
 
 function highCardSpendPenalty(move: Move, pressure: MemoryPressure): number {
@@ -216,35 +159,58 @@ function chooseFinishingMove(
  * 同代价里偏好多脱牌、先小后大、保留成型组合;控牌(A/2/王)按记牌压力计罚;
  * 农民侧对「地主确定压死的 ≥K 单/对」加罚(白送控牌)。
  */
+const HARD_LEAD_SHED_WEIGHT = 20;
+const PIMC_LEAD_BAND = 200;
+const PIMC_FOLLOW_BAND = 250;
+
+function canSampleWorld(
+  snapshot: Parameters<AiStrategy>[0],
+  hand: Card[],
+  history: GameEvent[],
+): boolean {
+  let played = 0;
+  for (const event of history) if (event.type === 'play') played += event.pattern.cards.length;
+  const hidden = snapshot.handCounts.reduce(
+    (sum, count, seat) => seat === snapshot.turn ? sum : sum + count,
+    0,
+  );
+  return 54 - hand.length - played === hidden;
+}
+
 function chooseLeadMove(
   ctx: HardContext,
+  snapshot: Parameters<AiStrategy>[0],
   hand: Card[],
   moves: Move[],
   history: GameEvent[],
+  profile: PimcProfile,
 ): Move {
   const protectedSet = protectedCards(hand);
-  const pressure = estimateMemoryPressure(hand, history);
   const shapingCandidates = moves.filter(
     (move) => !isBombLike(move.pattern.category) && !usesProtectedCards(move, protectedSet),
   );
 
   if (shapingCandidates.length === 0) return pickSmallest(moves);
-  return chooseByLowestScore(shapingCandidates, (move) => {
-    let score =
-      ctx.decomposer.structureCost(hand, move.cards) * 400 +
-      highCardSpendPenalty(move, pressure) -
-      move.cards.length * 12 +
-      move.pattern.mainRank * 2 -
-      categoryShapingBonus(move) * 0.3;
-    if (ctx.certainLandlordByRank && move.pattern.mainRank >= Rank.K) {
-      const size =
-        move.pattern.category === Category.Single ? 1 : move.pattern.category === Category.Pair ? 2 : 0;
-      if (size > 0 && certainlyBeaten(ctx.certainLandlordByRank, move.pattern.mainRank, size)) {
-        score += 60;
-      }
-    }
-    return score;
+  const memoryPressure = estimateMemoryPressure(hand, history);
+  const pressureCtx = toPressureContext(ctx, snapshot);
+  const scored = shapingCandidates.map((move) => ({
+    move,
+    score: moveOutcomeScore(ctx.decomposer, hand, move, pressureCtx)
+      + Math.round(highCardSpendPenalty(move, memoryPressure) / 3)
+      - move.cards.length * HARD_LEAD_SHED_WEIGHT,
+  })).sort((left, right) => {
+    const delta = left.score - right.score;
+    return delta !== 0 ? delta : compareMoves(left.move, right.move);
   });
+  const best = scored[0]!;
+  const band = scored
+    .filter((entry) => entry.score <= best.score + PIMC_LEAD_BAND)
+    .slice(0, profile.maxCandidates)
+    .map((entry) => entry.move);
+  if (profile.samples > 0 && band.length >= 2 && canSampleWorld(snapshot, hand, history)) {
+    return pimcArbitrate({ snapshot, history, candidates: band, includePass: false, profile }) ?? best.move;
+  }
+  return best.move;
 }
 
 /**
@@ -304,9 +270,9 @@ function choosePressingLeadMove(ctx: HardContext, hand: Card[], moves: Move[]): 
   const candidates = safeMoves.length > 0 ? safeMoves : moves;
   const blockers = candidates.filter((move) => move.cards.length >= 2);
   if (blockers.length > 0) {
-    return chooseByLowestScore(blockers, (move) => {
-      return ctx.decomposer.structureCost(hand, move.cards) * 100 - move.cards.length * 18 - categoryShapingBonus(move);
-    });
+    return chooseByLowestScore(blockers, (move) => (
+      moveOutcomeScore(ctx.decomposer, hand, move) - move.cards.length * 18
+    ));
   }
 
   return pickLargest(candidates);
@@ -319,8 +285,7 @@ function chooseControlFollow(hand: Card[], moves: Move[]): Move | null {
     const remaining = removeMoveCards(hand, move);
     return remaining.length > 0 && canFinishInOneMove(remaining);
   });
-  if (controlCandidates.length === 0) return null;
-  return pickLargest(controlCandidates);
+  return controlCandidates.length > 0 ? pickLargest(controlCandidates) : null;
 }
 
 function isAbsoluteTopSingle(move: Move, remainingByRank: Readonly<Record<number, number>>): boolean {
@@ -338,8 +303,7 @@ function chooseAbsoluteTopSingleFollow(
   if (history.length === 0 || snapshot.top?.pattern.category !== Category.Single) return null;
   const memory = trackPlayed(history, hand);
   const candidates = moves.filter((move) => isAbsoluteTopSingle(move, memory.remainingByRank));
-  if (candidates.length === 0) return null;
-  return pickSmallest(candidates);
+  return candidates.length > 0 ? pickSmallest(candidates) : null;
 }
 
 /**
@@ -444,6 +408,8 @@ function chooseStructuredFollow(
   snapshot: Parameters<AiStrategy>[0],
   hand: Card[],
   moves: Move[],
+  history: GameEvent[],
+  profile: PimcProfile,
 ): Move | 'pass' {
   const protectedSet = protectedCards(hand);
   const safe = moves.filter(
@@ -453,75 +419,155 @@ function chooseStructuredFollow(
     ...opponentSeats(snapshot).map((seat) => snapshot.handCounts[seat]),
   );
 
-  if (safe.length === 0) {
-    const bombs = bombLikeMoves(moves);
-    if (bombs.length > 0 && opponentMin <= 2) return pickSmallestBombLike(bombs);
-    return 'pass';
-  }
-
   const scored = safe.map((move) => ({
     move,
     cost: ctx.decomposer.structureCost(hand, move.cards),
+    score: moveOutcomeScore(ctx.decomposer, hand, move, toPressureContext(ctx, snapshot)),
   }));
-  const free = scored.filter((entry) => entry.cost <= 0);
+  const teammate = teammateSeat(snapshot);
+  const teammateRace = teammate !== null
+    && snapshot.top?.seat === snapshot.landlord
+    && snapshot.handCounts[teammate] <= 1;
+  const free = teammateRace ? [] : scored.filter((entry) => entry.cost <= 0);
   if (free.length > 0) return pickSmallest(free.map((entry) => entry.move));
 
+  const bombs = bombLikeMoves(moves);
   const cheap = scored.filter((entry) => entry.cost === 1);
-  if (cheap.length > 0) {
-    const pick = pickSmallest(cheap.map((entry) => entry.move));
-    if (pick.pattern.mainRank < Rank.A) return pick;
-    if (ctx.decomposer.decompose(hand).moveCount <= 3) return pick;
-  }
+  const fallback = (): Move | 'pass' => {
+    if (safe.length === 0) {
+      if (bombs.length > 0 && opponentMin <= 2) return pickSmallestBombLike(bombs);
+      return 'pass';
+    }
+    if (cheap.length > 0) {
+      const pick = pickSmallest(cheap.map((entry) => entry.move));
+      if (pick.pattern.mainRank < Rank.A) return pick;
+      if (ctx.decomposer.decompose(hand).moveCount <= 3) return pick;
+    }
+    const urgentThreshold = 8;
+    if (opponentMin <= urgentThreshold) return pickSmallest(safe);
+    return 'pass';
+  };
 
-  if (opponentMin <= 4) return pickSmallest(safe);
-  return 'pass';
+  const structuredFallback = fallback();
+  const grayPool = safe.length > 0 ? safe : bombs;
+  const grayScored = grayPool.map((move) => ({
+    move,
+    score: moveOutcomeScore(ctx.decomposer, hand, move, toPressureContext(ctx, snapshot)),
+  })).sort((left, right) => {
+    const delta = left.score - right.score;
+    return delta !== 0 ? delta : compareMoves(left.move, right.move);
+  });
+  const grayBest = grayScored[0];
+  const gray = grayBest
+    ? grayScored.filter((entry) => entry.score <= grayBest.score + PIMC_FOLLOW_BAND).map((entry) => entry.move)
+    : [];
+  if (profile.samples > 0 && gray.length > 0 && canSampleWorld(snapshot, hand, history)) {
+    const verdict = pimcArbitrate({
+      snapshot,
+      history,
+      candidates: gray,
+      includePass: true,
+      profile,
+      mustInclude: structuredFallback === 'pass' ? undefined : structuredFallback,
+    });
+    return verdict ?? 'pass';
+  }
+  return structuredFallback;
 }
 
-/** 积极控权策略：拆解驱动内核（W-AUDIT-AI B2），纯公开信息、确定性。 */
-export const hardStrategy: AiStrategy = (snapshot, _rng, history = []) => {
-  const hand = requireHand(snapshot);
-  const moves = snapshot.top ? legalFollows(hand, snapshot.top.pattern) : enumerateMoves(hand);
+function countsFromRecord(record: Readonly<Record<number, number>>): number[] {
+  const counts = new Array<number>(Rank.BigJoker + 1).fill(0);
+  for (let rank = Rank.R3; rank <= Rank.BigJoker; rank += 1) counts[rank] = record[rank] ?? 0;
+  return counts;
+}
 
-  if (snapshot.top && moves.length === 0) return { type: 'pass', seat: snapshot.turn };
+function toPressureContext(
+  ctx: HardContext,
+  snapshot: Parameters<AiStrategy>[0],
+): PressureContext | undefined {
+  if (!ctx.remainingByRank) return undefined;
+  const hidden = opponentSeats(snapshot);
+  const first = hidden[0] ?? ((snapshot.turn + 1) % 3);
+  const second = hidden[1] ?? [0, 1, 2].find((seat) => seat !== snapshot.turn && seat !== first)!;
+  return {
+    remainingByRank: countsFromRecord(ctx.remainingByRank),
+    hiddenCounts: [snapshot.handCounts[first], snapshot.handCounts[second]],
+    certainlyBeatenByRank: ctx.certainLandlordByRank
+      ? countsFromRecord(ctx.certainLandlordByRank)
+      : undefined,
+  };
+}
 
-  const finishingMove = chooseFinishingMove(hand, moves, snapshot);
-  if (finishingMove !== null) return toPlay(snapshot, finishingMove);
+/** 积极控权策略工厂：profile 只改变确定性预算，不改变信息面与合法性。 */
+export function hardStrategyWithProfile(profile: PimcProfile): AiStrategy {
+  return (snapshot, _rng, history = []) => {
+    const hand = requireHand(snapshot);
+    const moves = snapshot.top ? legalFollows(hand, snapshot.top.pattern) : enumerateMoves(hand);
 
-  const ctx = buildHardContext(snapshot, hand, history);
+    if (snapshot.top && moves.length === 0) return { type: 'pass', seat: snapshot.turn };
 
-  // T-AI-DEPTH2：终局必胜看破（纯公开信息）——lead 走保证序列；follow 用不可压候选夺权收官。
-  if (ctx.remainingByRank) {
-    const guaranteed = snapshot.top === null
-      ? chooseGuaranteedLead(hand, moves, ctx.remainingByRank)
-      : chooseGuaranteedTakeover(hand, moves, ctx.remainingByRank);
+    const finishingMove = chooseFinishingMove(hand, moves, snapshot);
+    if (finishingMove !== null) return toPlay(snapshot, finishingMove);
+
+    const ctx = buildHardContext(snapshot, hand, history);
+    const raceTeammate = teammateSeat(snapshot);
+    const deferFarmerTakeover = snapshot.top !== null
+      && raceTeammate !== null
+      && snapshot.top.seat === snapshot.landlord
+      && snapshot.handCounts[raceTeammate] <= 1;
+
+    let guaranteed: Move | null = null;
+    if (ctx.remainingByRank) {
+      if (snapshot.top === null) guaranteed = chooseGuaranteedLead(hand, moves, ctx.remainingByRank);
+      else if (!deferFarmerTakeover) guaranteed = chooseGuaranteedTakeover(hand, moves, ctx.remainingByRank);
+    }
     if (guaranteed !== null) return toPlay(snapshot, guaranteed);
-  }
 
-  if (isTeammateTop(snapshot)) return { type: 'pass', seat: snapshot.turn };
+    if (ctx.remainingByRank && hand.length <= 10 && history.length > 0 && !deferFarmerTakeover) {
+      const unseenByRank = countsFromRecord(ctx.remainingByRank);
+      const unseenCount = unseenByRank.reduce((sum, count) => sum + count, 0);
+      if (unseenCount <= 14) {
+        const exact = solveForcedWin({
+          hand,
+          unseenByRank,
+          minOpponentHandCount: Math.min(...opponentSeats(snapshot).map((seat) => snapshot.handCounts[seat])),
+          top: snapshot.top?.pattern ?? null,
+          nodeBudget: 60_000,
+        });
+        if (exact.result === 'win' && exact.move !== null) return toPlay(snapshot, exact.move);
+      }
+    }
 
-  if (isPressing(snapshot)) {
-    const bombs = bombLikeMoves(moves);
-    if (bombs.length > 0) return toPlay(snapshot, pickSmallestBombLike(bombs));
-    if (snapshot.top) return toPlay(snapshot, pickLargest(moves));
-    return toPlay(snapshot, choosePressingLeadMove(ctx, hand, moves));
-  }
+    if (isTeammateTop(snapshot)) return { type: 'pass', seat: snapshot.turn };
 
-  if (!snapshot.top) {
-    const feed = chooseFeedTeammateLead(snapshot, hand, moves);
-    if (feed !== null) return toPlay(snapshot, feed);
-    return toPlay(snapshot, chooseLeadMove(ctx, hand, moves, history));
-  }
+    if (isPressing(snapshot)) {
+      const bombs = bombLikeMoves(moves);
+      if (bombs.length > 0) return toPlay(snapshot, pickSmallestBombLike(bombs));
+      if (snapshot.top && !deferFarmerTakeover) return toPlay(snapshot, pickLargest(moves));
+      if (!snapshot.top) return toPlay(snapshot, choosePressingLeadMove(ctx, hand, moves));
+    }
 
-  const controlFollow = chooseControlFollow(hand, moves);
-  if (controlFollow !== null) return toPlay(snapshot, controlFollow);
+    if (!snapshot.top) {
+      const feed = chooseFeedTeammateLead(snapshot, hand, moves);
+      if (feed !== null) return toPlay(snapshot, feed);
+      return toPlay(snapshot, chooseLeadMove(ctx, snapshot, hand, moves, history, profile));
+    }
 
-  const absoluteTopSingle = chooseAbsoluteTopSingleFollow(snapshot, hand, moves, history);
-  if (absoluteTopSingle !== null) return toPlay(snapshot, absoluteTopSingle);
+    if (!deferFarmerTakeover) {
+      const controlFollow = chooseControlFollow(hand, moves);
+      if (controlFollow !== null) return toPlay(snapshot, controlFollow);
 
-  const upstreamPress = chooseUpstreamPressFollow(snapshot, hand, moves);
-  if (upstreamPress !== null) return toPlay(snapshot, upstreamPress);
+      const absoluteTopSingle = chooseAbsoluteTopSingleFollow(snapshot, hand, moves, history);
+      if (absoluteTopSingle !== null) return toPlay(snapshot, absoluteTopSingle);
+    }
 
-  const structured = chooseStructuredFollow(ctx, snapshot, hand, moves);
-  if (structured === 'pass') return { type: 'pass', seat: snapshot.turn };
-  return toPlay(snapshot, structured);
-};
+    const upstreamPress = chooseUpstreamPressFollow(snapshot, hand, moves);
+    if (upstreamPress !== null) return toPlay(snapshot, upstreamPress);
+
+    const structured = chooseStructuredFollow(ctx, snapshot, hand, moves, history, profile);
+    if (structured === 'pass') return { type: 'pass', seat: snapshot.turn };
+    return toPlay(snapshot, structured);
+  };
+}
+
+export const hardStrategy: AiStrategy = hardStrategyWithProfile(HARD_PIMC);

@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-W-SHINE-S4 图像机检门(v1.6 二次终审整改)。纯 PIL,读 s4-evidence.mjs 的产物 + assets 里的皮肤 PNG/meta。
+W-VISION-S4R 图像机检门(v1.7 视觉门重建)。纯 PIL,读 s4-evidence.mjs 的产物 + assets 里的皮肤 PNG/meta。
 
 用户两次驳回都指向同一类问题(文字压线/看不清、异形、icon 变形),口头判据不可复现,故全部固化成门:
 
-  门C 文字可读(AA 4.5:1) —— 每个 Label 的「声明字色」即字芯,其视口矩形在真实截图上的「底色众数」即底色。
-       此门专为捕获「v15 深底皮 → v18 浅底皮换肤后,浅奶油字只剩 1.22:1」这一类回归而设。
+  门C 文字可读(AA 4.5:1;真实禁用态 3.0) —— 每个 Label 的「声明字色」即字芯,其视口矩形在真实截图上的
+       「底色众数」即底色。此门专为捕获「v15 深底皮 → v18 浅底皮换肤后,浅奶油字只剩 1.22:1」这一类回归而设。
+       W-VISION-COLOR-R2 规划裁决(2026-07-16):采证器显式标注 interactable===false 的 Label(真实禁用控件)
+       用 DISABLED_AA=3.0——WCAG 1.4.3 对 inactive 组件整体豁免,本门保留强于标准的 3.0 下限,与
+       ui-text-colors 规划种子的 disabled 契约(≥3.0)同口径;色值已获用户签收锁定,提对比只剩改字色一途,
+       禁用态按 4.5 判红会强迫破坏色锁。字段缺失/true/null 一律 4.5(fail-safe,不许按名称/颜色豁免);
+       全部豁免逐条列印并落 report['contrastExempt']。
   门D 底图规则(无异形) —— 皮肤 PNG 的 alpha 掩膜在中段必须行行满宽、列列满高(花瓣/扇贝/缺口即挂)。
   门E icon 不变形     —— meta 的 trim 后 rect 长宽比必须≈原图长宽比(trimType=auto 削掉透明边会改比例,
        SIMPLE 渲染进方框就会拉伸——这正是用户②所指)。
@@ -23,12 +28,13 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '../..'))
-SHOTS = os.path.join(ROOT, 'coordination/reports/W-SHINE-S4-evidence/shots')
-LABELS = os.path.join(ROOT, 'coordination/reports/W-SHINE-S4-evidence/labels')
+SHOTS = os.path.join(ROOT, 'coordination/reports/W-VISION-S4R-evidence/shots')
+LABELS = os.path.join(ROOT, 'coordination/reports/W-VISION-S4R-evidence/labels')
 ART = os.path.join(ROOT, 'assets/resources/art')
-REPORT = os.path.join(ROOT, 'coordination/reports/W-SHINE-S4-evidence/image-gates.json')
+REPORT = os.path.join(ROOT, 'coordination/reports/W-VISION-S4R-evidence/image-gates.json')
 
 AA = 4.5          # WCAG AA 正文对比度
+DISABLED_AA = 3.0  # 真实禁用态(采证 interactable===false)下限;见文件头 R2 规划裁决
 BOXY = 0.98       # 规则性:中段行/列必须达最大跨度的 98%
 ASPECT_TOL = 0.05  # icon 比例偏差上限 5%
 LINE_MAX = 0.030  # 盖字底图中央净区的线条像素占比上限 3%
@@ -52,6 +58,17 @@ def contrast(a, b):
     la, lb = lum(a), lum(b)
     hi, lo = max(la, lb), min(la, lb)
     return (hi + 0.05) / (lo + 0.05)
+
+
+def label_aa_threshold(interactable):
+    """门C 阈值:仅显式 False(真实禁用控件)用 DISABLED_AA;缺失/True/None 一律 AA(fail-safe)。"""
+    return DISABLED_AA if interactable is False else AA
+
+
+# 门C 阈值自证(每次运行必跑,坏一条立即崩):enabled@3.2 必违规;disabled@3.2 必放行;disabled@2.9 必违规。
+for _c, _i, _expect_bad in [(3.2, None, True), (4.6, None, False), (3.2, False, False),
+                            (2.9, False, True), (3.2, True, True)]:
+    assert (_c < label_aa_threshold(_i)) == _expect_bad, ('门C 阈值自证失败', _c, _i, _expect_bad)
 
 
 def over(fg, bg):
@@ -173,8 +190,7 @@ for dp, _d, fs_ in os.walk(ART):
         if f.endswith('.png'):
             ART_PNG.setdefault(f[:-4], os.path.join(dp, f))
 
-# 禁用态按 WCAG 1.4.3 豁免对比度要求(灰字即「不可点」的语义信号),但仍列出披露。
-DISABLED_NODES = {'btn-disabled-v18'}
+# R2 起的硬约束:活跃四态按钮字色全部达到 AA；门 C 不保留禁用态豁免分支。
 # 牌面文字不入门B:牌点/花色按扑克惯例贴角排,不是「居中盖在皮上」,中心十字探针不适用
 # (且它们的底是卡牌本身、不是被误判到的底牌托盘)。可读性仍由门C 约束。
 B_SKIP_PREFIX = ('card-rank-label', 'card-suit-label', 'mini-')
@@ -187,7 +203,6 @@ if not scenes:
 print('=== 门B 文字不压线(字形带 ⊂ 盖字皮净区) + 门C 文字可读(AA %.1f:1) ===' % AA)
 worst = []
 overrun = []
-exempt = []
 all_sprites = []
 skins_seen = set()   # 运行时真正被文字盖住的皮 —— 门D/门F 的清单由此自动推导,不手维护
 for scene in scenes:
@@ -214,8 +229,9 @@ for scene in scenes:
             row = {
                 'scene': scene, 'node': r['node'], 'text': r['text'],
                 'ink': list(ink), 'bg': list(bg), 'contrast': round(contrast(ink, bg), 2), 'spr': spr,
+                'interactable': r.get('interactable'),
             }
-            (exempt if spr in DISABLED_NODES else worst).append(row)
+            worst.append(row)
         # ---- 门B:字形带必须落进盖字皮的净区(阈值从 PNG+meta 量,不拍脑袋)。
         # 位置包含判定,不只比尺寸:偏置的文字盒即便更小,也可能压到某一侧的描边。
         png = ART_PNG.get(spr) if spr else None
@@ -263,20 +279,30 @@ for k, v in report['skinGeometry'].items():
         k, '%dx%d' % tuple(v['rect']), tuple(v['cap']), tuple(v['margin'])))
 
 worst.sort(key=lambda d: d['contrast'])
-exempt.sort(key=lambda d: d['contrast'])
 report['contrast'] = worst
+# R2 规划裁决:真实禁用态(interactable===false)按 DISABLED_AA 判;落带内(≥3.0 <4.5)的逐条豁免列印。
+exempt = [d for d in worst if d.get('interactable') is False and DISABLED_AA <= d['contrast'] < AA]
 report['contrastExempt'] = exempt
-bad = [d for d in worst if d['contrast'] < AA]
+bad = [d for d in worst if d['contrast'] < label_aa_threshold(d.get('interactable'))]
 seen = set()
 for d in bad:
     k = (d['node'], d['spr'])
     if k in seen:
         continue
     seen.add(k)
-    print('   ✗ %-22s %-14s 字%s 底%s = %.2f:1  [%s@%s]' % (
-        d['node'], '"%s"' % d['text'][:12], tuple(d['ink']), tuple(d['bg']), d['contrast'], d['spr'], d['scene']))
-gate(len(bad) == 0, '门C 全场 %d 个 Label 均达 AA(违规 %d 例,最低 %.2f:1)' % (
-    len(worst), len(bad), worst[0]['contrast'] if worst else 0))
+    print('   ✗ %-22s %-14s 字%s 底%s = %.2f:1(阈 %.1f)  [%s@%s]' % (
+        d['node'], '"%s"' % d['text'][:12], tuple(d['ink']), tuple(d['bg']),
+        d['contrast'], label_aa_threshold(d.get('interactable')), d['spr'], d['scene']))
+seen = set()
+for d in exempt:
+    k = (d['node'], d['spr'])
+    if k in seen:
+        continue
+    seen.add(k)
+    print('   ◦ 禁用豁免 %-18s %-12s %.2f:1 ∈ [%.1f, %.1f)  [%s@%s]' % (
+        d['node'], '"%s"' % d['text'][:10], d['contrast'], DISABLED_AA, AA, d['spr'], d['scene']))
+gate(len(bad) == 0, '门C 全场 %d 个 Label 达标(违规 %d 例,禁用豁免 %d 例,最低 %.2f:1)' % (
+    len(worst), len(bad), len(exempt), worst[0]['contrast'] if worst else 0))
 if worst:
     print('   最低 6 个(通过也列出,便于复审):')
     shown = set()
@@ -287,10 +313,6 @@ if worst:
         print('      %-22s %-12s %.2f:1  [%s]' % (d['node'], '"%s"' % d['text'][:10], d['contrast'], d['spr']))
         if len(shown) >= 6:
             break
-if exempt:
-    print('   禁用态(WCAG 1.4.3 豁免,仅披露):最低 %.2f:1 —— %s' % (
-        exempt[0]['contrast'], exempt[0]['text']))
-
 # ------------------------------------------------- 门D/门F 盖字底图:规则 + 简洁
 # 清单不手维护:取「运行时真的被文字盖住的皮」(门B 同一集合)。退役的件自动出列,新接的件自动入列。
 TEXT_BACKDROPS = sorted(skins_seen)
@@ -371,10 +393,63 @@ for d in report['aspect_skew']:
         d['spr'], '%dx%d' % tuple(d['rect']), '%dx%d' % tuple(d['box']), d['dev'], d['scene']))
 gate(len(skew) == 0, '门E %d 个 SIMPLE 精灵比例守恒(变形 %d 件)' % (checked, len(skew)))
 
+# ---------------------------------------------------------------- 门M 禁用态可见性(R2-d)
+# 用户整改(2026-07-16):禁用钮以 alpha=24(≈9.4%)压皮,皮/rim/底唇/投影近乎消失——不是「降权」是「视觉缺失」。
+# 判据:禁用大按钮的皮必须「可见但降权」——运行时 Sprite color alpha ∈ [M_ALPHA_LO, M_ALPHA_HI];
+#       可交互大按钮必须全强调(alpha == 255)。数据源 = 采证器 sprites[].interactable(运行时 Button 实况,
+#       禁按名推断)+ sprites[].colorA(Sprite.color.a 实况)。字段缺失 = 采证器未升级,按门失败处理(fail-safe)。
+print('\n=== 门M 禁用态可见性——禁用大按钮皮 alpha ∈ [%d, %d](可见但降权),可交互 == 255 ===' % (96, 160))
+M_ALPHA_LO, M_ALPHA_HI = 96, 160
+M_BIG_BUTTON_KEYS = {'btn-primary-c2', 'btn-secondary-c2', 'btn-neutral-c2'}
+
+
+def m_verdict(interactable, color_a):
+    """None=不适用;'' = 合格;非空字符串 = 违规原因。仅显式 True/False 参与判定。"""
+    if interactable is None:
+        return None
+    if color_a is None:
+        return 'colorA 字段缺失(采证器未升级)'
+    if interactable is False:
+        if color_a < M_ALPHA_LO:
+            return '禁用皮近透明 alpha=%d < %d(视觉缺失)' % (color_a, M_ALPHA_LO)
+        if color_a > M_ALPHA_HI:
+            return '禁用皮 alpha=%d > %d(与可点态无降权差异)' % (color_a, M_ALPHA_HI)
+        return ''
+    return '' if color_a == 255 else '可交互皮 alpha=%d ≠ 255' % color_a
+
+
+# 门M 自证(每次运行必跑):alpha=24 旧实现必红;120 带内必绿;200 越上限必红;可交互 255 绿/120 红;字段缺失必红。
+for _i, _a, _expect in [(False, 24, True), (False, 120, False), (False, 200, True),
+                        (True, 255, False), (True, 120, True), (False, None, True)]:
+    _v = m_verdict(_i, _a)
+    assert (bool(_v)) == _expect, ('门M 自证失败', _i, _a, _v)
+assert m_verdict(None, 255) is None, '门M 自证失败:无 Button 祖先不适用'
+
+m_bad = []
+m_disabled_seen = 0
+for s in all_sprites:
+    base = (s.get('spr') or '').split('/')[-1]
+    if base not in M_BIG_BUTTON_KEYS:
+        continue
+    verdict = m_verdict(s.get('interactable'), s.get('colorA'))
+    if verdict is None:
+        continue
+    if s.get('interactable') is False:
+        m_disabled_seen += 1
+    if verdict:
+        m_bad.append({'scene': s['scene'], 'node': s.get('owner') or s['node'], 'spr': base,
+                      'interactable': s.get('interactable'), 'colorA': s.get('colorA'), 'why': verdict})
+for d in m_bad:
+    print('   ✗ %-22s %-18s interactable=%s colorA=%s  %s  [%s]' % (
+        d['spr'], d['node'], d['interactable'], d['colorA'], d['why'], d['scene']))
+report['disabledVisibility'] = {'violations': m_bad, 'disabledSeen': m_disabled_seen}
+gate(len(m_bad) == 0, '门M 大按钮禁用态可见性(违规 %d,禁用实例覆盖 %d)' % (len(m_bad), m_disabled_seen))
+gate(m_disabled_seen > 0, '门M 证据完备性:采证覆盖至少 1 个真实禁用大按钮(实测 %d)' % m_disabled_seen)
+
 os.makedirs(os.path.dirname(REPORT), exist_ok=True)
 json.dump(report, open(REPORT, 'w'), ensure_ascii=False, indent=1)
 print('\n-> %s' % REPORT)
 if fails:
-    print('\nS4 IMAGE GATES FAIL (%d)' % len(fails))
+    print('\nS4R IMAGE GATES FAIL (%d)' % len(fails))
     sys.exit(1)
-print('\nS4 IMAGE GATES PASS')
+print('\nS4R IMAGE GATES PASS')

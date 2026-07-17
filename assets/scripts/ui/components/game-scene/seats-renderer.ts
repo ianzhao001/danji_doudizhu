@@ -11,10 +11,12 @@ import { deriveLastPlays, type SeatLastPlay } from '../../last-play-view';
 import { RESOURCE_PATHS, type ResourcePath } from '../../asset-keys';
 import type { Rect } from '../../table-layout';
 import type { TableZones } from '../../table-zones';
+import type { TypographyRole } from '../../theme';
 import { t } from '../../strings';
+import { UI_TEXT_COLORS } from '../../ui-text-colors';
+import type { SessionTotals } from '../../session-score';
 import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
-import { CARD_SIZE } from './card-node';
-import { dropZoneForSeat, seatDisplayName, visualSideForSeat } from './seat-display';
+import { dropZoneForSeat, seatDisplayName } from './seat-display';
 
 export interface GameSceneRendererContext {
   uiRoot: Node;
@@ -28,6 +30,7 @@ export interface GameSceneRendererContext {
   turnTimerElapsedMs: number;
   turnTimerMs: number;
   spriteFrames: Map<string, SpriteFrame>;
+  sessionTotals(): SessionTotals;
   isLandscape(canvas: { width: number; height: number }): boolean;
   screenPoint(canvas: { width: number; height: number }, screenX: number, screenY: number): { x: number; y: number };
   rectPoint(rect: Rect, canvas: { width: number; height: number }, fx: number, fy: number): { x: number; y: number };
@@ -36,7 +39,7 @@ export interface GameSceneRendererContext {
     text: string,
     x: number,
     y: number,
-    fontSize: number,
+    role: TypographyRole,
     parent?: Node,
     width?: number,
     height?: number,
@@ -56,13 +59,13 @@ export interface GameSceneRendererContext {
   ): Label;
   addSprite(path: ResourcePath, x: number, y: number, width: number, height: number, parent: Node, name: string, sliced?: boolean): Node;
   addSpriteContain(path: ResourcePath, x: number, y: number, width: number, height: number, parent: Node, name: string): Node;
-  loadSprite(path: ResourcePath, sprite: Sprite | null): void;
+  loadSprite(path: ResourcePath, sprite: Sprite | null): SpriteFrame | null;
   drawPanelSkin(parent: Node, width: number, height: number, name?: string): Node;
   render(): void;
   setMemoryExpanded(value: boolean): void;
-  /** v1.5 P-RESULT-CINE:结算入场动画防重播签名(startGame 时重置)。 */
-  animatedResultKey(): string | null;
-  setAnimatedResultKey(key: string | null): void;
+  /** Unified R1 id gate shared by card, toast and result animation entrypoints. */
+  claimAnimationId(id: string): boolean;
+  hasAnimationId(id: string): boolean;
   /** v1.5 W3-B:常驻特效层(prune 豁免),胜局彩带/星光等跨 render 生命周期特效挂点。 */
   fxLayer(): Node;
   toggleAdvisor(): void;
@@ -81,13 +84,12 @@ export interface GameSceneRendererContext {
 }
 
 const HERO_SEAT: SeatIndex = 0;
-// v1.6 二次终审(用户设计原则「盖字底图要简洁」的可读性推论):v18 皮全族是浅底
-// (info-pill 浅粉 249,220,232 / nameplate 奶油 255,242,229),而 v15 深底时代留下的
-// 浅奶油/金/白字压上去只剩 ~1.2:1,近乎隐形。凡压 v18 皮的字一律深莓,弱化档也守 AA 4.5:1。
-const NAMEPLATE_TEXT = toColor(THEME.palette.brandDark); // 深莓 on 奶油名牌 = 8.9:1(截图实测)
-export const PILL_TEXT = toColor(THEME.palette.brandDark); // 深莓 on 浅粉药丸 = 7.7:1
-export const PILL_TEXT_MUTED = toColor(THEME.palette.textSecondary); // 弱化档:药丸 4.9:1 / 名牌 5.7:1
-const NAMEPLATE_MUTED = PILL_TEXT_MUTED;
+// W-VISION S4:换皮必须同步换字色。v19 名牌是亮粉底,旧 secondary 莓色实景仅 2.92:1；
+// 名称与角色说明统一用 ART-V19 推荐深莓 #6C2E4C,仍以字号/字重表达层级,不拿低对比当“弱化”。
+const NAMEPLATE_TEXT = toColor(UI_TEXT_COLORS.primary);
+export const PILL_TEXT = toColor(UI_TEXT_COLORS.primary);
+export const PILL_TEXT_MUTED = toColor(THEME.palette.textSecondary);
+const NAMEPLATE_MUTED = NAMEPLATE_TEXT;
 const ALERT_TEXT_ON_DARK = toColor(THEME.palette.textOnAccent); // 白 on danger 深红 = 5.4:1
 const ALERT_TEXT_ON_LIGHT = toColor(THEME.palette.brandDark); // 深莓 on warning 浅金 = 6.9:1
 
@@ -99,9 +101,9 @@ export function renderSeats(
   canvas: { width: number; height: number },
   alerts: SeatAlert[] = [],
 ): void {
-  const heroBody = seatBodyVisualRect('seat-hero', layout.heroBody, canvas);
-  const leftBody = seatBodyVisualRect('seat-left', layout.opponentLeftBody, canvas);
-  const rightBody = seatBodyVisualRect('seat-right', layout.opponentRightBody, canvas);
+  const heroBody = layout.heroBody;
+  const leftBody = layout.opponentLeftBody;
+  const rightBody = layout.opponentRightBody;
   const leftSeat: SeatIndex = 2;
   const rightSeat: SeatIndex = 1;
   renderSeatCard(ctx, 'seat-hero', heroBody, canvas, RESOURCE_PATHS.heroBodyV13);
@@ -110,7 +112,7 @@ export function renderSeats(
   renderSeatNameplate(
     ctx,
     'seat-hero-nameplate',
-    seatNameplateRect(0, layout.heroNameplate, heroBody, layout, canvas),
+    layout.heroNameplate,
     canvas,
     0,
     handCounts[0],
@@ -120,7 +122,7 @@ export function renderSeats(
   renderSeatNameplate(
     ctx,
     'seat-left-nameplate',
-    seatNameplateRect(leftSeat, layout.opponentLeftNameplate, leftBody, layout, canvas),
+    layout.opponentLeftNameplate,
     canvas,
     leftSeat,
     handCounts[leftSeat],
@@ -130,7 +132,7 @@ export function renderSeats(
   renderSeatNameplate(
     ctx,
     'seat-right-nameplate',
-    seatNameplateRect(rightSeat, layout.opponentRightNameplate, rightBody, layout, canvas),
+    layout.opponentRightNameplate,
     canvas,
     rightSeat,
     handCounts[rightSeat],
@@ -157,74 +159,6 @@ function renderSeatCard(
   bodyNode.setSiblingIndex(0);
 }
 
-function seatBodyVisualRect(
-  name: string,
-  body: Rect,
-  canvas: { width: number; height: number },
-): Rect {
-  let visualWidth = body.width;
-  let visualHeight = body.height;
-  let screenX = body.x + visualWidth / 2;
-  let screenY = body.y + visualHeight / 2;
-  if (name === 'seat-hero') {
-    visualWidth = Math.round(body.width * 0.92);
-    visualHeight = Math.round(body.height * 0.9);
-    screenX = body.x + visualWidth / 2;
-    screenY = body.y + body.height - visualHeight / 2;
-  }
-  if (name === 'seat-left' || name === 'seat-right') {
-    visualWidth = Math.round(body.width * 0.9);
-    visualHeight = Math.round(body.height * 0.92);
-    const outward = Math.round(body.width * 0.03);
-    screenX += name === 'seat-left' ? -outward : outward;
-    screenY -= Math.round(body.height * 0.08);
-  }
-  return {
-    x: clamp(Math.round(screenX - visualWidth / 2), 0, canvas.width - visualWidth),
-    y: clamp(Math.round(screenY - visualHeight / 2), 0, canvas.height - visualHeight),
-    width: visualWidth,
-    height: visualHeight,
-  };
-}
-
-function seatNameplateRect(
-  seat: SeatIndex,
-  nameplate: Rect,
-  body: Rect,
-  layout: TableZones,
-  canvas: { width: number; height: number },
-): Rect {
-  const gap = 8;
-  const width = nameplate.width;
-  const height = nameplate.height;
-  if (seat === 0) {
-    const leftHudX = Math.min(layout.strengthMeter.x, layout.memoryDock.x);
-    const outsideBodyX = body.x + body.width + gap;
-    const availableWidth = Math.max(46, Math.min(width, leftHudX - gap - outsideBodyX));
-    const compactWidth = Math.min(width, availableWidth);
-    const x = clamp(outsideBodyX, gap, leftHudX - gap - compactWidth);
-    const y = clamp(
-      Math.min(body.y + Math.round(body.height * 0.08), layout.heroHandLarge.y - gap - height - 12),
-      gap,
-      canvas.height - gap - height,
-    );
-    return { x, y, width: compactWidth, height };
-  }
-  const side = visualSideForSeat(seat);
-  if (side === 'left') {
-    const x = clamp(body.x + Math.round(body.width * 0.04), gap, canvas.width - gap - width);
-    const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
-    return { x, y, width, height };
-  }
-  const x = clamp(body.x + body.width - width - Math.round(body.width * 0.04), gap, canvas.width - gap - width);
-  const y = clamp(body.y + body.height + gap, gap, layout.tableActionBar.y - gap - height);
-  return { x, y, width, height };
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
 function renderSeatNameplate(
   ctx: GameSceneRendererContext,
   name: string,
@@ -242,7 +176,7 @@ function renderSeatNameplate(
   root.setPosition(nameplateCenter.x, nameplateCenter.y, 0);
   addUiTransform(root, nameplate.width, nameplate.height);
   const plate = ctx.addSprite(
-    RESOURCE_PATHS.seatNameplateV18,
+    RESOURCE_PATHS.seatNameplateC1,
     0,
     0,
     nameplate.width,
@@ -255,26 +189,37 @@ function renderSeatNameplate(
 
   const roleText = roleKnown ? (isLandlord ? '地主' : '农民') : '待定';
   const compactHero = seat === HERO_SEAT && nameplate.width < 80;
-  const labelWidth = Math.max(40, nameplate.width - 16);
-  // 门B:名牌净区高 ≈ 81.4%,两行(名 + 角色)必须一起塞进去——原偏移在 33 高的 hero 紧凑板上撑爆。
-  // 按板高按比例排:名行居上 18%、角色行居下 21%,行高压到净区内。
-  const nameY = Math.round(nameplate.height * 0.18);
-  const roleY = -Math.round(nameplate.height * 0.21);
-  const label = ctx.addLabel(
+  const labelWidth = Math.max(40, nameplate.width - THEME.spacing.section);
+  const roleTypography = compactHero ? THEME.typography.assistive : THEME.typography.secondary;
+  // 门B:33px 名牌实测净高约 28px。两行按彼此行高推中心，让字形带恰好相接且整体居中，
+  // 避免按高度比例取整后出现 0.5–1px 的行间相撞。
+  const nameY = roleTypography.lineHeight / 2;
+  const roleY = -THEME.typography.meta.lineHeight / 2 + 1;
+  ctx.addLabel(
     compactHero ? seatDisplayName(seat) : `${seatDisplayName(seat)}  ${handCount}张`,
     0,
     nameY,
-    13,
+    'meta',
     root,
     labelWidth,
-    Math.max(13, Math.round(nameplate.height * 0.40)),
+    Math.max(THEME.typography.meta.lineHeight, Math.round(nameplate.height * 0.40)),
     'seat-name-label',
     NAMEPLATE_TEXT,
   );
-  label.lineHeight = 15;
-  const role = ctx.addLabel(roleText, 0, roleY, compactHero ? 10 : 12, root, labelWidth,
-    Math.max(12, Math.round(nameplate.height * 0.34)), 'seat-role-label', NAMEPLATE_MUTED);
-  role.lineHeight = compactHero ? 12 : 13;
+  ctx.addLabel(roleText, 0, roleY, compactHero ? 'assistive' : 'secondary', root, labelWidth,
+    Math.max(roleTypography.lineHeight, Math.round(nameplate.height * 0.34)), 'seat-role-label', NAMEPLATE_MUTED);
+  if (roleKnown) {
+    const roleIcon = ctx.addSpriteContain(
+      isLandlord ? RESOURCE_PATHS.landlordHatV19 : RESOURCE_PATHS.farmerBadgeV19,
+      ctx.isLandscape(canvas) ? nameplate.width / 2 - 18 : nameplate.width / 2 - 11,
+      0,
+      20,
+      18,
+      root,
+      'seat-role-icon',
+    );
+    roleIcon.setSiblingIndex(root.children.length - 1);
+  }
   const alert = alerts.find((item) => item.seat === seat);
   if (alert) renderSeatAlertBadge(ctx, root, nameplate, alert);
 }
@@ -293,15 +238,14 @@ function renderSeatAlertBadge(
   badge.setPosition(nameplate.width / 2 - width / 2 - 2, nameplate.height / 2 + 8, 0);
   addUiTransform(badge, width, height);
   drawPanel(badge, width, height, backdrop);
-  const label = ctx.addLabel(text, 0, 0, 10, badge, width, height, 'seat-alert-label',
+  ctx.addLabel(text, 0, 0, 'assistive', badge, width, height, 'seat-alert-label',
     alert.kind === 'lastOne' ? ALERT_TEXT_ON_DARK : ALERT_TEXT_ON_LIGHT);
-  label.lineHeight = 12;
 }
 
-/** v1.6 二次终审:信息药丸统一 v18 皮肤(浅粉单一填充+一条细描边),取代 v15 异形深底;清残留 Graphics 防叠影。 */
+/** W-VISION-COLOR:信息药丸换 c1 象牙白底+细粉边；清残留 Graphics 防叠影。 */
 export function applyPillSkin(ctx: GameSceneRendererContext, root: Node, width: number, height: number): void {
   root.getComponent(Graphics)?.clear();
-  const skin = ctx.addSprite(RESOURCE_PATHS.infoPillV18, 0, 0, width, height, root, 'pill-skin', true);
+  const skin = ctx.addSprite(RESOURCE_PATHS.infoPillC1, 0, 0, width, height, root, 'pill-skin', true);
   skin.setSiblingIndex(0);
 }
 
@@ -321,7 +265,11 @@ function renderLastActions(
 ): void {
   const recentRoundEvents = ctx.recentEvents.flatMap((event) => (event.type === 'round' ? [event.event] : []));
   const rows = deriveLastPlays(recentRoundEvents);
-  rows.forEach((row) => renderLastPlayRow(ctx, row, layout, canvas));
+  const thinking = ctx.aiThinkingView();
+  const occupiedSeat = thinking?.active ? thinking.seat : null;
+  rows.forEach((row) => {
+    if (row.seat !== occupiedSeat) renderLastPlayRow(ctx, row, layout, canvas);
+  });
 }
 
 function renderLastPlayRow(
@@ -335,73 +283,25 @@ function renderLastPlayRow(
   // 此处直接不渲染——未 ensureNode 的旧药丸由 render prune 自动销毁。
   // view-model(deriveLastPlays)与其测试零改动:'—' 仍是它的空值语义,只是视图层不再展示。
   if (row.kind === null) return;
-  const maxWidth = row.seat === HERO_SEAT ? 146 : 124;
-  const width = row.kind === 'play' && row.cards.length > 0
-    ? lastPlayCardsWidth(row.cards.length, maxWidth)
-    : maxWidth;
+  // hero 名牌贴左屏边；气泡既要与名牌同心，也必须连同强调皮完整落屏。
+  // 直接吃名牌宽度，文字交给既有 SHRINK 适配，不另造偏心或裁切特例。
+  const width = row.seat === HERO_SEAT ? layout.heroNameplate.width : 124;
   const pos = lastActionPosition(ctx, row.seat, layout, canvas, width);
   const root = ctx.ensureNode(`last-action-pill-${row.seat}`, ctx.uiRoot);
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, width, 30);
 
-  if (row.kind === 'play' && row.cards.length > 0) {
-    renderMiniPlayCards(ctx, root, row.cards, width, row.emphasis);
-    return;
-  }
-
   // kind=null 已在入口挡掉,此处必有真实消息('不要' 或牌型文案)——空值('—')分支随之消失。
-  const text = row.kind === 'pass' ? (row.text || t('action.pass')) : row.text;
+  const text = row.kind === 'pass' ? (row.text || t('action.pass')) : (row.text || '已出牌');
   applyPillSkin(ctx, root, width, 28);
+  if (row.emphasis) {
+    const path = row.emphasis === 'bomb' ? RESOURCE_PATHS.emphasisBomb : RESOURCE_PATHS.emphasisRocket;
+    // 强调图是装饰而非第二块功能皮：等比内接、居中垫在药丸下方，既不拉伸也不制造“皮吃皮”。
+    const emphasis = ctx.addSpriteContain(path, 0, 0, width + 14, 30, root, 'last-play-emphasis');
+    emphasis.setSiblingIndex(0);
+  }
   // 门B:y 归 0(原 +1 让字形带上缘越出净区顶)+ 盒宽收到 -24(原 -16 越出净区右缘 1px)。
-  ctx.addLabel(text, 0, 0, THEME.typography.xs, root, width - 24, 20, `last-action-${row.seat}`, PILL_TEXT);
-}
-
-function miniCardMetrics(cardCount: number, maxWidth: number): { scale: number; spacing: number } {
-  const baseWidth = CARD_SIZE.width;
-  if (cardCount <= 1) return { scale: 0.34, spacing: 0 };
-  if (cardCount <= 5) {
-    const scale = 0.34;
-    return { scale, spacing: baseWidth * scale + 2 };
-  }
-  const scale = 0.28;
-  const span = maxWidth - 8;
-  const spacing = Math.max(2, (span - baseWidth * scale) / Math.max(1, cardCount - 1));
-  return { scale, spacing };
-}
-
-function lastPlayCardsWidth(cardCount: number, maxWidth: number): number {
-  const { scale, spacing } = miniCardMetrics(cardCount, maxWidth);
-  if (cardCount <= 1) return Math.min(maxWidth, Math.round(baseCardWidth(scale) + 8));
-  return Math.min(maxWidth, Math.round(spacing * (cardCount - 1) + baseCardWidth(scale) + 8));
-}
-
-function baseCardWidth(scale: number): number {
-  return CARD_SIZE.width * scale;
-}
-
-function renderMiniPlayCards(
-  ctx: GameSceneRendererContext,
-  root: Node,
-  cards: Card[],
-  maxWidth: number,
-  emphasis: SeatLastPlay['emphasis'],
-): void {
-  const { scale, spacing } = miniCardMetrics(cards.length, maxWidth);
-  const totalWidth = cards.length <= 1
-    ? baseCardWidth(scale)
-    : spacing * (cards.length - 1) + baseCardWidth(scale);
-
-  if (emphasis) {
-    const path = emphasis === 'bomb' ? RESOURCE_PATHS.emphasisBomb : RESOURCE_PATHS.emphasisRocket;
-    ctx.addSprite(path, 0, 0, totalWidth + 14, 30, root, 'last-play-emphasis', true);
-  }
-
-  const startX = -totalWidth / 2 + baseCardWidth(scale) / 2;
-  cards.forEach((card, index) => {
-    const x = startX + index * spacing;
-    const node = ctx.addDisplayCard(card, x, 0, root, `last-play-card-${index}`, false);
-    node.setScale(scale, scale, 1);
-  });
+  ctx.addLabel(text, 0, 0, 'assistive', root, width - THEME.spacing.wide, 20, `last-action-${row.seat}`, PILL_TEXT);
 }
 
 function renderAiThinking(
@@ -421,8 +321,8 @@ function renderAiThinking(
   applyPillSkin(ctx, root, pos.width, 28);
 
   const dots = ctx.settings.animation ? '.'.repeat(thinking.dots) : '';
-  const label = ctx.addLabel(`${seatDisplayName(thinking.seat)}思考中${dots}`, 0, 1, THEME.typography.sm, root, pos.width - 12, 24, 'ai-thinking-label');
-  label.color = PILL_TEXT;
+  const label = ctx.addLabel(`${seatDisplayName(thinking.seat)}思考中${dots}`, 0, 0, 'meta', root, pos.width - THEME.spacing.comfortable, 24, 'ai-thinking-label');
+  label.color = toColor(UI_TEXT_COLORS.activeAccent);
 }
 
 function clearAiThinkingNodes(ctx: GameSceneRendererContext): void {
@@ -439,18 +339,9 @@ export function lastActionPosition(
   seat: SeatLastAction['seat'],
   layout: TableZones,
   canvas: { width: number; height: number },
-  width = seat === HERO_SEAT ? 146 : 124,
+  width = seat === HERO_SEAT ? layout.heroNameplate.width : 124,
 ): { x: number; y: number; width: number } {
-  if (seat === HERO_SEAT) {
-    const minY = layout.playArea.y + layout.playArea.height + 12;
-    const maxY = layout.heroHandLarge.y - 30;
-    const screenY = clamp(layout.tableActionBar.y - 24, minY, maxY);
-    const pos = ctx.screenPoint(canvas, canvas.width / 2, screenY);
-    return { ...pos, width };
-  }
-  const rect = dropZoneForSeat(layout, seat);
-  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(22, rect.y - 32));
-  return { ...pos, width };
+  return feedbackPillPosition(ctx, seat, layout, canvas, width);
 }
 
 export function aiThinkingPosition(
@@ -459,7 +350,34 @@ export function aiThinkingPosition(
   layout: TableZones,
   canvas: { width: number; height: number },
 ): { x: number; y: number; width: number } {
+  return feedbackPillPosition(ctx, seat, layout, canvas, 126);
+}
+
+function feedbackPillPosition(
+  ctx: GameSceneRendererContext,
+  seat: SeatIndex,
+  layout: TableZones,
+  canvas: { width: number; height: number },
+  width: number,
+): { x: number; y: number; width: number } {
+  const pillHeight = 28;
+  const anchorGap = THEME.spacing.default;
+  if (seat === HERO_SEAT) {
+    const plate = layout.heroNameplate;
+    const pos = ctx.screenPoint(
+      canvas,
+      plate.x + plate.width / 2,
+      plate.y - anchorGap - pillHeight / 2,
+    );
+    return { ...pos, width };
+  }
   const rect = dropZoneForSeat(layout, seat);
-  const pos = ctx.screenPoint(canvas, rect.x + rect.width / 2, Math.max(24, rect.y - 36));
-  return { ...pos, width: 126 };
+  const dropCenterX = rect.x + rect.width / 2;
+  const inward = Math.sign(canvas.width / 2 - dropCenterX) * 10;
+  const pos = ctx.screenPoint(
+    canvas,
+    dropCenterX + inward,
+    rect.y + rect.height + anchorGap + pillHeight / 2,
+  );
+  return { ...pos, width };
 }

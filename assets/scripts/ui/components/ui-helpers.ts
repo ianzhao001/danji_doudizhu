@@ -1,10 +1,15 @@
-import { Button, Color, Graphics, Label, Node, Sprite, SpriteFrame, UITransform, Vec3, resources } from 'cc';
+import { Button, Color, Graphics, Label, Node, Overflow, Sprite, SpriteFrame, UITransform, Vec3, resources } from 'cc';
 import { pressFeedback } from '../animation-params';
 import { spriteFrameResourcePath, type ResourcePath } from '../asset-keys';
-import { THEME, type ThemeColor } from '../theme';
+import { THEME, type ThemeColor, type TypographyRole } from '../theme';
+import { applyRegularFont } from './game-scene/font-loader';
 
 type EnsureNode = (name: string, parent: Node) => Node;
-type SpriteLoader = (path: ResourcePath, sprite: Sprite | null) => void;
+type SpriteLoader = (path: ResourcePath, sprite: Sprite | null) => SpriteFrame | null;
+
+// W-VISION-COLOR-R2-d 用户整改：禁用按钮仍需清楚可辨，同时保留降权。
+// 门 M 锁定运行时皮肤 alpha 在 [96,160]；文字禁用色与 THEME.alpha.disabled 保持原契约。
+export const BUTTON_DISABLED_SKIN_ALPHA = 120;
 
 interface SkinnedButtonLayout {
   renderHeight: number;
@@ -13,8 +18,7 @@ interface SkinnedButtonLayout {
     y: number;
     width: number;
     height: number;
-    fontSize: number;
-    lineHeight: number;
+    role: TypographyRole;
   };
   icon?: {
     x: number;
@@ -34,6 +38,14 @@ interface SkinnedButtonLayoutInput {
 
 function labelColor(enabled: boolean): Color {
   return enabled ? toColor(THEME.palette.textOnAccent) : toColor(THEME.palette.textOnAccent, 120);
+}
+
+function isEmphasisRole(role: TypographyRole): boolean {
+  return role === 'prominentAction'
+    || role === 'sectionTitle'
+    || role === 'cardRank'
+    || role === 'hero'
+    || role === 'display';
 }
 
 export function toColor(token: ThemeColor, alpha?: number): Color {
@@ -83,27 +95,31 @@ export function addLabel(
     text: string;
     x: number;
     y: number;
-    fontSize: number;
+    role: TypographyRole;
     parent: Node;
     width: number;
     height: number;
     name: string;
     color?: Color;
-    lineHeightOffset?: number;
+    overflow?: Overflow;
   },
 ): Label {
   const node = ensureNode(options.name, options.parent);
   node.setPosition(options.x, options.y, 0);
   addUiTransform(node, options.width, options.height);
   const label = node.getComponent(Label) ?? node.addComponent(Label);
+  const typography = THEME.typography[options.role];
   label.string = options.text;
-  label.fontSize = options.fontSize;
-  label.lineHeight = options.fontSize + (options.lineHeightOffset ?? 5);
+  label.fontSize = typography.size;
+  label.lineHeight = typography.lineHeight;
+  label.isBold = isEmphasisRole(options.role);
   label.horizontalAlign = Label.HorizontalAlign.CENTER;
   label.verticalAlign = Label.VerticalAlign.CENTER;
-  // v1.6 终审整改②:所有文字 SHRINK——超出容器自动缩字号,永不溢出(务必解决文字溢出)。
-  label.overflow = Label.Overflow.SHRINK;
+  // Cocos 默认 NONE 会让文字直接溢出。所有 Label 在唯一出口显式收口；
+  // 当前单行 HUD/按钮优先 SHRINK，需要截断或自适应高度的文本可由调用方显式选 CLAMP/RESIZE_HEIGHT。
+  label.overflow = options.overflow ?? Label.Overflow.SHRINK;
   label.color = options.color ?? toColor(THEME.palette.textOnAccent);
+  applyRegularFont(label);
   return label;
 }
 
@@ -120,8 +136,7 @@ export function addButton(
     parent: Node;
     name: string;
     selected?: boolean;
-    fontSize: number;
-    lineHeight: number;
+    role: TypographyRole;
     owner?: unknown;
   },
 ): Label {
@@ -143,13 +158,16 @@ export function addButton(
   const labelNode = ensureNode('button-label', node);
   addUiTransform(labelNode, options.width, options.height);
   const label = labelNode.getComponent(Label) ?? labelNode.addComponent(Label);
+  const typography = THEME.typography[options.role];
   label.string = options.text;
-  label.fontSize = options.fontSize;
-  label.lineHeight = options.lineHeight;
+  label.fontSize = typography.size;
+  label.lineHeight = typography.lineHeight;
+  label.isBold = isEmphasisRole(options.role);
   label.horizontalAlign = Label.HorizontalAlign.CENTER;
   label.verticalAlign = Label.VerticalAlign.CENTER;
   label.overflow = Label.Overflow.SHRINK;
   label.color = labelColor(options.enabled);
+  applyRegularFont(label);
   return label;
 }
 
@@ -169,11 +187,22 @@ export function addSkinnedSprite(
 ): Node {
   const node = ensureNode(options.name, options.parent);
   node.setPosition(options.x, options.y, 0);
+  if (options.sliced) node.setScale(1, 1, 1);
   addUiTransform(node, options.width, options.height);
   const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
   sprite.type = options.sliced ? Sprite.Type.SLICED : Sprite.Type.SIMPLE;
   sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-  load(options.path, sprite);
+  const frame = load(options.path, sprite);
+  // W-VISION S4R:矮九宫格若直接拿目标尺寸切片,capInsets 会在局部坐标里互相压住。
+  // 预载命中时先在源图高度尺度完成切片,再把整张皮等比回缩到目标屏上尺寸；
+  // capInsets 仍使用 SpriteFrame/meta 的原值。异步未命中时保持旧的目标尺寸降级路径，
+  // 避免先缩空节点、待资源回来后再闪变。
+  if (options.sliced && frame && frame.rect.height > 0 && options.height > 0) {
+    const sourceScale = frame.rect.height / options.height;
+    addUiTransform(node, options.width * sourceScale, frame.rect.height);
+    const renderScale = 1 / sourceScale;
+    node.setScale(renderScale, renderScale, 1);
+  }
   return node;
 }
 
@@ -252,19 +281,27 @@ export function addSkinnedButton(
     sliced: true,
   });
   bg.setSiblingIndex(0);
-  button.target = bg;
+  // W-VISION-COLOR-R2:禁用大按钮不得切第三张灰色皮。沿用黄/绿角色皮，
+  // R2-d 把皮肤透明度从近消失提高到可辨的 120；文字仍由调用方使用 disabledButton。
+  const skinTint = new Color(255, 255, 255, options.enabled ? 255 : BUTTON_DISABLED_SKIN_ALPHA);
+  const bgSprite = bg.getComponent(Sprite);
+  if (bgSprite) bgSprite.color = skinTint;
   // v1.5 P-BTN-FEEL:动效开=SCALE 按压(参数出自 pressFeedback());动效关=保持既有 COLOR 过渡。
   if (options.feel?.animated) {
+    // SCALE 认领按钮根节点：背景的 scale-safe 回缩只负责九宫格，不再被 Button
+    // 在 COLOR→SCALE 或缓存 miss→hit 的复用路径里拉回 1。
+    button.target = node;
     const press = pressFeedback();
     button.transition = Button.Transition.SCALE;
     button.zoomScale = press.scale;
     button.duration = press.ms / 1000;
   } else {
+    button.target = bg;
     button.transition = Button.Transition.COLOR;
     button.normalColor = toColor(THEME.palette.textOnAccent);
     button.pressedColor = toColor(THEME.palette.selectedTint, 255);
     button.hoverColor = toColor(THEME.palette.textOnAccent);
-    button.disabledColor = toColor(THEME.palette.textOnAccent);
+    button.disabledColor = skinTint;
   }
   button.interactable = options.enabled;
   node.off(Button.EventType.CLICK);
@@ -295,24 +332,22 @@ export function addSkinnedButton(
     text: options.text,
     x: layout.label.x,
     y: layout.label.y,
-    fontSize: layout.label.fontSize,
+    role: layout.label.role,
     parent: node,
     width: layout.label.width,
     height: layout.label.height,
     name: 'button-label',
     color: options.textColor(options.name, options.enabled, selected),
-    lineHeightOffset: 4,
   });
-  label.lineHeight = layout.label.lineHeight;
   return label;
 }
 
-export function loadSprite(path: ResourcePath, sprite: Sprite | null, cache?: Map<string, SpriteFrame>): void {
-  if (!sprite) return;
+export function loadSprite(path: ResourcePath, sprite: Sprite | null, cache?: Map<string, SpriteFrame>): SpriteFrame | null {
+  if (!sprite) return null;
   const cached = cache?.get(path);
   if (cached) {
     sprite.spriteFrame = cached;
-    return;
+    return cached;
   }
   resources.load(spriteFrameResourcePath(path), SpriteFrame, (error, frame) => {
     if (!error && frame) {
@@ -320,4 +355,5 @@ export function loadSprite(path: ResourcePath, sprite: Sprite | null, cache?: Ma
       sprite.spriteFrame = frame;
     }
   });
+  return null;
 }

@@ -136,3 +136,29 @@
 音频(T-CUE-AUDIO,音频解禁裁决 2026-07-12):`assets/resources/audio/` 增 redeal.wav(0.35s)/reset.wav(0.22s)/landlord.wav(0.55s),44.1kHz mono Int16 峰值 23592 与存量归一一致,landlord RMS 压 win 之下;合成器 `coordination/scripts/v16-audio-synth.py`(标准库+LCG 定值种子,重跑逐字节一致)。音频键 12:12。
 
 预览包与 manifest(SHA-256)存 `asset-previews/v16-settlement/`(gitignored,本机);v13 结算三键保留仅作回滚。
+
+## v1.7 · ART-V20 按钮族(2026-07-15 用户驳回·rollback-only)
+
+生成:Codex ImageGen 四态独立出图,经 chroma-key 去底与三段归一整理为 480×160;导入:`assets/resources/art/ui`(4)。`.meta` 由 Cocos Creator 3.8.8 资产数据库生成并二次重导,未手写;SpriteFrame trim rect 均为 `(7,5,466,149)`,九宫格 capInsets 均为 L/R48·T44·B48,trim auto,走 scale-safe 渲染。
+
+| 键 | 路径 | 用途 |
+|---|---|---|
+| btnPrimaryV20 | art/ui/btn-primary-v20 | 主题莓粉高饱和主操作；深莓字 |
+| btnSecondaryV20 | art/ui/btn-secondary-v20 | 奶油/柔灰次操作；深莓字 |
+| btnTertiaryV20 | art/ui/btn-tertiary-v20 | 暖金提示/强调操作；深棕字 |
+| btnDisabledV20 | art/ui/btn-disabled-v20 | 低饱和灰粉禁用态；灰莓字 |
+
+共同艺术方向:奶油拟物 candy 风,多段柔渐变+顶部高光带+底部内阴影+贴边细描金+柔和外投影;中央净区不画线。五视口实机机检虽全绿,用户仍明确裁决“太丑、不可接受”，故四键与 PNG/meta 仅保留 rollback-only，产品零消费。
+
+## v1.7 · ART-V21 参考图游戏按钮族(2026-07-15 R4 临时色值·终局待修)
+
+生成:Codex ImageGen 根据用户上传的斗地主截图抽取按钮规范，去字后生成四态同构底图，经 chroma-key 去底、同色阴影校正与三段归一为 480×160。R3 用户确认式样 okay、仅驳回颜色后，R4 再以截图“叫地主/不叫”双钮为唯一色彩参考，只迁移逐行 hue/saturation 到已签 R3 像素；四态 alpha 与 HSV value 场逐像素不变，因此轮廓、圆角、高光、底唇和阴影几何零变化。导入:`assets/resources/art/ui`(4)；`.meta` 仍为 Creator 生成字节，未手写且 R4 前后 SHA 不变。SpriteFrame trim rect 均为 `(7,5,466,149)`，capInsets 为 L/R64·T46·B54，走 scale-safe 九宫格。
+
+| 键 | 路径 | 用途 |
+|---|---|---|
+| btnPrimaryV21 | art/ui/btn-primary-v21 | 截图暖黄橙主操作；深棕字 `#4A1800` |
+| btnSecondaryV21 | art/ui/btn-secondary-v21 | 截图天蓝到蓝紫次操作；深蓝黑字 `#040A16` |
+| btnTertiaryV21 | art/ui/btn-tertiary-v21 | 同源暖黄橙强调/提示；深棕字 `#4A2700` |
+| btnDisabledV21 | art/ui/btn-disabled-v21 | 低饱和蓝灰禁用态；深蓝灰字 `#0D111C` |
+
+共同艺术方向:参考图的塑胶游戏感，规则厚圆角+上半柔高光+下半渐深+同色底唇/投影+贴边细内泽；不再沿用 v20 的奶油粉与金边语言。R4 中心带临时值:primary 由 `#FCD12A` 过渡到 `#FA9011`，secondary 由 `#3CB0F9` 过渡到 `#4869F4`；tertiary 同暖橙族，disabled 从蓝紫去饱和。五视口真档门虽全绿，但用户明确未签该色值；它只作为 S5/S6 继续开发的临时基线，终局前必须再调。

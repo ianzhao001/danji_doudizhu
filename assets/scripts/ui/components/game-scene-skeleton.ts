@@ -2,14 +2,12 @@ import {
   _decorator,
   AudioSource,
   Component,
-  Label,
   Node,
-  Sprite,
   SpriteFrame,
   resources,
 } from 'cc';
 import { AiLevel } from '../../ai';
-import { pickHint } from '../hint-flow';
+import { pickHint, type HintSession } from '../hint-flow';
 import { commitFinishedRound, persistRound, restoreRound, type SessionKeys } from '../../data/session';
 import { difficultyConfig } from '../../data/difficultyConfig';
 import { STORAGE_KEYS } from '../../data/storage-keys';
@@ -21,19 +19,32 @@ import type { FlowEvent } from '../../flow/types';
 import type { GameEvent, ResumeSnapshot, RoundFinishInput, SeatIndex } from '../../game';
 import type { Card } from '../../rules';
 import { cocosStorage } from '../../runtime/cocos-storage';
-import { clearSelection, toggle } from '../selection';
+import { clearSelection, toggle, type DragSelectionMode } from '../selection';
 import { deriveFollowUx } from '../follow-ux';
 import { rebuildRecentEvents } from '../resume-rebuild';
 import { deriveScreenVM } from '../screen-view';
-import { emptyToasts, type ToastQueue } from '../toast-queue';
+import { emptyToasts, pushToast, type ToastQueue } from '../toast-queue';
 import { initialPause, type PauseState } from '../pause-menu';
 import { tableZones, type TableZones } from '../table-zones';
+import { deriveCardStage, type CardStage } from '../card-stage';
+import {
+  instant,
+  planCardChoreography,
+} from '../card-choreography';
 import {
   RESOURCE_PATHS,
   spriteFrameResourcePath,
   type ResourcePath,
 } from '../asset-keys';
 import { t } from '../strings';
+import { settlementReveal } from '../animation-params';
+import { addRoundScores, emptySessionTotals, type SessionTotals } from '../session-score';
+import {
+  beginSettlementHold,
+  isHoldingSettlement,
+  tickSettlementHold,
+  type SettlementHold,
+} from '../settlement-reveal';
 import {
   renderActions as renderActionsSection,
   renderAdvisor as renderAdvisorSection,
@@ -52,9 +63,8 @@ import {
 import {
   CARD_SIZE,
   HAND_LIFT,
-  addCard as addCardImpl,
   addDisplayCard as addDisplayCardImpl,
-  addCardNode as addCardNodeImpl,
+  renderStageCard as renderStageCardImpl,
   cardFaceColor as cardFaceColorImpl,
   cardSpritePath as cardSpritePathImpl,
   suitSpritePath as suitSpritePathImpl,
@@ -65,15 +75,10 @@ import {
 } from './game-scene/card-node';
 import {
   renderBottomCardsDock as renderBottomCardsDockImpl,
-  renderPlayArea as renderPlayAreaImpl,
-  playAreaLayout as playAreaLayoutImpl,
-  sideSeatPlaySafeBand as sideSeatPlaySafeBandImpl,
-  playAreaCardVerticalBounds as playAreaCardVerticalBoundsImpl,
-  playCardPosition as playCardPositionImpl,
-  renderHand as renderHandImpl,
-  handLayoutFrame as handLayoutFrameImpl,
-  armDealAnimationLock as armDealAnimationLockImpl,
-  layoutDisplayHandSlots as layoutDisplayHandSlotsImpl,
+  renderCardStage as renderCardStageImpl,
+  renderPlayAreaFxTarget as renderPlayAreaFxTargetImpl,
+  renderHandPlaceholder as renderHandPlaceholderImpl,
+  interactiveSlotsFromStage as interactiveSlotsFromStageImpl,
   bindHandDragHandlers as bindHandDragHandlersImpl,
 } from './game-scene/play-area-renderer';
 import {
@@ -105,11 +110,11 @@ import {
   clearFxLayer as clearFxLayerImpl,
   renderBombBurst as renderBombBurstImpl,
   renderButtonRipple as renderButtonRippleImpl,
+  renderLandlordCeremony as renderLandlordCeremonyImpl,
+  renderPatternBurst as renderPatternBurstImpl,
   renderRocketBurst as renderRocketBurstImpl,
 } from './game-scene/fx-program';
 import {
-  animateCardDeal as animateCardDealImpl,
-  animateCardPlay as animateCardPlayImpl,
   animateScaleIn as animateScaleInImpl,
   prepareToastAnimation as prepareToastAnimationImpl,
   drawDimOverlay as drawDimOverlayImpl,
@@ -145,6 +150,7 @@ import {
   ensureNode as ensureNodeImpl,
   beginRenderDiff as beginRenderDiffImpl,
   hideSettledTransientHud as hideSettledTransientHudImpl,
+  hideSettlementSceneChrome as hideSettlementSceneChromeImpl,
   hideLiveSubtree as hideLiveSubtreeImpl,
   markLiveSubtree as markLiveSubtreeImpl,
   endRenderDiff as endRenderDiffImpl,
@@ -155,8 +161,9 @@ import {
   rectPoint as rectPointImpl,
   screenPoint as screenPointImpl,
 } from './game-scene/ui-runtime-helpers';
+import { CardAnimator, cardRuntimeNodeName } from './game-scene/card-animator';
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 const HERO_SEAT: SeatIndex = 0;
 const SETTINGS_KEY = STORAGE_KEYS.settings;
@@ -172,7 +179,7 @@ const BID_FAILED_TEXT = t('game.bidFailed');
 const PLAY_FAILED_TEXT = t('game.playFailed');
 const PASS_FAILED_TEXT = t('game.passFailed');
 const RUNTIME_PRELOAD_SPRITES: readonly ResourcePath[] = [
-  RESOURCE_PATHS.gameTableBgV13,
+  RESOURCE_PATHS.gameTableBgC1,
   RESOURCE_PATHS.heroBodyV13,
   RESOURCE_PATHS.leftAiBodyV13,
   RESOURCE_PATHS.rightAiBodyV13,
@@ -184,20 +191,23 @@ const RUNTIME_PRELOAD_SPRITES: readonly ResourcePath[] = [
   RESOURCE_PATHS.suitDiamondV13,
   RESOURCE_PATHS.jokerSmallV13,
   RESOURCE_PATHS.jokerBigV13,
-  RESOURCE_PATHS.btnPrimaryV18,
-  RESOURCE_PATHS.btnSecondaryV18,
-  RESOURCE_PATHS.btnTertiaryV18,
-  RESOURCE_PATHS.btnDisabledV18,
-  RESOURCE_PATHS.infoPillV18,
-  RESOURCE_PATHS.seatNameplateV18,
+  RESOURCE_PATHS.btnPrimaryC2,
+  RESOURCE_PATHS.btnSecondaryC2,
+  RESOURCE_PATHS.btnNeutralC2,
+  RESOURCE_PATHS.infoPillC1,
+  RESOURCE_PATHS.seatNameplateC1,
   RESOURCE_PATHS.bottomCardsDockV15,
-  RESOURCE_PATHS.panelPopupV15,
-  // v1.6 二次终审整改③(Codex S4 审查阻断):v15 胜/负横幅是异形燕尾缎带,已由 v18 规则牌匾取代。
-  // 换肤时只改了 result-overlay 的消费点,漏了这张预载表——onLoad 仍会实际加载它们,
-  // 与「旧横幅零产品消费、仅保留 asset key 供回滚」的披露不符。已移出预载;键与文件保留。
-  RESOURCE_PATHS.settlementPanelV15,
-  RESOURCE_PATHS.badgeMultiplierV13,
-  RESOURCE_PATHS.badgeTimerV13,
+  RESOURCE_PATHS.panelPopupV19,
+  RESOURCE_PATHS.settlementPanelV19,
+  RESOURCE_PATHS.countdownRingV19,
+  RESOURCE_PATHS.landlordHatV19,
+  RESOURCE_PATHS.farmerBadgeV19,
+  RESOURCE_PATHS.patternLabelV19,
+  RESOURCE_PATHS.fxSparkV19,
+  RESOURCE_PATHS.fxRingV19,
+  RESOURCE_PATHS.fxStarV19,
+  RESOURCE_PATHS.fxTrailV19,
+  RESOURCE_PATHS.fxConfettiV19,
   RESOURCE_PATHS.iconPlay,
   RESOURCE_PATHS.iconPass,
   RESOURCE_PATHS.iconHint,
@@ -208,42 +218,70 @@ const RUNTIME_PRELOAD_SPRITES: readonly ResourcePath[] = [
   RESOURCE_PATHS.emphasisRocket,
 ];
 
+function emptyCardStage(): CardStage {
+  return { placements: [], byKey: new Map(), handHits: [] };
+}
+
+function cardStageFingerprint(stage: CardStage): string {
+  return stage.placements.map((placement) => [
+    placement.key,
+    placement.zone,
+    placement.x,
+    placement.y,
+    placement.scale,
+    placement.angle,
+    placement.z,
+    placement.faceUp ? 1 : 0,
+    placement.selected ? 1 : 0,
+    placement.interactive ? 1 : 0,
+  ].join(':')).join('|');
+}
+
+function flowEventCardId(event: FlowEvent, stage: CardStage): string {
+  let eventKey = event.type;
+  if (event.type === 'redeal') eventKey += `:${event.attempt}`;
+  if (event.type === 'bottomRevealed') eventKey += `:${event.cards.map((card) => `${card.rank}:${card.suit}`).join(',')}`;
+  if (event.type === 'round') {
+    const round = event.event;
+    eventKey += `:${round.type}`;
+    if ('seat' in round) eventKey += `:${round.seat}`;
+    if (round.type === 'play') eventKey += `:${round.pattern.cards.map((card) => `${card.rank}:${card.suit}`).join(',')}`;
+  }
+  return `${eventKey}|${cardStageFingerprint(stage)}`;
+}
+
+interface CardEventRender {
+  readonly event: true;
+  readonly startPrepared: boolean;
+}
+
 @ccclass('GameSceneSkeleton')
 export class GameSceneSkeleton extends Component {
-  @property(Sprite)
-  background: Sprite | null = null;
-
-  @property(Sprite)
-  cardTemplate: Sprite | null = null;
-
-  @property(Label)
-  phaseLabel: Label | null = null;
-
-  @property(Label)
-  landlordLabel: Label | null = null;
-
-  @property(Label)
-  multiplierLabel: Label | null = null;
-
-  @property(Label)
-  handCountLabel: Label | null = null;
-
-  @property(Label)
-  actionLabel: Label | null = null;
-
   private runtime: RoundRuntime | null = null;
   private unsubscribe: (() => void) | null = null;
   private audioSource: AudioSource | null = null;
   private uiRoot: Node | null = null;
+  private cardLayer: Node | null = null;
   private playAreaRoot: Node | null = null;
+  private cardStage: CardStage = emptyCardStage();
+  private cardRenderGeneration = 0;
+  private pendingPatternBurst: { seat: SeatIndex; cards: Card[] } | null = null;
+  private sessionTotals: SessionTotals = emptySessionTotals();
+  private settlementHold: SettlementHold = { remainingMs: 0 };
+  private readonly cardAnimator = new CardAnimator(() => {
+    this.flushPendingPatternBurst();
+    void Promise.resolve().then(() => {
+      if (this.node?.isValid) this.render();
+    });
+  });
   private selected: Card[] = [];
+  private hintSession: HintSession | null = null;
   private recentEvents: FlowEvent[] = [];
   private fullGameEvents: GameEvent[] = [];
   private toasts: ToastQueue = emptyToasts;
   private toastClockMs = 0;
   private turnTimerKey: string | null = null;
   private turnTimerElapsedMs = 0;
-  private dealAnimationLockMs = 0;
   private uiTickRenderMs = 0;
   private memoryExpanded = false;
   private advisorEnabled = false;
@@ -258,28 +296,16 @@ export class GameSceneSkeleton extends Component {
   private terminationFeedbackActionsVisible = false;
   private terminationFeedbackText: string | null = null;
   private readonly spriteFrames = new Map<string, SpriteFrame>();
-  private lastHandSignature = '';
-  private lastPlayAreaSignature = '';
-  /**
-   * v1.5 P-CARD-FLIGHT(R2):方向化飞入的触发闸——仅当真实 play 事件（round/play）到达时
-   * 记下出牌席位，renderPlayArea 一次性消费后清零。断局恢复首帧没有 play 事件，
-   * 该值为 null → flyFrom=undefined → 保持旧无方向淡入。
-   */
-  private pendingPlayFlightSeat: number | null = null;
-  private lastBottomCardsSignature = '';
-  private renderedSelectedCardKeys = new Set<string>();
-  private animatedToastIds = new Set<number>();
   private liveRenderNodes: Set<Node> | null = null;
-  private displayHandSlots: ReturnType<typeof layoutDisplayHandSlotsImpl> = [];
+  private displayHandSlots: ReturnType<typeof interactiveSlotsFromStageImpl> = [];
   private handDragActive = false;
   private handDragMoved = false;
+  private handDragMode: DragSelectionMode | null = null;
+  private handDragOriginCard: Card | null = null;
   private handDragStartX = 0;
   private handDragCurrentX = 0;
-  private animatedResultKeyValue: string | null = null;
 
   onLoad(): void {
-    if (this.background) this.background.node.active = false;
-    if (this.cardTemplate) this.cardTemplate.node.active = false;
     this.hideSceneScaffold();
     this.audioSource = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
     this.uiRoot = this.ensureNode('runtime-ui', this.node);
@@ -291,6 +317,8 @@ export class GameSceneSkeleton extends Component {
   }
 
   onDestroy(): void {
+    this.cardRenderGeneration += 1;
+    this.cardAnimator.reset();
     this.unsubscribe?.();
     this.runtime?.dispose();
     this.unsubscribe = null;
@@ -314,14 +342,12 @@ export class GameSceneSkeleton extends Component {
     this.uiTickRenderMs += deltaMs;
 
     let shouldRender = this.tickToastState();
+    const holdTick = tickSettlementHold(this.settlementHold, deltaMs);
+    this.settlementHold = holdTick.hold;
+    if (holdTick.justExpired) shouldRender = true;
     if (this.pollTerminationFeedback()) shouldRender = true;
-    if (this.dealAnimationLockMs > 0) {
-      const nextLock = Math.max(0, this.dealAnimationLockMs - deltaMs);
-      if (nextLock === 0) shouldRender = true;
-      this.dealAnimationLockMs = nextLock;
-    }
     const timerActive = this.syncTurnTimerKey();
-    const timerFrozen = this.isTurnTimerFrozen() || this.dealAnimationLockMs > 0;
+    const timerFrozen = this.isTurnTimerFrozen() || this.cardAnimator.isBusy();
     const thinkingAnimating = this.settings.animation && this.isAiThinkingActive();
     if (timerActive && !timerFrozen) this.turnTimerElapsedMs = Math.min(TURN_TIMER_MS, this.turnTimerElapsedMs + deltaMs);
     if (((timerActive && !timerFrozen) || thinkingAnimating) && this.uiTickRenderMs >= UI_TICK_RENDER_MS) {
@@ -333,18 +359,22 @@ export class GameSceneSkeleton extends Component {
   }
 
   private startGame(forceNew: boolean): void {
+    this.cardRenderGeneration += 1;
+    this.cardAnimator.reset();
+    this.cardStage = emptyCardStage();
+    this.pendingPatternBurst = null;
+    this.settlementHold = { remainingMs: 0 };
     this.unsubscribe?.();
     this.runtime?.dispose();
     this.unsubscribe = null;
     this.selected = clearSelection();
-    this.animatedResultKeyValue = null;
+    this.hintSession = null;
     this.recentEvents = [];
     this.fullGameEvents = [];
     this.toasts = emptyToasts;
     this.toastClockMs = 0;
     this.turnTimerKey = null;
     this.turnTimerElapsedMs = 0;
-    this.dealAnimationLockMs = 0;
     this.uiTickRenderMs = 0;
     this.advisorEnabled = false;
     this.biddingAdvisorEnabled = false;
@@ -355,15 +385,9 @@ export class GameSceneSkeleton extends Component {
     this.terminationFeedbackNotified = false;
     this.terminationFeedbackActionsVisible = false;
     this.terminationFeedbackText = null;
-    this.animatedToastIds.clear();
     this.statusText = '';
-    this.lastHandSignature = '';
-    this.lastPlayAreaSignature = '';
-    this.lastBottomCardsSignature = '';
-    this.pendingPlayFlightSeat = null;
     // v1.5 W3-B:跨局清空 fx 层(彩带 repeatForever 等循环特效不能残留到新局)。
     this.clearFxLayer();
-    this.renderedSelectedCardKeys.clear();
 
     const storage = cocosStorage();
     this.settings = loadSettings(storage, SETTINGS_KEY);
@@ -383,8 +407,13 @@ export class GameSceneSkeleton extends Component {
       clock: realClock,
       persist: (payload: Parameters<typeof persistRound>[2]) =>
         persistRound(storage, SESSION_KEYS, { ...payload, savedAt: Date.now() }),
-      onSettled: (finish: RoundFinishInput) =>
-        commitFinishedRound(storage, SESSION_KEYS, { finish, heroSeat: HERO_SEAT, playedAt: Date.now() }),
+      onSettled: (finish: RoundFinishInput) => {
+        this.sessionTotals = addRoundScores(this.sessionTotals, finish.settlement.scores);
+        commitFinishedRound(storage, SESSION_KEYS, { finish, heroSeat: HERO_SEAT, playedAt: Date.now() });
+        // Runtime emits its settled event before this callback. Re-render so
+        // animation-off sessions also replace the pre-accumulation result text.
+        this.render();
+      },
     };
 
     let resume: ResumeSnapshot | null = null;
@@ -405,23 +434,110 @@ export class GameSceneSkeleton extends Component {
     if (resume?.state.bottom) this.revealedBottomCards = resume.state.bottom.slice();
     this.runtime = resume ? resumeRoundRuntime(resume, config) : startRoundRuntime(config);
     this.unsubscribe = this.runtime.onEvent((event) => {
-      if (event.type === 'deal' || event.type === 'redeal') {
-        this.revealedBottomCards = null;
-        this.lastBottomCardsSignature = '';
-      }
+      if (event.type === 'deal' || event.type === 'redeal') this.revealedBottomCards = null;
       if (event.type === 'bottomRevealed') this.revealedBottomCards = event.cards.slice();
       if (event.type === 'round') this.fullGameEvents.push(event.event);
-      if (event.type === 'round' && event.event.type === 'play') this.pendingPlayFlightSeat = event.event.seat;
       this.recentEvents.push(event);
       this.recentEvents = this.recentEvents.slice(-12);
       this.pushEventToast(event);
-      this.render();
+      const runtimeAtEvent = this.runtime;
+      const generation = this.cardRenderGeneration;
+      const renderEvent = (): void => {
+        if (this.runtime !== runtimeAtEvent || this.cardRenderGeneration !== generation) return;
+        try {
+          // S3 contract: stage diff and ownership begin in the runtime event
+          // callback. render() only refreshes authoritative content/nodes and
+          // starts an already-prepared adapter after those nodes exist.
+          const startPrepared = this.prepareCardEvent(event);
+          this.render({ event: true, startPrepared });
+          if (event.type === 'landlordDecided') this.showLandlordCeremony(event);
+        } catch (error) {
+          // RoundRuntime isolates subscriber errors. Fail safe to an idle,
+          // authoritative render instead of leaving an invisible permanent lock.
+          this.cardAnimator.settleAll(false);
+          console.error('card choreography render failed', error);
+          this.render();
+        }
+      };
+      // Runtime emits bottomRevealed before createPlayingState/phase=playing.
+      // Defer only this event so its stage sees the landlord's final 20 cards.
+      if (event.type === 'bottomRevealed') void Promise.resolve().then(renderEvent);
+      else renderEvent();
       this.playCue(event);
     });
     this.render();
   }
 
-  private render(): void {
+  private prepareCardEvent(event: FlowEvent): boolean {
+    const nextCardStage = this.deriveCurrentCardStage();
+    const choreography = planCardChoreography({
+      id: flowEventCardId(event, nextCardStage),
+      previous: this.cardStage,
+      next: nextCardStage,
+    });
+    const prepared = this.cardAnimator.prepare(
+      this.settings.animation ? choreography : instant(choreography),
+    );
+    // bomb/rocket/win 等跟随事件不会改变 CardStage，prepare 会按 R1 no-op。
+    // 这类事件不得清掉前一个 play 已认领的标签，否则炸弹/王炸标签永远到不了 settle。
+    if (prepared) {
+      this.pendingPatternBurst = event.type === 'round' && event.event.type === 'play'
+        ? { seat: event.event.seat, cards: event.event.pattern.cards.slice() }
+        : null;
+    }
+    return prepared;
+  }
+
+  private flushPendingPatternBurst(): void {
+    const pending = this.pendingPatternBurst;
+    this.pendingPatternBurst = null;
+    if (!pending || !this.uiRoot) return;
+    if (this.runtime?.phase() === 'settled') {
+      if (!this.settings.animation) return;
+      this.settlementHold = beginSettlementHold(this.settings.animation, settlementReveal());
+    }
+    const canvas = this.canvasSize();
+    renderPatternBurstImpl.call(
+      this,
+      pending.cards,
+      pending.seat,
+      tableZones(canvas.width, canvas.height),
+      canvas,
+    );
+  }
+
+  private showLandlordCeremony(event: Extract<FlowEvent, { type: 'landlordDecided' }>): void {
+    const id = `landlord-ceremony:${event.landlord}:${event.bidMultiplier}`;
+    if (!this.cardAnimator.claimAnimationId(id) || !this.uiRoot) return;
+    const canvas = this.canvasSize();
+    renderLandlordCeremonyImpl.call(
+      this,
+      event.landlord,
+      tableZones(canvas.width, canvas.height),
+      canvas,
+    );
+  }
+
+  private deriveCurrentCardStage(): CardStage {
+    if (!this.runtime || !this.uiRoot) return emptyCardStage();
+    const snapshot = this.runtime.currentSnapshot() ?? undefined;
+    const biddingDeal = this.runtime.biddingDeal() ?? undefined;
+    const canvas = this.canvasSize();
+    return deriveCardStage({
+      zones: tableZones(canvas.width, canvas.height),
+      canvas,
+      heroSeat: HERO_SEAT,
+      heroHand: snapshot?.viewerHand ?? biddingDeal?.viewerHand ?? [],
+      selected: this.selected,
+      top: snapshot?.top ?? null,
+      bottomCards: this.runtime.phase() === 'bidding' ? null : this.revealedBottomCards,
+      phase: this.runtime.phase(),
+      cardBox: CARD_SIZE,
+      liftOffset: HAND_LIFT,
+    });
+  }
+
+  private render(cardRender?: CardEventRender): void {
     if (!this.runtime || !this.uiRoot) return;
 
     const snapshot = this.runtime.currentSnapshot() ?? undefined;
@@ -435,6 +551,18 @@ export class GameSceneSkeleton extends Component {
     const canvas = this.canvasSize();
     this.renderPlaceholderBackground(canvas);
     const layout = tableZones(canvas.width, canvas.height);
+    const phase = this.runtime.phase();
+    const nextCardStage = this.deriveCurrentCardStage();
+
+    if (!cardRender && (
+      this.cardAnimator.isAnimating()
+      && cardStageFingerprint(this.cardStage) !== cardStageFingerprint(nextCardStage)
+    )) {
+      // A non-event render must never let an old terminal outlive current VM.
+      this.cardAnimator.settleAll(false);
+    }
+    this.cardStage = nextCardStage;
+
     const vm = deriveScreenVM({
       snapshot,
       bidding,
@@ -442,7 +570,7 @@ export class GameSceneSkeleton extends Component {
       selectedCards: this.selected,
       recentEvents: this.recentEvents,
       layoutOpts: {
-        containerWidth: this.handLayoutFrame(canvas).width,
+        containerWidth: layout.heroHandLarge.width,
         containerHeight: canvas.height,
         cardWidth: CARD_SIZE.width,
         liftOffset: HAND_LIFT,
@@ -450,33 +578,25 @@ export class GameSceneSkeleton extends Component {
       settlement,
       biddingHand: biddingDeal?.viewerHand,
     });
-    const phase = this.runtime.phase();
     const handCounts = snapshot?.handCounts ?? biddingDeal?.handCounts ?? [0, 0, 0];
     const handCount = snapshot?.viewerHand?.length ?? biddingDeal?.viewerHand.length ?? 0;
-    const handFrame = this.handLayoutFrame(canvas);
-    const viewerHand = snapshot?.viewerHand ?? biddingDeal?.viewerHand ?? [];
-    this.displayHandSlots = viewerHand.length > 0
-      ? layoutDisplayHandSlotsImpl({
-        hand: viewerHand,
-        selected: this.selected,
-        containerWidth: handFrame.width,
-        cardWidth: CARD_SIZE.width,
-        liftOffset: HAND_LIFT,
-      })
-      : [];
-    this.armDealAnimationLock(phase, this.displayHandSlots);
     const followUx = snapshot ? deriveFollowUx({ snapshot, viewerSeat: HERO_SEAT }) : { mustPass: false, alerts: [] };
     const showTransientHud = phase !== 'settled';
+    const visibleResult = this.cardAnimator.isBusy() || isHoldingSettlement(this.settlementHold) ? null : vm.result;
 
     this.beginRenderDiff();
-    if (!showTransientHud) this.hideSettledTransientHud();
     this.renderTopBar(phase, vm.topBar, handCount, layout, canvas);
     this.renderSeats(handCounts, snapshot?.landlord ?? null, layout, canvas, followUx.alerts);
+    if (!showTransientHud) this.hideSettledTransientHud();
+    // Keep scene chrome through the final card flight. Hide it in the same
+    // render pass that makes the settlement scrim/panel visible.
+    if (visibleResult) this.hideSettlementSceneChrome();
     if (showTransientHud) this.renderSeatFeedback(layout, canvas);
-    this.renderBottomCardsDock(phase === 'bidding' ? null : this.revealedBottomCards, layout, canvas);
-    this.renderPlayArea(snapshot?.top ?? null, layout, canvas);
+    this.renderBottomCardsDock(phase === 'bidding' ? null : this.revealedBottomCards, layout, canvas, nextCardStage);
+    this.renderPlayAreaFxTarget(layout, canvas, nextCardStage, phase);
+    this.renderCardStage(nextCardStage);
     if (showTransientHud) this.renderHud(snapshot?.viewerHand ?? [], layout, canvas);
-    this.renderHand(this.displayHandSlots, layout, canvas);
+    this.renderHandPlaceholder(nextCardStage, layout, canvas);
     if (showTransientHud) this.renderAdvisor(snapshot, layout, canvas);
     if (phase === 'bidding') this.renderBidding(vm.bidding, layout, canvas);
     if (showTransientHud && phase !== 'bidding') this.renderStatus(this.statusText, layout, canvas);
@@ -489,13 +609,23 @@ export class GameSceneSkeleton extends Component {
     }
     if (showTransientHud) this.renderToasts(layout, canvas);
     this.renderTerminationFeedbackActions(layout, canvas);
-    this.renderResult(vm.result, handCounts, layout, canvas);
+    // The final card owns transform/opacity until it reaches CardStage. Show
+    // settlement only after that flight completes; otherwise the completion
+    // render would overwrite the independent result entrance tween mid-flight.
+    this.renderResult(visibleResult, handCounts, layout, canvas);
     if (!vm.result) {
       if (phase !== 'disposed') this.renderPauseControl(layout, canvas);
       this.renderPauseOverlay(canvas);
     }
     this.markLiveSubtree(this.ensureFxLayer());
+    const busyNode = this.ensureNode('anim-busy-runtime', this.uiRoot);
+    busyNode.active = this.cardAnimator.isBusy();
     this.endRenderDiff();
+
+    if (cardRender?.startPrepared) {
+      this.cardAnimator.startPrepared((key) =>
+        this.cardLayer?.getChildByName(cardRuntimeNodeName(key)) ?? null);
+    }
   }
 
   private rendererContext(): GameSceneRendererContext {
@@ -511,6 +641,7 @@ export class GameSceneSkeleton extends Component {
       turnTimerElapsedMs: this.turnTimerElapsedMs,
       turnTimerMs: TURN_TIMER_MS,
       spriteFrames: this.spriteFrames,
+      sessionTotals: () => this.sessionTotals,
       isLandscape: this.isLandscape.bind(this),
       screenPoint: this.screenPoint.bind(this),
       rectPoint: this.rectPoint.bind(this),
@@ -525,10 +656,8 @@ export class GameSceneSkeleton extends Component {
       setMemoryExpanded: (value) => {
         this.memoryExpanded = value;
       },
-      animatedResultKey: () => this.animatedResultKeyValue,
-      setAnimatedResultKey: (key) => {
-        this.animatedResultKeyValue = key;
-      },
+      claimAnimationId: (id) => this.cardAnimator.claimAnimationId(id),
+      hasAnimationId: (id) => this.cardAnimator.hasAnimationId(id),
       fxLayer: () => this.ensureFxLayer(),
       toggleAdvisor: this.toggleAdvisor.bind(this),
       toggleBiddingAdvisor: this.toggleBiddingAdvisor.bind(this),
@@ -566,15 +695,11 @@ export class GameSceneSkeleton extends Component {
 
   private renderBottomCardsDock = renderBottomCardsDockImpl;
 
-  private renderPlayArea = renderPlayAreaImpl;
+  private renderCardStage = renderCardStageImpl;
 
-  private playAreaLayout = playAreaLayoutImpl;
+  private renderPlayAreaFxTarget = renderPlayAreaFxTargetImpl;
 
-  private sideSeatPlaySafeBand = sideSeatPlaySafeBandImpl;
-
-  private playAreaCardVerticalBounds = playAreaCardVerticalBoundsImpl;
-
-  private playCardPosition = playCardPositionImpl;
+  private renderHandPlaceholder = renderHandPlaceholderImpl;
 
   private renderHud(hand: Card[], layout: TableZones, canvas: { width: number; height: number }): void {
     renderHudSection(this.rendererContext(), hand, layout, canvas);
@@ -589,13 +714,8 @@ export class GameSceneSkeleton extends Component {
     layout: TableZones,
     canvas: { width: number; height: number },
   ): void {
-    const gated = this.dealAnimationLockMs > 0 && bidding
-      ? { ...bidding, buttons: bidding.buttons.map((button) => ({ ...button, enabled: false })) }
-      : bidding;
-    renderBiddingSection(this.rendererContext(), gated, layout, canvas);
+    renderBiddingSection(this.rendererContext(), bidding, layout, canvas);
   }
-
-  private renderHand = renderHandImpl;
 
   private renderActions(
     play: boolean,
@@ -615,8 +735,6 @@ export class GameSceneSkeleton extends Component {
   private renderTurnTimer(layout: TableZones, canvas: { width: number; height: number }): void {
     renderTurnTimerSection(this.rendererContext(), layout, canvas);
   }
-
-  private armDealAnimationLock = armDealAnimationLockImpl;
 
   private renderAdvisor(
     snapshot: ReturnType<RoundRuntime['currentSnapshot']> | undefined,
@@ -638,8 +756,6 @@ export class GameSceneSkeleton extends Component {
   ): void {
     renderResultSection(this.rendererContext(), result, handCounts, layout, canvas);
   }
-
-  private handLayoutFrame = handLayoutFrameImpl;
 
   private renderPauseControl = renderPauseControlImpl;
 
@@ -698,12 +814,15 @@ export class GameSceneSkeleton extends Component {
     if (!this.runtime) return;
     const snapshot = this.runtime.currentSnapshot();
     if (!snapshot?.viewerHand || !this.runtime.isPlayerTurn()) return;
-    // V8 签收意见④：首点（无选中）= AI 最优推荐；已有选中时沿既有排序循环换下一手。
-    // 提示只改 selected，绝不代提交。W-AUDIT-AI R2：选择逻辑收进纯岛 pickHint
-    //（行为契约在 test/ui/hint-delegation.test.ts），本壳禁止直接调用提示原语。
-    const move = pickHint({ snapshot, history: this.fullGameEvents, selected: this.selected });
-    if (!move) return;
-    this.selected = move.cards.slice();
+    const verdict = pickHint({ snapshot, history: this.fullGameEvents, selected: this.selected, session: this.hintSession });
+    if (verdict.kind === 'move') {
+      this.hintSession = verdict.session;
+      this.selected = verdict.move.cards.slice();
+    } else {
+      this.hintSession = null;
+      this.selected = clearSelection();
+      this.toasts = pushToast(this.toasts, t(verdict.kind === 'passAdvice' ? 'hint.passAdvice' : 'hint.none'), this.toastClockMs);
+    }
     this.render();
   }
 
@@ -717,11 +836,9 @@ export class GameSceneSkeleton extends Component {
     this.render();
   }
 
-  private addCard = addCardImpl;
-
   private addDisplayCard = addDisplayCardImpl;
 
-  private addCardNode = addCardNodeImpl;
+  private renderStageCard = renderStageCardImpl;
 
   private cardFaceColor = cardFaceColorImpl;
 
@@ -732,10 +849,6 @@ export class GameSceneSkeleton extends Component {
   private configureCardSprite = configureCardSpriteImpl;
 
   private fitSpriteInBox = fitSpriteInBoxImpl;
-
-  private animateCardDeal = animateCardDealImpl;
-
-  private animateCardPlay = animateCardPlayImpl;
 
   private animateScaleIn = animateScaleInImpl;
 
@@ -820,6 +933,8 @@ export class GameSceneSkeleton extends Component {
   private beginRenderDiff = beginRenderDiffImpl;
 
   private hideSettledTransientHud = hideSettledTransientHudImpl;
+
+  private hideSettlementSceneChrome = hideSettlementSceneChromeImpl;
 
   private hideLiveSubtree = hideLiveSubtreeImpl;
 

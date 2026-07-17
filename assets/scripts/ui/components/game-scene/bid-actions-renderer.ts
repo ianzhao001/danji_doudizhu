@@ -8,6 +8,7 @@ import { deriveInsightView } from '../../insight-view';
 import { deriveScreenVM } from '../../screen-view';
 import { t } from '../../strings';
 import type { TableZones } from '../../table-zones';
+import type { TypographyRole } from '../../theme';
 import { deriveTurnTimer } from '../../turn-timer';
 import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
 import { applyPillSkin, PILL_TEXT, type GameSceneRendererContext } from './seats-renderer';
@@ -28,11 +29,13 @@ export function renderBidding(
   canvas: { width: number; height: number },
 ): void {
   if (!bidding) return;
+  const landscape = ctx.isLandscape(canvas);
   const prompt = ctx.rectPoint(layout.statusLine, canvas, 0.5, 0.5);
-  renderStatusPill(ctx, 'bidding-prompt', bidding.prompt, prompt.x, prompt.y, Math.min(230, layout.statusLine.width), 32, 16);
-  const buttonHeight = 60;
-  const buttonWidth = Math.min(118, Math.max(96, (layout.tableActionBar.width - 12) / Math.max(1, bidding.buttons.length)));
-  const step = buttonWidth + 10;
+  renderStatusPill(ctx, 'bidding-prompt', bidding.prompt, prompt.x, prompt.y,
+    Math.min(230, layout.statusLine.width), landscape ? layout.statusLine.height : 32, 'action');
+  const buttonHeight = landscape ? layout.tableActionBar.height : 60;
+  const buttonWidth = Math.min(118, Math.max(96, (layout.tableActionBar.width - THEME.spacing.comfortable) / Math.max(1, bidding.buttons.length)));
+  const step = buttonWidth + THEME.spacing.card;
   bidding.buttons.forEach((button, index) => {
     const screenX = layout.tableActionBar.x + layout.tableActionBar.width / 2 + (index - (bidding.buttons.length - 1) / 2) * step;
     const screenY = layout.tableActionBar.y + layout.tableActionBar.height * 0.5;
@@ -63,9 +66,9 @@ export function renderActions(
   mustPass = false,
 ): void {
   const y = layout.tableActionBar.y + layout.tableActionBar.height * 0.5;
-  const buttonHeight = 60;
-  const buttonWidth = Math.min(94, Math.max(78, (layout.tableActionBar.width - 20) / 3));
-  const step = buttonWidth + 8;
+  const buttonHeight = ctx.isLandscape(canvas) ? layout.tableActionBar.height : 60;
+  const buttonWidth = Math.min(94, Math.max(78, (layout.tableActionBar.width - THEME.spacing.safe) / 3));
+  const step = buttonWidth + THEME.spacing.default;
   const center = layout.tableActionBar.x + layout.tableActionBar.width / 2;
   const playEnabled = mustPass ? false : play;
   const hintEnabled = mustPass ? false : hint;
@@ -100,7 +103,8 @@ export function renderStatus(
 ): void {
   if (!text) return;
   const pos = ctx.rectPoint(layout.statusLine, canvas, 0.5, 0.5);
-  renderStatusPill(ctx, 'status-label', text, pos.x, pos.y, Math.min(230, layout.statusLine.width), 30, 15);
+  renderStatusPill(ctx, 'status-label', text, pos.x, pos.y, Math.min(230, layout.statusLine.width),
+    ctx.isLandscape(canvas) ? layout.statusLine.height : 30, 'body');
 }
 
 export function renderTurnTimer(
@@ -120,17 +124,22 @@ export function renderTurnTimer(
   //  ① 深炭紫底(surfaceRaised 48,40,58)是全 UI 唯一的深色残留(旧深色主题遗物),粉系里极突兀;
   //  ② urgent 时暗红字压深底只有 1.6:1,几乎读不出;
   //  ③ 进度条(4px 细线)就画在字脚下 —— 正是用户所指「盖字的设计不宜出现很多线条」。
-  // 改法:换 v18 浅药丸皮(单一填充+一条细描边,与 pill/名牌同族),去掉压字的进度条,
+  // 改法:换 v19 浅药丸皮与独立倒计时环,去掉压字的进度条,
   // 只留「计时 Ns」+ 告急时字转深红(浅底上 6.2:1)。倒计时语义由数字本身承载,更简洁。
   applyPillSkin(ctx, root, width, height);
   ctx.ensureNode('turn-timer-bar', root).getComponent(Graphics)?.clear();
-  ctx.addSprite(RESOURCE_PATHS.badgeTimerV13, -width / 2 + 14, 0, 18, 18, root, 'turn-timer-badge');
+  const iconWidth = 18;
+  const contentGap = THEME.spacing.tight;
+  const labelWidth = Math.max(44, width - 64);
+  const contentWidth = iconWidth + contentGap + labelWidth;
+  const iconX = -contentWidth / 2 + iconWidth / 2;
+  const labelX = contentWidth / 2 - labelWidth / 2;
+  ctx.addSprite(RESOURCE_PATHS.countdownRingV19, iconX, 0, iconWidth, iconWidth, root, 'turn-timer-badge');
 
   // 门B:文字盒排在徽标右侧的剩余净区内(原 x=w/2-31、盒宽 56 会向右越出净区 4px);
   // 药丸仅 22 高,默认行高 16 也会让字形带越出净区(15)→ 行高压到 13。
-  const label = ctx.addLabel(`计时 ${timer.label}`, 12, 0, THEME.typography.xs, root,
-    Math.max(44, width - 64), Math.max(13, height - 8), 'turn-timer-label');
-  label.lineHeight = 13;
+  const label = ctx.addLabel(`计时 ${timer.label}`, labelX, 0, 'assistive', root,
+    labelWidth, Math.max(13, height - THEME.spacing.default), 'turn-timer-label');
   label.color = timer.urgent ? TIMER_URGENT_TEXT : STATUS_TEXT;
 }
 
@@ -172,7 +181,7 @@ export function renderAdvisor(
       : toColor(THEME.palette.surfaceRaised, 184);
   drawPanel(root, width, height, color);
 
-  const label = ctx.addLabel(insight.text, 0, 1, THEME.typography.xs, root, width - 18, height - 4, 'advisor-label');
+  const label = ctx.addLabel(insight.text, 0, 1, 'assistive', root, width - THEME.spacing.safe, height - THEME.spacing.tight, 'advisor-label');
   label.color = insight.emphasize ? toColor(THEME.palette.textOnAccent) : toColor(THEME.palette.accentCream);
 }
 
@@ -184,14 +193,15 @@ function renderStatusPill(
   y: number,
   width: number,
   height: number,
-  fontSize: number,
+  role: TypographyRole,
 ): void {
   const root = ctx.ensureNode(name, ctx.uiRoot);
   root.setPosition(x, y, 0);
   addUiTransform(root, width, height);
   applyPillSkin(ctx, root, width, height);
   // 门B:文字盒收进药丸净区,且 y 归 0——原来 y=+1 的偏移让字形带上缘越出净区顶。
-  const label = ctx.addLabel(text, 0, 0, fontSize, root, width - 18, Math.round(height * 0.78), `${name}-text`);
+  const label = ctx.addLabel(text, 0, 0, role, root, width - THEME.spacing.safe,
+    Math.max(12, Math.floor(height * 0.72)), `${name}-text`);
   label.color = STATUS_TEXT;
 }
 
@@ -236,7 +246,7 @@ function renderBiddingAdvisor(
   addUiTransform(root, width, height);
   drawPanel(root, width, height, view.emphasize ? BID_ADVICE_STRONG_BACKDROP : BID_ADVICE_BACKDROP);
 
-  const label = ctx.addLabel(biddingAdviceText(view), 0, 1, THEME.typography.sm, root, width - 18, height - 6, 'bid-advisor-label');
+  const label = ctx.addLabel(biddingAdviceText(view), 0, 1, 'meta', root, width - THEME.spacing.safe, height - 6, 'bid-advisor-label');
   label.color = view.emphasize ? BID_ADVICE_STRONG_TEXT : BID_ADVICE_TEXT;
 }
 

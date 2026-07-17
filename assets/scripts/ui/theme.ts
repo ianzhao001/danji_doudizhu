@@ -10,6 +10,25 @@ export interface ThemeColor {
   a: number;
 }
 
+export interface TypographyStep {
+  readonly size: number;
+  readonly lineHeight: number;
+}
+
+export type TypographyRole =
+  | 'assistive'
+  | 'secondary'
+  | 'meta'
+  | 'body'
+  | 'action'
+  | 'prominentAction'
+  | 'sectionTitle'
+  | 'cardRank'
+  | 'hero'
+  | 'display';
+
+export type SpacingRole = 'tight' | 'default' | 'card' | 'comfortable' | 'section' | 'safe' | 'wide';
+
 export interface Theme {
   palette: {
     brand: ThemeColor;
@@ -29,14 +48,18 @@ export interface Theme {
     selectedTint: ThemeColor;
     tableFelt: ThemeColor;
   };
-  typography: { xs: number; sm: number; md: number; lg: number; xl: number; display: number };
-  spacing: { xs: number; sm: number; md: number; lg: number; xl: number };
+  typography: Record<TypographyRole, TypographyStep>;
+  spacing: Record<SpacingRole, number>;
   radius: { sm: number; md: number; lg: number; pill: number };
   alpha: { disabled: number; hover: number; pressed: number; scrim: number };
 }
 
 function color(r: number, g: number, b: number, a = 255): ThemeColor {
   return { r, g, b, a };
+}
+
+function typography(size: number, lineHeight: number): TypographyStep {
+  return { size, lineHeight };
 }
 
 function deepFreeze<T extends object>(value: T): T {
@@ -87,19 +110,27 @@ const themeData: Theme = {
     tableFelt: color(74, 70, 72, 235),
   },
   typography: {
-    xs: 11,
-    sm: 13,
-    md: 16,
-    lg: 20,
-    xl: 24,
-    display: 28,
+    // 小字档行高按 v18 药丸/名牌的实测净区收紧，避免门 B 将字形带判出皮肤。
+    assistive: typography(11, 12),
+    secondary: typography(12, 13),
+    meta: typography(13, 15),
+    body: typography(14, 18),
+    action: typography(16, 20),
+    prominentAction: typography(18, 24),
+    sectionTitle: typography(22, 30),
+    // v1.7 R2 用户裁决：牌面排印回退 v1.6，小王/大王再由 card-node 覆盖 11/13。
+    cardRank: typography(13, 16),
+    hero: typography(24, 32),
+    display: typography(30, 38),
   },
   spacing: {
-    xs: 4,
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
+    tight: 4,
+    default: 8,
+    card: 10,
+    comfortable: 12,
+    section: 16,
+    safe: 20,
+    wide: 24,
   },
   radius: {
     sm: 4,

@@ -5,6 +5,7 @@ import { deriveCardMemoryView } from '../../card-memory-view';
 import { deriveStrengthMeter } from '../../strength-meter-view';
 import { trackPlayed } from '../../../ai/cardMemory';
 import type { TableZones } from '../../table-zones';
+import { UI_TEXT_COLORS } from '../../ui-text-colors';
 import { THEME, addUiTransform, drawPanel, toColor } from '../ui-helpers';
 import type { GameSceneRendererContext } from './seats-renderer';
 
@@ -56,8 +57,8 @@ function renderStrengthMeter(
   graphics.roundRect(-barWidth / 2, -barHeight / 2, filled, barHeight, 4);
   graphics.fill();
 
-  ctx.addLabel('强度', -width / 2 + 22, 3, THEME.typography.xs, root, 42, 20, 'hud-strength-title');
-  ctx.addLabel(`${strength.label}${strength.pct}%`, width / 2 - 34, 3, 11, root, 68, 20, 'hud-strength-value');
+  ctx.addLabel('强度', -width / 2 + 22, 3, 'assistive', root, 42, 20, 'hud-strength-title');
+  ctx.addLabel(`${strength.label}${strength.pct}%`, width / 2 - 34, 3, 'assistive', root, 68, 20, 'hud-strength-value');
 }
 
 export function renderCardMemory(
@@ -78,7 +79,7 @@ export function renderCardMemory(
   addUiTransform(root, panelWidth, panelHeight);
   drawPanel(root, panelWidth, panelHeight, toColor(THEME.palette.surfaceRaised, 168));
 
-  ctx.addLabel('剩牌', -panelWidth / 2 + 24, panelHeight / 2 - 18, THEME.typography.sm, root, 42, 24, 'hud-memory-title');
+  ctx.addLabel('剩牌', -panelWidth / 2 + THEME.spacing.wide, panelHeight / 2 - 18, 'meta', root, 42, 24, 'hud-memory-title');
   const toggleLabel = ctx.memoryExpanded ? '收起' : '展开';
   addCompactHudButton(ctx, root, toggleLabel, -panelWidth / 2 + 76, panelHeight / 2 - 18, () => {
     ctx.setMemoryExpanded(!ctx.memoryExpanded);
@@ -93,7 +94,7 @@ export function renderCardMemory(
     const x = -panelWidth / 2 + 16 + cellWidth / 2 + col * cellWidth;
     const y = panelHeight / 2 - 44 - line * 19;
     const text = `${row.rankLabel}${row.remaining}`;
-    const item = ctx.addLabel(text, x, y, THEME.typography.xs, root, cellWidth, 22, `hud-memory-${index}`);
+    const item = ctx.addLabel(text, x, y, 'assistive', root, cellWidth, 22, `hud-memory-${index}`);
     item.color = row.exhausted ? toColor(THEME.palette.textOnAccent, 112) : toColor(THEME.palette.accentCream);
   });
 }
@@ -122,7 +123,6 @@ function addCompactHudButton(
   button.disabledColor = toColor(THEME.palette.textOnAccent, 120);
   node.off(Button.EventType.CLICK);
   node.on(Button.EventType.CLICK, cb);
-  const label = ctx.addLabel(text, 0, 1, THEME.typography.sm, node, width - 8, height - 4, 'hud-memory-toggle-label');
-  label.color = toColor(THEME.palette.brandDark);
-  label.lineHeight = 17;
+  const label = ctx.addLabel(text, 0, 1, 'meta', node, width - THEME.spacing.default, height - THEME.spacing.tight, 'hud-memory-toggle-label');
+  label.color = toColor(UI_TEXT_COLORS.primary);
 }

@@ -24,13 +24,13 @@ export interface TableZones extends TableRegions {
   dropZoneRight: Rect;
   /** 玩家出牌落点：中央。 */
   dropZoneHero: Rect;
-  /** 状态/叫抢提示行：dropZoneHero 之下、actionBar 之上。 */
+  /** 状态/叫抢提示行：横屏在 dropZoneHero 之上；竖屏保留 legacy 下方位置。 */
   statusLine: Rect;
   /** 叫抢按钮组与出牌按钮组共享（相位互斥）。 */
   actionBar: Rect;
-  /** 手牌强度条：actionBar 左侧翼（x 不相交）。 */
+  /** 手牌强度条：横屏左缘独立停靠（当前隐藏）。 */
   strengthMeter: Rect;
-  /** 计时：actionBar 右侧翼（x 不相交）。 */
+  /** 计时：横屏停靠 actionBar 左翼；竖屏保留 legacy 左下位置。 */
   turnTimer: Rect;
   /** 记牌器收起态停靠：左半屏。 */
   memoryDock: Rect;
@@ -50,7 +50,7 @@ export interface TableZones extends TableRegions {
   opponentRightNameplate: Rect;
   /** v13 底部横向大手牌区。 */
   heroHandLarge: Rect;
-  /** v13 牌桌中部行动按钮区。 */
+  /** v13 牌桌右下行动按钮区（与 actionBar 同一事实源）。 */
   tableActionBar: Rect;
   /** v13 结算展示覆盖区：暗幕牌桌上的胜负大字与三家分数面板。 */
   settlementShowcase: Rect;
@@ -58,6 +58,7 @@ export interface TableZones extends TableRegions {
 
 export function tableZones(width: number, height: number): TableZones {
   const legacy = tableLayout(width, height);
+  const landscape = width >= height;
   const gap = 8;
   const infoStripHeight = Math.min(14, Math.max(12, Math.round(height * 0.034)));
   const infoStripWidth = Math.min(260, Math.max(176, Math.round(width * 0.28)));
@@ -65,29 +66,30 @@ export function tableZones(width: number, height: number): TableZones {
     legacy.opponentLeft.y + legacy.opponentLeft.height,
     legacy.opponentRight.y + legacy.opponentRight.height,
   );
-  const dropHeight = legacy.playArea.height;
+  const dropHeight = clamp(Math.round(height * 0.13), 44, 52);
   const dropWidth = Math.min(128, Math.max(108, Math.round(width * 0.15)));
-  const dockWidth = Math.min(220, Math.max(176, Math.round(width * 0.24)));
-  const bottomDockHeight = Math.min(30, Math.max(24, Math.round(height * 0.07)));
-  const statusHeight = Math.min(24, Math.max(20, Math.round(height * 0.055)));
-  const sideWidth = Math.min(118, Math.max(96, Math.round(width * 0.13)));
+  const dropY = opponentBottom + gap;
+  const dockWidth = clamp(Math.round(width * 0.175), 136, 154);
+  const bottomDockHeight = clamp(Math.round(height * 0.115), 40, 46);
+  const statusHeight = clamp(Math.round(height * 0.05), 18, 22);
+  const sideWidth = clamp(Math.round(width * 0.105), 84, 96);
   const dockHeight = Math.min(32, Math.max(28, Math.round(height * 0.08)));
-  const sideY = legacy.actionButtons.y + legacy.actionButtons.height + gap;
-  const v13 = gameRemakeZones(width, height, gap);
+  const sideY = legacy.actionButtons.y;
+  const v13 = gameRemakeZones(width, height, gap, legacy);
 
   return {
     ...legacy,
     infoStrip: centered(width, infoStripWidth, legacy.topBar.y + legacy.topBar.height + gap, infoStripHeight),
-    bottomCardsDock: centered(width, dockWidth, legacy.opponentLeft.y, bottomDockHeight),
+    bottomCardsDock: centered(width, dockWidth, legacy.topBar.y + legacy.topBar.height + gap, bottomDockHeight),
     dropZoneLeft: {
       x: legacy.opponentLeft.x + legacy.opponentLeft.width + gap,
-      y: opponentBottom + gap,
+      y: dropY,
       width: dropWidth,
       height: dropHeight,
     },
     dropZoneRight: {
       x: legacy.opponentRight.x - gap - dropWidth,
-      y: opponentBottom + gap,
+      y: dropY,
       width: dropWidth,
       height: dropHeight,
     },
@@ -95,30 +97,32 @@ export function tableZones(width: number, height: number): TableZones {
     statusLine: centered(
       width,
       Math.min(240, Math.max(168, Math.round(width * 0.26))),
-      legacy.playArea.y + legacy.playArea.height + gap,
+      landscape
+        ? legacy.playArea.y - gap - statusHeight
+        : legacy.playArea.y + legacy.playArea.height + gap,
       statusHeight,
     ),
     actionBar: { ...legacy.actionButtons },
     strengthMeter: {
-      x: Math.max(gap, legacy.actionButtons.x - gap - sideWidth),
-      y: legacy.actionButtons.y,
+      x: landscape ? gap : gap + sideWidth + gap,
+      y: sideY,
       width: sideWidth,
       height: legacy.actionButtons.height,
     },
     turnTimer: {
-      x: Math.min(width - gap - sideWidth, legacy.actionButtons.x + legacy.actionButtons.width + gap),
-      y: legacy.actionButtons.y,
+      x: landscape ? legacy.actionButtons.x - gap - sideWidth : gap,
+      y: landscape ? legacy.actionButtons.y : sideY,
       width: sideWidth,
       height: legacy.actionButtons.height,
     },
     memoryDock: {
-      x: Math.max(gap, legacy.actionButtons.x - gap - sideWidth),
+      x: gap,
       y: sideY,
       width: sideWidth,
       height: dockHeight,
     },
     advisorDock: {
-      x: Math.min(width - gap - sideWidth, legacy.actionButtons.x + legacy.actionButtons.width + gap),
+      x: width - gap - sideWidth,
       y: sideY,
       width: sideWidth,
       height: dockHeight,
@@ -136,7 +140,7 @@ function centered(width: number, rectWidth: number, y: number, height: number): 
   };
 }
 
-function gameRemakeZones(width: number, height: number, gap: number): Pick<
+function gameRemakeZones(width: number, height: number, gap: number, legacy: TableRegions): Pick<
   TableZones,
   | 'heroBody'
   | 'opponentLeftBody'
@@ -148,30 +152,37 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
   | 'tableActionBar'
   | 'settlementShowcase'
 > {
-  const heroHandHeight = clamp(Math.round(height * 0.22), 80, 96);
-  const heroHandReservedLeft = clamp(Math.round(width * 0.21), 132, 176);
+  const heroHandReservedLeft = clamp(Math.round(width * 0.132), 102, 120);
   const heroHandLarge = {
     x: heroHandReservedLeft,
-    y: height - heroHandHeight,
-    width: width - heroHandReservedLeft - gap,
-    height: heroHandHeight,
+    y: legacy.playerHand.y,
+    width: width >= height
+      ? width - 2 * heroHandReservedLeft
+      : width - heroHandReservedLeft - gap,
+    height: legacy.playerHand.height,
   };
 
-  const tableActionHeight = clamp(Math.round(height * 0.125), 44, 56);
-  const tableActionWidth = clamp(Math.round(width * 0.32), 252, 330);
-  const tableActionBar = centered(width, tableActionWidth, heroHandLarge.y - gap - tableActionHeight, tableActionHeight);
+  const tableActionBar = { ...legacy.actionButtons };
 
   const settlementHeight = Math.round(height * 0.5);
   const settlementShowcase = centered(
     width,
     clamp(Math.round(width * 0.56), 360, 520),
-    clamp(Math.round(height * 0.09), 32, 40),
+    tableActionBar.y - settlementHeight,
     settlementHeight,
   );
 
-  const topBodyY = clamp(Math.round(height * 0.075), 26, 32);
-  const bodyWidth = clamp(Math.round(width * 0.125), 96, 112);
-  const bodyHeight = clamp(Math.round(height * 0.41), 148, 170);
+  const bodyWidth = clamp(Math.round(width * 0.105), 84, 96);
+  const bodyHeight = clamp(Math.round(height * 0.26), 94, 106);
+  const dropHeight = clamp(Math.round(height * 0.13), 44, 52);
+  const dropWidth = Math.min(128, Math.max(108, Math.round(width * 0.15)));
+  const opponentBottom = Math.max(
+    legacy.opponentLeft.y + legacy.opponentLeft.height,
+    legacy.opponentRight.y + legacy.opponentRight.height,
+  );
+  const dropY = opponentBottom + gap;
+  const dropZoneLeftX = legacy.opponentLeft.x + legacy.opponentLeft.width + gap;
+  const dropZoneRightX = legacy.opponentRight.x - gap - dropWidth;
   const heroBodyX = gap;
   const heroBodyY = Math.max(0, height - bodyHeight);
   const heroBody = {
@@ -181,35 +192,41 @@ function gameRemakeZones(width: number, height: number, gap: number): Pick<
     height: bodyHeight,
   };
   const opponentLeftBody = {
-    x: gap,
-    y: topBodyY,
+    x: width >= height ? dropZoneLeftX - gap - bodyWidth : gap,
+    y: width >= height ? dropY + dropHeight - bodyHeight : legacy.topBar.y + legacy.topBar.height + gap,
     width: bodyWidth,
     height: bodyHeight,
   };
   const opponentRightBody = {
-    x: width - gap - bodyWidth,
-    y: topBodyY,
+    x: width >= height ? dropZoneRightX + dropWidth + gap : width - gap - bodyWidth,
+    y: width >= height ? dropY + dropHeight - bodyHeight : legacy.topBar.y + legacy.topBar.height + gap,
     width: bodyWidth,
     height: bodyHeight,
   };
 
-  const nameplateWidth = clamp(Math.round(width * 0.17), 132, 156);
-  const nameplateHeight = clamp(Math.round(height * 0.085), 30, 36);
+  const nameplateWidth = width >= height
+    ? clamp(Math.round(width * 0.123), 96, 106)
+    : clamp(Math.round(width * 0.135), 104, 116);
+  const nameplateHeight = clamp(Math.round(height * 0.09), 32, 36);
   const heroNameplate = {
     x: heroBody.x,
-    y: clamp(heroBody.y - gap - nameplateHeight, 0, height - nameplateHeight),
-    width: Math.min(nameplateWidth, heroBody.width + 24),
+    y: heroBody.y - gap - nameplateHeight,
+    width: nameplateWidth,
     height: nameplateHeight,
   };
   const opponentLeftNameplate = {
-    x: opponentLeftBody.x,
-    y: clamp(opponentLeftBody.y + opponentLeftBody.height + gap, 0, height - nameplateHeight),
+    x: width >= height ? gap : opponentLeftBody.x,
+    y: width >= height
+      ? opponentLeftBody.y - gap - nameplateHeight
+      : opponentLeftBody.y + opponentLeftBody.height + gap,
     width: nameplateWidth,
     height: nameplateHeight,
   };
   const opponentRightNameplate = {
-    x: clamp(opponentRightBody.x + opponentRightBody.width - nameplateWidth, gap, width - gap - nameplateWidth),
-    y: clamp(opponentRightBody.y + opponentRightBody.height + gap, 0, height - nameplateHeight),
+    x: width - gap - nameplateWidth,
+    y: width >= height
+      ? opponentRightBody.y - gap - nameplateHeight
+      : opponentRightBody.y + opponentRightBody.height + gap,
     width: nameplateWidth,
     height: nameplateHeight,
   };

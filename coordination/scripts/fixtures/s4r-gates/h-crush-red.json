@@ -1,0 +1,7 @@
+{
+  "labels": [],
+  "sprites": [
+    { "node": "pill-skin", "spr": "info-pill-v19", "type": "SLICED", "box": [89, 22], "rect": [350, 89], "metaBorder": [72, 72, 34, 34] },
+    { "node": "play-tray-skin", "spr": "play-tray-v19", "type": "SLICED", "box": [270, 121], "rect": [694, 132], "metaBorder": [64, 64, 48, 48] }
+  ]
+}

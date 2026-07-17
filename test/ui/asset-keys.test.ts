@@ -27,8 +27,75 @@ describe('asset keys', () => {
   });
 
   it('maps image resources to their Cocos SpriteFrame sub-asset path', () => {
-    expect(spriteFrameResourcePath(RESOURCE_PATHS.cardTemplate)).toBe('art/cards/card-template/spriteFrame');
+    expect(spriteFrameResourcePath(RESOURCE_PATHS.cardTemplateV13)).toBe('art/cards/card-template-v13/spriteFrame');
     expect(spriteFrameResourcePath(RESOURCE_PATHS.lobbyBg)).toBe('art/backgrounds/lobby-bg/spriteFrame');
+  });
+
+  it('locks every active card / button / skin / fx key to an independent literal resource path', () => {
+    // W-VISION-COLOR 用户裁决:信息层级配色重构(c1)→ R2-d rim 加厚(c2,仅按钮三张);
+    // v21 按钮族 + v19 药丸/名牌/托盘 + v13 牌桌底 + c1 按钮族退役入 rollback;
+    // 卡面 v13、牌桌/药丸/名牌 c1、面板/头像/环/帽/徽/牌型/特效 v19 续用。
+    expect({
+      // v13 卡系(续用;无 cardSelectedFrame——v1.6 无选中框层)
+      cardTemplateV13: RESOURCE_PATHS.cardTemplateV13,
+      cardBackV13: RESOURCE_PATHS.cardBackV13,
+      suitSpadeV13: RESOURCE_PATHS.suitSpadeV13,
+      suitHeartV13: RESOURCE_PATHS.suitHeartV13,
+      suitClubV13: RESOURCE_PATHS.suitClubV13,
+      suitDiamondV13: RESOURCE_PATHS.suitDiamondV13,
+      jokerSmallV13: RESOURCE_PATHS.jokerSmallV13,
+      jokerBigV13: RESOURCE_PATHS.jokerBigV13,
+      // c2 按钮族（R2-d 用户解锁 rim 加厚 ~1px:三张同族一致、向内加厚、alpha/trim/capInsets 不变;
+      // 圆角/高光/底唇/投影/渐变/色相/饱和全部不动——结构冻结仅解锁 rim 这一项）
+      btnPrimaryC2: RESOURCE_PATHS.btnPrimaryC2,
+      btnSecondaryC2: RESOURCE_PATHS.btnSecondaryC2,
+      btnNeutralC2: RESOURCE_PATHS.btnNeutralC2,
+      // c1 皮相（牌桌降饱和 / 象牙白药丸·名牌;R2 移除中央托盘,playTrayC1 退役,不在活跃表）
+      gameTableBgC1: RESOURCE_PATHS.gameTableBgC1,
+      infoPillC1: RESOURCE_PATHS.infoPillC1,
+      seatNameplateC1: RESOURCE_PATHS.seatNameplateC1,
+      // v19 皮相（未在本波改色范围,续用）
+      panelPopupV19: RESOURCE_PATHS.panelPopupV19,
+      settlementPanelV19: RESOURCE_PATHS.settlementPanelV19,
+      avatarFrameV19: RESOURCE_PATHS.avatarFrameV19,
+      countdownRingV19: RESOURCE_PATHS.countdownRingV19,
+      landlordHatV19: RESOURCE_PATHS.landlordHatV19,
+      farmerBadgeV19: RESOURCE_PATHS.farmerBadgeV19,
+      patternLabelV19: RESOURCE_PATHS.patternLabelV19,
+      // v19 特效族（续用）
+      fxConfettiV19: RESOURCE_PATHS.fxConfettiV19,
+      fxStarV19: RESOURCE_PATHS.fxStarV19,
+      fxSparkV19: RESOURCE_PATHS.fxSparkV19,
+      fxRingV19: RESOURCE_PATHS.fxRingV19,
+      fxTrailV19: RESOURCE_PATHS.fxTrailV19,
+    }).toEqual({
+      cardTemplateV13: 'art/cards/card-template-v13',
+      cardBackV13: 'art/cards/card-back-v13',
+      suitSpadeV13: 'art/cards/suit-spade-v13',
+      suitHeartV13: 'art/cards/suit-heart-v13',
+      suitClubV13: 'art/cards/suit-club-v13',
+      suitDiamondV13: 'art/cards/suit-diamond-v13',
+      jokerSmallV13: 'art/cards/joker-small-v13',
+      jokerBigV13: 'art/cards/joker-big-v13',
+      btnPrimaryC2: 'art/ui/btn-primary-c2',
+      btnSecondaryC2: 'art/ui/btn-secondary-c2',
+      btnNeutralC2: 'art/ui/btn-neutral-c2',
+      gameTableBgC1: 'art/backgrounds/game-table-bg-c1',
+      infoPillC1: 'art/ui/info-pill-c1',
+      seatNameplateC1: 'art/ui/seat-nameplate-c1',
+      panelPopupV19: 'art/ui/panel-popup-v19',
+      settlementPanelV19: 'art/ui/settlement-panel-v19',
+      avatarFrameV19: 'art/ui/avatar-frame-v19',
+      countdownRingV19: 'art/ui/countdown-ring-v19',
+      landlordHatV19: 'art/ui/landlord-hat-v19',
+      farmerBadgeV19: 'art/ui/farmer-badge-v19',
+      patternLabelV19: 'art/ui/pattern-label-v19',
+      fxConfettiV19: 'art/fx/fx-confetti-v19',
+      fxStarV19: 'art/fx/fx-star-v19',
+      fxSparkV19: 'art/fx/fx-spark-v19',
+      fxRingV19: 'art/fx/fx-ring-v19',
+      fxTrailV19: 'art/fx/fx-trail-v19',
+    });
   });
 
   it('maps final reviewed ART-IMPORT sprites to resources paths', () => {
@@ -64,22 +131,22 @@ describe('asset keys', () => {
 
   it('maps normal cards to card template and jokers to joker art', () => {
     expect(cardAssetPath(cardView({ rank: Rank.R7, suit: Suit.Heart }).assetKey)).toBe(
-      RESOURCE_PATHS.cardTemplate,
+      'art/cards/card-template-v13',
     );
     expect(cardAssetPath(cardView({ rank: Rank.SmallJoker, suit: Suit.Joker }).assetKey)).toBe(
-      RESOURCE_PATHS.jokerSmall,
+      'art/cards/joker-small-v13',
     );
     expect(cardAssetPath(cardView({ rank: Rank.BigJoker, suit: Suit.Joker }).assetKey)).toBe(
-      RESOURCE_PATHS.jokerBig,
+      'art/cards/joker-big-v13',
     );
     expect(cardAssetPath('999-Z')).toBeNull();
   });
 
   it('maps suits to suit art and joker suit to null', () => {
-    expect(suitAssetPath(Suit.Spade)).toBe(RESOURCE_PATHS.suitSpade);
-    expect(suitAssetPath(Suit.Heart)).toBe(RESOURCE_PATHS.suitHeart);
-    expect(suitAssetPath(Suit.Club)).toBe(RESOURCE_PATHS.suitClub);
-    expect(suitAssetPath(Suit.Diamond)).toBe(RESOURCE_PATHS.suitDiamond);
+    expect(suitAssetPath(Suit.Spade)).toBe('art/cards/suit-spade-v13');
+    expect(suitAssetPath(Suit.Heart)).toBe('art/cards/suit-heart-v13');
+    expect(suitAssetPath(Suit.Club)).toBe('art/cards/suit-club-v13');
+    expect(suitAssetPath(Suit.Diamond)).toBe('art/cards/suit-diamond-v13');
     expect(suitAssetPath('joker')).toBeNull();
   });
 
@@ -126,12 +193,16 @@ describe('ART-IMPORT-UIKIT 新键', () => {
   });
 });
 
-// v1.6 审计裁决 P1-2 契约改写(披露):退役键物理隔离至 asset-keys-rollback.ts——
-// 旧断言「v15 横幅/v13 键在 RESOURCE_PATHS 里」正是审计点名的软约束(退役键混在活跃表,
-// 靠人工 grep 守零消费)。改断言:活跃键仍在 RESOURCE_PATHS,回滚键在隔离文件且路径不变。
-describe('ART-V16 结算键与回滚隔离', () => {
-  it('活跃结算面板键仍指向 v15 资源路径', () => {
-    expect(RESOURCE_PATHS.settlementPanelV15).toBe('art/ui/settlement-panel-v15');
+// W-VISION-COLOR 契约改写(披露):信息层级配色——牌桌/托盘/药丸/名牌/游戏按钮换 c1(v21 结构不动只改色);
+// v21 按钮族 + v19 药丸/名牌/托盘 + v13 牌桌底物理隔离至 rollback;卡面 v13、其余 v19 皮相续用。
+describe('ART 活跃键与回滚隔离(W-VISION-COLOR c1 配色 → R2-d c2 rim 加厚)', () => {
+  it('活跃皮相键:结算面板 v19、卡面 v13、c2 游戏按钮与 c1 皮相', () => {
+    expect(RESOURCE_PATHS.settlementPanelV19).toBe('art/ui/settlement-panel-v19');
+    expect(RESOURCE_PATHS.cardTemplateV13).toBe('art/cards/card-template-v13');
+    expect(RESOURCE_PATHS.btnPrimaryC2).toBe('art/ui/btn-primary-c2');
+    expect(RESOURCE_PATHS.gameTableBgC1).toBe('art/backgrounds/game-table-bg-c1');
+    expect(RESOURCE_PATHS.infoPillC1).toBe('art/ui/info-pill-c1');
+    expect(RESOURCE_PATHS.seatNameplateC1).toBe('art/ui/seat-nameplate-c1');
   });
 
   it('回滚键在隔离文件中路径不变(回滚可用),且与活跃表零重名', () => {
@@ -140,7 +211,36 @@ describe('ART-V16 结算键与回滚隔离', () => {
     expect(ROLLBACK_RESOURCE_PATHS.settlementPanelV13).toBe('art/ui/settlement-panel-v13');
     expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryV15).toBe('art/ui/btn-primary-v15');
     expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryV17).toBe('art/ui/btn-primary-v17');
+    expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryV18).toBe('art/ui/btn-primary-v18');
+    // S4R-R2:v19 卡系退役入回滚(卡面回滚 v13);S4R-R2/R3:v19 与 v20 按钮退役。
+    expect(ROLLBACK_RESOURCE_PATHS.cardTemplateV19).toBe('art/cards/card-template-v19');
+    expect(ROLLBACK_RESOURCE_PATHS.cardSelectedFrameV19).toBe('art/cards/card-selected-frame-v19');
+    expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryV19).toBe('art/ui/btn-primary-v19');
+    expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryV20).toBe('art/ui/btn-primary-v20');
+    // W-VISION-COLOR:v21 按钮族 + v19 药丸/名牌/托盘 + v13 牌桌底退役入回滚(全场景换 c1 信息层级配色)。
+    expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryV21).toBe('art/ui/btn-primary-v21');
+    expect(ROLLBACK_RESOURCE_PATHS.btnSecondaryV21).toBe('art/ui/btn-secondary-v21');
+    expect(ROLLBACK_RESOURCE_PATHS.btnTertiaryV21).toBe('art/ui/btn-tertiary-v21');
+    expect(ROLLBACK_RESOURCE_PATHS.btnDisabledV21).toBe('art/ui/btn-disabled-v21');
+    expect(ROLLBACK_RESOURCE_PATHS.gameTableBgV13).toBe('art/backgrounds/game-table-bg-v13');
+    expect(ROLLBACK_RESOURCE_PATHS.playTrayV19).toBe('art/ui/play-tray-v19');
+    // R2:中央托盘移除,c1 托盘皮 playTrayC1 亦退役(零消费)。
+    expect(ROLLBACK_RESOURCE_PATHS.playTrayC1).toBe('art/ui/play-tray-c1');
+    // R2-d:rim 加厚换 c2,c1 按钮族退役入回滚(保留可回退性——规划者裁决走 c2 新键,不原位替换)。
+    expect(ROLLBACK_RESOURCE_PATHS.btnPrimaryC1).toBe('art/ui/btn-primary-c1');
+    expect(ROLLBACK_RESOURCE_PATHS.btnSecondaryC1).toBe('art/ui/btn-secondary-c1');
+    expect(ROLLBACK_RESOURCE_PATHS.btnNeutralC1).toBe('art/ui/btn-neutral-c1');
+    expect(ROLLBACK_RESOURCE_PATHS.infoPillV19).toBe('art/ui/info-pill-v19');
+    expect(ROLLBACK_RESOURCE_PATHS.seatNameplateV19).toBe('art/ui/seat-nameplate-v19');
+    expect(ROLLBACK_RESOURCE_PATHS.panelPopupV15).toBe('art/ui/panel-popup-v15');
+    expect(ROLLBACK_RESOURCE_PATHS.fxConfetti).toBe('art/fx/fx-confetti');
     expect(ROLLBACK_RESOURCE_PATHS.pauseBtnToggle).toBe('art/ui/pause-btn-toggle');
+    // 回滚方向反锁:活跃键不得残留在回滚表(否则「回滚可用」与「活跃」自相矛盾)。
+    const rollback = ROLLBACK_RESOURCE_PATHS as unknown as Record<string, string | undefined>;
+    expect(rollback.cardTemplateV13, 'v13 卡面应在活跃表,不在回滚表').toBeUndefined();
+    expect(rollback.btnPrimaryC2, 'c2 按钮应在活跃表,不在回滚表').toBeUndefined();
+    expect(rollback.gameTableBgC1, 'c1 牌桌应在活跃表,不在回滚表').toBeUndefined();
+    expect(rollback.infoPillC1, 'c1 药丸应在活跃表,不在回滚表').toBeUndefined();
     const activeKeys = new Set(Object.keys(RESOURCE_PATHS));
     for (const key of Object.keys(ROLLBACK_RESOURCE_PATHS)) {
       expect(activeKeys.has(key), `回滚键「${key}」不得同时存在于活跃表`).toBe(false);

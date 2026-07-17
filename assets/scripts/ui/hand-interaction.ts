@@ -4,6 +4,7 @@
  */
 
 import { type Card } from '../rules';
+import { cardKey } from '../rules/guards';
 import { layoutHand } from './hand-layout';
 import { sortByRank, isSelected } from './selection';
 
@@ -74,4 +75,18 @@ export function dragSelectCards(slots: InteractiveSlot[], fromX: number, toX: nu
     }
   }
   return selected;
+}
+
+/**
+ * Anchor a sweep to the real TOUCH_START card, not the raw touch x. A lifted
+ * overlapping card can receive a touch whose x already belongs to a neighbour.
+ */
+export function dragSelectCardsFromOrigin(
+  slots: InteractiveSlot[],
+  origin: Card,
+  toX: number,
+): Card[] {
+  const originKey = cardKey(origin);
+  const originSlot = slots.find((slot) => cardKey(slot.card) === originKey);
+  return originSlot ? dragSelectCards(slots, originSlot.x, toX) : [];
 }

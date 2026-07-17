@@ -4,7 +4,7 @@
  * 烂手当地主 1v2 是「Hard 作地主胜率反转」(hard-depth.test.ts 曾登记)的直接成因。
  * 新口径:火箭/炸弹恒强;≥3 张控牌(2/王)恒强;恰 2 张控牌须配短手型(精确拆解 ≤8 手)。
  */
-import { type Card } from '../rules';
+import { type Card } from '../../../assets/scripts/rules';
 import { decompose } from './decompose';
 import { evaluateHand } from './handStrength';
 

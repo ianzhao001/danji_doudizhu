@@ -61,6 +61,7 @@ describe('M6-L2 animation-params 纯映射', () => {
 // ---- v1.5 W-JUICE 新增参数(T-ANIM-PARAMS·纯增量,不改上方既有断言) ----
 import {
   dealFlight,
+  cardChoreographyParams,
   fxBurst,
   playFlyArc,
   pressFeedback,
@@ -68,6 +69,9 @@ import {
   buttonRipple,
   rocketBurst,
   resultWinFx,
+  patternBurst,
+  settlementScoreRoll,
+  landlordCeremony,
   sceneFade,
 } from '../../assets/scripts/ui/animation-params';
 
@@ -151,5 +155,44 @@ describe('v1.5 W-JUICE 动效参数', () => {
     expect(p.ms).toBeGreaterThan(0);
     const f = sceneFade();
     expect(f.outMs + f.inMs).toBeLessThanOrEqual(400);
+  });
+
+  it('W-VISION S3 牌编排参数确定、全为有限正数且沿用既有飞行预算', () => {
+    const params = cardChoreographyParams();
+    expect(params).toEqual(cardChoreographyParams());
+    expect(Object.values(params).every((value) => Number.isFinite(value) && value > 0)).toBe(true);
+    expect(params.dealMs).toBe(dealFlight().durationMs);
+    expect(params.playMs).toBe(playFlyArc().durationMs);
+    expect(params.playLiftY).toBe(playFlyArc().liftY);
+    expect(params.playRotateDeg).toBe(playFlyArc().rotateDeg);
+    expect(params.playImpactScale).toBeGreaterThanOrEqual(0.85);
+    expect(params.playImpactScale).toBeLessThan(0.98);
+    expect(params.playImpactMs + params.playReboundMs).toBeLessThan(params.playMs);
+  });
+
+  it('W-VISION S5b 标签/滚分/地主仪式参数确定且时长、尺寸、缩放合法', () => {
+    expect(patternBurst()).toEqual(patternBurst());
+    expect(settlementScoreRoll()).toEqual(settlementScoreRoll());
+    expect(landlordCeremony()).toEqual(landlordCeremony());
+
+    const label = patternBurst();
+    expect(label.popMs).toBeGreaterThan(0);
+    expect(label.holdMs).toBeGreaterThan(0);
+    expect(label.fadeMs).toBeGreaterThan(0);
+    expect(label.fromScale).toBeGreaterThan(0);
+    expect(label.fromScale).toBeLessThan(1);
+    expect(label.width).toBeGreaterThan(label.height);
+
+    const score = settlementScoreRoll();
+    expect(Number.isInteger(score.steps)).toBe(true);
+    expect(score.steps).toBeGreaterThan(1);
+    expect(score.stepMs).toBeGreaterThan(0);
+
+    const hat = landlordCeremony();
+    expect(hat.dropMs).toBeGreaterThan(0);
+    expect(hat.holdMs).toBeGreaterThan(0);
+    expect(hat.fadeMs).toBeGreaterThan(0);
+    expect(hat.fromScale).toBeGreaterThan(1);
+    expect(hat.sizePx).toBeGreaterThan(0);
   });
 });

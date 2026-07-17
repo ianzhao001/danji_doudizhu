@@ -4,7 +4,7 @@
 
 This is an offline, single-player Dou Dizhu project built with Cocos Creator 3.8.8. The human player controls one seat while two computer opponents control the others. It implements the classic three-player rules, a complete round, three AI levels, local settings, match records, and interrupted-game recovery.
 
-The current release is v1.6. The repository is intended to be runnable from source by people who do not have a software-development background.
+The current release is v1.9 (further Hard-AI and hint improvements, including the earlier all-difficulty upgrade and visual overhaul; see [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)). The repository is intended to be runnable from source by people who do not have a software-development background.
 
 ## Project Overview
 
@@ -18,7 +18,7 @@ The current release is v1.6. The repository is intended to be runnable from sour
 | Launch scene | `assets/scene/lobby.scene` |
 | Build target | `web-mobile` |
 | AI levels | Simple, Normal, Hard |
-| Verification baseline | 160 test files and 874 passing tests, 2 environment-gated tests skipped, typecheck passing |
+| Verification baseline | 195 test files and 1227 passing tests, 2 environment-gated tests skipped, typecheck passing |
 
 ## Design Principles
 
@@ -44,11 +44,12 @@ The project is designed around four goals: reliable rules, reproducible flow, re
 
 ### AI and hints
 
-- Simple: prioritizes legal, direct actions.
-- Normal: adds basic hand decomposition, combinations, teammate awareness, and bomb preservation.
-- Hard: adds initiative control, endgame evaluation, visible-card memory, and deeper candidate scoring.
-- AI reads only the permitted snapshot and never reads hidden opponent cards.
-- Hints reuse the same legal-move foundation as AI and return playable candidates for the current trick.
+- Simple: plays combinations with basic cooperation, plus anti-blunder guards (never splits bombs, always finishes when the whole hand clears).
+- Normal: structure-aware leads and follows driven by an exact minimum-moves hand decomposition, protects shapes, and feeds its teammate.
+- Hard: everything in Normal plus milli-hand scoring, card memory, determinized Monte Carlo sampling (PIMC), pass inference, an exact perfect-information world solver, and an exact endgame solver.
+- AI reads only the permitted snapshot and never reads hidden opponent cards; every decision is deterministic and reproducible (the same position always yields the same move).
+- Hints share the Hard engine at a higher sampling budget: the first press suggests the best move, repeated presses cycle a deduplicated ranked list, and pass advice or manual reselection produces explicit feedback.
+- See [docs/AI_DESIGN.md](docs/AI_DESIGN.md) for the AI design, external references, and exact adoption boundaries.
 
 ### Offline experience
 
@@ -63,6 +64,21 @@ The project is designed around four goals: reliable rules, reproducible flow, re
 - Multiple landscape sizes plus safeguards for text overflow, contrast, and sprite aspect ratio.
 
 To keep the v1.6 lobby simple, secondary entries for records, history, tutorials, and help are hidden. Their underlying modules remain available for future restoration or extension.
+
+## Third-party Use, References, and Acknowledgements
+
+The v1.9 AI is implemented in TypeScript under two constraints: no external API and no local model runtime. The exact decomposition, PIMC, endgame search, perfect-information world solver, and milli-hand scoring are implemented in this project. Mirrored evaluation reports Hard at +20.17pp, Normal at +10.50pp, and Simple at +32.17pp. The table below separates bundled third-party content from conceptual references, research papers, and investigated material that was not adopted.
+
+| Type | Project | License or nature | Actual boundary in this project |
+| --- | --- | --- | --- |
+| Bundled with the game | Source Han Sans CN | [SIL Open Font License 1.1](assets/resources/fonts/LICENSE-SourceHanSans.txt) | Regular and Heavy font files are included for in-game text |
+| Algorithm and evaluation reference | [kwai/DouZero](https://github.com/kwai/DouZero) | Apache-2.0 | Mirrored evaluation and the 14-pattern move-enumeration taxonomy were referenced; no reinforcement-learning model or source code is used |
+| Algorithm reference | [ZhouWeikuan/DouDiZhu](https://github.com/ZhouWeikuan/DouDiZhu) | Apache-2.0 | Weighted decomposition and remaining-hand ranking were referenced; the behavior is independently implemented on this project's exact decomposition engine |
+| Baseline research reference | [datamllab/rlcard](https://github.com/datamllab/rlcard) | MIT | Used only as a reference for a simple rule-agent baseline; it is not a product runtime dependency |
+| Paper reference | [DeltaDou](https://www.ijcai.org/proceedings/2019/0176.pdf) | IJCAI 2019 paper | The pass-inference idea informed opponent modeling; weighted sampling and effective-sample safeguards are implemented here |
+| Investigated, not adopted | [DreamAndDead/joker](https://github.com/DreamAndDead/joker) | Local review found no license and no transcribable positions in its README | No code or data is used; `worldSolver` is cross-checked with an in-project naive oracle, sweep cases, and manually reasoned expected results |
+
+The test workspace also uses TypeScript, Vitest, and Node.js type definitions as development-only dependencies; they are not included in the Cocos game build. See [docs/AI_DESIGN.md](docs/AI_DESIGN.md) for the complete design and source notes, and [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) for version changes.
 
 ## Functional Modules
 
@@ -161,7 +177,7 @@ npm --prefix test run typecheck
 git diff --check
 ```
 
-The isolated test project lives under `test/` and is not included in the Cocos build. The current baseline is 160 passing test files and 874 passing tests, with 2 tests skipped because they require a specific evidence environment.
+The isolated test project lives under `test/` and is not included in the Cocos build. The current baseline is 195 passing test files and 1227 passing tests, with 2 tests skipped because they require a specific evidence environment.
 
 ## Troubleshooting
 

@@ -9,6 +9,7 @@ import { seatDisplayName } from './seat-display';
 
 const GAME_TABLE_BACKGROUND_ASPECT = 1688 / 780;
 const BRIGHT_PANEL_TEXT = toColor(THEME.palette.brandDark);
+const NAMEPLATE_TEXT = toColor({ r: 70, g: 25, b: 50, a: 255 });
 const GAME_TEXT = {
   phaseBidding: t('phase.bidding'),
   phasePlaying: t('phase.playing'),
@@ -38,6 +39,38 @@ function compactToggleText(label: string, on: boolean): string {
   return label + (on ? GAME_TEXT.on : GAME_TEXT.off);
 }
 
+interface PillItem {
+  key: string;
+  width: number;
+}
+
+interface PillLayout {
+  width: number;
+  itemX: Readonly<Record<string, number>>;
+}
+
+/** 内容盒是唯一几何来源：药丸只负责在内容并集外补呼吸，不再反推手写锚点。 */
+function layoutPill(
+  items: readonly PillItem[],
+  gap = THEME.spacing.tight,
+  padding = THEME.spacing.card,
+): PillLayout {
+  const contentWidth = items.reduce((sum, item) => sum + item.width, 0)
+    + Math.max(0, items.length - 1) * gap;
+  let cursor = -contentWidth / 2;
+  const itemX: Record<string, number> = {};
+  for (const item of items) {
+    itemX[item.key] = cursor + item.width / 2;
+    cursor += item.width + gap;
+  }
+  return { width: contentWidth + 2 * padding, itemX };
+}
+
+function hudTextWidth(text: string, role: 'action' | 'assistive', minimum: number): number {
+  const glyphWidth = THEME.typography[role].size;
+  return Math.max(minimum, Math.ceil(Array.from(text).length * glyphWidth * 1.05));
+}
+
 export function renderTopBar(this: any,
   phase: string,
   topBar: { multiplier: number; bombs: number; landlordSeat: number | null },
@@ -45,40 +78,57 @@ export function renderTopBar(this: any,
   layout: TableZones,
   canvas: { width: number; height: number },
 ): void {
-  const topY = Math.max(14, layout.topBar.y + layout.topBar.height * 0.52);
-  const phasePos = this.screenPoint(canvas, 70, topY);
-  const landlordPos = this.screenPoint(canvas, 178, topY);
-  const multiplierPos = this.screenPoint(canvas, canvas.width - 265, topY);
-  const bombsPos = this.screenPoint(canvas, canvas.width - 165, topY);
-  const handPos = this.screenPoint(canvas, canvas.width - 86, topY);
+  const topY = layout.topBar.y + layout.topBar.height / 2;
+  const edge = THEME.spacing.safe;
+  const groupGap = THEME.spacing.default;
+  const phaseLabel = phaseText(phase);
+  const multiplierLabel = `${GAME_TEXT.multiplierPrefix}${topBar.multiplier}`;
+  const bombsLabel = `${GAME_TEXT.bombsPrefix}${topBar.bombs}`;
+  const handLabel = `${GAME_TEXT.handPrefix}${handCount}`;
+  const phaseLabelWidth = hudTextWidth(phaseLabel, 'action', 64);
+  const multiplierLabelWidth = hudTextWidth(multiplierLabel, 'assistive', 56);
+  const bombsLabelWidth = hudTextWidth(bombsLabel, 'assistive', 56);
+  const handLabelWidth = hudTextWidth(handLabel, 'assistive', 56);
+  const leftPill = layoutPill([
+    { key: 'timer', width: 22 },
+    { key: 'phase', width: phaseLabelWidth },
+  ]);
+  const statsPill = layoutPill([
+    { key: 'multiplier', width: multiplierLabelWidth },
+    { key: 'bombs', width: bombsLabelWidth },
+    { key: 'hand', width: handLabelWidth },
+  ], THEME.spacing.default);
+  const landlordWidth = 92;
+  const leftPillScreenX = layout.topBar.x + edge + leftPill.width / 2;
+  const landlordScreenX = leftPillScreenX + leftPill.width / 2 + groupGap + landlordWidth / 2;
+  const statsPillScreenX = layout.topBar.x + layout.topBar.width - edge - statsPill.width / 2;
+  const leftPillPos = this.screenPoint(canvas, leftPillScreenX, topY);
+  const landlordPos = this.screenPoint(canvas, landlordScreenX, topY);
+  const statsPillPos = this.screenPoint(canvas, statsPillScreenX, topY);
+  const timerPos = this.screenPoint(canvas, leftPillScreenX + leftPill.itemX.timer, topY);
+  const phasePos = this.screenPoint(canvas, leftPillScreenX + leftPill.itemX.phase, topY);
+  const multiplierPos = this.screenPoint(canvas, statsPillScreenX + statsPill.itemX.multiplier, topY);
+  const bombsPos = this.screenPoint(canvas, statsPillScreenX + statsPill.itemX.bombs, topY);
+  const handPos = this.screenPoint(canvas, statsPillScreenX + statsPill.itemX.hand, topY);
 
   // v1.6 二次终审「举一反三」:顶栏 HUD 文字原本直接压在桌景照片上——灯笼/彩带/花枝密布,
   // 正是用户所指「会在元素上盖字的设计,不宜出现很多线条」;对比度实测也只有 3.96~4.06:1(门C,差 AA)。
-  // 同屏的「地主X」早已有干净名牌底、一眼可读——照此给左右两组补 v18 净底板(单一填充+一条细描边)。
-  // 药丸尺寸由内容实测边界推出(徽标外缘…文字外缘 + 呼吸),不写死常量,随视口宽自适应。
+  // 同屏的「地主X」早已有干净名牌底、一眼可读——照此给左右两组补 c1 象牙白净底板。
+  // 药丸尺寸由内容盒并集 + 对称呼吸推出,盒中心恒等于药丸中心。
   const PILL_H = 26;
-  const phaseLabelW = 72;
-  const leftFrom = phasePos.x - 56 - 7; // 阶段徽标左缘(22 宽,中心 -45)再留 7 呼吸
-  const leftTo = phasePos.x + 4 + phaseLabelW / 2 + 7;
-  this.addSprite(RESOURCE_PATHS.infoPillV18, (leftFrom + leftTo) / 2, phasePos.y, leftTo - leftFrom, PILL_H,
+  this.addSprite(RESOURCE_PATHS.infoPillC1, leftPillPos.x, leftPillPos.y, leftPill.width, PILL_H,
     this.uiRoot!, 'top-phase-pill', true);
-  const rightFrom = multiplierPos.x - 50 - 8; // 倍数徽标左缘(20 宽,中心 -40)
-  const rightTo = handPos.x + 5 + 29 + 8; // 手牌文字右缘(58 宽,中心 +5)
-  this.addSprite(RESOURCE_PATHS.infoPillV18, (rightFrom + rightTo) / 2, handPos.y, rightTo - rightFrom, PILL_H,
+  this.addSprite(RESOURCE_PATHS.infoPillC1, statsPillPos.x, statsPillPos.y, statsPill.width, PILL_H,
     this.uiRoot!, 'top-stats-pill', true);
 
-  this.addSprite(RESOURCE_PATHS.badgeTimerV13, phasePos.x - 45, phasePos.y, 22, 22, this.uiRoot!, 'top-phase-badge');
-  // v1.6 PL-07:地主名牌换族;倍数/炸弹/手牌小徽标无对应新件,保留 v13 并在 KNOWN_LIMITATIONS 记口径。
-  this.addSprite(RESOURCE_PATHS.seatNameplateV18, landlordPos.x, landlordPos.y, 92, 24, this.uiRoot!, 'top-landlord-nameplate', true);
-  this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, multiplierPos.x - 40, multiplierPos.y, 20, 20, this.uiRoot!, 'top-multiplier-badge');
-  this.addSprite(RESOURCE_PATHS.badgeMultiplierV13, bombsPos.x - 40, bombsPos.y, 20, 20, this.uiRoot!, 'top-bombs-badge');
-  this.addSprite(RESOURCE_PATHS.badgeTimerV13, handPos.x - 31, handPos.y, 20, 20, this.uiRoot!, 'top-hand-badge');
+  this.addSpriteContain(RESOURCE_PATHS.countdownRingV19, timerPos.x, timerPos.y, 22, 22, this.uiRoot!, 'top-phase-badge');
+  this.addSprite(RESOURCE_PATHS.seatNameplateC1, landlordPos.x, landlordPos.y, landlordWidth, 24, this.uiRoot!, 'top-landlord-nameplate', true);
   // 文字盒高度收进药丸/名牌净区(81.2% / 81.4%,门B 实测),长文案交 SHRINK 缩字号。
-  this.addLabel(phaseText(phase), phasePos.x + 4, phasePos.y, THEME.typography.md, this.uiRoot!, phaseLabelW, 20, 'top-phase', BRIGHT_PANEL_TEXT);
-  this.addLabel(topBar.landlordSeat === null ? GAME_TEXT.landlordPending : `${GAME_TEXT.landlordPrefix}${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, THEME.typography.xs, this.uiRoot!, 84, 19, 'top-landlord', BRIGHT_PANEL_TEXT);
-  this.addLabel(`${GAME_TEXT.multiplierPrefix}${topBar.multiplier}`, multiplierPos.x + 4, multiplierPos.y, THEME.typography.xs, this.uiRoot!, 74, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
-  this.addLabel(`${GAME_TEXT.bombsPrefix}${topBar.bombs}`, bombsPos.x + 4, bombsPos.y, THEME.typography.xs, this.uiRoot!, 74, 20, 'top-bombs', BRIGHT_PANEL_TEXT);
-  this.addLabel(`${GAME_TEXT.handPrefix}${handCount}`, handPos.x + 5, handPos.y, THEME.typography.xs, this.uiRoot!, 58, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
+  this.addLabel(phaseLabel, phasePos.x, phasePos.y, 'action', this.uiRoot!, phaseLabelWidth, 20, 'top-phase', BRIGHT_PANEL_TEXT);
+  this.addLabel(topBar.landlordSeat === null ? GAME_TEXT.landlordPending : `${GAME_TEXT.landlordPrefix}${seatDisplayName(topBar.landlordSeat)}`, landlordPos.x, landlordPos.y, 'assistive', this.uiRoot!, 80, 19, 'top-landlord', NAMEPLATE_TEXT);
+  this.addLabel(multiplierLabel, multiplierPos.x, multiplierPos.y, 'assistive', this.uiRoot!, multiplierLabelWidth, 20, 'top-multiplier', BRIGHT_PANEL_TEXT);
+  this.addLabel(bombsLabel, bombsPos.x, bombsPos.y, 'assistive', this.uiRoot!, bombsLabelWidth, 20, 'top-bombs', BRIGHT_PANEL_TEXT);
+  this.addLabel(handLabel, handPos.x, handPos.y, 'assistive', this.uiRoot!, handLabelWidth, 20, 'top-hand-count', BRIGHT_PANEL_TEXT);
 }
 
 export function renderRuntimeSettings(this: any, layout: TableRegions, canvas: { width: number; height: number }): void {
@@ -91,7 +141,7 @@ export function renderRuntimeSettings(this: any, layout: TableRegions, canvas: {
   const landscape = this.isLandscape(canvas);
   const y = landscape
     ? Math.max(
-        layout.opponentLeft.y + layout.opponentLeft.height + 10,
+        layout.opponentLeft.y + layout.opponentLeft.height + THEME.spacing.card,
         layout.playArea.y - 13,
       )
     : layout.opponentLeft.y + layout.opponentLeft.height * 0.35;
@@ -126,7 +176,7 @@ export function renderPlaceholderBackground(this: any, canvas: { width: number; 
   const sprite = node.getComponent(Sprite) ?? node.addComponent(Sprite);
   sprite.type = Sprite.Type.SIMPLE;
   sprite.sizeMode = Sprite.SizeMode.CUSTOM;
-  this.loadSprite(RESOURCE_PATHS.gameTableBgV13, sprite);
+  this.loadSprite(RESOURCE_PATHS.gameTableBgC1, sprite);
 }
 
 export function isLandscape(this: any, canvas: { width: number; height: number }): boolean {

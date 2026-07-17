@@ -1,3 +1,18 @@
+/**
+ * W-AI 修订版：困难档大样本分层门（规划者修订种子 · 2026-07-17 · sota2）。
+ *
+ * 落位：Codex 逐字节复制**覆盖** test/selfplay/hard-depth2-gate.test.ts，独立 seed commit（B2 棒）。
+ *
+ * ── 修订依据（用户裁决「全体上移一档」的语义重定义，BOARD 已披露）──
+ *   G1（Hard vs Simple 对称差）0.4 → **0.25**：Simple≈旧 Normal 后对 Simple 的绝对差必然压缩；
+ *   G2（地主角色正差）≥ +0.03 保留；
+ *   G3（Hard vs Normal 对称差）0 → **≥ +0.05** 收紧（新引擎不许吃掉分层）。
+ *   仍为 env 门控大样本门（SELFPLAY_GATE=1），与竞技场 new-vs-legacy 强度门互补：
+ *   本门守「新引擎内三档分层」，竞技场门守「相对旧引擎的提升幅度」。
+ *
+ * ── 预期红 ── 门控默认跳过；B2 开 SELFPLAY_GATE=1 跑数归档，跌破即阻断。
+ * ── 负向变异自证：把 Hard 档路由临时换成 Normal（同策略）→ G3 红（差≈0 < 0.05）。
+ */
 import { describe, expect, it } from 'vitest';
 import { AiLevel } from '../../assets/scripts/ai';
 import { runDifficultyMatchup } from './difficulty';
@@ -40,7 +55,7 @@ async function targetStats(target: AiLevel, filler: AiLevel): Promise<TargetStat
   return { winRate: wins / total, landlordWinRate: llWins / Math.max(1, llTotal) };
 }
 
-describe.skipIf(!GATE)('T-AI-DEPTH2 selfplay 验收门（三门）', () => {
+describe.skipIf(!GATE)('T-AI-DEPTH2 selfplay 验收门（三门·W-AI re-baseline）', () => {
   it(`G1/G2/G3 @ ${SEED_COUNT} seed × 3 席`, async () => {
     const hardInNormal = await targetStats(AiLevel.Hard, AiLevel.Normal);
     const normalInHard = await targetStats(AiLevel.Normal, AiLevel.Hard);
@@ -57,12 +72,11 @@ describe.skipIf(!GATE)('T-AI-DEPTH2 selfplay 验收门（三门）', () => {
     };
     // eslint-disable-next-line no-console
     console.log(JSON.stringify(gates));
-    // W-AUDIT-AI 门槛收紧(2026-07-13):拆解内核+结构化叫分落地后,
-    // G2 从「容忍 −0.03」升为「地主角色正差 ≥ +0.03」(消灭登记过的地主角色反转),
-    // G3 从「容忍 Hard 弱 12pp 的过渡态」收为「Hard 不得弱于 Normal(≥0)」。
-    // 跌破即强度回归,不许调低门槛消红。
-    expect(gates.g1HardSimpleDiff).toBeGreaterThanOrEqual(0.4);
+    // W-AI re-baseline(2026-07-17,BOARD 披露):全体上移后 Simple≈旧 Normal——
+    // G1 由 0.4 重定标为 0.25(对 Simple 绝对差压缩);G3 由 ≥0 收紧为 ≥0.05(分层不许被吃掉);
+    // G2 地主角色正差不变。跌破即强度回归,不许调低门槛消红。
+    expect(gates.g1HardSimpleDiff).toBeGreaterThanOrEqual(0.25);
     expect(gates.g2LandlordDiff).toBeGreaterThanOrEqual(0.03);
-    expect(gates.g3HardNormalDiff).toBeGreaterThanOrEqual(0);
+    expect(gates.g3HardNormalDiff).toBeGreaterThanOrEqual(0.05);
   }, 1800000);
 });

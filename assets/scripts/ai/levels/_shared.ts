@@ -7,6 +7,7 @@ import {
   type Move,
 } from '../../rules';
 import type { AiStrategy } from '../strategy';
+import { canFinishInOneMove, finishingFollow } from '../endgame';
 
 interface ProtectedCards {
   bombRanks: Set<Rank>;
@@ -133,4 +134,32 @@ export function conservativeAction(snapshot: Snapshot, hand: Card[], moves: Move
   }
 
   return toPlay(snapshot, pickSmallest(moves));
+}
+
+/** 三档共用的清手前置：领出整手或跟牌整手均优先结束牌局。 */
+export function chooseFinishingMove(snapshot: Snapshot, hand: Card[], moves: Move[]): Move | null {
+  if (snapshot.top === null) {
+    if (!canFinishInOneMove(hand)) return null;
+    return moves.find((move) => move.cards.length === hand.length) ?? null;
+  }
+  return finishingFollow(hand, snapshot.top.pattern);
+}
+
+/** 农民队友报单/报双且地主未告急时，喂出最小安全单/对。 */
+export function chooseFeedTeammateLead(snapshot: Snapshot, hand: Card[], moves: Move[]): Move | null {
+  if (snapshot.turn === snapshot.landlord || snapshot.top !== null) return null;
+  const teammate = ([0, 1, 2] as const).find(
+    (seat) => seat !== snapshot.turn && seat !== snapshot.landlord,
+  );
+  if (teammate === undefined) return null;
+  const teammateCount = snapshot.handCounts[teammate];
+  if (teammateCount > 2 || snapshot.handCounts[snapshot.landlord] <= 2) return null;
+  const protectedSet = protectedCards(hand);
+  const wanted = teammateCount === 1 ? Category.Single : Category.Pair;
+  const feeds = moves.filter(
+    (move) => move.pattern.category === wanted
+      && move.pattern.mainRank < Rank.A
+      && !usesProtectedCards(move, protectedSet),
+  );
+  return feeds.length > 0 ? pickSmallest(feeds) : null;
 }

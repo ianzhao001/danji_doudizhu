@@ -1,0 +1,10 @@
+{
+  "labels": [
+    { "node": "card-rank-label", "text": "小王★", "fontSize": 22, "rect": [1379, 300, 42, 30], "sprName": null, "sprRect": null, "occluded": false },
+    { "node": "card-rank-label", "text": "3♦", "fontSize": 22, "rect": [118, 300, 42, 30], "sprName": null, "sprRect": null, "occluded": false }
+  ],
+  "sprites": [
+    { "node": "card-bg", "spr": "card-template-v19", "type": "SIMPLE", "vpRect": [1387, 296, 64, 90], "box": [64, 90], "rect": [220, 320] },
+    { "node": "card-bg", "spr": "card-template-v19", "type": "SIMPLE", "vpRect": [111, 296, 64, 90], "box": [64, 90], "rect": [220, 320] }
+  ]
+}

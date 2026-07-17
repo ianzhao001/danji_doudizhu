@@ -26,7 +26,7 @@ const GAME_TEXT = {
 
 export function renderToasts(this: any, layout: TableRegions, canvas: { width: number; height: number }): void {
   if (this.toasts.items.length === 0) return;
-  const pos = this.screenPoint(canvas, canvas.width / 2, Math.max(148, layout.playArea.y - 10));
+  const pos = this.screenPoint(canvas, canvas.width / 2, Math.max(148, layout.playArea.y - THEME.spacing.card));
   const root = this.ensureNode('toast-layer-runtime', this.uiRoot!);
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, Math.min(260, canvas.width - 64), 112);
@@ -35,10 +35,10 @@ export function renderToasts(this: any, layout: TableRegions, canvas: { width: n
     const width = Math.min(238, Math.max(174, canvas.width - 112));
     const height = 30;
     const node = this.ensureNode(`toast-${toast.id}`, root);
-    node.setPosition(0, -index * 34, 0);
+    node.setPosition(0, -index * (height + THEME.spacing.tight), 0);
     addUiTransform(node, width, height);
     this.drawPanelSkin(node, width, Math.max(48, height), 'toast-skin');
-    const label = this.addLabel(toast.text, 0, 0, 15, node, width - 22, height, 'toast-label', BRIGHT_PANEL_TEXT);
+    const label = this.addLabel(toast.text, 0, 0, 'body', node, width - THEME.spacing.wide, height, 'toast-label', BRIGHT_PANEL_TEXT);
     label.color = BRIGHT_PANEL_TEXT;
     this.prepareToastAnimation(node, toast.id);
   });
@@ -68,7 +68,7 @@ export function renderTerminationFeedbackActions(this: any, _layout: TableRegion
     this.terminationFeedbackText ?? GAME_TEXT.roundTerminated,
     0,
     28,
-    THEME.typography.md,
+    'action',
     panel,
     panelWidth - 38,
     30,
@@ -90,8 +90,6 @@ export function showStatus(this: any, text: string): void {
 export function tickToastState(this: any): boolean {
   const before = this.toasts.items.map((toast) => toast.id).join('|');
   this.toasts = tickToasts(this.toasts, this.toastClockMs);
-  const activeIds = new Set(this.toasts.items.map((toast) => toast.id));
-  this.animatedToastIds = new Set(Array.from(this.animatedToastIds).filter((id) => activeIds.has(id)));
   return before !== this.toasts.items.map((toast) => toast.id).join('|');
 }
 

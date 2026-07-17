@@ -1,14 +1,25 @@
 /**
- * M4-05 全序 tie-breaker 回归锁定（架构维护）。
+ * W-AI 修订版：全序 tie-breaker + 领出分档锚（规划者修订种子 · 2026-07-17 · sota2）。
  *
- * 背景：M4-05 用 _shared.compareMoves 的全序（length → category → mainRank →
- * 逐张点序 → 逐张花色序）取代了对 enumerateMoves 产出顺序的隐式依赖。本测试钉死
- * 该全序在「同长度·同主点·不同牌型」边界的确定序，并锁定 simple/normal 对外行为不变
- * （length 优先于 category tiebreak，领出仍出最小单），防止后续重构悄悄改变选择。
+ * 落位：Codex 逐字节复制**覆盖** test/ai/tie-breaker.test.ts，独立 seed commit（B2 棒）。
+ *
+ * ── 修订依据（用户裁决：全体上移一档）──
+ *   describe 1（compareMoves 全序）逐字保留——_shared 语义不动。
+ *   describe 2 重钉：旧「simple 领出最小单」新手锚点随裁决废止——
+ *     · Simple（新，≈旧 Normal）：组合领出，3 4 5 6 7 7 7 → 5 张顺子（旧 Normal 的确定行为原样转移）；
+ *     · Normal（新，结构引擎）：领出必为「结构代价 ≤0 的多张组合」且不动保护牌
+ *       （性质钉扎——引擎常数可调，性质不可破）。
+ *
+ * ── 预期红（对 main 现实现）── Simple 组合锚红 1（旧出单 3）；Normal 性质锚对旧实现绿（旧顺子 cost0）。
+ *
+ * ── 负向变异自证（执行者实现后自查）──
+ *   ① Simple 回退 pickSmallest → Simple 组合锚红。
+ *   ② Normal 领出改 pickSmallest（单张 cost>0）→ Normal 性质锚红。
  */
 import { describe, it, expect } from 'vitest';
-import { compareMoves, pickSmallest, pickLargest } from '../../assets/scripts/ai/levels/_shared';
+import { compareMoves, pickSmallest, pickLargest, protectedCards, usesProtectedCards } from '../../assets/scripts/ai/levels/_shared';
 import { strategyFor, AiLevel } from '../../assets/scripts/ai';
+import { Decomposer } from '../../assets/scripts/ai/decompose';
 import { createRng, recognize, Category, Rank, type Move } from '../../assets/scripts/rules';
 import { GamePhase, type GameSnapshot } from '../../assets/scripts/game';
 import { cards } from '../rules/_util';
@@ -72,24 +83,30 @@ function leadSnap(over: Partial<GameSnapshot>): GameSnapshot {
   };
 }
 
-describe('T-AI-1 领出行为分档（simple 锚定最小单；normal 组合优先）', () => {
-  it('simple：含同长多型候选的手牌，领出仍出最小单 3（新手锚点·不变契约）', () => {
+describe('W-AI 领出行为分档（全体上移：Simple 组合领出；Normal 结构白出）', () => {
+  it('Simple（≈旧 Normal）：3 4 5 6 7 7 7 领出 5 张顺子 34567（旧 Normal 确定行为原样转移）', () => {
     const a = strategyFor(AiLevel.Simple)(leadSnap({}), createRng(1));
-    expect(a.type).toBe('play');
-    if (a.type === 'play') {
-      expect(a.cards).toHaveLength(1);
-      expect(a.cards[0].rank).toBe(Rank.R3);
-    }
-  });
-
-  it('normal：3 4 5 6 7 7 7 领出改出 5 张顺子 34567（T-AI-1 组合首出）', () => {
-    const a = strategyFor(AiLevel.Normal)(leadSnap({}), createRng(1));
     expect(a.type).toBe('play');
     if (a.type === 'play') {
       const pattern = recognize(a.cards);
       expect(a.cards).toHaveLength(5);
       expect(pattern?.category).toBe(Category.Straight);
       expect(pattern?.mainRank).toBe(Rank.R7);
+    }
+  });
+
+  it('Normal（结构引擎）：领出必为结构代价 ≤0 的多张组合，且不动保护牌（性质钉扎）', () => {
+    const s = leadSnap({});
+    const a = strategyFor(AiLevel.Normal)(s, createRng(1));
+    expect(a.type).toBe('play');
+    if (a.type === 'play') {
+      expect(a.cards.length).toBeGreaterThanOrEqual(2);
+      const pattern = recognize(a.cards);
+      expect(pattern).not.toBeNull();
+      const hand = s.viewerHand!;
+      const cost = new Decomposer().structureCost(hand, a.cards);
+      expect(cost, '领出不得拆散最优分解（白出）').toBeLessThanOrEqual(0);
+      expect(usesProtectedCards({ cards: a.cards, pattern: pattern! }, protectedCards(hand))).toBe(false);
     }
   });
 });

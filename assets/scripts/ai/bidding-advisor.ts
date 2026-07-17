@@ -1,5 +1,4 @@
-import { isStrongHand } from './bidding';
-import { thresholdFor } from './bidding-levels';
+import { isStrongByScore } from './bidding-eval';
 import { AiLevel } from './strategy';
 import type { Card } from '../rules';
 
@@ -9,7 +8,7 @@ export interface BidAdvice {
 }
 
 export function adviseBid(hand: Card[], phase: 'calling' | 'grabbing', level: AiLevel): BidAdvice {
-  const strong = isStrongHand(hand, thresholdFor(level));
+  const strong = isStrongByScore(hand, level);
   if (!strong) return { suggestion: 'pass', strong };
   return { suggestion: phase === 'calling' ? 'call' : 'grab', strong };
 }

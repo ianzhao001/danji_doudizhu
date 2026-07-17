@@ -1,15 +1,24 @@
-import { Color, EventTouch, Node, Sprite, SpriteFrame, UIOpacity, UITransform, Vec3, resources, tween } from 'cc';
+import { Color, EventTouch, Node, Sprite, SpriteFrame, UIOpacity, resources } from 'cc';
 import { Rank, Suit, type Card } from '../../../rules';
 import { cardKey } from '../../../rules/guards';
+import type { CardPlacement } from '../../card-stage';
 import { cardView } from '../../card-view';
 import { RESOURCE_PATHS, spriteFrameResourcePath, type ResourcePath } from '../../asset-keys';
+import { THEME } from '../../theme';
 import { addUiTransform } from '../ui-helpers';
+import { cardRuntimeNodeName } from './card-animator';
 
-export const CARD_SIZE = { width: 56, height: 82 };
+export const CARD_SIZE = { width: 64, height: 90 };
 const CARD_SUIT_ICON_SIZE = 21;
 export const HAND_LIFT = 18;
 const CARD_PRESS_SCALE = 0.96;
 const CARD_PRESS_OPACITY = 214;
+
+type RuntimeCardNode = Node & {
+  __cardStageKey?: string;
+  __cardStageZone?: CardPlacement['zone'];
+  __cardStageZ?: number;
+};
 
 export function sameCard(a: Card, b: Card): boolean {
   return a.rank === b.rank && a.suit === b.suit;
@@ -34,27 +43,18 @@ function suitText(suit: Suit | 'joker'): string {
   }
 }
 
-export function addCard(this: any,
-  card: Card,
-  x: number,
-  y: number,
-  selected: boolean,
-  index: number,
-  total: number,
-  animateDeal: boolean,
-): void {
-  const node = this.addCardNode(card, x, y, this.uiRoot!, `card-${index}`, true);
-  const key = cardKey(card);
-  const wasSelected = this.renderedSelectedCardKeys.has(key);
-  if (this.settings.animation && animateDeal) {
-    this.animateCardDeal(node, x, y, index, total);
-  } else if (this.settings.animation && wasSelected !== selected) {
-    const fromY = selected ? y - HAND_LIFT : y + HAND_LIFT;
-    node.setPosition(x, fromY, 0);
-    tween(node).to(0.12, { position: new Vec3(x, y, 0) }).start();
-  } else {
-    node.setPosition(x, y, 0);
-  }
+/** Render one physical card. Identity and parent are stable across all zones. */
+export function renderStageCard(this: any, placement: CardPlacement, parent: Node): Node {
+  const node = this.ensureNode(cardRuntimeNodeName(placement.key), parent) as RuntimeCardNode;
+  node.__cardStageKey = placement.key;
+  node.__cardStageZone = placement.zone;
+
+  const owned = Boolean(this.cardAnimator?.owns(placement.key));
+  if (!owned) applyPlacementTransform(node, placement);
+
+  const interactive = placement.interactive && !owned && !this.cardAnimator?.isBusy();
+  renderCardContent.call(this, node, placement.card, placement.faceUp, interactive);
+  return node;
 }
 
 export function addDisplayCard(
@@ -67,21 +67,33 @@ export function addDisplayCard(
   animate: boolean,
   flyFrom?: { dx: number; dy: number },
 ): Node {
-  const node = this.addCardNode(card, x, y, parent, name, false);
-  if (this.settings.animation && animate) this.animateCardPlay(node, x, y, flyFrom);
+  // Non-physical mini echoes (last-play pills / duplicated public bottom cards)
+  // deliberately stay outside card-layer-runtime and never enter choreography.
+  const node = this.ensureNode(`${name}:${cardKey(card)}`, parent) as RuntimeCardNode;
+  node.setPosition(x, y, 0);
+  node.setScale(1, 1, 1);
+  node.angle = 0;
+  const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
+  opacity.opacity = 255;
+  renderCardContent.call(this, node, card, true, false);
+  void animate;
+  void flyFrom;
   return node;
 }
 
-export function addCardNode(this: any, card: Card, x: number, y: number, parent: Node, name: string, interactive: boolean): Node {
-  const node = this.ensureNode(`${name}-${cardKey(card)}`, parent);
-  node.setPosition(x, y, 0);
-  node.setScale(1, 1, 1);
+function applyPlacementTransform(node: RuntimeCardNode, placement: CardPlacement): void {
+  node.setPosition(placement.x, placement.y, 0);
+  node.setScale(placement.scale, placement.scale, 1);
+  node.angle = placement.angle;
+  node.__cardStageZ = placement.z;
   const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
   opacity.opacity = 255;
+}
+
+function renderCardContent(this: any, node: Node, card: Card, faceUp: boolean, interactive: boolean): void {
   addUiTransform(node, CARD_SIZE.width, CARD_SIZE.height);
   const parentSprite = node.getComponent(Sprite);
   if (parentSprite) parentSprite.destroy();
-  const view = cardView(card);
   // v1.6 用户追加①「去掉卡牌背景的那个面板」:原先每张牌先画一层 `card-fill`(Graphics 的 surface 圆角面板
   // + brand 描边)当卡面图的兜底,再把卡面图盖上去。卡面图一旦带透明边,这层兜底就从边缘露出来——
   // 17 张并排时连成一整条"面板"(用户截图所指)。删掉兜底层:卡面图本身就是完整的牌面,不需要底板。
@@ -89,8 +101,13 @@ export function addCardNode(this: any, card: Card, x: number, y: number, parent:
   const bgNode = this.ensureNode('card-bg', node);
   bgNode.setPosition(0, 0, 0);
   bgNode.setSiblingIndex(0);
-  // 等比内接:卡面/王牌裁后比例各不相同(204:262 / 204:261 / 204:277),直接给 56×82 会拉伸(门E)。
-  this.fitSpriteInBox(bgNode, this.cardSpritePath(card), CARD_SIZE.width, CARD_SIZE.height);
+  // 等比内接:卡面/王牌裁后比例各不相同,直接塞进 64×90 会触发门 E。
+  this.fitSpriteInBox(
+    bgNode,
+    faceUp ? this.cardSpritePath(card) : RESOURCE_PATHS.cardBackV13,
+    CARD_SIZE.width,
+    CARD_SIZE.height,
+  );
   node.off(Node.EventType.TOUCH_START);
   node.off(Node.EventType.TOUCH_MOVE);
   node.off(Node.EventType.TOUCH_END);
@@ -98,7 +115,7 @@ export function addCardNode(this: any, card: Card, x: number, y: number, parent:
   if (interactive) {
     node.on(Node.EventType.TOUCH_START, (event: EventTouch) => {
       this.setCardPressed(node, true);
-      this.onHandDragStart?.(event);
+      this.onHandDragStart?.(event, card);
     }, this);
     node.on(Node.EventType.TOUCH_MOVE, (event: EventTouch) => {
       this.onHandDragMove?.(event);
@@ -114,18 +131,27 @@ export function addCardNode(this: any, card: Card, x: number, y: number, parent:
     }, this);
   }
 
+  if (!faceUp) return;
+
+  const view = cardView(card);
+
   const faceColor = this.cardFaceColor(view.suitKey);
   const cornerLabel = this.addLabel(
     `${view.rankLabel}${suitText(view.suitKey)}`,
-    -13,
+    -9,
     24,
-    view.suitKey === 'joker' ? 11 : 13,
+    'cardRank',
     node,
     38,
     22,
     'card-rank-label',
   );
-  cornerLabel.lineHeight = view.suitKey === 'joker' ? 13 : 16;
+  if (view.suitKey === 'joker') {
+    // v1.6 王字角标 = 11/13；复用现有语义阶梯，不引入第 10 个字号角色。
+    cornerLabel.fontSize = THEME.typography.assistive.size;
+    cornerLabel.lineHeight = THEME.typography.secondary.lineHeight;
+  }
+  cornerLabel.isBold = false;
   cornerLabel.color = faceColor;
 
   if (view.suitKey !== 'joker') {
@@ -133,11 +159,10 @@ export function addCardNode(this: any, card: Card, x: number, y: number, parent:
     if (suitPath) {
       const suitNode = this.ensureNode('card-suit-icon', node);
       suitNode.setPosition(0, -7, 0);
-      // 花色裁后比例也非正方(黑桃 98:116、方块 96:116),塞进 21×21 方框会拉伸 15~17%(门E,用户②)。
+      // 花色裁后比例也非正方,正方显示框必须等比内接(门 E)。
       this.fitSpriteInBox(suitNode, suitPath, CARD_SUIT_ICON_SIZE, CARD_SUIT_ICON_SIZE);
     }
   }
-  return node;
 }
 
 /**

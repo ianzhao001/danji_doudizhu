@@ -1,0 +1,54 @@
+{
+  "labels": [
+    {
+      "node": "turn-timer-label",
+      "text": "计时 15s",
+      "rect": [
+        30,
+        252,
+        44,
+        14
+      ],
+      "sprName": "info-pill-v19",
+      "sprRect": [
+        8,
+        246,
+        89,
+        26
+      ],
+      "occluded": false
+    },
+    {
+      "node": "seat-name-label",
+      "text": "你 20张",
+      "rect": [
+        16,
+        252,
+        98,
+        15
+      ],
+      "sprName": "seat-nameplate-v19",
+      "sprRect": [
+        8,
+        242,
+        114,
+        35
+      ],
+      "occluded": false
+    },
+    {
+      "node": "status-label",
+      "text": "等待出牌",
+      "rect": [
+        340,
+        100,
+        160,
+        18
+      ],
+      "sprName": null,
+      "graphicsBackdrop": false,
+      "occluded": false
+    }
+  ],
+  "sprites": []
+}

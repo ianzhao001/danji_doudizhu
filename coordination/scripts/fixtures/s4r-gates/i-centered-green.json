@@ -1,0 +1,6 @@
+{
+  "labels": [
+    { "node": "top-multiplier", "text": "倍数×4", "rect": [630, 30, 60, 14], "sprName": "info-pill-v19", "sprRect": [521, 24, 279, 26], "occluded": false }
+  ],
+  "sprites": []
+}

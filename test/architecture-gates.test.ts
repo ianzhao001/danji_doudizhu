@@ -13,23 +13,41 @@ import { describe, expect, it } from 'vitest';
 const SCRIPTS_ROOT = fileURLToPath(new URL('../assets/scripts', import.meta.url));
 const PURE_LAYERS = ['rules', 'game', 'ai', 'flow', 'data'] as const;
 
-// rollback-only 键(v1.5/v1.6 各轮裁决:键与文件保留仅作回滚,产品零消费)。
-// 注意:bottomCardsDockV15/panelPopupV15/settlementPanelV15 是活跃皮肤键,严禁加进来。
+// rollback-only 键(v1.5~v1.7 各轮裁决:键与文件保留仅作回滚,产品零消费)。
+// 注意:bottomCardsDockV15 仍是活跃皮肤键,严禁加进来。
 const ROLLBACK_ONLY_KEYS = [
+  'cardTemplate', 'cardBack', 'suitSpade', 'suitHeart', 'suitClub', 'suitDiamond', 'jokerSmall', 'jokerBig',
+  'cardTemplateV19', 'cardBackV19', 'cardSelectedFrameV19',
+  'suitSpadeV19', 'suitHeartV19', 'suitClubV19', 'suitDiamondV19', 'jokerSmallV19', 'jokerBigV19',
+  'btnPrimaryV19', 'btnSecondaryV19', 'btnTertiaryV19', 'btnDisabledV19',
+  'btnPrimaryV20', 'btnSecondaryV20', 'btnTertiaryV20', 'btnDisabledV20',
   'btnPrimaryV15', 'btnSecondaryV15', 'btnTertiaryV15', 'btnDisabledV15',
   'btnPrimaryV17', 'btnSecondaryV17', 'btnTertiaryV17', 'btnDisabledV17',
+  'btnPrimaryV18', 'btnSecondaryV18', 'btnTertiaryV18', 'btnDisabledV18',
   'infoPillV15', 'seatNameplateV15',
+  'infoPillV18', 'seatNameplateV18',
   'settlementBannerWinV15', 'settlementBannerLoseV15',
   'settlementPanelV13', 'settlementBannerWinV13', 'settlementBannerLoseV13',
   'pauseBtnToggle', 'pauseBtnAction',
+  'panelPopupV15', 'settlementPanelV15',
+  'badgeMultiplierV13',
+  'badgeTimerV13',
+  'fxSpark', 'fxRing', 'fxStar', 'fxTrail', 'fxConfetti',
+  // W-VISION-COLOR:v21 按钮族 + v19 药丸/名牌/托盘 + v13 牌桌底退役(全场景换 c1 信息层级配色,零消费)。
+  'btnPrimaryV21', 'btnSecondaryV21', 'btnTertiaryV21', 'btnDisabledV21',
+  'gameTableBgV13', 'playTrayV19', 'infoPillV19', 'seatNameplateV19',
+  // W-VISION-COLOR-R2:中央托盘移除,c1 托盘皮亦退役(零消费)。
+  'playTrayC1',
+  // W-VISION-COLOR-R2-d:rim 加厚换 c2,c1 按钮族退役(零消费)。
+  'btnPrimaryC1', 'btnSecondaryC1', 'btnNeutralC1',
 ];
 const ROLLBACK_KEY_DEFINITION_FILES = new Set([
   'ui/asset-keys.ts', // 键值定义处
   'ui/asset-keys-rollback.ts', // 物理隔离后的定义处(审计裁决 P1-2)
 ]);
 // 场景 @property 绑定冷构建后会失效(KNOWN_LIMITATIONS),棘轮只减不增;
-// 基线 14 = lobby-scene.ts 7 + game-scene-skeleton.ts 7。移除装饰器后应同步下调预算。
-const PROPERTY_DECORATOR_BUDGET = 14;
+// W-VISION S3 后基线 7 = lobby-scene.ts 7；game-scene-skeleton 的 7 个死绑定已删除。
+const PROPERTY_DECORATOR_BUDGET = 7;
 
 function listTsFiles(root: string): string[] {
   return readdirSync(root, { recursive: true, withFileTypes: true })

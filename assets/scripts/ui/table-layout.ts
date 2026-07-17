@@ -71,28 +71,37 @@ export function tableLayout(containerWidth?: number, containerHeight?: number): 
 }
 
 function landscapeLayout(width: number, height: number): TableRegions {
-  const topBarHeight = Math.min(32, Math.max(27, Math.round(height * 0.075)));
-  const verticalGap = 8;
-  const infoStripHeight = Math.min(14, Math.max(12, Math.round(height * 0.034)));
-  const opponentWidth = Math.min(150, Math.max(118, Math.round(width * 0.16)));
-  const opponentHeight = Math.min(52, Math.max(46, Math.round(height * 0.13)));
-  const opponentY = topBarHeight + verticalGap + infoStripHeight + verticalGap;
-  const playAreaWidth = Math.min(180, Math.max(142, Math.round(width * 0.2)));
-  const playAreaHeight = Math.min(30, Math.max(26, Math.round(height * 0.07)));
-  const playAreaY = opponentY + opponentHeight + verticalGap;
-  const playerHandHeight = Math.min(86, Math.max(76, Math.round(height * 0.21)));
+  const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
+  const gap = 8;
+
+  // Landscape is a two-dimensional table: seats occupy the upper corners, the
+  // current trick owns the centre, and the controls dock above the lower hand.
+  const topBarHeight = clamp(Math.round(height * 0.075), 27, 32);
+  const opponentWidth = clamp(Math.round(width * 0.135), 104, 116);
+  const opponentHeight = clamp(Math.round(height * 0.26), 94, 106);
+  const opponentY = topBarHeight + gap;
+
+  const playerHandHeight = clamp(Math.round(height * 0.235), 90, 94);
   const playerHandY = height - playerHandHeight;
-  const actionHeight = Math.min(38, Math.max(34, Math.round(height * 0.095)));
-  const actionWidth = Math.min(270, Math.max(238, Math.round(width * 0.31)));
-  const statusHeight = Math.min(24, Math.max(20, Math.round(height * 0.055)));
-  const actionY = playAreaY + playAreaHeight + verticalGap + statusHeight + verticalGap;
+  const actionHeight = clamp(Math.round(height * 0.125), 44, 48);
+  const actionWidth = clamp(Math.round(width * 0.3), 236, 262);
+  const actionX = Math.round((width - actionWidth) / 2);
+  const actionY = playerHandY - gap - actionHeight;
+
+  const playAreaWidth = clamp(Math.round(width * 0.35), 276, 320);
+  const playAreaHeight = clamp(Math.round(height * 0.26), 96, 106);
+  const playAreaX = Math.round((width - playAreaWidth) / 2);
+  const playAreaY = Math.min(
+    Math.round((height - playAreaHeight) / 2),
+    actionY - gap - playAreaHeight,
+  );
 
   return {
     topBar: { x: 0, y: 0, width, height: topBarHeight },
     opponentLeft: { x: 0, y: opponentY, width: opponentWidth, height: opponentHeight },
     opponentRight: { x: width - opponentWidth, y: opponentY, width: opponentWidth, height: opponentHeight },
-    playArea: { x: Math.round((width - playAreaWidth) / 2), y: playAreaY, width: playAreaWidth, height: playAreaHeight },
-    actionButtons: { x: Math.round((width - actionWidth) / 2), y: actionY, width: actionWidth, height: actionHeight },
+    playArea: { x: playAreaX, y: playAreaY, width: playAreaWidth, height: playAreaHeight },
+    actionButtons: { x: actionX, y: actionY, width: actionWidth, height: actionHeight },
     playerHand: { x: 0, y: playerHandY, width, height: playerHandHeight },
   };
 }

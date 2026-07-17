@@ -10,6 +10,20 @@ export interface FlyFromTo {
   durationMs: number;
 }
 
+/** Shared timing/arc constants consumed by the engine-free card choreography. */
+export interface CardChoreographyParams {
+  dealMs: number;
+  dealStaggerMs: number;
+  playMs: number;
+  playImpactMs: number;
+  playReboundMs: number;
+  playImpactScale: number;
+  playLiftY: number;
+  playRotateDeg: number;
+  reflowMs: number;
+  revealMs: number;
+}
+
 const PULSE_DURATION = { upMs: 100, downMs: 160 } as const;
 const PULSE_SCALE: Record<string, number> = {
   bomb: 1.12,
@@ -33,6 +47,27 @@ export function dealCardDelay(index: number, total: number): number {
 
 export function playFlyFromTo(): FlyFromTo {
   return { fromY: -96, toY: 0, durationMs: 180 };
+}
+
+/**
+ * W-VISION S3 card motion budget. Keeping these values in the existing pure
+ * parameter island prevents the Cocos animator from growing another set of
+ * inline timing constants.
+ */
+export function cardChoreographyParams(): CardChoreographyParams {
+  const play = playFlyArc();
+  return {
+    dealMs: dealFlight().durationMs,
+    dealStaggerMs: 18,
+    playMs: play.durationMs,
+    playImpactMs: 70,
+    playReboundMs: 70,
+    playImpactScale: 0.9,
+    playLiftY: play.liftY,
+    playRotateDeg: play.rotateDeg,
+    reflowMs: 120,
+    revealMs: 140,
+  };
 }
 
 // ---- v1.5 W-JUICE 动效参数(纯常量函数·确定性·供 W3 编排消费,vitest 锁) ----
@@ -136,6 +171,59 @@ export function resultWinFx(): {
   starSizePx: number;
 } {
   return { confettiSizePx: 22, swayPx: 26, rotateDeg: 50, spreadRatio: 0.86, starCount: 3, starPulseMs: 560, starScaleTo: 1.28, starSizePx: 34 };
+}
+
+/** S5b 出牌落定后的牌型标签：弹入、短停、上浮淡出。 */
+export function patternBurst(): {
+  popMs: number;
+  holdMs: number;
+  fadeMs: number;
+  riseY: number;
+  fromScale: number;
+  width: number;
+  height: number;
+  emphasisPadding: number;
+} {
+  return {
+    popMs: 140,
+    holdMs: 280,
+    fadeMs: 180,
+    riseY: 12,
+    fromScale: 0.86,
+    width: 118,
+    height: 36,
+    emphasisPadding: 14,
+  };
+}
+
+/** Hold the settlement overlay until the terminal pattern burst has finished. */
+export function settlementReveal(): { holdMs: number } {
+  const burst = patternBurst();
+  return { holdMs: burst.popMs + burst.holdMs + burst.fadeMs };
+}
+
+/** S5b 结算三行分数滚动：帧数与节拍统一来自纯参数岛。 */
+export function settlementScoreRoll(): { steps: number; stepMs: number } {
+  return { steps: 8, stepMs: 55 };
+}
+
+/** S5b 地主确立仪式：帽子自屏顶落至地主名牌侧，停留后淡出。 */
+export function landlordCeremony(): {
+  dropMs: number;
+  holdMs: number;
+  fadeMs: number;
+  fromScale: number;
+  sizePx: number;
+  targetOffsetX: number;
+} {
+  return {
+    dropMs: 360,
+    holdMs: 300,
+    fadeMs: 180,
+    fromScale: 1.32,
+    sizePx: 42,
+    targetOffsetX: 8,
+  };
 }
 
 /** 按钮按压反馈(SCALE 过渡)。 */

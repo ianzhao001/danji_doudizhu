@@ -1,0 +1,44 @@
+[
+  {
+    "file": "g-overlap-red.json",
+    "expect": {
+      "g": 1
+    }
+  },
+  {
+    "file": "g-clear-green.json",
+    "expect": {}
+  },
+  {
+    "file": "h-crush-red.json",
+    "expect": {
+      "h": 1
+    }
+  },
+  {
+    "file": "h-nonuniform-red.json",
+    "expect": {
+      "h": 1
+    }
+  },
+  {
+    "file": "i-offcenter-red.json",
+    "expect": {
+      "i": 1
+    }
+  },
+  {
+    "file": "i-centered-green.json",
+    "expect": {}
+  },
+  {
+    "file": "j-bleed-red-844x390.json",
+    "expect": {
+      "j": 1
+    }
+  },
+  {
+    "file": "j-fit-green-844x390.json",
+    "expect": {}
+  }
+]

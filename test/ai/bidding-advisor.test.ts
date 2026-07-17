@@ -1,50 +1,58 @@
 /**
- * 验证叫牌建议与三档难度的阈值配置保持同一真相源。
+ * W-AI 修订版：玩家叫牌建议同源（规划者修订种子 · 2026-07-17 · sota2）。
+ *
+ * 落位：Codex 逐字节复制**覆盖** test/ai/bidding-advisor.test.ts，独立 seed commit（B2 棒）。
+ *
+ * ── 修订依据（修复口径分裂）──
+ *   旧实现：adviseBid 走 thresholdFor（Hard=阈1「逢局必叫」），而 AI 实际走结构化判强——
+ *   给玩家的建议与 AI 自己的行为不一致。新契约：adviseBid ≡ isStrongByScore 同一真相源，
+ *   建议即「同难度 AI 会怎么叫」。旧「Hard 单高牌即 call」激进钉随之废止。
+ *
+ * ── 预期红（对 main 现实现）── isStrongByScore 不存在 → 全文件红（4 用例）。
+ *
+ * ── 负向变异自证（执行者实现后自查）──
+ *   ① adviseBid 改回 thresholdFor 口径 → 同源恒等用例红（22345 @Simple 分叉）。
+ *   ② suggestion 相位映射写反（calling→grab）→ 相位用例红。
  */
 import { describe, it, expect } from 'vitest';
 import { adviseBid } from '../../assets/scripts/ai/bidding-advisor';
-import { isStrongHand } from '../../assets/scripts/ai/bidding';
-import { thresholdFor } from '../../assets/scripts/ai/bidding-levels';
+import { isStrongByScore } from '../../assets/scripts/ai/bidding-eval';
 import { AiLevel } from '../../assets/scripts/ai/strategy';
-import { Rank, Suit, type Card } from '../../assets/scripts/rules';
+import { cards } from '../rules/_util';
 
-const c = (rank: Rank, suit: Suit): Card => ({ rank, suit });
-// 高牌 = rank ≥ R2（含 2 与双王）；三手均不含火箭/炸弹，强弱完全由高牌数决定。
-const twoHigh = [c(Rank.R2, Suit.Spade), c(Rank.SmallJoker, Suit.Joker), c(Rank.R5, Suit.Heart)];
-const oneHigh = [c(Rank.R2, Suit.Spade), c(Rank.R9, Suit.Club), c(Rank.R5, Suit.Heart)];
-const zeroHigh = [c(Rank.R3, Suit.Spade), c(Rank.R7, Suit.Heart), c(Rank.K, Suit.Club)];
-const ALL_LEVELS = [AiLevel.Simple, AiLevel.Normal, AiLevel.Hard];
+const LEVELS = [AiLevel.Simple, AiLevel.Normal, AiLevel.Hard] as const;
+const HANDS = ['2 2 3 4 5', '2 3 4 5 6', 'x X 3 4 5', '3 4 5 6 7', '6 6 6 6 3', '2 2 3 3 4 4'];
 
-describe('P-BID-POLISH G3 adviseBid 按档阈值对齐', () => {
-  it('Simple(阈3)：两高牌手 pass——比 Normal 更保守', () => {
-    expect(adviseBid(twoHigh, 'calling', AiLevel.Simple)).toEqual({ suggestion: 'pass', strong: false });
-    expect(adviseBid(twoHigh, 'grabbing', AiLevel.Simple)).toEqual({ suggestion: 'pass', strong: false });
-  });
-
-  it('Normal(阈2)：两高牌手 call/grab、单高牌手 pass——与旧硬编码阈值 2 行为一致', () => {
-    expect(adviseBid(twoHigh, 'calling', AiLevel.Normal)).toEqual({ suggestion: 'call', strong: true });
-    expect(adviseBid(twoHigh, 'grabbing', AiLevel.Normal)).toEqual({ suggestion: 'grab', strong: true });
-    expect(adviseBid(oneHigh, 'calling', AiLevel.Normal)).toEqual({ suggestion: 'pass', strong: false });
-  });
-
-  it('Hard(阈1)：单高牌手即 call/grab——比 Normal 更激进', () => {
-    expect(adviseBid(oneHigh, 'calling', AiLevel.Hard)).toEqual({ suggestion: 'call', strong: true });
-    expect(adviseBid(oneHigh, 'grabbing', AiLevel.Hard)).toEqual({ suggestion: 'grab', strong: true });
-  });
-
-  it('零高牌手三档两相全 pass', () => {
-    for (const lv of ALL_LEVELS) {
-      expect(adviseBid(zeroHigh, 'calling', lv)).toEqual({ suggestion: 'pass', strong: false });
-      expect(adviseBid(zeroHigh, 'grabbing', lv)).toEqual({ suggestion: 'pass', strong: false });
+describe('W-AI adviseBid 与 AI 同源（isStrongByScore 单一真相源）', () => {
+  it('同源恒等：strong ≡ isStrongByScore(hand, level)，suggestion 随相位映射（六手×三档×两相）', () => {
+    for (const spec of HANDS) {
+      for (const level of LEVELS) {
+        const strong = isStrongByScore(cards(spec), level);
+        expect(adviseBid(cards(spec), 'calling', level))
+          .toEqual({ suggestion: strong ? 'call' : 'pass', strong });
+        expect(adviseBid(cards(spec), 'grabbing', level))
+          .toEqual({ suggestion: strong ? 'grab' : 'pass', strong });
+      }
     }
   });
 
-  it('同一真相源：strong ≡ isStrongHand(hand, thresholdFor(level))·三档×三手全对齐且确定', () => {
-    for (const lv of ALL_LEVELS) {
-      for (const hand of [twoHigh, oneHigh, zeroHigh]) {
-        expect(adviseBid(hand, 'calling', lv).strong).toBe(isStrongHand(hand, thresholdFor(lv)));
-        expect(adviseBid(hand, 'calling', lv)).toEqual(adviseBid(hand, 'calling', lv));
-      }
+  it('全体上移锚：两控牌 2 2 3 4 5 三档建议 call（Simple 不再劝退）', () => {
+    for (const level of LEVELS) {
+      expect(adviseBid(cards('2 2 3 4 5'), 'calling', level).suggestion, `@${level}`).toBe('call');
+    }
+  });
+
+  it('口径分裂修复锚：单控散手 2 3 4 5 6 三档建议 pass（旧 Hard 阈1「逢局必叫」废止）', () => {
+    for (const level of LEVELS) {
+      expect(adviseBid(cards('2 3 4 5 6'), 'calling', level)).toEqual({ suggestion: 'pass', strong: false });
+      expect(adviseBid(cards('2 3 4 5 6'), 'grabbing', level)).toEqual({ suggestion: 'pass', strong: false });
+    }
+  });
+
+  it('确定性：同入参重复调用深相等', () => {
+    for (const level of LEVELS) {
+      expect(adviseBid(cards('2 2 3 4 5'), 'calling', level))
+        .toEqual(adviseBid(cards('2 2 3 4 5'), 'calling', level));
     }
   });
 });

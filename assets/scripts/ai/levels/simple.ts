@@ -4,22 +4,37 @@
  * 仅依赖 rules + 只读快照，禁止 import `cc`，禁止改签名。
  */
 
-import { enumerateMoves, legalFollows } from '../../rules';
+import { enumerateMoves, isBombLike, legalFollows } from '../../rules';
 import type { AiStrategy } from '../strategy';
-import { pickSmallest, requireHand, toPlay } from './_shared';
+import {
+  chooseFinishingMove,
+  isTeammateTop,
+  pickSmallest,
+  protectedCards,
+  requireHand,
+  toPlay,
+  usesProtectedCards,
+} from './_shared';
+import { chooseNormalLeadMove } from './lead-score';
 
 /** 最小化策略桩：实现见 M4-01。 */
 export const simpleStrategy: AiStrategy = (snapshot) => {
   const hand = requireHand(snapshot);
+  const moves = snapshot.top ? legalFollows(hand, snapshot.top.pattern) : enumerateMoves(hand);
 
-  if (!snapshot.top) {
-    const move = pickSmallest(enumerateMoves(hand));
-    return toPlay(snapshot, move);
+  if (snapshot.top && moves.length === 0) return { type: 'pass', seat: snapshot.turn };
+  const finishing = chooseFinishingMove(snapshot, hand, moves);
+  if (finishing) return toPlay(snapshot, finishing);
+
+  if (snapshot.top && isTeammateTop(snapshot) && snapshot.handCounts[snapshot.landlord] > 2) {
+    return { type: 'pass', seat: snapshot.turn };
   }
+  if (!snapshot.top) return toPlay(snapshot, chooseNormalLeadMove(hand, moves));
 
-  const follows = legalFollows(hand, snapshot.top.pattern);
-  if (follows.length === 0) return { type: 'pass', seat: snapshot.turn };
-
-  const move = pickSmallest(follows);
-  return toPlay(snapshot, move);
+  const protectedSet = protectedCards(hand);
+  const safe = moves.filter(
+    (move) => !isBombLike(move.pattern.category) && !usesProtectedCards(move, protectedSet),
+  );
+  if (safe.length === 0) return { type: 'pass', seat: snapshot.turn };
+  return toPlay(snapshot, pickSmallest(safe));
 };

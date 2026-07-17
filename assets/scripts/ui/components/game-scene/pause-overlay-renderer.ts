@@ -1,12 +1,12 @@
 import { BlockInputEvents, Node, director } from 'cc';
 import { askQuit, cancelQuit, closeMenu, openMenu } from '../../pause-menu';
 import { t } from '../../strings';
-import type { TableRegions } from '../../table-layout';
+import type { TableZones } from '../../table-zones';
 import { THEME, addUiTransform, toColor } from '../ui-helpers';
 import { fadeThenLoad } from '../scene-transition';
 
 const BRIGHT_PANEL_TEXT = toColor(THEME.palette.brandDark);
-const BRIGHT_PANEL_MUTED = toColor(THEME.palette.textSecondary);
+const BRIGHT_PANEL_MUTED = toColor(THEME.palette.brandDark);
 const GAME_TEXT = {
   pause: t('game.pause'),
   progressKept: t('game.progressKept'),
@@ -28,12 +28,18 @@ function compactToggleText(label: string, on: boolean): string {
   return label + (on ? GAME_TEXT.on : GAME_TEXT.off);
 }
 
-export function renderPauseControl(this: any, layout: TableRegions, canvas: { width: number; height: number }): void {
-  // v1.6 PL-01:原 topBar 行位与右侧倍数/炸弹/手牌徽标群(占位至 width-52)同排叠压,
-  // 按钮 64 宽(跨 width-74..width-10)被压底只露端头饰——移到顶栏下一行右侧空区。
-  const screenY = Math.max(52, layout.topBar.y + layout.topBar.height + 24);
-  const pos = this.screenPoint(canvas, canvas.width - 42, screenY);
-  const label = this.addButton(
+export function renderPauseControl(this: any, layout: TableZones, canvas: { width: number; height: number }): void {
+  // 横屏将暂停钮停在底牌坞左翼：既避开右家头顶名牌，也与中央底牌坞保持 8px。
+  // 竖屏维持既有右下顶栏位置，不改旧构图。
+  const landscape = canvas.width >= canvas.height;
+  const screenX = landscape
+    ? layout.bottomCardsDock.x - THEME.spacing.default - 32
+    : canvas.width - 42;
+  const screenY = landscape
+    ? Math.max(15, layout.topBar.y + layout.topBar.height / 2)
+    : Math.max(52, layout.topBar.y + layout.topBar.height + 24);
+  const pos = this.screenPoint(canvas, screenX, screenY);
+  this.addButton(
     GAME_TEXT.pause,
     pos.x,
     pos.y,
@@ -44,8 +50,6 @@ export function renderPauseControl(this: any, layout: TableRegions, canvas: { wi
     this.uiRoot!,
     'pause-open-button',
   );
-  label.fontSize = THEME.typography.md;
-  label.lineHeight = 20;
 }
 
 export function renderPauseOverlay(this: any, canvas: { width: number; height: number }): void {
@@ -76,21 +80,29 @@ export function renderPauseOverlay(this: any, canvas: { width: number; height: n
 }
 
 export function renderPauseMenu(this: any, panel: Node, panelWidth: number, panelHeight: number): void {
-  this.addLabel(GAME_TEXT.pause, 0, panelHeight / 2 - 46, 26, panel, panelWidth - 48, 48, 'pause-title', BRIGHT_PANEL_TEXT);
-  const hint = this.addLabel(GAME_TEXT.progressKept, 0, panelHeight / 2 - 82, 14, panel, panelWidth - 58, 30, 'pause-hint', BRIGHT_PANEL_MUTED);
+  const titleHeight = 32;
+  const hintHeight = 20;
+  const titleY = panelHeight / 2 - THEME.spacing.safe - titleHeight / 2;
+  const hintY = titleY - titleHeight / 2 - THEME.spacing.default - hintHeight / 2;
+  this.addLabel(GAME_TEXT.pause, 0, titleY, 'hero', panel, panelWidth - 48, titleHeight, 'pause-title', BRIGHT_PANEL_TEXT);
+  const hint = this.addLabel(GAME_TEXT.progressKept, 0, hintY, 'body', panel, panelWidth - 58, hintHeight, 'pause-hint', BRIGHT_PANEL_MUTED);
   hint.color = BRIGHT_PANEL_MUTED;
   // v1.6 PL-03 rider:六钮 88→92 宽,给 pause-btn 皮端头多让些中央区(320 面板下仍留 14px 边距)。
-  const buttonWidth = Math.min(92, Math.max(86, Math.floor((panelWidth - 44) / 3)));
-  const buttonStep = buttonWidth + 8;
+  const buttonWidth = Math.min(92, Math.max(86, Math.floor(
+    (panelWidth - THEME.spacing.safe * 2 - THEME.spacing.default * 2) / 3,
+  )));
+  const buttonStep = buttonWidth + THEME.spacing.default;
   const buttonHeight = 60;
+  const upperRowY = hintY - hintHeight / 2 - THEME.spacing.section - buttonHeight / 2;
+  const lowerRowY = upperRowY - buttonHeight - THEME.spacing.section;
   const leftX = -buttonStep;
   const rightX = buttonStep;
-  this.addButton(compactToggleText(GAME_TEXT.sound, this.settings.sound), leftX, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('sound'), panel, 'pause-setting-sound');
-  this.addButton(compactToggleText(GAME_TEXT.animation, this.settings.animation), 0, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('animation'), panel, 'pause-setting-animation');
-  this.addButton(compactToggleText(GAME_TEXT.vibration, this.settings.vibration), rightX, 20, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('vibration'), panel, 'pause-setting-vibration');
-  this.addButton(GAME_TEXT.continue, leftX, -58, buttonWidth, buttonHeight, true, () => this.closePauseMenu(), panel, 'pause-continue');
-  this.addButton(GAME_TEXT.restartShort, 0, -58, buttonWidth, buttonHeight, true, () => this.restartFromPause(), panel, 'pause-restart');
-  this.addButton(GAME_TEXT.exit, rightX, -58, buttonWidth, buttonHeight, true, () => this.askPauseQuit(), panel, 'pause-quit');
+  this.addButton(compactToggleText(GAME_TEXT.sound, this.settings.sound), leftX, upperRowY, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('sound'), panel, 'pause-setting-sound');
+  this.addButton(compactToggleText(GAME_TEXT.animation, this.settings.animation), 0, upperRowY, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('animation'), panel, 'pause-setting-animation');
+  this.addButton(compactToggleText(GAME_TEXT.vibration, this.settings.vibration), rightX, upperRowY, buttonWidth, buttonHeight, true, () => this.toggleRuntimeSetting('vibration'), panel, 'pause-setting-vibration');
+  this.addButton(GAME_TEXT.continue, leftX, lowerRowY, buttonWidth, buttonHeight, true, () => this.closePauseMenu(), panel, 'pause-continue');
+  this.addButton(GAME_TEXT.restartShort, 0, lowerRowY, buttonWidth, buttonHeight, true, () => this.restartFromPause(), panel, 'pause-restart');
+  this.addButton(GAME_TEXT.exit, rightX, lowerRowY, buttonWidth, buttonHeight, true, () => this.askPauseQuit(), panel, 'pause-quit');
 }
 
 export function renderPauseConfirm(this: any, panel: Node, panelWidth: number, panelHeight: number): void {
@@ -98,7 +110,7 @@ export function renderPauseConfirm(this: any, panel: Node, panelWidth: number, p
     GAME_TEXT.quitTitle,
     0,
     panelHeight / 2 - 48,
-    THEME.typography.xl,
+    'hero',
     panel,
     panelWidth - 48,
     48,
@@ -109,7 +121,7 @@ export function renderPauseConfirm(this: any, panel: Node, panelWidth: number, p
     GAME_TEXT.quitHint,
     0,
     14,
-    THEME.typography.md,
+    'action',
     panel,
     panelWidth - 58,
     36,

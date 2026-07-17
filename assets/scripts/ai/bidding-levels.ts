@@ -11,28 +11,10 @@
 
 import { type Card } from '../rules';
 import type { BiddingState, BidAction } from '../game';
-import { actionForStrength, isStrongHand } from './bidding';
-import { isHardStrongHand } from './bidding-hard';
+import { actionForStrength } from './bidding';
+import { isStrongByScore } from './bidding-eval';
 import { AiLevel } from './strategy';
 
-export function thresholdFor(level: AiLevel): number {
-  switch (level) {
-    case AiLevel.Simple:
-      return 3;
-    case AiLevel.Normal:
-      return 2;
-    case AiLevel.Hard:
-      return 1; // 历史口径保留(W-AUDIT-AI 起 Hard 不再走高牌阈值,见 chooseBidByLevel)
-    default: {
-      const exhaustive: never = level;
-      throw new Error(`unknown AiLevel: ${String(exhaustive)}`);
-    }
-  }
-}
-
 export function chooseBidByLevel(hand: Card[], state: BiddingState, level: AiLevel): BidAction {
-  // W-AUDIT-AI B2:Hard 换结构化判强(火箭/炸/≥3 控牌/2 控牌+短手型),
-  // 修「一张高牌就抢地主」的过度激进;Simple/Normal 维持高牌阈值口径不动。
-  if (level === AiLevel.Hard) return actionForStrength(state, isHardStrongHand(hand));
-  return actionForStrength(state, isStrongHand(hand, thresholdFor(level)));
+  return actionForStrength(state, isStrongByScore(hand, level));
 }

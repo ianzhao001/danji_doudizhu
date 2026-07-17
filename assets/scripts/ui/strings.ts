@@ -8,6 +8,8 @@ export const STRINGS: Readonly<Record<string, string>> = Object.freeze({
   'action.play': '出牌',
   'action.pass': '不要',
   'action.hint': '提示',
+  'hint.passAdvice': '建议不出，保留手牌',
+  'hint.none': '当前无可提示着法',
   'action.mustPass': '要不起',
   'bid.call': '叫地主',
   'bid.grab': '抢地主',

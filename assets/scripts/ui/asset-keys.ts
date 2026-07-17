@@ -2,14 +2,6 @@ import { Rank, Suit } from '../rules';
 import type { CueId } from './event-cues';
 
 export const RESOURCE_PATHS = {
-  cardTemplate: 'art/cards/card-template',
-  cardBack: 'art/cards/card-back',
-  suitSpade: 'art/cards/suit-spade',
-  suitHeart: 'art/cards/suit-heart',
-  suitClub: 'art/cards/suit-club',
-  suitDiamond: 'art/cards/suit-diamond',
-  jokerSmall: 'art/cards/joker-small',
-  jokerBig: 'art/cards/joker-big',
   cardTemplateV13: 'art/cards/card-template-v13',
   cardBackV13: 'art/cards/card-back-v13',
   suitSpadeV13: 'art/cards/suit-spade-v13',
@@ -22,7 +14,7 @@ export const RESOURCE_PATHS = {
   lobbyBg: 'art/backgrounds/lobby-bg',
   gameTableBg: 'art/backgrounds/game-table-bg',
   settlementBg: 'art/backgrounds/settlement-bg',
-  gameTableBgV13: 'art/backgrounds/game-table-bg-v13',
+  gameTableBgC1: 'art/backgrounds/game-table-bg-c1',
 
   playerAvatar: 'art/avatars/player-avatar',
   aiCheerfulAvatar: 'art/avatars/ai-cheerful-avatar',
@@ -52,8 +44,6 @@ export const RESOURCE_PATHS = {
   btnDisabledV13: 'art/ui/btn-disabled-v13',
   seatNameplateV13: 'art/ui/seat-nameplate-v13',
   bottomCardsDockV13: 'art/ui/bottom-cards-dock-v13',
-  badgeMultiplierV13: 'art/ui/badge-multiplier-v13',
-  badgeTimerV13: 'art/ui/badge-timer-v13',
   iconPlay: 'art/ui/icon-play',
   iconPass: 'art/ui/icon-pass',
   iconHint: 'art/ui/icon-hint',
@@ -67,24 +57,26 @@ export const RESOURCE_PATHS = {
   emphasisRocket: 'art/ui/emphasis-rocket',
   emphasisSpring: 'art/ui/emphasis-spring',
   panelPopup: 'art/ui/panel-popup',
-  // v1.6 二次终审整改(用户设计原则:盖字底图=单一填充+至多一条细描边,禁多层线条/异形):
-  // v18 极简族——按钮四态 + 信息条 + 席位名牌。
-  // 退役代键(v15 异形/v17 多层描边/结算 v13 三键/pause 专皮)已物理隔离至 asset-keys-rollback.ts。
-  btnPrimaryV18: 'art/ui/btn-primary-v18',
-  btnSecondaryV18: 'art/ui/btn-secondary-v18',
-  btnTertiaryV18: 'art/ui/btn-tertiary-v18',
-  btnDisabledV18: 'art/ui/btn-disabled-v18',
-  infoPillV18: 'art/ui/info-pill-v18',
-  seatNameplateV18: 'art/ui/seat-nameplate-v18',
+  // W-VISION-COLOR-R2-d:c2 沿用 c1 色彩与 v21 结构，仅将 rim 向内加厚。
+  btnPrimaryC2: 'art/ui/btn-primary-c2',
+  btnSecondaryC2: 'art/ui/btn-secondary-c2',
+  btnNeutralC2: 'art/ui/btn-neutral-c2',
+  infoPillC1: 'art/ui/info-pill-c1',
+  seatNameplateC1: 'art/ui/seat-nameplate-c1',
+  panelPopupV19: 'art/ui/panel-popup-v19',
+  settlementPanelV19: 'art/ui/settlement-panel-v19',
+  avatarFrameV19: 'art/ui/avatar-frame-v19',
+  countdownRingV19: 'art/ui/countdown-ring-v19',
+  landlordHatV19: 'art/ui/landlord-hat-v19',
+  farmerBadgeV19: 'art/ui/farmer-badge-v19',
+  patternLabelV19: 'art/ui/pattern-label-v19',
   bottomCardsDockV15: 'art/ui/bottom-cards-dock-v15',
-  panelPopupV15: 'art/ui/panel-popup-v15',
-  settlementPanelV15: 'art/ui/settlement-panel-v15',
 
-  fxSpark: 'art/fx/fx-spark',
-  fxRing: 'art/fx/fx-ring',
-  fxStar: 'art/fx/fx-star',
-  fxTrail: 'art/fx/fx-trail',
-  fxConfetti: 'art/fx/fx-confetti',
+  fxSparkV19: 'art/fx/fx-spark-v19',
+  fxRingV19: 'art/fx/fx-ring-v19',
+  fxStarV19: 'art/fx/fx-star-v19',
+  fxTrailV19: 'art/fx/fx-trail-v19',
+  fxConfettiV19: 'art/fx/fx-confetti-v19',
 
   splash: 'art/misc/splash',
   appIcon: 'art/misc/app-icon',
@@ -142,22 +134,22 @@ export function cardAssetPath(assetKey: string): ResourcePath | null {
   const [rankRaw, suit] = assetKey.split('-');
   const rank = Number(rankRaw);
 
-  if (rank === Rank.SmallJoker && suit === Suit.Joker) return RESOURCE_PATHS.jokerSmall;
-  if (rank === Rank.BigJoker && suit === Suit.Joker) return RESOURCE_PATHS.jokerBig;
-  if (NORMAL_RANKS.has(rank) && NORMAL_SUITS.has(suit)) return RESOURCE_PATHS.cardTemplate;
+  if (rank === Rank.SmallJoker && suit === Suit.Joker) return RESOURCE_PATHS.jokerSmallV13;
+  if (rank === Rank.BigJoker && suit === Suit.Joker) return RESOURCE_PATHS.jokerBigV13;
+  if (NORMAL_RANKS.has(rank) && NORMAL_SUITS.has(suit)) return RESOURCE_PATHS.cardTemplateV13;
   return null;
 }
 
 export function suitAssetPath(suit: Suit | 'joker'): ResourcePath | null {
   switch (suit) {
     case Suit.Spade:
-      return RESOURCE_PATHS.suitSpade;
+      return RESOURCE_PATHS.suitSpadeV13;
     case Suit.Heart:
-      return RESOURCE_PATHS.suitHeart;
+      return RESOURCE_PATHS.suitHeartV13;
     case Suit.Club:
-      return RESOURCE_PATHS.suitClub;
+      return RESOURCE_PATHS.suitClubV13;
     case Suit.Diamond:
-      return RESOURCE_PATHS.suitDiamond;
+      return RESOURCE_PATHS.suitDiamondV13;
     default:
       return null;
   }
