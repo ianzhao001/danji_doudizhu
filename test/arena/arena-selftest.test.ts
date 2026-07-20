@@ -8,6 +8,8 @@ import {
   judgeCrippledCaught,
   judgeSelftest,
   judgeStrength,
+  judgeStrengthCI,
+  roleOf,
   summarizeMirror,
   type ArenaGame,
 } from './arena-lib';
@@ -83,5 +85,77 @@ describe('W-AI S14 竞技场判定谓词', () => {
 
     const sneaky = summarizeMirror(mirroredSet(() => ({ newScore: 2, legacyScore: -2 })));
     expect(judgeCrippledCaught(sneaky, 8).pass, '弱桩若通过强度门=门自证失败').toBe(false);
+  });
+});
+
+/**
+ * W-AI-R3（B0 立度量）新增判据自证：角色分层 + 配对 CI 门。
+ * 预期**绿**（守护门）。── 负向变异自证 ──
+ *   ① roleOf 把 (地主+1)%3 误判为 upper → 角色用例红；
+ *   ② summarizeMirror 漏记 landlordSplitPairs 或按 split 对仍分层 → 分层用例红；
+ *   ③ judgeStrengthCI 退化为只看点估（丢 CI 下界检查）→「点估过但 CI 挡住」用例红。
+ */
+function mirroredWithLandlord(
+  perPair: (seed: number, seat: 0 | 1 | 2) => { newScore: number; legacyScore: number; landlord: 0 | 1 | 2; oldLandlord?: 0 | 1 | 2 },
+): ArenaGame[] {
+  const games: ArenaGame[] = [];
+  for (let seed = 1; seed <= 4; seed += 1) {
+    for (const seat of [0, 1, 2] as const) {
+      const { newScore, legacyScore, landlord, oldLandlord } = perPair(seed, seat);
+      games.push({ seed, targetSeat: seat, targetSide: 'new', targetScore: newScore, landlord });
+      games.push({ seed, targetSeat: seat, targetSide: 'legacy', targetScore: legacyScore, landlord: oldLandlord ?? landlord });
+    }
+  }
+  return games;
+}
+
+describe('W-AI-R3 竞技场角色分层 + 配对 CI 门', () => {
+  it('roleOf：地主/下家((L+1)%3)/上家((L+2)%3) 精确', () => {
+    expect(roleOf(0, 0)).toBe('landlord');
+    expect(roleOf(1, 0)).toBe('lower');
+    expect(roleOf(2, 0)).toBe('upper');
+    expect(roleOf(0, 1)).toBe('upper');
+    expect(roleOf(2, 1)).toBe('lower');
+    expect(roleOf(1, 2)).toBe('upper');
+  });
+
+  it('byRole：两向同地主的干净对按角色分桶；两向异地主计入 landlordSplitPairs 且不分层', () => {
+    // 全局地主=0：seat0→landlord、seat1→lower、seat2→upper，各 4 对，new 全胜(+2)。
+    const clean = summarizeMirror(mirroredWithLandlord(() => ({ newScore: 2, legacyScore: -2, landlord: 0 })));
+    expect(clean.landlordSplitPairs).toBe(0);
+    const roles = Object.fromEntries((clean.byRole ?? []).map((r) => [r.role, r]));
+    expect(roles.landlord.pairs).toBe(4);
+    expect(roles.lower.pairs).toBe(4);
+    expect(roles.upper.pairs).toBe(4);
+    expect(roles.landlord.mirrorWinRateDiffPp).toBe(100);
+    expect(roles.landlord.avgPairedScoreDiff).toBe(4);
+
+    // 两向落不同地主（叫牌分叉）→ 全部对计 split，且不进任何角色桶。
+    const split = summarizeMirror(mirroredWithLandlord(() => ({ newScore: 2, legacyScore: -2, landlord: 0, oldLandlord: 1 })));
+    expect(split.landlordSplitPairs).toBe(12);
+    expect(split.byRole ?? []).toEqual([]);
+  });
+
+  it('judgeStrengthCI：强正向(CI 下界>0)过；零差被挡；点估微正但高方差(CI 含 0)被挡而点估门放行', () => {
+    const strong = summarizeMirror(mirroredWithLandlord(() => ({ newScore: 2, legacyScore: -2, landlord: 0 })));
+    expect(strong.avgPairedScoreDiffCI!.lo).toBeGreaterThan(0);
+    expect(judgeStrengthCI(strong, 0).pass).toBe(true);
+
+    const zero = summarizeMirror(mirroredWithLandlord(() => ({ newScore: 2, legacyScore: 2, landlord: 0 })));
+    expect(judgeStrengthCI(zero, 0).pass, '零差不得被判为增益').toBe(false);
+
+    // 高方差微正：胜率各半(点估胜率差=0)、配对分差点估 >0，但 95% 配对 CI 下界 ≤0。
+    // 点估门 judgeStrength(,0) 放行，CI 门 judgeStrengthCI 挡住——证明 CI 更严。
+    const noisy = summarizeMirror(mirroredWithLandlord((seed, seat) => {
+      const newWins = (seed + seat) % 2 === 0;
+      const mag = newWins ? 20 : 18; // new 赢时 +20，输时 −18 → 均值微正、方差大
+      return newWins
+        ? { newScore: mag, legacyScore: -mag, landlord: 0 }
+        : { newScore: -mag, legacyScore: mag, landlord: 0 };
+    }));
+    expect(noisy.avgPairedScoreDiff).toBeGreaterThan(0);
+    expect(judgeStrength(noisy, 0).pass, '点估门在微正均值下放行').toBe(true);
+    expect(noisy.avgPairedScoreDiffCI!.lo).toBeLessThanOrEqual(0);
+    expect(judgeStrengthCI(noisy, 0).pass, 'CI 门挡住采样噪声级的微正').toBe(false);
   });
 });

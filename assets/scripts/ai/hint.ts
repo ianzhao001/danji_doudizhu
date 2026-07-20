@@ -15,7 +15,7 @@ import { compareMoves } from './levels/_shared';
 import { Decomposer } from './decompose';
 import { moveOutcomeScore } from './handWeight';
 import { hardStrategyWithProfile } from './levels/hard';
-import { HINT_PIMC, pimcRank } from './pimc';
+import { capturePimcRanks, HINT_PIMC, type RankedOption } from './pimc';
 
 export interface HintResult {
   moves: Move[];
@@ -79,12 +79,36 @@ function airplaneKey(move: Move): string | null {
   return `${category}:${move.pattern.mainRank}:${move.pattern.length}`;
 }
 
-function rankableCandidates(hand: Card[], current: HandPattern | null): Move[] {
+function wingCards(move: Move): Card[] {
+  const { category, mainRank, length } = move.pattern;
+  if (category === Category.TripsSingle
+    || category === Category.TripsPair
+    || category === Category.FourPlusTwoSingles
+    || category === Category.FourPlusTwoPairs) {
+    return move.cards.filter((card) => card.rank !== mainRank);
+  }
+  const groups = category === Category.AirplaneSingles
+    ? length / 4
+    : category === Category.AirplanePairs
+      ? length / 5
+      : 0;
+  if (!Number.isInteger(groups) || groups < 2) return [];
+  const firstCoreRank = mainRank - groups + 1;
+  return move.cards.filter((card) => card.rank < firstCoreRank || card.rank > mainRank);
+}
+
+function hasForbiddenHintWing(move: Move): boolean {
+  return wingCards(move).some((card) => card.rank >= Rank.R2);
+}
+
+function isRankableHintMove(move: Move, advisedKey: string): boolean {
+  return cardsKey(move.cards) === advisedKey || !hasForbiddenHintWing(move);
+}
+
+function rankableCandidates(hand: Card[], legal: Move[], advised: Move): Move[] {
   const decomposer = new Decomposer();
-  const ordered = hintSuggestions(hand, current).filter((move) => (
-    move.pattern.category !== Category.AirplaneSingles
-    || move.cards.every((card) => card.rank !== Rank.R2)
-  )).sort((left, right) => {
+  const advisedKey = cardsKey(advised.cards);
+  const ordered = legal.filter((move) => isRankableHintMove(move, advisedKey)).sort((left, right) => {
     const delta = moveOutcomeScore(decomposer, hand, left) - moveOutcomeScore(decomposer, hand, right);
     return delta !== 0 ? delta : compareHintMoves(left, right);
   });
@@ -103,14 +127,41 @@ function rankableCandidates(hand: Card[], current: HandPattern | null): Move[] {
   return result;
 }
 
-function canSampleHintWorld(snapshot: GameSnapshot, history: readonly GameEvent[]): boolean {
-  const hand = snapshot.viewerHand;
-  if (!hand) return false;
-  let played = 0;
-  for (const event of history) if (event.type === 'play') played += event.pattern.cards.length;
-  let hidden = 0;
-  for (let seat = 0; seat < 3; seat += 1) if (seat !== snapshot.turn) hidden += snapshot.handCounts[seat] ?? 0;
-  return 54 - hand.length - played === hidden;
+function mergeHardRanking(
+  hand: Card[],
+  advised: Move,
+  captured: readonly RankedOption[],
+  candidates: readonly Move[],
+): RankedHint[] {
+  const decomposer = new Decomposer();
+  const advisedKey = cardsKey(advised.cards);
+  const seenCards = new Set<string>();
+  const seenAirplanes = new Set<string>();
+  const hints: RankedHint[] = [];
+  const add = (move: Move, score: number): void => {
+    const key = cardsKey(move.cards);
+    if (!isRankableHintMove(move, advisedKey)) return;
+    if (seenCards.has(key)) return;
+    const plane = airplaneKey(move);
+    if (plane !== null && seenAirplanes.has(plane)) return;
+    seenCards.add(key);
+    if (plane !== null) seenAirplanes.add(plane);
+    hints.push({ move, score });
+  };
+
+  // A sampled Hard decision already owns both the first move and its ranked
+  // alternatives. Keep that one score scale intact instead of padding the list
+  // with structurally scored moves that PIMC never evaluated.
+  if (captured.length > 0) {
+    for (const option of captured) if (option.move) add(option.move, option.score);
+    return hints.slice(0, 6);
+  }
+
+  // Hard can decide before entering PIMC. In that case there is no sampled
+  // ranking to reuse, so preserve its authoritative move and fill a local list.
+  add(advised, -moveOutcomeScore(decomposer, hand, advised));
+  for (const move of candidates) add(move, -moveOutcomeScore(decomposer, hand, move));
+  return hints.slice(0, 6);
 }
 
 export function rankHintCandidates(args: {
@@ -125,31 +176,13 @@ export function rankHintCandidates(args: {
   if (snapshot.winner !== null || snapshot.turn !== viewerSeat || !hand || hand.length === 0) {
     return { kind: 'none' };
   }
-  const candidates = rankableCandidates(hand, snapshot.top?.pattern ?? null);
-  if (candidates.length === 0) return { kind: 'passAdvice' };
-  const advised = adviseBestMove({ snapshot, history, viewerSeat });
+  const legal = hintSuggestions(hand, snapshot.top?.pattern ?? null);
+  if (legal.length === 0) return { kind: 'passAdvice' };
+  const analysis = capturePimcRanks(() => adviseBestMove({ snapshot, history, viewerSeat }));
+  const advised = analysis.value;
   if (!advised) return { kind: 'passAdvice' };
-
-  const advisedKey = cardsKey(advised.cards);
-  const pool = candidates.filter((move) => cardsKey(move.cards) !== advisedKey).slice(0, 5);
-  pool.unshift(advised);
-  let ranked: RankedHint[];
-  if (canSampleHintWorld(snapshot, history)) {
-    ranked = pimcRank({
-      snapshot,
-      history,
-      candidates: pool,
-      includePass: snapshot.top !== null,
-      profile: HINT_PIMC,
-      mustInclude: advised,
-    }).filter((option): option is { move: Move; score: number } => option.move !== null);
-  } else {
-    const decomposer = new Decomposer();
-    ranked = pool.map((move) => ({ move, score: -moveOutcomeScore(decomposer, hand, move) }));
-  }
-
-  const byKey = new Map(ranked.map((hint) => [cardsKey(hint.move.cards), hint]));
-  const first = byKey.get(advisedKey) ?? { move: advised, score: 0 };
-  const hints = [first, ...ranked.filter((hint) => cardsKey(hint.move.cards) !== advisedKey)].slice(0, 6);
+  const captured = analysis.rankings[analysis.rankings.length - 1] ?? [];
+  const candidates = captured.length === 0 ? rankableCandidates(hand, legal, advised) : [];
+  const hints = mergeHardRanking(hand, advised, captured, candidates);
   return { kind: 'ranked', hints };
 }

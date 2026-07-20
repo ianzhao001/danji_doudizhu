@@ -10,6 +10,7 @@ import {
   Rank,
   Suit,
   enumerateMoves,
+  isBombLike,
   legalFollows,
   type Card,
   type HandPattern,
@@ -82,7 +83,11 @@ function moveKey(move: Move): string {
 function legalMoves(counts: readonly number[], top: HandPattern | null): Move[] {
   const hand = cardsFromCounts(counts);
   const moves = top ? legalFollows(hand, top) : enumerateMoves(hand);
+  const total = cardCount(counts);
   return moves.slice().sort((left, right) => {
+    const leftPriority = left.cards.length === total ? 0 : isBombLike(left.pattern.category) ? 2 : 1;
+    const rightPriority = right.cards.length === total ? 0 : isBombLike(right.pattern.category) ? 2 : 1;
+    if (leftPriority !== rightPriority) return leftPriority - rightPriority;
     const leftKey = moveKey(left);
     const rightKey = moveKey(right);
     return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;

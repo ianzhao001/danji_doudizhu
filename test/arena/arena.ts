@@ -20,10 +20,16 @@ import type { AiStrategy } from '../../assets/scripts/ai';
 import { runHeadlessRound, type BidPolicy, type PlayPolicy } from '../../assets/scripts/flow';
 import { enumerateMoves, legalFollows } from '../../assets/scripts/rules';
 import { legacyBidByName, legacyStrategyByName, type LegacyLevelName } from '../fixtures/legacy-ai/legacy';
-import { judgeCrippledCaught, judgeSelftest, judgeStrength, summarizeMirror, type ArenaGame, type ArenaSide } from './arena-lib';
+import { v19BidByName, v19StrategyByName } from '../fixtures/ai-v19/v19';
+import { judgeCrippledCaught, judgeSelftest, judgeStrength, judgeStrengthCI, summarizeMirror, type ArenaGame, type ArenaSide } from './arena-lib';
 
 type Pairing = 'hard' | 'normal' | 'simple' | 'self' | 'crippled';
 type Profile = 'full' | 'weights-only';
+// W-AI-R3（B0 立度量）：新增基线选择与叫牌固定轴。
+// baseline：旧引擎一侧＝冻结的 pre-v1.8 legacy 或 v1.9（candidate-vs-v19 前向度量）。
+// fixed-bid：钉住叫牌引擎（所有席同一），只让出牌随目标席变 → 隔离出牌强度。
+type Baseline = 'legacy' | 'v19';
+type FixedBid = 'none' | 'new' | 'legacy' | 'v19';
 
 // W-AI-R2 棘轮(BOARD 2026-07-17):hard 8→9(已交付 +10.17pp,R2 不得回吐;签收目标 +12)。
 const STRENGTH_GATE_PP: Record<'hard' | 'normal' | 'simple', number> = { hard: 9, normal: 8, simple: 10 };
@@ -72,24 +78,41 @@ function newPlayStrategy(pairing: Pairing, level: AiLevel, weightsOnlyHard: AiSt
   return strategyFor(level);
 }
 
+/** 旧引擎一侧的出牌策略：self 用新引擎；否则按 baseline 取 legacy 或 v19 冻结件。 */
+function oldPlayStrategy(pairing: Pairing, baseline: Baseline, name: LegacyLevelName, level: AiLevel): AiStrategy {
+  if (pairing === 'self') return strategyFor(level);
+  return baseline === 'v19' ? v19StrategyByName(name) : legacyStrategyByName(name);
+}
+
 function sidePolicies(
   pairing: Pairing,
   seatSides: [ArenaSide, ArenaSide, ArenaSide],
   weightsOnlyHard: AiStrategy | null,
+  baseline: Baseline,
+  fixedBid: FixedBid,
 ): { playPolicy: PlayPolicy; bidPolicy: BidPolicy } {
   const level = levelOf(pairing);
   const legacyName = (pairing === 'normal' ? 'normal' : pairing === 'simple' ? 'simple' : 'hard') as LegacyLevelName;
   const newPlay = newPlayStrategy(pairing, level, weightsOnlyHard);
-  const legacyPlay = pairing === 'self' ? strategyFor(level) : legacyStrategyByName(legacyName);
+  const oldPlay = oldPlayStrategy(pairing, baseline, legacyName, level);
+  const oldBid = (hand: Parameters<BidPolicy>[0]['hand'], state: Parameters<BidPolicy>[0]['state']) => (
+    baseline === 'v19' ? v19BidByName(hand, state, legacyName) : legacyBidByName(hand, state, legacyName)
+  );
   return {
     playPolicy: ({ snapshot, rng, history }) => (
       seatSides[snapshot.turn] === 'new'
         ? newPlay(snapshot, rng, history ?? [])
-        : legacyPlay(snapshot, rng, history ?? [])
+        : oldPlay(snapshot, rng, history ?? [])
     ),
     bidPolicy: ({ seat, state, hand }) => {
+      // 钉叫牌：全席同一叫牌引擎，出牌才随目标席变 → 胜率差纯归因于出牌。
+      if (fixedBid !== 'none') {
+        if (fixedBid === 'new') return chooseBidByLevel(hand, state, level);
+        if (fixedBid === 'v19') return v19BidByName(hand, state, legacyName);
+        return legacyBidByName(hand, state, legacyName);
+      }
       if (pairing === 'self' || seatSides[seat] === 'new') return chooseBidByLevel(hand, state, level);
-      return legacyBidByName(hand, state, legacyName);
+      return oldBid(hand, state);
     },
   };
 }
@@ -97,7 +120,11 @@ function sidePolicies(
 async function runShard(args: Map<string, string>): Promise<void> {
   const pairing = (args.get('pairing') ?? 'hard') as Pairing;
   const profile = (args.get('profile') ?? 'full') as Profile;
+  const baseline = (args.get('baseline') ?? 'legacy') as Baseline;
+  const fixedBid = (args.get('fixed-bid') ?? 'none') as FixedBid;
   const seedCount = Number(args.get('seeds') ?? 200);
+  // 保留集：用大偏移（如 --seed-base=100000）跑与调参集(1..N)不相交的独立种子块。
+  const seedBase = Number(args.get('seed-base') ?? 0);
   const [shardIndex, shardTotal] = (args.get('shard') ?? '0/1').split('/').map(Number);
   const out = args.get('out');
   if (!out) throw new Error('--out required in run mode');
@@ -106,35 +133,42 @@ async function runShard(args: Map<string, string>): Promise<void> {
     : null;
 
   const games: ArenaGame[] = [];
-  for (let seed = 1; seed <= seedCount; seed += 1) {
-    if ((seed - 1) % shardTotal !== shardIndex) continue;
+  for (let index = 0; index < seedCount; index += 1) {
+    if (index % shardTotal !== shardIndex) continue;
+    const seed = seedBase + index + 1;
     for (const targetSeat of [0, 1, 2] as const) {
       for (const targetSide of ['new', 'legacy'] as const) {
         const filler: ArenaSide = targetSide === 'new' ? 'legacy' : 'new';
         const seatSides: [ArenaSide, ArenaSide, ArenaSide] = [filler, filler, filler];
         seatSides[targetSeat] = targetSide;
-        const { playPolicy, bidPolicy } = sidePolicies(pairing, seatSides, weightsOnlyHard);
+        const { playPolicy, bidPolicy } = sidePolicies(pairing, seatSides, weightsOnlyHard, baseline, fixedBid);
         const result = await runHeadlessRound({ seed, playPolicy, bidPolicy });
-        games.push({ seed, targetSeat, targetSide, targetScore: result.settlement.scores[targetSeat] });
+        games.push({
+          seed, targetSeat, targetSide,
+          targetScore: result.settlement.scores[targetSeat],
+          landlord: result.landlord ?? undefined,
+        });
       }
     }
   }
-  writeFileSync(out, `${JSON.stringify({ pairing, profile, shard: `${shardIndex}/${shardTotal}`, games }, null, 1)}\n`);
-  console.log(`[arena] shard done pairing=${pairing} profile=${profile} shard=${shardIndex}/${shardTotal} games=${games.length}`);
+  writeFileSync(out, `${JSON.stringify({ pairing, profile, baseline, fixedBid, seedBase, shard: `${shardIndex}/${shardTotal}`, games }, null, 1)}\n`);
+  console.log(`[arena] shard done pairing=${pairing} profile=${profile} baseline=${baseline} fixedBid=${fixedBid} seedBase=${seedBase} shard=${shardIndex}/${shardTotal} games=${games.length}`);
 }
 
 function judgeMerged(args: Map<string, string>): void {
   const pairing = (args.get('pairing') ?? 'hard') as Pairing;
   const profile = (args.get('profile') ?? 'full') as Profile;
+  const baseline = (args.get('baseline') ?? 'legacy') as Baseline;
   const inputs = (args.get('inputs') ?? '').split(',').filter(Boolean);
   const out = args.get('out');
   if (inputs.length === 0) throw new Error('--inputs required in judge mode');
 
   const games: ArenaGame[] = [];
   for (const path of inputs) {
-    const shard = JSON.parse(readFileSync(path, 'utf8')) as { pairing: Pairing; profile: Profile; games: ArenaGame[] };
-    if (shard.pairing !== pairing || shard.profile !== profile) {
-      throw new Error(`shard mismatch: ${path} is ${shard.pairing}/${shard.profile}, expected ${pairing}/${profile}`);
+    const shard = JSON.parse(readFileSync(path, 'utf8')) as { pairing: Pairing; profile: Profile; baseline?: Baseline; games: ArenaGame[] };
+    const shardBaseline = shard.baseline ?? 'legacy';
+    if (shard.pairing !== pairing || shard.profile !== profile || shardBaseline !== baseline) {
+      throw new Error(`shard mismatch: ${path} is ${shard.pairing}/${shard.profile}/${shardBaseline}, expected ${pairing}/${profile}/${baseline}`);
     }
     games.push(...shard.games);
   }
@@ -145,11 +179,15 @@ function judgeMerged(args: Map<string, string>): void {
     ? judgeSelftest(summary)
     : pairing === 'crippled'
       ? judgeCrippledCaught(summary, STRENGTH_GATE_PP.hard)
-      : judgeStrength(summary, profile === 'weights-only' && pairing === 'hard'
-        ? WEIGHTS_ONLY_HARD_GATE_PP
-        : STRENGTH_GATE_PP[pairing]);
+      : baseline === 'v19'
+        // v19 前向门：候选须显著优于 v1.9（点估为正 + 95% 配对 CI 下界 > 0），
+        // 不套用对已弱 legacy 的 +Npp 老阈值（两强对比增量本就小）。
+        ? judgeStrengthCI(summary, 0)
+        : judgeStrength(summary, profile === 'weights-only' && pairing === 'hard'
+          ? WEIGHTS_ONLY_HARD_GATE_PP
+          : STRENGTH_GATE_PP[pairing]);
 
-  const report = { pairing, profile, summary, verdict };
+  const report = { pairing, profile, baseline, summary, verdict };
   const rendered = `${JSON.stringify(report, null, 1)}\n`;
   if (out) writeFileSync(out, rendered);
   console.log(rendered.trimEnd());

@@ -5,8 +5,7 @@
  */
 
 import { Card, Rank, isSequenceable } from './card';
-import { HandPattern, recognize } from './pattern';
-import { beats } from './compare';
+import { Category, HandPattern, recognize } from './pattern';
 
 export interface Move {
   cards: Card[];
@@ -34,6 +33,89 @@ function combinations<T>(items: T[], size: number): T[][] {
 
   walk(0, []);
   return out;
+}
+
+interface RankedHand {
+  ranks: Rank[];
+  countOf: (rank: Rank) => number;
+  take: (rank: Rank, count: number) => Card[];
+}
+
+function indexHand(hand: Card[]): RankedHand {
+  const byRank = new Map<Rank, Card[]>();
+  for (const card of hand) {
+    const sameRank = byRank.get(card.rank);
+    if (sameRank) sameRank.push(card);
+    else byRank.set(card.rank, [card]);
+  }
+  const ranks = Array.from(byRank.keys()).sort((left, right) => left - right);
+  return {
+    ranks,
+    countOf: (rank) => byRank.get(rank)?.length ?? 0,
+    take: (rank, count) => (byRank.get(rank) ?? []).slice(0, count),
+  };
+}
+
+interface MoveCollector {
+  moves: Move[];
+  add: (cards: Card[]) => void;
+}
+
+function createMoveCollector(): MoveCollector {
+  const moves: Move[] = [];
+  const seen = new Set<string>();
+  const add = (cards: Card[]): void => {
+    if (cards.length === 0) return;
+    const pattern = recognize(cards);
+    if (!pattern) return;
+    const key = pattern.category + '|' + cards.map((card) => `${card.rank}${card.suit}`).sort().join(',');
+    if (seen.has(key)) return;
+    seen.add(key);
+    moves.push({ cards: cards.slice(), pattern });
+  };
+  return { moves, add };
+}
+
+function consecutiveRunsWith(hand: RankedHand, minCount: number): Rank[][] {
+  const eligible = hand.ranks.filter((rank) => isSequenceable(rank) && hand.countOf(rank) >= minCount);
+  const runs: Rank[][] = [];
+  let current: Rank[] = [];
+  for (const rank of eligible) {
+    if (current.length === 0 || rank === current[current.length - 1] + 1) current.push(rank);
+    else {
+      runs.push(current);
+      current = [rank];
+    }
+  }
+  if (current.length > 0) runs.push(current);
+  return runs;
+}
+
+function subRuns(run: Rank[], minLength: number): Rank[][] {
+  const out: Rank[][] = [];
+  for (let length = minLength; length <= run.length; length += 1) {
+    for (let index = 0; index + length <= run.length; index += 1) {
+      out.push(run.slice(index, index + length));
+    }
+  }
+  return out;
+}
+
+function exactRuns(hand: RankedHand, minCount: number, length: number): Rank[][] {
+  if (!Number.isInteger(length) || length <= 0) return [];
+  const out: Rank[][] = [];
+  for (const run of consecutiveRunsWith(hand, minCount)) {
+    for (let index = 0; index + length <= run.length; index += 1) {
+      out.push(run.slice(index, index + length));
+    }
+  }
+  return out;
+}
+
+function addRocket(hand: RankedHand, add: (cards: Card[]) => void): void {
+  if (hand.countOf(Rank.SmallJoker) >= 1 && hand.countOf(Rank.BigJoker) >= 1) {
+    add([...hand.take(Rank.SmallJoker, 1), ...hand.take(Rank.BigJoker, 1)]);
+  }
 }
 
 /** 枚举一手牌在「领出」时可出的全部合法牌型。 */
@@ -156,5 +238,123 @@ export function enumerateMoves(hand: Card[]): Move[] {
 
 /** 针对当前牌权，枚举手牌中所有能压过它的着法。 */
 export function legalFollows(hand: Card[], current: HandPattern): Move[] {
-  return enumerateMoves(hand).filter((m) => beats(m.pattern, current));
+  const ranked = indexHand(hand);
+  const { ranks, countOf, take } = ranked;
+  const { moves, add } = createMoveCollector();
+
+  // 火箭不可被压。
+  if (current.category === Category.Rocket) return moves;
+
+  // 旧枚举器把基础单/对/三与同点炸弹交错产出；这三类跟牌须保留该顺序。
+  const basicCount = current.category === Category.Single
+    ? 1
+    : current.category === Category.Pair
+      ? 2
+      : current.category === Category.Trips
+        ? 3
+        : 0;
+  if (basicCount > 0) {
+    for (const rank of ranks) {
+      if (current.length === basicCount && rank > current.mainRank && countOf(rank) >= basicCount) {
+        add(take(rank, basicCount));
+      }
+      if (countOf(rank) >= 4) add(take(rank, 4));
+    }
+    addRocket(ranked, add);
+    return moves;
+  }
+
+  // 其余牌型在旧枚举顺序中都位于炸弹、火箭之后。
+  for (const rank of ranks) {
+    if (countOf(rank) >= 4
+      && (current.category !== Category.Bomb || rank > current.mainRank)) {
+      add(take(rank, 4));
+    }
+  }
+  addRocket(ranked, add);
+  if (current.category === Category.Bomb) return moves;
+
+  if (current.category === Category.TripsSingle && current.length === 4) {
+    for (const tripRank of ranks.filter((rank) => countOf(rank) >= 3 && rank > current.mainRank)) {
+      for (const wingRank of ranks) {
+        if (wingRank !== tripRank && countOf(wingRank) >= 1) {
+          add([...take(tripRank, 3), ...take(wingRank, 1)]);
+        }
+      }
+    }
+    return moves;
+  }
+
+  if (current.category === Category.TripsPair && current.length === 5) {
+    for (const tripRank of ranks.filter((rank) => countOf(rank) >= 3 && rank > current.mainRank)) {
+      for (const wingRank of ranks) {
+        if (wingRank !== tripRank && countOf(wingRank) >= 2) {
+          add([...take(tripRank, 3), ...take(wingRank, 2)]);
+        }
+      }
+    }
+    return moves;
+  }
+
+  if (current.category === Category.Straight && current.length >= 5) {
+    for (const run of exactRuns(ranked, 1, current.length)) {
+      if (run[run.length - 1] > current.mainRank) add(run.flatMap((rank) => take(rank, 1)));
+    }
+    return moves;
+  }
+
+  if (current.category === Category.ConsecutivePairs
+    && current.length >= 6
+    && current.length % 2 === 0) {
+    for (const run of exactRuns(ranked, 2, current.length / 2)) {
+      if (run[run.length - 1] > current.mainRank) add(run.flatMap((rank) => take(rank, 2)));
+    }
+    return moves;
+  }
+
+  const airplaneGroups = current.category === Category.Airplane
+    ? current.length / 3
+    : current.category === Category.AirplaneSingles
+      ? current.length / 4
+      : current.category === Category.AirplanePairs
+        ? current.length / 5
+        : 0;
+  if (Number.isInteger(airplaneGroups) && airplaneGroups >= 2) {
+    for (const run of exactRuns(ranked, 3, airplaneGroups)) {
+      if (run[run.length - 1] <= current.mainRank) continue;
+      const tripCards = run.flatMap((rank) => take(rank, 3));
+      if (current.category === Category.Airplane) {
+        add(tripCards);
+        continue;
+      }
+      const inRun = new Set(run);
+      const wingCount = current.category === Category.AirplaneSingles ? 1 : 2;
+      const wingRanks = ranks.filter((rank) => !inRun.has(rank) && countOf(rank) >= wingCount);
+      for (const wings of combinations(wingRanks, airplaneGroups)) {
+        add([...tripCards, ...wings.flatMap((rank) => take(rank, wingCount))]);
+      }
+    }
+    return moves;
+  }
+
+  if (current.category === Category.FourPlusTwoSingles && current.length === 6) {
+    for (const quadRank of ranks.filter((rank) => countOf(rank) >= 4 && rank > current.mainRank)) {
+      const wingRanks = ranks.filter((rank) => rank !== quadRank && countOf(rank) >= 1);
+      for (const wings of combinations(wingRanks, 2)) {
+        add([...take(quadRank, 4), ...wings.flatMap((rank) => take(rank, 1))]);
+      }
+    }
+    return moves;
+  }
+
+  if (current.category === Category.FourPlusTwoPairs && current.length === 8) {
+    for (const quadRank of ranks.filter((rank) => countOf(rank) >= 4 && rank > current.mainRank)) {
+      const wingRanks = ranks.filter((rank) => rank !== quadRank && countOf(rank) >= 2);
+      for (const wings of combinations(wingRanks, 2)) {
+        add([...take(quadRank, 4), ...wings.flatMap((rank) => take(rank, 2))]);
+      }
+    }
+  }
+
+  return moves;
 }

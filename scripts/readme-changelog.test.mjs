@@ -79,8 +79,8 @@ function setupRepository() {
   chmodSync(resolve(repo, '.githooks/pre-push'), 0o755);
 
   const emptyMarker = '<!-- readme-changelog-covered-through: 0000000000000000000000000000000000000000 -->';
-  write(resolve(repo, 'README.md'), `# 测试\n\n## 更新记录\n\n${emptyMarker}\n`);
-  write(resolve(repo, 'README.en.md'), `# Test\n\n## Update Log\n\n${emptyMarker}\n`);
+  write(resolve(repo, 'README.md'), `# 测试\n\n## 更新记录\n\n<!-- readme-changelog-insert-here -->\n\n### 2026-01-01 00:00:00 +08:00\n\n- 历史记录\n\n${emptyMarker}\n`);
+  write(resolve(repo, 'README.en.md'), `# Test\n\n## Update Log\n\n<!-- readme-changelog-insert-here -->\n\n### 2026-01-01 00:00:00 +08:00\n\n- Historical entry\n\n${emptyMarker}\n`);
   write(resolve(repo, 'seed.txt'), 'seed\n');
   const seed = commit(repo, 'chore: seed repository tooling');
   replaceMarker(repo, seed);
@@ -124,9 +124,10 @@ test('one command summarizes multiple commits, updates both READMEs, and is idem
       assert.match(content, /feat\(ai\): add alpha decision/);
       assert.match(content, /docs: explain alpha decision/);
       assert.equal(occurrenceCount(content, DISPLAY_TIME), 1);
+      assert.ok(content.indexOf(DISPLAY_TIME) < content.indexOf('2026-01-01 00:00:00 +08:00'));
     }
-    assert.match(zh, /受影响模块：AI、文档/);
-    assert.match(en, /Affected modules: AI, documentation/);
+    assert.match(zh, /本期更新：feat\(ai\): add alpha decision；docs: explain alpha decision/);
+    assert.match(en, /Summary: feat\(ai\): add alpha decision; docs: explain alpha decision/);
     assert.equal(git(fixture.bare, ['rev-parse', 'main']), git(fixture.repo, ['rev-parse', 'HEAD']));
     assert.deepEqual(
       git(fixture.repo, ['diff', '--name-only', `${coveredHead}..HEAD`]).split('\n').sort(),

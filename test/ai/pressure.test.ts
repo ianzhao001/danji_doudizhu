@@ -15,6 +15,7 @@
  *   ① 主点单调破坏（更高 rank 概率反升）→ 单调用例红。
  *   ② 炸弹威胁抬底删除 → 威胁地板用例红。
  *   ③ 定点改浮点直除（结果非整数）→ 值域用例红。
+ *   ④ 四带二退回通用 bombThreat 512 抬底 → 外炸分散的精确概率用例红。
  */
 import { describe, expect, it } from 'vitest';
 import { Category, Rank } from '../../assets/scripts/rules';
@@ -24,6 +25,8 @@ import { cards } from '../rules/_util';
 
 const single = (rank: number) => ({ category: Category.Single, mainRank: rank, length: 1 });
 const pair = (rank: number) => ({ category: Category.Pair, mainRank: rank, length: 1 });
+const fourSingles = (rank: number) => ({ category: Category.FourPlusTwoSingles, mainRank: rank, length: 6 });
+const fourPairs = (rank: number) => ({ category: Category.FourPlusTwoPairs, mainRank: rank, length: 8 });
 
 describe('W-AI-R2 pressure 被压概率（1/1024 定点）', () => {
   it('值域与整数性：0 ≤ P̂ ≤ 1024 且为整数（全夹具扫描）', () => {
@@ -76,5 +79,29 @@ describe('W-AI-R2 pressure 被压概率（1/1024 定点）', () => {
     expect(pWithout).toBe(0);
     expect(withAce.join(',')).toBe(before);
     expect(beatProbability1024(single(Rank.K), withAce, [2, 1])).toBe(pWith);
+  });
+
+  it('四带二：外炸分散两席的风险为精确低值，不得被通用逻辑抬到 512', () => {
+    const remaining = toRankCounts(cards('9 9 9 9 3 4 5 6'));
+    const singles = beatProbability1024(fourSingles(Rank.R5), remaining, [4, 4]);
+    const pairs = beatProbability1024(fourPairs(Rank.R5), remaining, [4, 4]);
+    expect(singles).toBeGreaterThan(0);
+    expect(singles).toBeLessThan(512);
+    expect(pairs).toBe(singles);
+  });
+
+  it('四带二：无炸无火箭则绝对不可压；双王分散风险亦保持低于 512', () => {
+    expect(beatProbability1024(
+      fourSingles(Rank.R5),
+      toRankCounts(cards('3 4 5 6')),
+      [2, 2],
+    )).toBe(0);
+    const rocket = beatProbability1024(
+      fourPairs(Rank.R5),
+      toRankCounts(cards('x X 3 4')),
+      [2, 2],
+    );
+    expect(rocket).toBeGreaterThan(0);
+    expect(rocket).toBeLessThan(512);
   });
 });

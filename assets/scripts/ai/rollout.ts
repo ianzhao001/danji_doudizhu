@@ -15,6 +15,8 @@ export interface RolloutArgs {
   landlord: 0 | 1 | 2;
   top: HandPattern | null;
   topSeat: 0 | 1 | 2 | null;
+  /** B2 校准接缝：B1' 只保留 legacy 领出，不启用非整手复合牌型领出。 */
+  leadPolicy?: 'legacy';
   rng: Rng;
 }
 

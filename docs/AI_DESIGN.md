@@ -1,8 +1,10 @@
 # AI 设计思路与开源致谢
 
-本文介绍 v1.8（W-AI 波）与 v1.9（W-AI-R2 波）落地的 AI 引擎：设计约束、架构、确定性方案、验收方法论，以及参考过的开源项目与研究论文。
+本文介绍 v1.8 至 v1.9-R3 的 AI 引擎：设计约束、架构、确定性方案、验收方法，以及实际援引的开源项目与研究论文。
 
-> **v1.9（W-AI-R2）增量**：在 v1.8 内核上做三件事——① 评分核从字典序独裁（结构分 ×10000 压死一切）重构为**毫手量纲评分**（`ai/handWeight.ts`+`ai/pressure.ts` 超几何被压概率），根治玩家打回的「困难飞机弃小保大、把顶张 2 当翼甩出」；② 新增**明牌世界精确解**（`ai/worldSolver.ts` 两阵营极大极小）与**过牌推断加权采样**，困难镜像强度 +10.17pp→**+20.17pp**；③ **提示会话重构**（`rankHintCandidates` 榜单轮换去冗 / 建议过牌不哑火 / 手动改选不劫持）。
+> **v1.9 增量**：在 v1.8 内核上将评分核重构为毫手量纲评分，新增明牌世界精确解和过牌推断加权采样，并重构提示候选轮换、过牌反馈和手动改选行为。
+
+> **v1.9-R3 增量**：冻结 v1.9 基线，并以固定叫牌、角色分层和配对 bootstrap 置信区间隔离评估出牌能力；为 PIMC 候选分配公平预算，补齐四带二压力、残局清手优先和序列中继；提示复用一次完整分析，p95 延迟约降低 39%；`legalFollows` 定向生成在 8,134 个等价性样本中保持一致，中位性能约提升 4.75 倍。保留集结果与 v1.9 统计等价，因此不宣称胜率提升。
 
 ## 设计约束与路线选择
 
@@ -53,8 +55,6 @@ PIMC 需要随机采样，但本仓库有三条铁律：AI 决策与注入随机
 | [datamllab/rlcard](https://github.com/datamllab/rlcard)（Rice/TAMU DATA Lab） | MIT | 斗地主规则 Agent 的拆牌骨架与保守跟牌基线作为参照（调研确认其为无配合的朴素规则，未进产品） |
 | [DeltaDou](https://www.ijcai.org/proceedings/2019/0176.pdf)（IJCAI'19，Jiang et al.） | 论文 | 对手建模中的「过牌推断」思想 → v1.9 过牌推断加权采样（`collectPassSignals` 识别非配合性过牌、`weighWorld` 对「本可免费同型压制却过牌」的矛盾世界降权、ESS 有效样本护栏防极端历史带偏）。PIMC 主干仍为自研通用实现 |
 
-自研部分（通用算法，不源于任何特定仓库）：PIMC 确定化蒙特卡洛（Perfect Information Monte Carlo，公认路线）、残局对抗 negamax+置换表、v1.9 的明牌世界两阵营极大极小求解器（`ai/worldSolver.ts`）与毫手量纲评分核（`ai/handWeight.ts`+`ai/pressure.ts` 超几何被压概率闭式）。调研中排除的方案：ratel（机器人策略过薄）、doudizhu-C（需训练模型）、DouZero 系实战外挂衍生（模型运行时）、doudizhu_endgame（GPL-3.0，许可证不兼容，未参考其代码）。
-
-另曾调研 [DreamAndDead/joker](https://github.com/DreamAndDead/joker)，但本地核查记录显示其 README 没有可转录残局，仓库也未发现许可证，因此没有使用其代码或数据。`worldSolver` 的交叉验证实际来自项目内置的三人明牌朴素 oracle、12 组扫掠样例和测试中的手算真值注释。
+自研部分（通用算法，不源于任何特定仓库）：PIMC 确定化蒙特卡洛（Perfect Information Monte Carlo）、残局对抗 negamax 与置换表、v1.9 的明牌世界两阵营极大极小求解器（`ai/worldSolver.ts`），以及毫手量纲评分核（`ai/handWeight.ts` 与 `ai/pressure.ts` 的超几何被压概率闭式）。
 
 感谢以上开源项目作者与论文作者的工作。

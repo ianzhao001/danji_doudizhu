@@ -97,6 +97,24 @@ function bombThreat(move: PressureMoveShape, counts: readonly number[]): boolean
   return false;
 }
 
+function fourPlusTwoThreat1024(
+  remainingByRank: readonly number[],
+  hiddenCounts: readonly [number, number],
+  total: number,
+): number {
+  if (total === 0) return 0;
+  const threats: number[] = [];
+  for (let rank = Rank.R3; rank <= Rank.R2; rank += 1) {
+    if ((remainingByRank[rank] ?? 0) === 4) {
+      threats.push(groupedBeat1024(4, 4, total, hiddenCounts[0]));
+    }
+  }
+  if ((remainingByRank[Rank.SmallJoker] ?? 0) > 0 && (remainingByRank[Rank.BigJoker] ?? 0) > 0) {
+    threats.push(groupedBeat1024(2, 2, total, hiddenCounts[0]));
+  }
+  return union1024(threats);
+}
+
 /**
  * 公开剩牌下，被任一隐藏席同型压过的 1/1024 定点估计。
  * 单/对/三/炸使用两席超几何闭式；链型用候选链 union 与固定集中度衰减。
@@ -108,6 +126,11 @@ export function beatProbability1024(
 ): number {
   if (move.category === Category.Rocket) return 0;
   const total = remainingByRank.reduce((sum, count) => sum + (count ?? 0), 0);
+  // 四带二无法被更高的同型四带二压制；只有炸弹/火箭是合法威胁。
+  // 这里直接返回隐藏席集中持有完整炸弹或双王的概率，不走通用 512 抜底。
+  if (move.category === Category.FourPlusTwoSingles || move.category === Category.FourPlusTwoPairs) {
+    return fourPlusTwoThreat1024(remainingByRank, hiddenCounts, total);
+  }
   let probability = 0;
   const groupedSize = move.category === Category.Single ? 1
     : move.category === Category.Pair ? 2

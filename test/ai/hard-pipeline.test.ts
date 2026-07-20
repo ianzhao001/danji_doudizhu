@@ -9,8 +9,8 @@
  *     canSampleWorld 降级为仲裁可行性守卫（合成/非守恒态跳过采样，打分不变）。
  *   · **单一打分路径负向锚**：chooseLeadMove 只经 moveOutcomeScore 打分，不得直调
  *     structureCost（消灭双打分口径复辟面）。
- *   · **带宽重标定**：毫手量纲下 PIMC_LEAD_BAND = 200（旧值 4 在新量纲等于永不触发）；
- *     跟牌 gray 加软带 PIMC_FOLLOW_BAND = 250 并带 mustInclude 结构化保底。
+ *   · **带宽重标定**：领出保留 PIMC_LEAD_BAND = 200；B2 将跟牌的 250 单档带换成
+ *     结构保底/综合分最优/最小控牌消耗三类有界代表，并保留 mustInclude 结构保底。
  *   决策序（finishing → 旧 prover → solveForcedWin → 队友让牌 → 压制期 → 喂牌/领出 → 结构跟牌）
  *   与白跟直通锚逐字保留。
  *
@@ -19,7 +19,8 @@
  * ── 负向变异自证（执行者实现后自查）──
  *   ① 恢复 samples===0 的第二打分分支 → 「无第二打分路径」锚红。
  *   ② PIMC_LEAD_BAND 回 4 → 带宽锚红。
- *   ③ gray 去 mustInclude 保底 → 保底锚红。
+ *   ③ 跟牌恢复 PIMC_FOLLOW_BAND 或删除 selectDiverseCandidates → 有界代表锚红。
+ *   ④ gray 去 mustInclude 保底 → 保底锚红。
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -79,12 +80,20 @@ describe('W-AI-R2 hard 管线接线契约', () => {
     expect(lead, '旧 Path B 的双路径开关不得复辟').not.toContain('samples === 0');
   });
 
-  it('带宽重标定锚：PIMC_LEAD_BAND=200（毫手）与跟牌软带 PIMC_FOLLOW_BAND=250 + mustInclude 保底', () => {
+  it('B2 跟牌有界代表锚：领出保留 200 带，跟牌取代 250 单档并保留 mustInclude', () => {
     expect(HARD_SOURCE).toContain('PIMC_LEAD_BAND = 200');
-    expect(HARD_SOURCE).toContain('PIMC_FOLLOW_BAND = 250');
+    expect(HARD_SOURCE).not.toContain('PIMC_FOLLOW_BAND');
     const follow = sliceBetween(HARD_SOURCE, 'function chooseStructuredFollow', 'export function hardStrategyWithProfile(');
-    expect(follow).toContain('PIMC_FOLLOW_BAND');
+    expect(follow).toContain('selectDiverseCandidates(');
+    expect(follow).toContain("structuredFallback === 'pass' ? null : structuredFallback");
+    expect(follow).toContain('grayScored[0]?.move');
+    expect(follow).toContain('lowControlCheap');
+    expect(follow).toContain('Math.min(profile.maxCandidates, 3)');
     expect(follow, 'gray 送仲裁必须带结构化保底').toContain('mustInclude');
+    const selector = sliceBetween(HARD_SOURCE, 'function selectDiverseCandidates', 'function canSampleWorld');
+    expect(selector).toContain('const seen = new Set<string>()');
+    expect(selector).toContain('if (seen.has(key)) continue');
+    expect(selector).toContain('selected.length >= maxCandidates');
   });
 
   it('决策序锚：finishing → 旧 prover → solveForcedWin → 队友让牌 → 压制期 → 喂队友', () => {

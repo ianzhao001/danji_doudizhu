@@ -25,6 +25,7 @@
 - **结算「累计」为连打内存态(W-AI 口径①,用户裁决)**:结算面板每席 本局±分+累计±分,滚动作用于累计列(上局累计→新累计);「再来一局」延续,回大厅/刷新清零;不入存档不入持久层——断局恢复视为新连打首局;与大厅历史净分(`data/stats.ts` 持久)相互独立。
 - **终局牌型标签放行窗(W-AI 口径②)**:终局最后一手照常弹牌型气泡,结算面板延后 `settlementReveal()`=patternBurst 三段和(600ms)放行;动效关闭=零延迟直显(旧口径)。
 - **AI R2(W-AI-R2,2026-07-18,玩家打回整改)**:困难翼牌决策根治——`ai/handWeight.ts` 从字典序独裁(structure×10000)重构为**毫手量纲评分**(1 手结构=W_STRUCT 1000 锚,全整数):`structureCost×1000 + controlSpend + pressRisk + beatenGift − clamp(remaining,±REMAIN_CAP)/2`;controlSpend 弃控牌罚仅计翼/挂牌角色(王/2/A 系数×(1−P̂beat)/1024,2 叠记牌绝对顶加成),**清手豁免**、冲刺÷2;P̂beat 超几何闭式(`ai/pressure.ts`,1/1024 定点)。新增**明牌世界精确解**(`ai/worldSolver.ts`,三家两阵营极大极小+农民同盟+置换表跨采样共享+节点预算,HARD{12,120k}/HINT{15,300k},超阈值/耗尽回退 rollout)与**过牌推断加权**(`collectPassSignals` 非队友顶+`weighWorld` 免费同型可压矛盾 w=2^(4−min(p,4))+ESS<samples/4 整批退化,`passInferenceCap=0` 关断)。提示会话重构(`rankHintCandidates` 三态 ranked/passAdvice/none+`HintSession` key=deriveWorldSeed 轮换去冗/防劫持;`nextHint` 退役)。`candidates.ts` 退役删除+`module-consumption` 防僵尸门。**强度门棘轮**:镜像换位 hard 8→9(实测 +20.17pp)/normal +10.5/simple +32.17/weights-only 消融 +3.17(门3,薄余量 +0.17 已披露);self≡0/crippled 被抓。**契约债**:`PimcProfile` 扩 solverCardMax/solverNodes 遇 `pimc-decision.test.ts` 完整键集深锁,用不可枚举属性承载(低危:配置不入确定性种子/不入序列化路径;偿还路径=未来需序列化时先出 pimc-decision 修订种子改精确四字段断言再移除 enumerable:false)。全量 195 文件/1227 用例绿。**跌破门槛即强度回归,不许调低门槛消红。**
+- **AI R3（2026-07-20）**：冻结 v1.9 基线，并用固定叫牌、角色分层、保留种子和配对 bootstrap 置信区间隔离评估出牌能力。PIMC 改为每候选等额独立预算，补齐四带二压力、残局清手优先、序列中继与跟牌仲裁；提示复用一次完整分析，p95 从约 201ms 降至 123ms；`legalFollows` 定向生成在 8,134 个等价性样本中保持一致，中位性能约提升 4.75 倍。保留集 ADP +0.007 且 95% 置信区间包含 0，因此本期与 v1.9 统计等价，不宣称胜率提升。全量 203 个测试文件、1262 个用例通过，2 个环境门控用例跳过，typecheck 通过。
 
 ## Save And Resume
 
@@ -65,7 +66,7 @@
 ## Deferred Refactors
 
 - `ui/components/game-scene-skeleton.ts` 与 `flow/round-runtime.ts` 体量偏大，适合在后续版本继续拆分。
-- `legalFollows` 仍采用全量枚举策略，若后续 profiling 证明确有瓶颈，再做等价剪枝优化。
+- `legalFollows` 已改为按目标牌型定向生成，并由全量枚举 oracle 持续校验集合、顺序和牌型等价性。
 - `save.ts` 仍有后续整理空间，可在数据层清理时统一处理。
 - `P-STRAY-LABEL`：**已结案(v1.5 W1-B)**——根因为 lobby.scene 六个 `_string:"label"` 占位 Label 依赖 @property 绑定隐藏,绑定失效即漏字;`hideLegacyScaffold` 兜底遍历隐藏,四横屏运行时探针 0 可见。
 - 建议功能(V10 用户终审整改,2026-07-12):`SHOW_ADVISOR=false` 隐藏「建议开/关」dock 与叫抢建议面板,**不删除、隐藏期间不迭代**;`adviseAction`/`adviseBid` 与测试保留。提示按钮同轮恢复可见(v1.5 曾误藏,升级版 AI 最优推荐逻辑未动)。记牌器与手牌强度条仍为前端隐藏(v1.4 起)。
@@ -82,6 +83,6 @@
 - **顶栏 HUD 底板(v1.6 二次终审·举一反三)**:相位/倍数/炸弹/手牌四项原直接压在灯笼彩带密布的桌景照片上(对比 3.96~4.06:1)。同屏「地主X」早有干净名牌底、一眼可读——照此给左右两组各补一块 `info-pill-v18` 净底板(尺寸由内容边界推出,随视口自适应)。
 - **卡牌兜底底板(v1.6 用户追加①,2026-07-13)**:每张牌原先垫一层 `card-fill`(Graphics 的 `surface` 圆角面板 + brand 描边)作卡面图兜底。卡面图一旦带透明边,这层兜底就从边缘露出来——17 张并排即连成一整条「面板」(用户点名去掉)。**已删除 `card-fill` 与 `drawCardBase`**;卡面/王牌/牌背/花色 meta 保持紧图(`trimType=auto`),渲染统一走 `fitSpriteInBox` **等比内接**(不拉伸、不留底、不露底板)。**通则:SIMPLE 精灵一律等比内接,不要用 Graphics 兜底层垫在图下面**——图一旦有透明边就会漏底。顶部三张底牌的托盘 `bottom-cards-dock-v15` 保留(有意设计的牌托,上面不盖字)。
 - **空气泡不常驻(v1.6 用户追加②)**:`deriveLastPlays` 无消息时返回 `kind=null / text='—'`,视图层原先照样铺一个空药丸常驻三席。改为 `kind===null` 直接不渲染(旧节点由 render prune 自动销毁)。**view-model 与其测试零改动**——`'—'` 仍是它的空值语义,只是视图层不再展示。
-- **v15 结算横幅零产品消费(v1.6·Codex S4 审查阻断)**:换肤时只改了 `result-overlay-renderer` 的消费点,**漏了 `RUNTIME_PRELOAD_SPRITES` 预载表**——`onLoad` 仍会实际加载。已移出预载。**规矩:退役任何资产,除消费点外必须同查预载表**(`game-scene-skeleton.ts` 的 `RUNTIME_PRELOAD_SPRITES`),否则「零消费」的披露不成立。
+- **v15 结算横幅零产品消费（v1.6）**：换肤时只改了 `result-overlay-renderer` 的消费点，曾遗漏 `RUNTIME_PRELOAD_SPRITES` 预载表，现已移出预载。退役任何资产时，除消费点外必须同时检查 `game-scene-skeleton.ts` 的预载表。
 - **机检门计数口径**:门A 是**全扫**(13 屏 323 个 Label);门C 是**有效数**(202,排除模态黑幕遮挡下的字——幕后字色被压暗,声明字色不再等于屏上字色)。两者数字不同是正常的,不要混用。
 - **退役键物理隔离(v1.6 审计 P1-2,持续扩展)**:当前 rollback-only 共53键,含 v15/v17/v18 旧按钮与面板族、v19 卡系9键、v19 按钮4键、旧徽标与特效等;`test/architecture-gates.test.ts` 门④断言其在产品代码零消费(含预载表)——S4 R1「预载表漏项」一类回归由门堵死,不再靠人工 grep。v13 卡面8键已按用户裁决恢复活跃;更老 v1 牌面仍仅作回滚。

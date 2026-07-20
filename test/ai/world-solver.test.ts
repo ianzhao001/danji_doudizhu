@@ -20,6 +20,7 @@
  *   ① 农民效用改私利（各自为战，不共享）→ 同盟夹具 W2 红。
  *   ② 两 pass 清 top 语义破坏 → 回权夹具红。
  *   ③ budget 不生效 → 预算用例红。
+ *   ④ move ordering 丢掉「清手最前」 → 清手夹具额外消耗节点，剩余预算断言红。
  */
 import { describe, expect, it } from 'vitest';
 import { Rank, recognize } from '../../assets/scripts/rules';
@@ -119,6 +120,20 @@ describe('W-AI-R2b worldSolver 叶端明牌精确解', () => {
     });
     expect(verdict).toBe('landlord');
     expect(oracleOf(world('A', '3', '4'), 1, { size: 1, rank: Rank.K }, 0)).toBe('landlord');
+  });
+
+  it('move ordering：整手可清的着法首先终止根节点，只消耗 1 node', () => {
+    const budget = { nodes: 1_000 };
+    const verdict = solveWorld({
+      counts: world('3 3 3 4', 'K', 'A'),
+      turn: 0,
+      landlord: 0,
+      top: null,
+      topSeat: null,
+      budget,
+    });
+    expect(verdict).toBe('landlord');
+    expect(budget.nodes).toBe(999);
   });
 
   it('≤8 张随机域扫掠：solveWorld 与 oracle 全一致（单/对/三域 12 个构造世界）', () => {

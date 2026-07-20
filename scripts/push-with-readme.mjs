@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import {
   README_FILES,
-  appendEntries,
+  prependEntries,
   collectSummary,
   coverageForRef,
   formatShanghaiTime,
@@ -80,7 +80,7 @@ function main() {
   if (hasUncoveredChanges(REPO_ROOT, coverage, head)) {
     const timestamp = formatShanghaiTime(requestedDate());
     const summary = collectSummary({ cwd: REPO_ROOT, baseRef: remoteRef, head });
-    appendEntries({
+    prependEntries({
       cwd: REPO_ROOT,
       timestamp,
       remote: REMOTE,

@@ -7,6 +7,7 @@ import process from 'node:process';
 
 export const README_FILES = ['README.md', 'README.en.md'];
 export const COVERAGE_PATTERN = /<!-- readme-changelog-covered-through: ([0-9a-f]{40}) -->/;
+export const INSERTION_MARKER = '<!-- readme-changelog-insert-here -->';
 const ZERO_SHA = '0'.repeat(40);
 
 function git(args, cwd, options = {}) {
@@ -57,6 +58,13 @@ export function readCoverage(content) {
 
 function marker(sha) {
   return `<!-- readme-changelog-covered-through: ${sha} -->`;
+}
+
+function assertInsertionMarker(content) {
+  const count = content.split(INSERTION_MARKER).length - 1;
+  if (count !== 1) {
+    throw new Error('README must contain exactly one changelog insertion marker.');
+  }
 }
 
 function moduleKey(path) {
@@ -130,18 +138,21 @@ function subjectLines(subjects) {
 }
 
 export function buildEntry({ locale, timestamp, remote, branch, head, summary }) {
-  const modules = localizedModules(summary.moduleKeys, locale) || (locale === 'zh' ? '无文件变化' : 'no file changes');
+  const subjects = summary.subjects.length > 0
+    ? summary.subjects.join(locale === 'zh' ? '；' : '; ')
+    : (locale === 'zh' ? '发布已验证的项目更新。' : 'Published verified project updates.');
   if (locale === 'zh') {
-    return `### ${timestamp}\n\n- 目标：\`${remote}/${branch}\`\n- 覆盖提交：\`${head}\`\n- 受影响模块：${modules}\n- 变更统计：${summary.files.length} 个文件，新增 ${summary.insertions} 行，删除 ${summary.deletions} 行，二进制文件 ${summary.binaryFiles} 个\n- 提交摘要：\n${subjectLines(summary.subjects)}`;
+    return `### ${timestamp}\n\n- 目标：\`${remote}/${branch}\`\n- 覆盖提交：\`${head}\`\n- 本期更新：${subjects}\n- 验证：见本页“开发者验证”与对应版本发布说明。`;
   }
-  return `### ${timestamp}\n\n- Target: \`${remote}/${branch}\`\n- Covered commit: \`${head}\`\n- Affected modules: ${modules}\n- Diff statistics: ${summary.files.length} files, ${summary.insertions} insertions, ${summary.deletions} deletions, ${summary.binaryFiles} binary files\n- Commit summary:\n${subjectLines(summary.subjects)}`;
+  return `### ${timestamp}\n\n- Target: \`${remote}/${branch}\`\n- Covered commit: \`${head}\`\n- Summary: ${subjects}\n- Verification: see “Developer Verification” on this page and the matching release notes.`;
 }
 
-export function appendEntries({ cwd, timestamp, remote, branch, head, summary }) {
+export function prependEntries({ cwd, timestamp, remote, branch, head, summary }) {
   for (const [index, file] of README_FILES.entries()) {
     const path = `${cwd}/${file}`;
     const content = readFileSync(path, 'utf8');
     readCoverage(content);
+    assertInsertionMarker(content);
     const entry = buildEntry({
       locale: index === 0 ? 'zh' : 'en',
       timestamp,
@@ -150,7 +161,8 @@ export function appendEntries({ cwd, timestamp, remote, branch, head, summary })
       head,
       summary,
     });
-    const updated = content.replace(COVERAGE_PATTERN, `${entry}\n\n${marker(head)}`);
+    const withEntry = content.replace(INSERTION_MARKER, `${INSERTION_MARKER}\n\n${entry}`);
+    const updated = withEntry.replace(COVERAGE_PATTERN, marker(head));
     writeFileSync(path, updated, 'utf8');
   }
 }

@@ -30,6 +30,31 @@ export interface RankedOption {
   score: number;
 }
 
+export interface CapturedPimcRanks<T> {
+  value: T;
+  rankings: RankedOption[][];
+}
+
+// B3 提示合流：同步作用域内观察 Hard 已经完成的 PIMC 排名，供提示榜复用。
+// run 必须同步且不得返回 Promise；栈 + try/finally 保证嵌套调用和异常都不会泄漏观察器。
+const rankCaptureStack: RankedOption[][][] = [];
+
+function publishPimcRanking(options: RankedOption[]): RankedOption[] {
+  const capture = rankCaptureStack[rankCaptureStack.length - 1];
+  if (capture) capture.push(options.map((option) => ({ ...option })));
+  return options;
+}
+
+export function capturePimcRanks<T>(run: () => T): CapturedPimcRanks<T> {
+  const rankings: RankedOption[][] = [];
+  rankCaptureStack.push(rankings);
+  try {
+    return { value: run(), rankings };
+  } finally {
+    rankCaptureStack.pop();
+  }
+}
+
 function solverProfile(
   samples: number,
   maxCandidates: number,
@@ -371,7 +396,7 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
   // deterministically to its structural order instead of throwing.
   if (unseenTotal !== needA + needB) {
     options.sort((left, right) => optionOrder(hand, left, right));
-    return options;
+    return publishPimcRanking(options);
   }
 
   const signals = passInferenceCap > 0 ? collectPassSignals(args.snapshot, args.history) : [];
@@ -401,11 +426,13 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
     for (const world of sampled) world.weight = 1;
   }
 
-  const solverBudget: WorldSolverBudget = { nodes: solverNodes };
+  const perOptionNodes = solverNodes > 0 ? Math.max(1, Math.floor(solverNodes / options.length)) : 0;
   const mySide = args.snapshot.turn === args.snapshot.landlord ? 'landlord' : 'farmer';
-  for (let sample = 0; sample < sampled.length; sample += 1) {
-    const world = sampled[sample]!;
-    for (const option of options) {
+  // 候选主序：每个候选拥有等额、独立的精确求解预算，并按同一批世界的固定顺序评估。
+  for (const option of options) {
+    const optionBudget: WorldSolverBudget = { nodes: perOptionNodes };
+    for (let sample = 0; sample < sampled.length; sample += 1) {
+      const world = sampled[sample]!;
       const board = world.counts.map((row) => row.slice()) as [number[], number[], number[]];
       board[args.snapshot.turn] = option.move
         ? removeMove(board[args.snapshot.turn], option.move)
@@ -417,14 +444,14 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
         ? mySide
         : null;
       const totalCards = board.reduce((sum, row) => sum + countCards(row), 0);
-      if (winner === null && solverCardMax > 0 && totalCards <= solverCardMax && solverBudget.nodes > 0) {
+      if (winner === null && solverCardMax > 0 && totalCards <= solverCardMax && optionBudget.nodes > 0) {
         winner = solveWorld({
           counts: board,
           turn: nextTurn,
           landlord: args.snapshot.landlord,
           top,
           topSeat,
-          budget: solverBudget,
+          budget: optionBudget,
         });
       }
       if (winner === null) {
@@ -441,7 +468,7 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
     }
   }
   options.sort((left, right) => optionOrder(hand, left, right));
-  return options;
+  return publishPimcRanking(options);
 }
 
 export function pimcArbitrate(args: PimcRankArgs): Move | null {

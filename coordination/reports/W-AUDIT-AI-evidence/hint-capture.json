@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-07-17T18:13:54.405Z",
+  "capturedAt": "2026-07-20T02:50:32.337Z",
   "base": "http://127.0.0.1:7788/build/web-mobile/",
   "difficulty": "hard",
   "capture": {
@@ -19,141 +19,221 @@
       "bombsPlayed": 0,
       "bottom": [
         {
-          "rank": 12,
-          "suit": "D"
-        },
-        {
           "rank": 4,
           "suit": "D"
         },
         {
-          "rank": 16,
-          "suit": "J"
+          "rank": 8,
+          "suit": "S"
+        },
+        {
+          "rank": 10,
+          "suit": "C"
         }
       ],
       "viewerHand": [
         {
-          "rank": 10,
-          "suit": "D"
-        },
-        {
           "rank": 9,
-          "suit": "D"
-        },
-        {
-          "rank": 5,
           "suit": "C"
         },
         {
-          "rank": 17,
-          "suit": "J"
-        },
-        {
           "rank": 3,
-          "suit": "H"
-        },
-        {
-          "rank": 13,
           "suit": "C"
-        },
-        {
-          "rank": 5,
-          "suit": "D"
-        },
-        {
-          "rank": 13,
-          "suit": "D"
-        },
-        {
-          "rank": 3,
-          "suit": "S"
         },
         {
           "rank": 7,
-          "suit": "S"
+          "suit": "D"
         },
         {
-          "rank": 14,
+          "rank": 15,
+          "suit": "H"
+        },
+        {
+          "rank": 5,
           "suit": "C"
+        },
+        {
+          "rank": 5,
+          "suit": "S"
         },
         {
           "rank": 4,
           "suit": "C"
         },
         {
-          "rank": 15,
-          "suit": "H"
-        },
-        {
-          "rank": 10,
-          "suit": "H"
+          "rank": 4,
+          "suit": "S"
         },
         {
           "rank": 11,
+          "suit": "D"
+        },
+        {
+          "rank": 13,
           "suit": "H"
         },
         {
-          "rank": 9,
+          "rank": 15,
+          "suit": "D"
+        },
+        {
+          "rank": 7,
+          "suit": "C"
+        },
+        {
+          "rank": 14,
           "suit": "S"
         },
         {
-          "rank": 15,
+          "rank": 3,
           "suit": "S"
+        },
+        {
+          "rank": 5,
+          "suit": "D"
         },
         {
           "rank": 12,
           "suit": "D"
         },
         {
+          "rank": 9,
+          "suit": "D"
+        },
+        {
           "rank": 4,
           "suit": "D"
         },
         {
-          "rank": 16,
-          "suit": "J"
+          "rank": 8,
+          "suit": "S"
+        },
+        {
+          "rank": 10,
+          "suit": "C"
         }
       ],
-      "bidMultiplier": 1
+      "bidMultiplier": 8
     },
     "history": []
   },
   "sel1Cards": [
     {
-      "rank": 10,
-      "suit": "D"
-    },
-    {
-      "rank": 11,
-      "suit": "H"
-    },
-    {
-      "rank": 12,
-      "suit": "D"
-    },
-    {
-      "rank": 13,
+      "rank": 4,
       "suit": "C"
     },
     {
-      "rank": 14,
+      "rank": 4,
+      "suit": "S"
+    },
+    {
+      "rank": 4,
+      "suit": "D"
+    },
+    {
+      "rank": 5,
+      "suit": "C"
+    },
+    {
+      "rank": 5,
+      "suit": "S"
+    },
+    {
+      "rank": 5,
+      "suit": "D"
+    },
+    {
+      "rank": 3,
+      "suit": "C"
+    },
+    {
+      "rank": 3,
+      "suit": "S"
+    },
+    {
+      "rank": 7,
+      "suit": "D"
+    },
+    {
+      "rank": 7,
       "suit": "C"
     }
   ],
   "sel2Cards": [
     {
-      "rank": 7,
+      "rank": 3,
+      "suit": "C"
+    },
+    {
+      "rank": 3,
       "suit": "S"
     }
   ],
   "sel3Cards": [
     {
-      "rank": 13,
+      "rank": 4,
+      "suit": "C"
+    },
+    {
+      "rank": 4,
+      "suit": "S"
+    },
+    {
+      "rank": 4,
+      "suit": "D"
+    },
+    {
+      "rank": 5,
+      "suit": "C"
+    },
+    {
+      "rank": 5,
+      "suit": "S"
+    },
+    {
+      "rank": 5,
+      "suit": "D"
+    },
+    {
+      "rank": 7,
+      "suit": "D"
+    },
+    {
+      "rank": 9,
       "suit": "C"
     }
   ],
   "playedCards": [
     {
-      "rank": 13,
+      "rank": 4,
+      "suit": "C"
+    },
+    {
+      "rank": 4,
+      "suit": "S"
+    },
+    {
+      "rank": 4,
+      "suit": "D"
+    },
+    {
+      "rank": 5,
+      "suit": "C"
+    },
+    {
+      "rank": 5,
+      "suit": "S"
+    },
+    {
+      "rank": 5,
+      "suit": "D"
+    },
+    {
+      "rank": 7,
+      "suit": "D"
+    },
+    {
+      "rank": 9,
       "suit": "C"
     }
   ],
@@ -219,7 +299,7 @@
           "suit": "S"
         }
       ],
-      "bidMultiplier": 1
+      "bidMultiplier": 8
     },
     "history": [],
     "toastText": "建议不出，保留手牌"

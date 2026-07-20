@@ -161,7 +161,22 @@ function chooseFinishingMove(
  */
 const HARD_LEAD_SHED_WEIGHT = 20;
 const PIMC_LEAD_BAND = 200;
-const PIMC_FOLLOW_BAND = 250;
+
+function selectDiverseCandidates(
+  representatives: readonly (Move | null | undefined)[],
+  maxCandidates: number,
+): Move[] {
+  const selected: Move[] = [];
+  const seen = new Set<string>();
+  for (const move of representatives) {
+    if (!move || selected.length >= maxCandidates) continue;
+    const key = move.cards.map(cardKey).sort().join('|');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    selected.push(move);
+  }
+  return selected;
+}
 
 function canSampleWorld(
   snapshot: Parameters<AiStrategy>[0],
@@ -328,8 +343,35 @@ function isUnbeatableMove(move: Move, remainingByRank: Readonly<Record<number, n
     return !ALL_RANKS.some((candidate) => candidate > rank && candidate <= Rank.R2 && (remainingByRank[candidate] ?? 0) === 4);
   }
   if (externalBombThreat(remainingByRank)) return false;
+  const sequence = category === Category.Straight
+    ? { groupSize: 1, ranks: move.pattern.length }
+    : category === Category.ConsecutivePairs
+      ? { groupSize: 2, ranks: move.pattern.length / 2 }
+      : category === Category.Airplane
+        ? { groupSize: 3, ranks: move.pattern.length / 3 }
+        : category === Category.AirplaneSingles
+          ? { groupSize: 3, ranks: move.pattern.length / 4 }
+          : category === Category.AirplanePairs
+            ? { groupSize: 3, ranks: move.pattern.length / 5 }
+            : null;
+  if (sequence && Number.isInteger(sequence.ranks)) {
+    for (let end = rank + 1; end <= Rank.A; end += 1) {
+      const start = end - sequence.ranks + 1;
+      if (start < Rank.R3) continue;
+      let complete = true;
+      for (let candidate = start; candidate <= end; candidate += 1) {
+        if ((remainingByRank[candidate] ?? 0) < sequence.groupSize) {
+          complete = false;
+          break;
+        }
+      }
+      // 翼型保守处理：更高同长度核心存在即视为可能配出合法翼。
+      if (complete) return false;
+    }
+    return true;
+  }
   const size = category === Category.Single ? 1 : category === Category.Pair ? 2 : category === Category.Trips ? 3 : 0;
-  if (size === 0) return false; // 顺子/飞机等只作末手，不作保证中继
+  if (size === 0) return false;
   return !ALL_RANKS.some((candidate) => candidate > rank && (remainingByRank[candidate] ?? 0) >= size);
 }
 
@@ -457,10 +499,16 @@ function chooseStructuredFollow(
     const delta = left.score - right.score;
     return delta !== 0 ? delta : compareMoves(left.move, right.move);
   });
-  const grayBest = grayScored[0];
-  const gray = grayBest
-    ? grayScored.filter((entry) => entry.score <= grayBest.score + PIMC_FOLLOW_BAND).map((entry) => entry.move)
-    : [];
+  const memoryPressure = estimateMemoryPressure(hand, history);
+  const lowControlCheap = cheap.slice().sort((left, right) => {
+    const spend = highCardSpendPenalty(left.move, memoryPressure)
+      - highCardSpendPenalty(right.move, memoryPressure);
+    return spend !== 0 ? spend : compareMoves(left.move, right.move);
+  })[0]?.move;
+  const gray = selectDiverseCandidates(
+    [structuredFallback === 'pass' ? null : structuredFallback, grayScored[0]?.move, lowControlCheap],
+    Math.min(profile.maxCandidates, 3),
+  );
   if (profile.samples > 0 && gray.length > 0 && canSampleWorld(snapshot, hand, history)) {
     const verdict = pimcArbitrate({
       snapshot,

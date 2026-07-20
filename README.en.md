@@ -4,7 +4,7 @@
 
 This is an offline, single-player Dou Dizhu project built with Cocos Creator 3.8.8. The human player controls one seat while two computer opponents control the others. It implements the classic three-player rules, a complete round, three AI levels, local settings, match records, and interrupted-game recovery.
 
-The current release is v1.9 (further Hard-AI and hint improvements, including the earlier all-difficulty upgrade and visual overhaul; see [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)). The repository is intended to be runnable from source by people who do not have a software-development background.
+The current release is v1.9-R3, with improved AI decision reliability, hint responsiveness, and rules-enumeration performance; see [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md). The repository is intended to be runnable from source by people who do not have a software-development background.
 
 ## Project Overview
 
@@ -18,7 +18,14 @@ The current release is v1.9 (further Hard-AI and hint improvements, including th
 | Launch scene | `assets/scene/lobby.scene` |
 | Build target | `web-mobile` |
 | AI levels | Simple, Normal, Hard |
-| Verification baseline | 195 test files and 1227 passing tests, 2 environment-gated tests skipped, typecheck passing |
+| Verification baseline | 203 test files and 1262 passing tests, 2 environment-gated tests skipped, typecheck passing |
+
+## What Changed in v1.9-R3
+
+- PIMC now assigns an independent, equal solver budget to each candidate. Four-with-two pressure, finish-first endgames, and sequence relays were also corrected to reduce ordering and edge-case bias.
+- Hints reuse one complete Hard analysis instead of sampling twice. Real hint-path p95 fell from about 201ms to 123ms, a reduction of roughly 39%.
+- Legal follow moves are generated directly for the target pattern. Results matched the previous implementation across 8,134 equivalence cases, with about 4.75x median speedup.
+- A frozen v1.9 baseline, fixed-bid play-only matches, role stratification, and paired bootstrap confidence intervals verify that playing strength is statistically equivalent to v1.9; this release does not claim a win-rate increase.
 
 ## Design Principles
 
@@ -67,7 +74,7 @@ To keep the v1.6 lobby simple, secondary entries for records, history, tutorials
 
 ## Third-party Use, References, and Acknowledgements
 
-The v1.9 AI is implemented in TypeScript under two constraints: no external API and no local model runtime. The exact decomposition, PIMC, endgame search, perfect-information world solver, and milli-hand scoring are implemented in this project. Mirrored evaluation reports Hard at +20.17pp, Normal at +10.50pp, and Simple at +32.17pp. The table below separates bundled third-party content from conceptual references, research papers, and investigated material that was not adopted.
+The AI is implemented in TypeScript under two constraints: no external API and no local model runtime. Exact decomposition, PIMC, endgame search, the perfect-information world solver, and milli-hand scoring are implemented in this project. The table lists only content bundled with the game and open-source projects or papers that actually informed the implementation.
 
 | Type | Project | License or nature | Actual boundary in this project |
 | --- | --- | --- | --- |
@@ -76,7 +83,6 @@ The v1.9 AI is implemented in TypeScript under two constraints: no external API 
 | Algorithm reference | [ZhouWeikuan/DouDiZhu](https://github.com/ZhouWeikuan/DouDiZhu) | Apache-2.0 | Weighted decomposition and remaining-hand ranking were referenced; the behavior is independently implemented on this project's exact decomposition engine |
 | Baseline research reference | [datamllab/rlcard](https://github.com/datamllab/rlcard) | MIT | Used only as a reference for a simple rule-agent baseline; it is not a product runtime dependency |
 | Paper reference | [DeltaDou](https://www.ijcai.org/proceedings/2019/0176.pdf) | IJCAI 2019 paper | The pass-inference idea informed opponent modeling; weighted sampling and effective-sample safeguards are implemented here |
-| Investigated, not adopted | [DreamAndDead/joker](https://github.com/DreamAndDead/joker) | Local review found no license and no transcribable positions in its README | No code or data is used; `worldSolver` is cross-checked with an in-project naive oracle, sweep cases, and manually reasoned expected results |
 
 The test workspace also uses TypeScript, Vitest, and Node.js type definitions as development-only dependencies; they are not included in the Cocos game build. See [docs/AI_DESIGN.md](docs/AI_DESIGN.md) for the complete design and source notes, and [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) for version changes.
 
@@ -177,7 +183,7 @@ npm --prefix test run typecheck
 git diff --check
 ```
 
-The isolated test project lives under `test/` and is not included in the Cocos build. The current baseline is 195 passing test files and 1227 passing tests, with 2 tests skipped because they require a specific evidence environment.
+The isolated test project lives under `test/` and is not included in the Cocos build. The current baseline is 203 passing test files and 1262 passing tests, with 2 tests skipped because they require a specific evidence environment.
 
 ## Troubleshooting
 
@@ -235,7 +241,7 @@ To publish local main-branch work to `origin/main`, use this command instead of 
 node scripts/push-with-readme.mjs
 ```
 
-The command refreshes the remote state, summarizes unpushed commits, writes the Shanghai-time timestamp, commit subjects, affected modules, and diff statistics to both README files, creates a separate log commit, and then pushes. It stops on a dirty worktree, a remote-ahead state, or branch divergence and never rewrites history automatically.
+The command refreshes the remote state, writes the latest release summary and covered commit at the top of both README update logs, creates a separate log commit, and then pushes. It stops on a dirty worktree, a remote-ahead state, or branch divergence and never rewrites history automatically.
 
 Intentional `git push --no-verify`, edits made directly in the GitHub web interface, and pushes from clones that never installed the hook are outside this mechanism's guarantees.
 
@@ -243,45 +249,34 @@ Intentional `git push --no-verify`, edits made directly in the GitHub web interf
 
 The update log starts at the formal v1.6 release baseline and does not backfill every earlier development commit.
 
-### 2026-07-13 18:01:55 +08:00
-
-- Target: `origin/main`
-- Covered commit: `063017ab2dd5a0c1397370686316d7af9e346992`
-- Summary: released v1.6 with final visual polish, interaction refinements, landscape adaptation, and verification evidence.
-- Verification: Cocos Creator 3.8.8 `web-mobile`, launch scene `lobby.scene`.
-
-### 2026-07-13 21:29:06 +08:00
-
-- Target: `origin/main`
-- Covered commit: `c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c`
-- Affected modules: AGENTS.md, AI, verification and release material, documentation, state machine, tests, tooling, UI
-- Diff statistics: 68 files, 2266 insertions, 120 deletions, 0 binary files
-- Commit summary:
-  - feat(A-DESIGN-GATES): land five architecture gates, scene assertions, rollback key isolation
-  - feat(A-SAVE-MIGRATION): explicit save migration chain + frozen v1 golden tripwire
-  - docs(W-AUDIT-AI): record four audit rulings and AI upgrade batch opening
-  - feat(W-AUDIT-AI/B1): exact hand decomposition engine (minimal move count + partition)
-  - feat(W-AUDIT-AI/B3): RoundState v2 public bottom cards + first real migration
-  - feat(W-AUDIT-AI/B2): decomposition-driven hard AI + structural bidding + tightened strength gates
-  - docs(W-AUDIT-AI): close out batch — strength gate numbers and disclosures on BOARD/KL
-  - docs(readme): add bilingual guide and push log automation
-
-### 2026-07-14 16:04:36 +08:00
-
-- Target: `origin/main`
-- Covered commit: `601252026ab73156caa8e0be5a24c032f5cf9a01`
-- Affected modules: AI, verification and release material, documentation, tests, UI
-- Diff statistics: 17 files, 975 insertions, 19 deletions, 4 binary files
-- Commit summary:
-  - fix(hint): harden runtime delegation and audit gates
+<!-- readme-changelog-insert-here -->
 
 ### 2026-07-18 03:10:45 +08:00
 
 - Target: `origin/main`
 - Covered commit: `639edf65510743cff9e7ab600e61b1c4a7f567cf`
-- Affected modules: AI, assets, verification and release material, local data, documentation, tests, UI
-- Diff statistics: 266 files, 21909 insertions, 2335 deletions, 53 binary files
-- Commit summary:
-  - release(v1.9): upgrade AI, visuals, and public documentation
+- Summary: released v1.9 with stronger Hard scoring, a perfect-information world solver, pass inference, improved hints, refreshed visuals, and public documentation.
+- Verification: 195 test files and 1227 tests passed, 2 environment-gated tests skipped, and typecheck passed.
+
+### 2026-07-14 16:04:36 +08:00
+
+- Target: `origin/main`
+- Covered commit: `601252026ab73156caa8e0be5a24c032f5cf9a01`
+- Summary: unified hints with the Hard decision engine and strengthened runtime delegation, candidate cycling, and pass feedback.
+- Verification: hint runtime evidence, AI regression tests, and UI interaction gates passed.
+
+### 2026-07-13 21:29:06 +08:00
+
+- Target: `origin/main`
+- Covered commit: `c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c`
+- Summary: added exact hand decomposition, structure-aware AI, save migration, architecture gates, and bilingual release-log protection.
+- Verification: rules, state-machine, AI, save, and architecture tests passed.
+
+### 2026-07-13 18:01:55 +08:00
+
+- Target: `origin/main`
+- Covered commit: `063017ab2dd5a0c1397370686316d7af9e346992`
+- Summary: released v1.6 with final visual polish, interaction refinements, and landscape adaptation.
+- Verification: Cocos Creator 3.8.8 `web-mobile`, launch scene `lobby.scene`.
 
 <!-- readme-changelog-covered-through: 639edf65510743cff9e7ab600e61b1c4a7f567cf -->

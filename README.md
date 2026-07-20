@@ -4,7 +4,7 @@
 
 这是一个基于 Cocos Creator 3.8.8 开发的离线单机斗地主项目。玩家固定控制一个座位，另外两个座位由电脑 AI 控制；游戏遵循经典三人斗地主规则，支持完整单局流程、三档难度、本地设置、战绩记录与断局恢复。
 
-当前发布版本为 v1.9（困难 AI 与提示体验继续增强，包含此前的全难度强化与视觉焕新，见 [发布说明](docs/RELEASE_NOTES.md)），目标是让普通玩家无需了解代码，也能下载源码并在 Cocos Creator 中运行游戏。
+当前发布版本为 v1.9-R3（AI 决策可靠性、提示响应和规则枚举效率增强，见 [发布说明](docs/RELEASE_NOTES.md)），目标是让普通玩家无需了解代码，也能下载源码并在 Cocos Creator 中运行游戏。
 
 ## 项目概览
 
@@ -18,7 +18,14 @@
 | 启动场景 | `assets/scene/lobby.scene` |
 | 构建目标 | `web-mobile` |
 | AI 难度 | 简单、普通、困难 |
-| 当前验证基线 | 195 个测试文件、1227 个用例通过、2 个环境门控用例跳过，typecheck 通过 |
+| 当前验证基线 | 203 个测试文件、1262 个用例通过、2 个环境门控用例跳过，typecheck 通过 |
+
+## v1.9-R3 本期更新
+
+- 为每个候选动作分配独立且等额的 PIMC 求解预算，并补齐四带二压力评估、残局清手优先与序列中继，减少候选顺序和残局边界造成的决策偏差。
+- 提示复用一次完整的困难档分析，不再重复采样；真实提示路径 p95 从约 201ms 降至 123ms，降低约 39%。
+- 合法跟牌改为按目标牌型定向生成；在 8,134 个等价性样本中结果与原实现一致，中位性能约提升 4.75 倍。
+- 使用冻结的 v1.9 基线、固定叫牌的出牌对局、地主/上下家分层和配对 bootstrap 置信区间验证。本期出牌强度与 v1.9 统计等价，不宣称胜率提升。
 
 ## 设计思路
 
@@ -67,7 +74,7 @@ v1.6 为了保持大厅简洁，隐藏了战绩、历史、教程和帮助等次
 
 ## 第三方使用、算法参考与致谢
 
-v1.9 的 AI 在「无外部 API、不跑本地模型」约束下使用 TypeScript 实现。精确拆解、PIMC、残局搜索、明牌世界求解与毫手量纲评分均由本项目实现；镜像换位验收结果为困难 +20.17pp、普通 +10.50pp、简单 +32.17pp。以下表格按本地代码、测试、许可证文件和设计记录区分“直接使用”与“思想参考”，避免把论文、调研对象或未采用代码写成项目依赖。
+AI 在「无外部 API、不跑本地模型」约束下使用 TypeScript 实现。精确拆解、PIMC、残局搜索、明牌世界求解与毫手量纲评分均由本项目实现。以下仅列出实际随项目分发或确实援引的开源项目与论文，并区分直接使用和思想参考。
 
 | 类型 | 项目 | 许可证或性质 | 本项目中的实际边界 |
 | --- | --- | --- | --- |
@@ -76,7 +83,6 @@ v1.9 的 AI 在「无外部 API、不跑本地模型」约束下使用 TypeScrip
 | 算法思想参考 | [ZhouWeikuan/DouDiZhu](https://github.com/ZhouWeikuan/DouDiZhu) | Apache-2.0 | 参考权重拆牌和剩余手牌权重排序思想；本项目在自己的精确拆解引擎上独立实现 |
 | 基线调研参考 | [datamllab/rlcard](https://github.com/datamllab/rlcard) | MIT | 仅作为朴素规则 Agent 的基线参照；不是产品运行时依赖 |
 | 论文参考 | [DeltaDou](https://www.ijcai.org/proceedings/2019/0176.pdf) | IJCAI 2019 论文 | 参考对手建模中的过牌推断思想；加权采样与有效样本护栏由本项目实现 |
-| 调研但未采用 | [DreamAndDead/joker](https://github.com/DreamAndDead/joker) | 本地调研记录未发现许可证，README 也无可转录残局 | 未使用其代码或数据；`worldSolver` 测试由项目内置朴素 oracle、扫掠样例和手算真值交叉验证 |
 
 测试工程另使用 TypeScript、Vitest 与 Node.js 类型定义作为开发依赖，它们不会进入 Cocos 游戏构建。完整设计与来源说明见 [docs/AI_DESIGN.md](docs/AI_DESIGN.md)，版本变化见 [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)。
 
@@ -177,7 +183,7 @@ npm --prefix test run typecheck
 git diff --check
 ```
 
-测试工程位于 `test/`，不会进入 Cocos 构建。当前基线为 195 个测试文件、1227 个用例通过，另有 2 个仅在特定采证环境运行的用例跳过。
+测试工程位于 `test/`，不会进入 Cocos 构建。当前基线为 203 个测试文件、1262 个用例通过，另有 2 个仅在特定采证环境运行的用例跳过。
 
 ## 常见问题
 
@@ -235,7 +241,7 @@ node scripts/install-git-hooks.mjs
 node scripts/push-with-readme.mjs
 ```
 
-该命令会刷新远端状态，汇总尚未推送的提交，把北京时间、提交摘要、受影响模块和增删统计同步写入中英文 README，创建独立记录提交后再推送。工作树不干净、远端领先或主线分叉时会停止，不会自动改写历史。
+该命令会刷新远端状态，把最新发布摘要和覆盖提交写到中英文 README 更新记录顶部，创建独立记录提交后再推送。工作树不干净、远端领先或主线分叉时会停止，不会自动改写历史。
 
 有意使用 `git push --no-verify`、直接在 GitHub 网页修改文件或从未安装 hook 的工作区推送，不在此机制的保证范围内。
 
@@ -243,45 +249,34 @@ node scripts/push-with-readme.mjs
 
 更新记录从 v1.6 正式发布基线开始，不回填此前的全部开发提交。
 
-### 2026-07-13 18:01:55 +08:00
-
-- 目标：`origin/main`
-- 覆盖提交：`063017ab2dd5a0c1397370686316d7af9e346992`
-- 摘要：发布 v1.6，完成视觉收光、交互打磨、横屏适配和验证证据收口。
-- 验证：Cocos Creator 3.8.8 `web-mobile`，启动场景 `lobby.scene`。
-
-### 2026-07-13 21:29:06 +08:00
-
-- 目标：`origin/main`
-- 覆盖提交：`c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c`
-- 受影响模块：AGENTS.md、AI、验证与发布资料、文档、状态机、测试、工程工具、界面
-- 变更统计：68 个文件，新增 2266 行，删除 120 行，二进制文件 0 个
-- 提交摘要：
-  - feat(A-DESIGN-GATES): land five architecture gates, scene assertions, rollback key isolation
-  - feat(A-SAVE-MIGRATION): explicit save migration chain + frozen v1 golden tripwire
-  - docs(W-AUDIT-AI): record four audit rulings and AI upgrade batch opening
-  - feat(W-AUDIT-AI/B1): exact hand decomposition engine (minimal move count + partition)
-  - feat(W-AUDIT-AI/B3): RoundState v2 public bottom cards + first real migration
-  - feat(W-AUDIT-AI/B2): decomposition-driven hard AI + structural bidding + tightened strength gates
-  - docs(W-AUDIT-AI): close out batch — strength gate numbers and disclosures on BOARD/KL
-  - docs(readme): add bilingual guide and push log automation
-
-### 2026-07-14 16:04:36 +08:00
-
-- 目标：`origin/main`
-- 覆盖提交：`601252026ab73156caa8e0be5a24c032f5cf9a01`
-- 受影响模块：AI、验证与发布资料、文档、测试、界面
-- 变更统计：17 个文件，新增 975 行，删除 19 行，二进制文件 4 个
-- 提交摘要：
-  - fix(hint): harden runtime delegation and audit gates
+<!-- readme-changelog-insert-here -->
 
 ### 2026-07-18 03:10:45 +08:00
 
 - 目标：`origin/main`
 - 覆盖提交：`639edf65510743cff9e7ab600e61b1c4a7f567cf`
-- 受影响模块：AI、资源、验证与发布资料、本地数据、文档、测试、界面
-- 变更统计：266 个文件，新增 21909 行，删除 2335 行，二进制文件 53 个
-- 提交摘要：
-  - release(v1.9): upgrade AI, visuals, and public documentation
+- 本期更新：发布 v1.9，强化困难 AI 评分、明牌世界求解、过牌推断与提示交互，并同步视觉和公开文档。
+- 验证：195 个测试文件、1227 个用例通过、2 个环境门控用例跳过，typecheck 通过。
+
+### 2026-07-14 16:04:36 +08:00
+
+- 目标：`origin/main`
+- 覆盖提交：`601252026ab73156caa8e0be5a24c032f5cf9a01`
+- 本期更新：提示与困难档决策引擎统一，补强运行时委托、候选轮换与过牌反馈。
+- 验证：提示运行时采证、AI 回归测试和界面交互门通过。
+
+### 2026-07-13 21:29:06 +08:00
+
+- 目标：`origin/main`
+- 覆盖提交：`c5ca73d0d09d9e1ef3a9b5f9cf6eedb72087548c`
+- 本期更新：加入精确手牌拆解、结构化 AI、存档迁移和架构约束，并建立双语发布记录保护。
+- 验证：规则、状态机、AI、存档与架构测试通过。
+
+### 2026-07-13 18:01:55 +08:00
+
+- 目标：`origin/main`
+- 覆盖提交：`063017ab2dd5a0c1397370686316d7af9e346992`
+- 本期更新：发布 v1.6，完成视觉收光、交互打磨和横屏适配。
+- 验证：Cocos Creator 3.8.8 `web-mobile`，启动场景 `lobby.scene`。
 
 <!-- readme-changelog-covered-through: 639edf65510743cff9e7ab600e61b1c4a7f567cf -->
