@@ -251,6 +251,13 @@ The update log starts at the formal v1.6 release baseline and does not backfill 
 
 <!-- readme-changelog-insert-here -->
 
+### 2026-07-20 13:55:00 +08:00
+
+- Target: `origin/main`
+- Covered commit: `c95075832c212e982e0ef221fbd98250b3177227`
+- Summary: release(v1.9-r3): harden AI analysis and speed up hints
+- Verification: see “Developer Verification” on this page and the matching release notes.
+
 ### 2026-07-18 03:10:45 +08:00
 
 - Target: `origin/main`
@@ -279,4 +286,4 @@ The update log starts at the formal v1.6 release baseline and does not backfill 
 - Summary: released v1.6 with final visual polish, interaction refinements, and landscape adaptation.
 - Verification: Cocos Creator 3.8.8 `web-mobile`, launch scene `lobby.scene`.
 
-<!-- readme-changelog-covered-through: 639edf65510743cff9e7ab600e61b1c4a7f567cf -->
+<!-- readme-changelog-covered-through: c95075832c212e982e0ef221fbd98250b3177227 -->
