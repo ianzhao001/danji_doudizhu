@@ -152,6 +152,7 @@ export function chooseFeedTeammateLead(snapshot: Snapshot, hand: Card[], moves: 
     (seat) => seat !== snapshot.turn && seat !== snapshot.landlord,
   );
   if (teammate === undefined) return null;
+  if ((snapshot.turn + 1) % 3 !== teammate) return null;
   const teammateCount = snapshot.handCounts[teammate];
   if (teammateCount > 2 || snapshot.handCounts[snapshot.landlord] <= 2) return null;
   const protectedSet = protectedCards(hand);

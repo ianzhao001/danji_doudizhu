@@ -73,6 +73,7 @@ export interface GameSnapshot {
   top: TopPlay | null;
   handCounts: [number, number, number];
   winner: Side | null;
+  passesInARow?: number;
   bidMultiplier?: number;
   bombsPlayed?: number;
   viewerHand?: Card[]; // 指定 viewer 时附其手牌

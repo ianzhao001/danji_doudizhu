@@ -37,7 +37,6 @@ export function pushRuntimeApplyResult(
   const flowEvents: FlowEvent[] = [];
   pushRoundEvents(flowEvents, runtime.gameEvents, { state: runtime.state, events: result.events });
   for (const event of flowEvents) runtime.emit(event, bucket);
-  if (bucket?.some((event) => event.type === 'landlordDecided')) return;
   runtime.persist?.({
     round: runtime.state,
     heroSeat: runtime.heroSeat,

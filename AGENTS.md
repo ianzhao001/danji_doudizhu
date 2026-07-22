@@ -53,6 +53,7 @@ Red lines added by the v1.6 audit ruling (machine-enforced):
 - Use Cocos Creator 3.8.8 to open, run, and build the project.
 - Do not manually edit generated folders such as `library/`, `temp/`, `build/`, `profiles/`, or `local/`.
 - Root tests live under `test/`; run them with `npm --prefix test test`.
+- Production TypeScript is checked by `test/source-typecheck-gate.test.ts` using `tsconfig-scan.json`.
 
 ## Working Style
 

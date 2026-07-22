@@ -27,10 +27,13 @@ import { canFinishInOneMove, finishingFollow } from '../endgame';
 import { solveForcedWin } from '../endgameSolver';
 import { moveOutcomeScore, type PressureContext } from '../handWeight';
 import { ALL_RANKS } from '../handStrength';
-import { HARD_PIMC, pimcArbitrate, type PimcProfile } from '../pimc';
+import { decisionNow, hasDecisionSink, publishDecision, type AiDecisionDraft } from '../decision-log';
+import { capturePimcRanks, HARD_PIMC, pimcArbitrate, type PimcProfile, type RankedOption } from '../pimc';
 import type { AiStrategy } from '../strategy';
+import { getTuning } from '../tuning';
 import {
   bombLikeMoves,
+  chooseFeedTeammateLead,
   compareMoves,
   isTeammateTop,
   pickLargest,
@@ -109,11 +112,15 @@ type MemoryPressure = Readonly<{
   possibleBombRanks: number;
 }>;
 
-function estimateMemoryPressure(hand: Card[], history: GameEvent[] = []): MemoryPressure {
-  const memory = trackPlayed(history, hand);
+function estimateMemoryPressure(
+  hand: Card[],
+  history: GameEvent[] = [],
+  remainingByRank: Readonly<Record<number, number>> | null = null,
+): MemoryPressure {
+  const remaining = remainingByRank ?? trackPlayed(history, hand).remainingByRank;
   const highRanks = [Rank.R2, Rank.SmallJoker, Rank.BigJoker] as const;
-  const unseenHighCards = highRanks.reduce((sum, rank) => sum + (memory.remainingByRank[rank] ?? 0), 0);
-  const possibleBombRanks = Object.entries(memory.remainingByRank).filter(
+  const unseenHighCards = highRanks.reduce((sum, rank) => sum + (remaining[rank] ?? 0), 0);
+  const possibleBombRanks = Object.entries(remaining).filter(
     ([rank, count]) => Number(rank) <= Rank.R2 && count === 4,
   ).length;
 
@@ -125,7 +132,10 @@ function estimateMemoryPressure(hand: Card[], history: GameEvent[] = []): Memory
 }
 
 function highCardSpendPenalty(move: Move, pressure: MemoryPressure): number {
-  const pressureMultiplier = pressure.highPressure ? 7 : 3;
+  const tuning = getTuning();
+  const pressureMultiplier = pressure.highPressure
+    ? tuning.highCardSpendPressureMultiplier
+    : tuning.highCardSpendBaseMultiplier;
   return move.cards.reduce((sum, card) => {
     if (card.rank >= Rank.R2) return sum + pressureMultiplier * 2;
     if (card.rank >= Rank.A) return sum + pressureMultiplier;
@@ -159,8 +169,55 @@ function chooseFinishingMove(
  * 同代价里偏好多脱牌、先小后大、保留成型组合;控牌(A/2/王)按记牌压力计罚;
  * 农民侧对「地主确定压死的 ≥K 单/对」加罚(白送控牌)。
  */
-const HARD_LEAD_SHED_WEIGHT = 20;
-const PIMC_LEAD_BAND = 200;
+type PimcDecisionDiag = Pick<AiDecisionDraft, 'topK' | 'voteGap' | 'worlds'>;
+
+interface DecisionTrace {
+  pimc?: PimcDecisionDiag;
+}
+
+function compactMove(option: RankedOption): string {
+  if (option.move === null) return 'pass';
+  return option.move.cards
+    .map((card) => card.rank)
+    .sort((left, right) => left - right)
+    .join(',');
+}
+
+function pimcDecisionDiag(rankings: RankedOption[][], profile: PimcProfile): PimcDecisionDiag {
+  const ranked = rankings[rankings.length - 1] ?? [];
+  const topK = ranked.slice(0, 8).map((option) => ({ move: compactMove(option), score: option.score }));
+  const diag: PimcDecisionDiag = { worlds: profile.samples };
+  if (topK.length > 0) diag.topK = topK;
+  if (ranked.length > 1) diag.voteGap = ranked[0]!.score - ranked[1]!.score;
+  return diag;
+}
+
+function publishHardDecision(
+  seat: Parameters<AiStrategy>[0]['turn'],
+  path: string,
+  startedAt: number | null,
+  diag?: PimcDecisionDiag,
+): void {
+  const finishedAt = decisionNow();
+  const elapsedMs = startedAt === null || finishedAt === null ? undefined : finishedAt - startedAt;
+  publishDecision({
+    seat,
+    path,
+    ...diag,
+    ...(elapsedMs === undefined ? {} : { elapsedMs }),
+  });
+}
+
+function finishDecision<T>(
+  snapshot: Parameters<AiStrategy>[0],
+  startedAt: number | null,
+  path: string,
+  value: T,
+  diag?: PimcDecisionDiag,
+): T {
+  publishHardDecision(snapshot.turn, path, startedAt, diag);
+  return value;
+}
 
 function selectDiverseCandidates(
   representatives: readonly (Move | null | undefined)[],
@@ -199,6 +256,7 @@ function chooseLeadMove(
   moves: Move[],
   history: GameEvent[],
   profile: PimcProfile,
+  trace: DecisionTrace,
 ): Move {
   const protectedSet = protectedCards(hand);
   const shapingCandidates = moves.filter(
@@ -206,56 +264,40 @@ function chooseLeadMove(
   );
 
   if (shapingCandidates.length === 0) return pickSmallest(moves);
-  const memoryPressure = estimateMemoryPressure(hand, history);
+  const leadTuning = getTuning();
+  const memoryPressure = estimateMemoryPressure(hand, history, ctx.remainingByRank);
   const pressureCtx = toPressureContext(ctx, snapshot);
   const scored = shapingCandidates.map((move) => ({
     move,
     score: moveOutcomeScore(ctx.decomposer, hand, move, pressureCtx)
       + Math.round(highCardSpendPenalty(move, memoryPressure) / 3)
-      - move.cards.length * HARD_LEAD_SHED_WEIGHT,
+      - move.cards.length * leadTuning.hardLeadShedWeight,
   })).sort((left, right) => {
     const delta = left.score - right.score;
     return delta !== 0 ? delta : compareMoves(left.move, right.move);
   });
   const best = scored[0]!;
   const band = scored
-    .filter((entry) => entry.score <= best.score + PIMC_LEAD_BAND)
+    .filter((entry) => entry.score <= best.score + leadTuning.pimcLeadBand)
     .slice(0, profile.maxCandidates)
     .map((entry) => entry.move);
   if (profile.samples > 0 && band.length >= 2 && canSampleWorld(snapshot, hand, history)) {
-    return pimcArbitrate({ snapshot, history, candidates: band, includePass: false, profile }) ?? best.move;
+    if (!hasDecisionSink()) {
+      return pimcArbitrate({ snapshot, history, candidates: band, includePass: false, profile }) ?? best.move;
+    }
+    const captured = capturePimcRanks(() =>
+      pimcArbitrate({ snapshot, history, candidates: band, includePass: false, profile }),
+    );
+    trace.pimc = pimcDecisionDiag(captured.rankings, profile);
+    return captured.value ?? best.move;
   }
   return best.move;
 }
 
 /**
- * T-AI-DEPTH2：喂队友（农民协作·真人对战场景两 AI 同档时直接生效）——
- * 队友已报单/报双且地主未濒临跑完时，领出给最小单/最小对（不动保护牌、不烧 A 以上）。
- */
-function chooseFeedTeammateLead(
-  snapshot: Parameters<AiStrategy>[0],
-  hand: Card[],
-  moves: Move[],
-): Move | null {
-  const teammate = teammateSeat(snapshot);
-  if (teammate === null) return null;
-  const teammateCount = snapshot.handCounts[teammate];
-  if (teammateCount > 2 || snapshot.handCounts[snapshot.landlord] <= 2) return null;
-  const protectedSet = protectedCards(hand);
-  const wanted = teammateCount === 1 ? Category.Single : Category.Pair;
-  const feeds = moves.filter(
-    (move) =>
-      move.pattern.category === wanted &&
-      move.pattern.mainRank < Rank.A &&
-      !usesProtectedCards(move, protectedSet),
-  );
-  if (feeds.length === 0) return null;
-  return pickSmallest(feeds);
-}
-
-/**
  * T-AI-DEPTH2：地主上家顶张——农民身处地主上家、跟地主的小牌时，
- * 用安全集里最大的牌顶上去，逼地主烧大牌或让出出牌权。
+ * 用安全集里最大的非绝对控牌顶上去，逼地主烧大牌或让出出牌权；
+ * 若只有 2/王能压则回落结构跟牌，避免为小牌白扔控牌。
  */
 function chooseUpstreamPressFollow(
   snapshot: Parameters<AiStrategy>[0],
@@ -271,8 +313,9 @@ function chooseUpstreamPressFollow(
   const safe = moves.filter(
     (move) => !isBombLike(move.pattern.category) && !usesProtectedCards(move, protectedSet),
   );
-  if (safe.length === 0) return null;
-  return pickLargest(safe);
+  const press = safe.filter((move) => move.cards.every((card) => card.rank < Rank.R2));
+  if (press.length === 0) return null;
+  return pickLargest(press);
 }
 
 function isSafeNonBombMove(move: Move, hand: Card[]): boolean {
@@ -314,10 +357,13 @@ function chooseAbsoluteTopSingleFollow(
   hand: Card[],
   moves: Move[],
   history: GameEvent[],
+  remainingByRank: Readonly<Record<number, number>> | null,
 ): Move | null {
-  if (history.length === 0 || snapshot.top?.pattern.category !== Category.Single) return null;
-  const memory = trackPlayed(history, hand);
-  const candidates = moves.filter((move) => isAbsoluteTopSingle(move, memory.remainingByRank));
+  if (history.length === 0 || !remainingByRank || snapshot.top?.pattern.category !== Category.Single) return null;
+  const protectedSet = protectedCards(hand);
+  const candidates = moves.filter(
+    (move) => isAbsoluteTopSingle(move, remainingByRank) && !usesProtectedCards(move, protectedSet),
+  );
   return candidates.length > 0 ? pickSmallest(candidates) : null;
 }
 
@@ -442,7 +488,7 @@ function chooseGuaranteedTakeover(
  * 结构代价定压/过:
  *   代价 ≤0(整组件白跟,含最优分解里的顺子/对/三带整手)→ 必跟最小;
  *   代价 =1(拆一手)→ 小牌位(<A)随手跟;高牌位只在冲刺期(自己 ≤3 手)才烧;
- *   代价 ≥2(碎结构)→ 只有对手阵营临近跑完(≤4 张)才硬拆压制,否则过牌保结构;
+ *   代价 ≥2(碎结构)→ 只有对手阵营临近跑完(≤8 张)才硬拆压制,否则过牌保结构;
  *   无安全跟法 → 对手告急(≤2 张)才烧最小炸,否则过牌(不再无脑烧炸)。
  */
 function chooseStructuredFollow(
@@ -452,6 +498,7 @@ function chooseStructuredFollow(
   moves: Move[],
   history: GameEvent[],
   profile: PimcProfile,
+  trace: DecisionTrace,
 ): Move | 'pass' {
   const protectedSet = protectedCards(hand);
   const safe = moves.filter(
@@ -485,8 +532,13 @@ function chooseStructuredFollow(
       if (pick.pattern.mainRank < Rank.A) return pick;
       if (ctx.decomposer.decompose(hand).moveCount <= 3) return pick;
     }
-    const urgentThreshold = 8;
-    if (opponentMin <= urgentThreshold) return pickSmallest(safe);
+    const urgentThreshold = getTuning().urgentThreshold;
+    if (opponentMin <= urgentThreshold) {
+      return scored.slice().sort((left, right) => {
+        const cost = left.cost - right.cost;
+        return cost !== 0 ? cost : compareMoves(left.move, right.move);
+      })[0]!.move;
+    }
     return 'pass';
   };
 
@@ -499,7 +551,7 @@ function chooseStructuredFollow(
     const delta = left.score - right.score;
     return delta !== 0 ? delta : compareMoves(left.move, right.move);
   });
-  const memoryPressure = estimateMemoryPressure(hand, history);
+  const memoryPressure = estimateMemoryPressure(hand, history, ctx.remainingByRank);
   const lowControlCheap = cheap.slice().sort((left, right) => {
     const spend = highCardSpendPenalty(left.move, memoryPressure)
       - highCardSpendPenalty(right.move, memoryPressure);
@@ -510,15 +562,29 @@ function chooseStructuredFollow(
     Math.min(profile.maxCandidates, 3),
   );
   if (profile.samples > 0 && gray.length > 0 && canSampleWorld(snapshot, hand, history)) {
-    const verdict = pimcArbitrate({
-      snapshot,
-      history,
-      candidates: gray,
-      includePass: true,
-      profile,
-      mustInclude: structuredFallback === 'pass' ? undefined : structuredFallback,
-    });
-    return verdict ?? 'pass';
+    if (!hasDecisionSink()) {
+      const verdict = pimcArbitrate({
+        snapshot,
+        history,
+        candidates: gray,
+        includePass: true,
+        profile,
+        mustInclude: structuredFallback === 'pass' ? undefined : structuredFallback,
+      });
+      return verdict ?? 'pass';
+    }
+    const captured = capturePimcRanks(() =>
+      pimcArbitrate({
+        snapshot,
+        history,
+        candidates: gray,
+        includePass: true,
+        profile,
+        mustInclude: structuredFallback === 'pass' ? undefined : structuredFallback,
+      }),
+    );
+    trace.pimc = pimcDecisionDiag(captured.rankings, profile);
+    return captured.value ?? 'pass';
   }
   return structuredFallback;
 }
@@ -549,13 +615,18 @@ function toPressureContext(
 /** 积极控权策略工厂：profile 只改变确定性预算，不改变信息面与合法性。 */
 export function hardStrategyWithProfile(profile: PimcProfile): AiStrategy {
   return (snapshot, _rng, history = []) => {
+    const startedAt = decisionNow();
     const hand = requireHand(snapshot);
     const moves = snapshot.top ? legalFollows(hand, snapshot.top.pattern) : enumerateMoves(hand);
 
-    if (snapshot.top && moves.length === 0) return { type: 'pass', seat: snapshot.turn };
+    if (snapshot.top && moves.length === 0) {
+      return finishDecision(snapshot, startedAt, 'no-legal-follow', { type: 'pass', seat: snapshot.turn });
+    }
 
     const finishingMove = chooseFinishingMove(hand, moves, snapshot);
-    if (finishingMove !== null) return toPlay(snapshot, finishingMove);
+    if (finishingMove !== null) {
+      return finishDecision(snapshot, startedAt, 'finishing', toPlay(snapshot, finishingMove));
+    }
 
     const ctx = buildHardContext(snapshot, hand, history);
     const raceTeammate = teammateSeat(snapshot);
@@ -563,13 +634,21 @@ export function hardStrategyWithProfile(profile: PimcProfile): AiStrategy {
       && raceTeammate !== null
       && snapshot.top.seat === snapshot.landlord
       && snapshot.handCounts[raceTeammate] <= 1;
+    const guaranteedMoves = history.length > 0 && snapshot.top?.pattern.category === Category.Single
+      ? moves.filter((move) => !usesProtectedCards(move, protectedCards(hand)))
+      : moves;
 
     let guaranteed: Move | null = null;
     if (ctx.remainingByRank) {
       if (snapshot.top === null) guaranteed = chooseGuaranteedLead(hand, moves, ctx.remainingByRank);
-      else if (!deferFarmerTakeover) guaranteed = chooseGuaranteedTakeover(hand, moves, ctx.remainingByRank);
+      else if (!deferFarmerTakeover) {
+        guaranteed = chooseGuaranteedTakeover(hand, guaranteedMoves, ctx.remainingByRank);
+      }
     }
-    if (guaranteed !== null) return toPlay(snapshot, guaranteed);
+    if (guaranteed !== null) {
+      const path = snapshot.top === null ? 'guaranteed-lead' : 'guaranteed-takeover';
+      return finishDecision(snapshot, startedAt, path, toPlay(snapshot, guaranteed));
+    }
 
     if (ctx.remainingByRank && hand.length <= 10 && history.length > 0 && !deferFarmerTakeover) {
       const unseenByRank = countsFromRecord(ctx.remainingByRank);
@@ -582,39 +661,78 @@ export function hardStrategyWithProfile(profile: PimcProfile): AiStrategy {
           top: snapshot.top?.pattern ?? null,
           nodeBudget: 60_000,
         });
-        if (exact.result === 'win' && exact.move !== null) return toPlay(snapshot, exact.move);
+        if (exact.result === 'win' && exact.move !== null) {
+          return finishDecision(snapshot, startedAt, 'exact-forced-win', toPlay(snapshot, exact.move));
+        }
       }
     }
 
-    if (isTeammateTop(snapshot)) return { type: 'pass', seat: snapshot.turn };
+    if (isTeammateTop(snapshot)) {
+      if (snapshot.handCounts[snapshot.landlord] <= 2) {
+        const rescue = moves.filter((move) => !isBombLike(move.pattern.category));
+        if (rescue.length > 0) {
+          return finishDecision(
+            snapshot,
+            startedAt,
+            'teammate-top-rescue',
+            toPlay(snapshot, pickLargest(rescue)),
+          );
+        }
+      }
+      return finishDecision(snapshot, startedAt, 'teammate-top-pass', { type: 'pass', seat: snapshot.turn });
+    }
 
     if (isPressing(snapshot)) {
       const bombs = bombLikeMoves(moves);
-      if (bombs.length > 0) return toPlay(snapshot, pickSmallestBombLike(bombs));
-      if (snapshot.top && !deferFarmerTakeover) return toPlay(snapshot, pickLargest(moves));
-      if (!snapshot.top) return toPlay(snapshot, choosePressingLeadMove(ctx, hand, moves));
+      if (bombs.length > 0) {
+        return finishDecision(snapshot, startedAt, 'pressing-bomb', toPlay(snapshot, pickSmallestBombLike(bombs)));
+      }
+      if (snapshot.top && !deferFarmerTakeover) {
+        return finishDecision(snapshot, startedAt, 'pressing-follow', toPlay(snapshot, pickLargest(moves)));
+      }
+      if (!snapshot.top) {
+        return finishDecision(snapshot, startedAt, 'pressing-lead', toPlay(snapshot, choosePressingLeadMove(ctx, hand, moves)));
+      }
     }
 
     if (!snapshot.top) {
       const feed = chooseFeedTeammateLead(snapshot, hand, moves);
-      if (feed !== null) return toPlay(snapshot, feed);
-      return toPlay(snapshot, chooseLeadMove(ctx, snapshot, hand, moves, history, profile));
+      if (feed !== null) {
+        return finishDecision(snapshot, startedAt, 'feed-teammate', toPlay(snapshot, feed));
+      }
+      const trace: DecisionTrace = {};
+      const lead = chooseLeadMove(ctx, snapshot, hand, moves, history, profile, trace);
+      const path = trace.pimc === undefined ? 'lead-structural' : 'lead-pimc';
+      return finishDecision(snapshot, startedAt, path, toPlay(snapshot, lead), trace.pimc);
     }
 
     if (!deferFarmerTakeover) {
       const controlFollow = chooseControlFollow(hand, moves);
-      if (controlFollow !== null) return toPlay(snapshot, controlFollow);
+      if (controlFollow !== null) {
+        return finishDecision(snapshot, startedAt, 'control-follow', toPlay(snapshot, controlFollow));
+      }
 
-      const absoluteTopSingle = chooseAbsoluteTopSingleFollow(snapshot, hand, moves, history);
-      if (absoluteTopSingle !== null) return toPlay(snapshot, absoluteTopSingle);
+      const absoluteTopSingle = chooseAbsoluteTopSingleFollow(snapshot, hand, moves, history, ctx.remainingByRank);
+      if (absoluteTopSingle !== null) {
+        return finishDecision(snapshot, startedAt, 'absolute-top-single', toPlay(snapshot, absoluteTopSingle));
+      }
     }
 
     const upstreamPress = chooseUpstreamPressFollow(snapshot, hand, moves);
-    if (upstreamPress !== null) return toPlay(snapshot, upstreamPress);
+    if (upstreamPress !== null) {
+      return finishDecision(snapshot, startedAt, 'upstream-press', toPlay(snapshot, upstreamPress));
+    }
 
-    const structured = chooseStructuredFollow(ctx, snapshot, hand, moves, history, profile);
-    if (structured === 'pass') return { type: 'pass', seat: snapshot.turn };
-    return toPlay(snapshot, structured);
+    const trace: DecisionTrace = {};
+    const structured = chooseStructuredFollow(ctx, snapshot, hand, moves, history, profile, trace);
+    if (trace.pimc !== undefined) {
+      const action = structured === 'pass' ? { type: 'pass' as const, seat: snapshot.turn } : toPlay(snapshot, structured);
+      return finishDecision(snapshot, startedAt, 'structured-pimc', action, trace.pimc);
+    }
+    if (structured === 'pass') {
+      return finishDecision(snapshot, startedAt, 'structured-pass', { type: 'pass', seat: snapshot.turn });
+    }
+    return finishDecision(snapshot, startedAt, 'structured-fallback', toPlay(snapshot, structured));
   };
 }
 

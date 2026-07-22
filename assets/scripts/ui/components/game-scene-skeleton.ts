@@ -7,18 +7,21 @@ import {
   resources,
 } from 'cc';
 import { AiLevel } from '../../ai';
+import { installDecisionSink, uninstallDecisionSink } from '../../ai/decision-log';
 import { pickHint, type HintSession } from '../hint-flow';
 import { commitFinishedRound, persistRound, restoreRound, type SessionKeys } from '../../data/session';
 import { difficultyConfig } from '../../data/difficultyConfig';
+import { loadMatchLog, saveMatchLog, setPinned } from '../../data/match-log';
 import { STORAGE_KEYS } from '../../data/storage-keys';
 import { defaultSettings, type Settings } from '../../data/settings';
 import { loadSettings } from '../../data/settingsStorage';
 import { startRoundRuntime, resumeRoundRuntime, type RoundRuntime } from '../../flow/round-runtime';
 import { realClock } from '../../flow/clock';
 import type { FlowEvent } from '../../flow/types';
-import type { GameEvent, ResumeSnapshot, RoundFinishInput, SeatIndex } from '../../game';
+import { GamePhase, type GameEvent, type ResumeSnapshot, type RoundFinishInput, type SeatIndex } from '../../game';
 import type { Card } from '../../rules';
 import { cocosStorage } from '../../runtime/cocos-storage';
+import { exportJsonFile } from '../../runtime/export-file';
 import { clearSelection, toggle, type DragSelectionMode } from '../selection';
 import { deriveFollowUx } from '../follow-ux';
 import { rebuildRecentEvents } from '../resume-rebuild';
@@ -54,11 +57,14 @@ import {
 } from './game-scene/bid-actions-renderer';
 import { renderCardMemory as renderCardMemorySection, renderHud as renderHudSection } from './game-scene/hud-renderer';
 import { fadeInOnLoad } from './scene-transition';
-import { renderResult as renderResultSection } from './game-scene/result-overlay-renderer';
+import {
+  renderResult as renderResultSection,
+  type ResultRendererContext,
+} from './game-scene/result-overlay-renderer';
+import { createMatchLogRecorder } from './game-scene/match-log-recorder';
 import {
   renderSeatFeedback as renderSeatFeedbackSection,
   renderSeats as renderSeatsSection,
-  type GameSceneRendererContext,
 } from './game-scene/seats-renderer';
 import {
   CARD_SIZE,
@@ -304,6 +310,7 @@ export class GameSceneSkeleton extends Component {
   private handDragOriginCard: Card | null = null;
   private handDragStartX = 0;
   private handDragCurrentX = 0;
+  private currentMatchLogId: string | null = null;
 
   onLoad(): void {
     this.hideSceneScaffold();
@@ -319,6 +326,7 @@ export class GameSceneSkeleton extends Component {
   onDestroy(): void {
     this.cardRenderGeneration += 1;
     this.cardAnimator.reset();
+    uninstallDecisionSink();
     this.unsubscribe?.();
     this.runtime?.dispose();
     this.unsubscribe = null;
@@ -364,6 +372,7 @@ export class GameSceneSkeleton extends Component {
     this.cardStage = emptyCardStage();
     this.pendingPatternBurst = null;
     this.settlementHold = { remainingMs: 0 };
+    uninstallDecisionSink();
     this.unsubscribe?.();
     this.runtime?.dispose();
     this.unsubscribe = null;
@@ -385,6 +394,7 @@ export class GameSceneSkeleton extends Component {
     this.terminationFeedbackNotified = false;
     this.terminationFeedbackActionsVisible = false;
     this.terminationFeedbackText = null;
+    this.currentMatchLogId = null;
     this.statusText = '';
     // v1.5 W3-B:跨局清空 fx 层(彩带 repeatForever 等循环特效不能残留到新局)。
     this.clearFxLayer();
@@ -399,22 +409,7 @@ export class GameSceneSkeleton extends Component {
       this.settings.difficulty,
       this.settings.difficulty,
     ];
-    const config = {
-      seed: this.resolveSeed(),
-      heroSeat: HERO_SEAT,
-      levels,
-      thinkingDelayMs,
-      clock: realClock,
-      persist: (payload: Parameters<typeof persistRound>[2]) =>
-        persistRound(storage, SESSION_KEYS, { ...payload, savedAt: Date.now() }),
-      onSettled: (finish: RoundFinishInput) => {
-        this.sessionTotals = addRoundScores(this.sessionTotals, finish.settlement.scores);
-        commitFinishedRound(storage, SESSION_KEYS, { finish, heroSeat: HERO_SEAT, playedAt: Date.now() });
-        // Runtime emits its settled event before this callback. Re-render so
-        // animation-off sessions also replace the pre-accumulation result text.
-        this.render();
-      },
-    };
+    const seed = this.resolveSeed();
 
     let resume: ResumeSnapshot | null = null;
     if (!forceNew) {
@@ -426,6 +421,46 @@ export class GameSceneSkeleton extends Component {
     } else {
       storage.removeItem(SESSION_KEYS.save);
     }
+
+    const recorder = createMatchLogRecorder({
+      storage,
+      now: () => Date.now(),
+      seed,
+      resumed: resume !== null,
+      difficulty: this.settings.difficulty,
+      heroSeat: HERO_SEAT,
+    });
+    if (resume !== null && resume.state.phase === GamePhase.Playing) {
+      recorder.onPersist({
+        round: resume.state,
+        heroSeat: resume.heroSeat,
+        bidMultiplier: resume.bidMultiplier,
+        events: resume.events,
+      });
+    }
+    installDecisionSink({
+      publish: (draft) => recorder.onDiag(draft),
+      now: () => Date.now(),
+    });
+    const config = {
+      seed,
+      heroSeat: HERO_SEAT,
+      levels,
+      thinkingDelayMs,
+      clock: realClock,
+      persist: (payload: Parameters<typeof persistRound>[2]) => {
+        recorder.onPersist(payload);
+        persistRound(storage, SESSION_KEYS, { ...payload, savedAt: Date.now() });
+      },
+      onSettled: (finish: RoundFinishInput) => {
+        this.currentMatchLogId = recorder.onSettled(finish);
+        this.sessionTotals = addRoundScores(this.sessionTotals, finish.settlement.scores);
+        commitFinishedRound(storage, SESSION_KEYS, { finish, heroSeat: HERO_SEAT, playedAt: Date.now() });
+        // Runtime emits its settled event before this callback. Re-render so
+        // animation-off sessions also replace the pre-accumulation result text.
+        this.render();
+      },
+    };
 
     this.fullGameEvents = resume?.events.slice() ?? [];
     this.recentEvents = rebuildRecentEvents(this.fullGameEvents);
@@ -628,7 +663,28 @@ export class GameSceneSkeleton extends Component {
     }
   }
 
-  private rendererContext(): GameSceneRendererContext {
+  private async exportCurrentMatchLog(): Promise<void> {
+    const storage = cocosStorage();
+    const state = loadMatchLog(storage);
+    const entry = this.currentMatchLogId === null
+      ? undefined
+      : state.entries.find((candidate) => candidate.logId === this.currentMatchLogId);
+    if (!entry) {
+      this.toasts = pushToast(this.toasts, '没有可导出的对局', this.toastClockMs);
+      this.render();
+      return;
+    }
+
+    const pinnedState = setPinned(state, entry.logId, true);
+    saveMatchLog(storage, pinnedState);
+    const pinnedEntry = pinnedState.entries.find((candidate) => candidate.logId === entry.logId) ?? entry;
+    const result = await exportJsonFile(`ddz-${entry.logId}.json`, JSON.stringify(pinnedEntry));
+    const feedback = result === 'download' ? '对局已导出' : result === 'clipboard' ? '对局已复制' : '导出失败';
+    this.toasts = pushToast(this.toasts, feedback, this.toastClockMs);
+    this.render();
+  }
+
+  private rendererContext(): ResultRendererContext {
     return {
       uiRoot: this.uiRoot!,
       settings: this.settings,
@@ -669,6 +725,7 @@ export class GameSceneSkeleton extends Component {
       strengthColor: this.strengthColor.bind(this),
       aiThinkingView: this.aiThinkingView.bind(this),
       startGame: this.startGame.bind(this),
+      exportCurrentMatchLog: this.exportCurrentMatchLog.bind(this),
       animateScaleIn: this.animateScaleIn.bind(this),
       drawDimOverlay: this.drawDimOverlay.bind(this),
       addDisplayCard: this.addDisplayCard.bind(this),
@@ -749,7 +806,7 @@ export class GameSceneSkeleton extends Component {
   private renderTerminationFeedbackActions = renderTerminationFeedbackActionsImpl;
 
   private renderResult(
-    result: ReturnType<typeof deriveScreenVM>['result'],
+    result: ReturnType<typeof deriveScreenVM>['result'] | null,
     handCounts: [number, number, number],
     layout: TableZones,
     canvas: { width: number; height: number },

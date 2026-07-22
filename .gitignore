@@ -40,6 +40,11 @@ asset-previews/
 *.worktrees/
 # 协作临时状态
 .cowork-temp/
+# 本地 AI 分析与调参输出
+coordination/reports/ai-analysis/
+coordination/reports/ai-tuning/
+# 本地协作下发信号
+coordination/tasks/*/DISPATCH/GO-*.md
 # macOS
 .DS_Store
 # Cocos 编辑器运行时配置

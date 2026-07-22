@@ -59,7 +59,7 @@ describe('T-AI-DEPTH2 hard 纵深行为边界', () => {
     expect(playedRanks(a)).toEqual([Rank.R3]); // 单张 3 送牌权
   });
 
-  it('地主上家顶张：跟地主小单用安全集最大顶上去', () => {
+  it('地主上家顶张：跟地主小单用非绝对控牌的安全集最大顶上去', () => {
     const s = snap({
       turn: 1,
       landlord: 2,
@@ -68,7 +68,7 @@ describe('T-AI-DEPTH2 hard 纵深行为边界', () => {
       viewerHand: cards('6 9 K 2'),
     });
     const a = hard(s, rng, []);
-    expect(playedRanks(a)).toEqual([Rank.R2]);
+    expect(playedRanks(a)).toEqual([Rank.K]);
   });
 
   it('终局必胜看破（lead）：外部无更大威胁时先出不可压中继而非塑形小牌', () => {

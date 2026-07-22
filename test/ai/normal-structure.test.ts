@@ -74,6 +74,21 @@ describe('W-AI S7 Normal 结构引擎（全体上移）', () => {
     }
   });
 
+  it('队友非直接下家时不喂：地主会先截牌 → 照常组合领出', () => {
+    const s = snap({
+      turn: 2,
+      landlord: 0,
+      top: null,
+      viewerHand: cards('3 6 9 9'),
+      handCounts: [5, 1, 4],
+    });
+    const a = normal(s, createRng(31));
+    expect(a.type).toBe('play');
+    if (a.type === 'play') {
+      expect(a.cards.map((card) => card.rank)).toEqual([Rank.R9, Rank.R9]);
+    }
+  });
+
   it('地主告急时不喂：地主 ≤2 张 → 不走喂牌（照常组合领出）', () => {
     const s = snap({
       turn: 1,

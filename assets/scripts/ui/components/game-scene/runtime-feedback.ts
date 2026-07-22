@@ -4,7 +4,7 @@ import { deriveAiThinking } from '../../ai-thinking-view';
 import { deriveTerminationFeedback } from '../../termination-feedback-view';
 import { t } from '../../strings';
 import type { TableRegions } from '../../table-layout';
-import { pushToast, tickToasts } from '../../toast-queue';
+import { pushToast, tickToasts, type Toast } from '../../toast-queue';
 import { THEME, addUiTransform, toColor } from '../ui-helpers';
 import { fadeThenLoad } from '../scene-transition';
 import { seatDisplayName } from './seat-display';
@@ -31,7 +31,7 @@ export function renderToasts(this: any, layout: TableRegions, canvas: { width: n
   root.setPosition(pos.x, pos.y, 0);
   addUiTransform(root, Math.min(260, canvas.width - 64), 112);
 
-  this.toasts.items.forEach((toast, index) => {
+  this.toasts.items.forEach((toast: Toast, index: number) => {
     const width = Math.min(238, Math.max(174, canvas.width - 112));
     const height = 30;
     const node = this.ensureNode(`toast-${toast.id}`, root);
@@ -88,9 +88,9 @@ export function showStatus(this: any, text: string): void {
 }
 
 export function tickToastState(this: any): boolean {
-  const before = this.toasts.items.map((toast) => toast.id).join('|');
+  const before = this.toasts.items.map((toast: Toast) => toast.id).join('|');
   this.toasts = tickToasts(this.toasts, this.toastClockMs);
-  return before !== this.toasts.items.map((toast) => toast.id).join('|');
+  return before !== this.toasts.items.map((toast: Toast) => toast.id).join('|');
 }
 
 export function pollTerminationFeedback(this: any): boolean {

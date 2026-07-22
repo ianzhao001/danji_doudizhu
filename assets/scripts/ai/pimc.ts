@@ -15,7 +15,8 @@ import { Decomposer } from './decompose';
 import { moveOutcomeScore } from './handWeight';
 import { compareMoves } from './levels/_shared';
 import { rolloutRound, toRankCounts } from './rollout';
-import { solveWorld, type WorldSolverBudget } from './worldSolver';
+import { solveWorld, type WorldSolverBudget, type WorldWinner } from './worldSolver';
+import { getTuning } from './tuning';
 
 export interface PimcProfile {
   samples: number;
@@ -212,19 +213,28 @@ export function weighWorld(
   signals: readonly PassSignal[],
   worldCountsAtNow: readonly [number[], number[], number[]],
   passInferenceCap = 4,
+  landlord?: SeatIndex,
 ): number {
   if (!Number.isInteger(passInferenceCap) || passInferenceCap < 0) {
     throw new Error('INVALID_PASS_INFERENCE_CAP');
   }
-  let contradictions = 0;
+  const tuning = getTuning();
+  let contradictionUnits = 0;
   for (const signal of signals) {
     const thenCounts = worldCountsAtNow[signal.seat].slice();
     for (let rank = Rank.R3; rank <= Rank.BigJoker; rank += 1) {
       thenCounts[rank] += signal.playedAfter[rank] ?? 0;
     }
-    if (isFreeSameTypeBeat(thenCounts, signal.top)) contradictions += 1;
+    if (isFreeSameTypeBeat(thenCounts, signal.top)) {
+      const seatUnit = signal.seat === landlord
+        ? tuning.passUnits.landlord
+        : tuning.passUnits.farmer;
+      const highTop = signal.top.mainRank >= Rank.A;
+      contradictionUnits += seatUnit >> (highTop ? tuning.passUnits.highTopShift : 0);
+    }
   }
-  return 2 ** (passInferenceCap - Math.min(contradictions, passInferenceCap));
+  const effectiveContradictions = Math.min(Math.round(contradictionUnits / 4), passInferenceCap);
+  return 2 ** (passInferenceCap - effectiveContradictions);
 }
 
 export function effectiveSampleDegrade(weights: readonly number[]): boolean {
@@ -321,10 +331,9 @@ function removeMove(counts: number[], move: Move): number[] {
   return rest;
 }
 
-function optionOrder(hand: Card[], left: RankedOption, right: RankedOption): number {
+function optionOrder(decomposer: Decomposer, hand: Card[], left: RankedOption, right: RankedOption): number {
   if (left.score !== right.score) return right.score - left.score;
   if (left.move === null || right.move === null) return left.move === null ? -1 : 1;
-  const decomposer = new Decomposer();
   const outcome = moveOutcomeScore(decomposer, hand, left.move) - moveOutcomeScore(decomposer, hand, right.move);
   return outcome !== 0 ? outcome : compareMoves(left.move, right.move);
 }
@@ -395,7 +404,7 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
   // Hard's production path guards these before PIMC; the public ranker degrades
   // deterministically to its structural order instead of throwing.
   if (unseenTotal !== needA + needB) {
-    options.sort((left, right) => optionOrder(hand, left, right));
+    options.sort((left, right) => optionOrder(decomposer, hand, left, right));
     return publishPimcRanking(options);
   }
 
@@ -419,7 +428,7 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
     board[args.snapshot.turn] = toRankCounts(hand);
     sampled.push({
       counts: board,
-      weight: signals.length > 0 ? weighWorld(signals, board, passInferenceCap) : 1,
+      weight: signals.length > 0 ? weighWorld(signals, board, passInferenceCap, args.snapshot.landlord) : 1,
     });
   }
   if (effectiveSampleDegrade(sampled.map((world) => world.weight))) {
@@ -428,6 +437,7 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
 
   const perOptionNodes = solverNodes > 0 ? Math.max(1, Math.floor(solverNodes / options.length)) : 0;
   const mySide = args.snapshot.turn === args.snapshot.landlord ? 'landlord' : 'farmer';
+  const sharedTable = new Map<string, WorldWinner>();
   // 候选主序：每个候选拥有等额、独立的精确求解预算，并按同一批世界的固定顺序评估。
   for (const option of options) {
     const optionBudget: WorldSolverBudget = { nodes: perOptionNodes };
@@ -437,9 +447,22 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
       board[args.snapshot.turn] = option.move
         ? removeMove(board[args.snapshot.turn], option.move)
         : board[args.snapshot.turn];
-      const nextTurn = ((args.snapshot.turn + 1) % 3) as SeatIndex;
-      const top = option.move ? option.move.pattern : args.snapshot.top?.pattern ?? null;
-      const topSeat = option.move ? args.snapshot.turn : args.snapshot.top?.seat ?? null;
+      const nextPasses = option.move === null ? (args.snapshot.passesInARow ?? 0) + 1 : 0;
+      const trickClosed = option.move === null && nextPasses >= 2 && args.snapshot.top !== null;
+      const nextTurn = trickClosed
+        ? args.snapshot.top!.seat
+        : ((args.snapshot.turn + 1) % 3) as SeatIndex;
+      const top = option.move
+        ? option.move.pattern
+        : trickClosed
+          ? null
+          : args.snapshot.top?.pattern ?? null;
+      const topSeat = option.move
+        ? args.snapshot.turn
+        : trickClosed
+          ? null
+          : args.snapshot.top?.seat ?? null;
+      const passes = trickClosed ? 0 : nextPasses;
       let winner: 'landlord' | 'farmer' | null = option.move && countCards(board[args.snapshot.turn]) === 0
         ? mySide
         : null;
@@ -451,7 +474,9 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
           landlord: args.snapshot.landlord,
           top,
           topSeat,
+          passes,
           budget: optionBudget,
+          table: sharedTable,
         });
       }
       if (winner === null) {
@@ -461,13 +486,14 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
           landlord: args.snapshot.landlord,
           top,
           topSeat,
+          passes,
           rng: createRng((seed ^ sample) >>> 0),
         }).winnerSide;
       }
       option.score += world.weight * (winner === mySide ? 1 : -1);
     }
   }
-  options.sort((left, right) => optionOrder(hand, left, right));
+  options.sort((left, right) => optionOrder(decomposer, hand, left, right));
   return publishPimcRanking(options);
 }
 

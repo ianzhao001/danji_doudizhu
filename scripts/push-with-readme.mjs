@@ -87,6 +87,10 @@ function main() {
       branch: BRANCH,
       head,
       summary,
+      summaries: {
+        zh: process.env.README_CHANGELOG_SUMMARY_ZH,
+        en: process.env.README_CHANGELOG_SUMMARY_EN,
+      },
     });
     git(['add', '--', ...README_FILES]);
     git(['commit', '-m', `docs(readme): update change log ${timestamp}`], { stdio: 'inherit' });

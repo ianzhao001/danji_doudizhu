@@ -15,3 +15,5 @@ export * from './endgame';
 export * from './bid-confidence';
 export * from './insight';
 export * from './bidding-eval';
+export * from './decision-log';
+export * from './tuning';

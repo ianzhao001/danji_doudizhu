@@ -137,17 +137,17 @@ function subjectLines(subjects) {
   return subjects.length > 0 ? subjects.map((subject) => `  - ${subject}`).join('\n') : '  - No commit subject available';
 }
 
-export function buildEntry({ locale, timestamp, remote, branch, head, summary }) {
-  const subjects = summary.subjects.length > 0
+export function buildEntry({ locale, timestamp, remote, branch, head, summary, summaryText }) {
+  const subjects = summaryText?.trim() || (summary.subjects.length > 0
     ? summary.subjects.join(locale === 'zh' ? '；' : '; ')
-    : (locale === 'zh' ? '发布已验证的项目更新。' : 'Published verified project updates.');
+    : (locale === 'zh' ? '发布已验证的项目更新。' : 'Published verified project updates.'));
   if (locale === 'zh') {
     return `### ${timestamp}\n\n- 目标：\`${remote}/${branch}\`\n- 覆盖提交：\`${head}\`\n- 本期更新：${subjects}\n- 验证：见本页“开发者验证”与对应版本发布说明。`;
   }
   return `### ${timestamp}\n\n- Target: \`${remote}/${branch}\`\n- Covered commit: \`${head}\`\n- Summary: ${subjects}\n- Verification: see “Developer Verification” on this page and the matching release notes.`;
 }
 
-export function prependEntries({ cwd, timestamp, remote, branch, head, summary }) {
+export function prependEntries({ cwd, timestamp, remote, branch, head, summary, summaries = {} }) {
   for (const [index, file] of README_FILES.entries()) {
     const path = `${cwd}/${file}`;
     const content = readFileSync(path, 'utf8');
@@ -160,6 +160,7 @@ export function prependEntries({ cwd, timestamp, remote, branch, head, summary }
       branch,
       head,
       summary,
+      summaryText: index === 0 ? summaries.zh : summaries.en,
     });
     const withEntry = content.replace(INSERTION_MARKER, `${INSERTION_MARKER}\n\n${entry}`);
     const updated = withEntry.replace(COVERAGE_PATTERN, marker(head));

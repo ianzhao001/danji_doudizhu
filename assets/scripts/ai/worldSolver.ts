@@ -30,7 +30,9 @@ export interface SolveWorldArgs {
   landlord: SeatIndex;
   top: HandPattern | null;
   topSeat: SeatIndex | null;
+  passes?: number;
   budget: WorldSolverBudget;
+  table?: Map<string, WorldWinner>;
 }
 
 interface SearchState {
@@ -186,7 +188,7 @@ export function solveWorld(args: SolveWorldArgs): WorldWinner | null {
   if (!Number.isInteger(args.budget.nodes) || args.budget.nodes < 0) {
     throw new Error('INVALID_WORLD_SOLVER_BUDGET');
   }
-  let table = TABLES.get(args.budget);
+  let table = args.table ?? TABLES.get(args.budget);
   if (!table) {
     table = new Map<string, WorldWinner>();
     TABLES.set(args.budget, table);
@@ -197,6 +199,6 @@ export function solveWorld(args: SolveWorldArgs): WorldWinner | null {
     landlord: args.landlord,
     top: args.top,
     topSeat: args.topSeat,
-    passes: 0,
+    passes: args.passes ?? 0,
   }, args.budget, table);
 }

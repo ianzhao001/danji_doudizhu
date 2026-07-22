@@ -175,6 +175,7 @@ export function snapshot(state: RoundState, viewer?: SeatIndex): GameSnapshot {
     top: state.top,
     handCounts,
     winner: state.winner,
+    passesInARow: state.passesInARow,
     bombsPlayed: state.bombsPlayed,
     bottom: state.bottom ? state.bottom.slice() : state.bottom,
   };

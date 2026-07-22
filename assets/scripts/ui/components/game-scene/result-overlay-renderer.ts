@@ -27,9 +27,13 @@ type ScoreRollRuntimeLabel = Label & {
   __scoreRollDone?: boolean;
 };
 
+export interface ResultRendererContext extends GameSceneRendererContext {
+  exportCurrentMatchLog(): Promise<void>;
+}
+
 export function renderResult(
-  ctx: GameSceneRendererContext,
-  result: ReturnType<typeof deriveScreenVM>['result'],
+  ctx: ResultRendererContext,
+  result: ReturnType<typeof deriveScreenVM>['result'] | null,
   handCounts: [number, number, number],
   layout: TableZones,
   canvas: { width: number; height: number },
@@ -126,8 +130,11 @@ export function renderResult(
     PANEL_TEXT,
   ) as ScoreRollRuntimeLabel;
 
-  ctx.addButton('再来一局', -68, buttonY, 124, actionHeight, true, () => ctx.startGame(true), panel, 'result-new');
-  ctx.addButton('返回大厅', 68, buttonY, 124, actionHeight, true, () => {
+  ctx.addButton('再来一局', -92, buttonY, 86, actionHeight, true, () => ctx.startGame(true), panel, 'result-new');
+  ctx.addButton('导出对局', 0, buttonY, 86, actionHeight, true, () => {
+    void ctx.exportCurrentMatchLog();
+  }, panel, 'result-export');
+  ctx.addButton('返回大厅', 92, buttonY, 86, actionHeight, true, () => {
     // v1.5 P-SCENE-FADE:黑幕淡入后切场景(动效关闭时直切)。
     fadeThenLoad(ctx.uiRoot, ctx.settings.animation, () => director.loadScene('lobby'));
   }, panel, 'result-lobby');
@@ -208,7 +215,7 @@ export function renderResult(
         .start();
     }
 
-    ['result-new', 'result-lobby'].forEach((name, index) => {
+    ['result-new', 'result-export', 'result-lobby'].forEach((name, index) => {
       const buttonNode = ctx.ensureNode(name, panel);
       const targetY = buttonY;
       buttonNode.setPosition(buttonNode.position.x, targetY - 16, 0);

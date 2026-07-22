@@ -7,7 +7,7 @@ import { fxBurst, pulseParams } from '../../animation-params';
 import { decideCuePlayback, vibrationPattern } from '../../audio-gate';
 import { RESOURCE_PATHS, cueAudioPath, type ResourcePath } from '../../asset-keys';
 import { cueForFlowEvent, type CueId } from '../../event-cues';
-import type { ToggleKey } from '../../settings-view';
+import { toggleSetting, type ToggleKey } from '../../settings-view';
 
 const SETTINGS_KEY = STORAGE_KEYS.settings;
 

@@ -8,16 +8,17 @@ import { describe, expect, it } from 'vitest';
 import { STORAGE_KEYS } from '../../assets/scripts/data/storage-keys';
 
 describe('T-DEDUP 存储键单一事实源', () => {
-  it('四个键与既有字面量逐一相等（行为零变化）', () => {
+  it('全部键与既有字面量逐一相等（行为零变化）', () => {
     expect(STORAGE_KEYS.settings).toBe('doudizhu.settings');
     expect(STORAGE_KEYS.save).toBe('doudizhu.save');
     expect(STORAGE_KEYS.stats).toBe('doudizhu.stats');
     expect(STORAGE_KEYS.records).toBe('doudizhu.records');
+    expect(STORAGE_KEYS.matchLog).toBe('doudizhu.matchlog');
   });
 
   it('全部键共享 doudizhu. 前缀且互不相同', () => {
     const values = Object.values(STORAGE_KEYS);
-    expect(values).toHaveLength(4);
+    expect(values).toHaveLength(5);
     for (const value of values) expect(value.startsWith('doudizhu.')).toBe(true);
     expect(new Set(values).size).toBe(values.length);
   });

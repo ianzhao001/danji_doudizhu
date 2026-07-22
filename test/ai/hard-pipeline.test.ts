@@ -28,6 +28,7 @@ import { createRng, recognize, Rank } from '../../assets/scripts/rules';
 import { GamePhase, type GameSnapshot, type TopPlay } from '../../assets/scripts/game';
 import { strategyFor, AiLevel } from '../../assets/scripts/ai';
 import { hardStrategyWithProfile } from '../../assets/scripts/ai/levels/hard';
+import { DEFAULT_TUNING } from '../../assets/scripts/ai/tuning';
 import { cards } from '../rules/_util';
 
 const HARD_SOURCE = readFileSync(
@@ -72,7 +73,7 @@ describe('W-AI-R2 hard 管线接线契约', () => {
   });
 
   it('D1/D3 根治锚：Path B 已删、单一打分路径、weights-only=同打分仅跳仲裁', () => {
-    const lead = sliceBetween(HARD_SOURCE, 'function chooseLeadMove', 'function chooseFeedTeammateLead');
+    const lead = sliceBetween(HARD_SOURCE, 'function chooseLeadMove', 'function chooseUpstreamPressFollow');
     expect(lead, '打分只经 moveOutcomeScore').toContain('moveOutcomeScore(');
     expect(lead, '无第二打分路径：chooseLeadMove 不得直调 structureCost').not.toContain('structureCost(');
     expect(lead, '仲裁触发=samples>0（weights-only 同打分仅跳仲裁）').toContain('profile.samples > 0');
@@ -81,7 +82,8 @@ describe('W-AI-R2 hard 管线接线契约', () => {
   });
 
   it('B2 跟牌有界代表锚：领出保留 200 带，跟牌取代 250 单档并保留 mustInclude', () => {
-    expect(HARD_SOURCE).toContain('PIMC_LEAD_BAND = 200');
+    expect(DEFAULT_TUNING.pimcLeadBand).toBe(200);
+    expect(HARD_SOURCE).toContain('leadTuning.pimcLeadBand');
     expect(HARD_SOURCE).not.toContain('PIMC_FOLLOW_BAND');
     const follow = sliceBetween(HARD_SOURCE, 'function chooseStructuredFollow', 'export function hardStrategyWithProfile(');
     expect(follow).toContain('selectDiverseCandidates(');

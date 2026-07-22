@@ -15,6 +15,7 @@ export interface RolloutArgs {
   landlord: 0 | 1 | 2;
   top: HandPattern | null;
   topSeat: 0 | 1 | 2 | null;
+  passes?: number;
   /** B2 校准接缝：B1' 只保留 legacy 领出，不启用非整手复合牌型领出。 */
   leadPolicy?: 'legacy';
   rng: Rng;
@@ -327,7 +328,7 @@ export function rolloutRound(args: RolloutArgs): RolloutOutcome {
   let turn = args.turn;
   let top = args.top ? lite(args.top) : null;
   let topSeat = args.topSeat;
-  let passes = 0;
+  let passes = args.passes ?? 0;
   let plays = 0;
   void args.rng;
 

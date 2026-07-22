@@ -4,7 +4,7 @@
 
 This is an offline, single-player Dou Dizhu project built with Cocos Creator 3.8.8. The human player controls one seat while two computer opponents control the others. It implements the classic three-player rules, a complete round, three AI levels, local settings, match records, and interrupted-game recovery.
 
-The current release is v1.9-R3, with improved AI decision reliability, hint responsiveness, and rules-enumeration performance; see [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md). The repository is intended to be runnable from source by people who do not have a software-development background.
+The current release is v1.9-R4, adding local match logs and export while continuing to improve Hard-AI cooperation, power-card protection, and search behavior; see [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md). The repository is intended to be runnable from source by people who do not have a software-development background.
 
 ## Project Overview
 
@@ -18,14 +18,14 @@ The current release is v1.9-R3, with improved AI decision reliability, hint resp
 | Launch scene | `assets/scene/lobby.scene` |
 | Build target | `web-mobile` |
 | AI levels | Simple, Normal, Hard |
-| Verification baseline | 203 test files and 1262 passing tests, 2 environment-gated tests skipped, typecheck passing |
+| Verification baseline | 215 test files and 1301 passing tests, 3 environment- or empty-directory-gated tests skipped, production typecheck passing |
 
-## What Changed in v1.9-R3
+## What Changed in v1.9-R4
 
-- PIMC now assigns an independent, equal solver budget to each candidate. Four-with-two pressure, finish-first endgames, and sequence relays were also corrected to reduce ordering and edge-case bias.
-- Hints reuse one complete Hard analysis instead of sampling twice. Real hint-path p95 fell from about 201ms to 123ms, a reduction of roughly 39%.
-- Legal follow moves are generated directly for the target pattern. Results matched the previous implementation across 8,134 equivalence cases, with about 4.75x median speedup.
-- A frozen v1.9 baseline, fixed-bid play-only matches, role stratification, and paired bootstrap confidence intervals verify that playing strength is statistically equivalent to v1.9; this release does not claim a win-rate increase.
+- The game now keeps up to 30 detailed match logs locally, including initial hands, events, settlement, and Hard-AI diagnostics. The lobby exports all logs, while the result screen exports the current match; nothing is uploaded.
+- PIMC pass-state ownership, teammate-top emergency rescue, and protection for absolute power cards such as 2s and jokers were corrected to reduce edge-case mistakes.
+- Perfect-information solver tables are reused across candidates in one analysis frame to avoid repeated search. The final baseline keeps decision p95 around 29ms and hints within the 400ms gate.
+- Replay bad-case analysis, a regression-fixture entry point, and a bounded SPSA tuning tool were added. The tuner only proposes candidates and does not rewrite production weights; no statistically unsupported candidate was adopted.
 
 ## Design Principles
 
@@ -64,7 +64,7 @@ The project is designed around four goals: reliable rules, reproducible flow, re
 - Tap and drag hand selection, deselection, and invalid-play protection.
 - Pause, resume, restart, and return to lobby.
 - Local audio, vibration, animation, and difficulty settings.
-- Local match records, history, and statistics.
+- Local statistics, detailed match logs, history, and JSON export.
 - Save and recovery for an unfinished round.
 - Deal, play, bomb, rocket, transition, and result animations.
 - Audio and vibration feedback for actions, plays, bidding, wins, and losses.
@@ -74,7 +74,7 @@ To keep the v1.6 lobby simple, secondary entries for records, history, tutorials
 
 ## Third-party Use, References, and Acknowledgements
 
-The AI is implemented in TypeScript under two constraints: no external API and no local model runtime. Exact decomposition, PIMC, endgame search, the perfect-information world solver, and milli-hand scoring are implemented in this project. The table lists only content bundled with the game and open-source projects or papers that actually informed the implementation.
+The AI is implemented in TypeScript under two constraints: no external API and no local model runtime. Exact decomposition, PIMC, endgame search, the perfect-information world solver, and milli-hand scoring are implemented in this project. v1.9-R4 adds no external runtime dependency. The table lists only content bundled with the game and open-source projects or papers that actually informed the implementation.
 
 | Type | Project | License or nature | Actual boundary in this project |
 | --- | --- | --- | --- |
@@ -183,7 +183,7 @@ npm --prefix test run typecheck
 git diff --check
 ```
 
-The isolated test project lives under `test/` and is not included in the Cocos build. The current baseline is 203 passing test files and 1262 passing tests, with 2 tests skipped because they require a specific evidence environment.
+The isolated test project lives under `test/` and is not included in the Cocos build. The current baseline is 215 passing test files and 1301 passing tests, with 3 environment- or empty-directory-gated tests skipped. Production source is also checked by the strict TypeScript gate in `tsconfig-scan.json`.
 
 ## Troubleshooting
 

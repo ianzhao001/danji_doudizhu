@@ -125,4 +125,13 @@ describe('W-AI-R2 ai 模块消费防僵尸门 v2（直连 ∨ 桶具名符号）
     }
     expect(zombies, `零消费僵尸模块: ${zombies.join(', ')}`).toEqual([]);
   });
+
+  it('tuning 离线注入器不被产品消费，产品只读取 getTuning', () => {
+    const sources = productSources('tuning.ts');
+    const setterConsumers = sources
+      .filter(({ source }) => source.includes('__setTuningForOfflineSearch'))
+      .map(({ rel }) => rel);
+    expect(setterConsumers).toEqual([]);
+    expect(sources.some(({ source }) => source.includes('getTuning'))).toBe(true);
+  });
 });

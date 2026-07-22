@@ -119,7 +119,10 @@ describe('round-runtime', () => {
     expect(result.ok).toBe(true);
     expect(runtime.phase()).toBe('playing');
     expect(runtime.isPlayerTurn()).toBe(true);
-    expect(persisted).toHaveLength(1);
+    expect(persisted).toHaveLength(2);
+    expect(persisted.at(-1)).toMatchObject({
+      events: [expect.objectContaining({ type: 'play', seat: 0 })],
+    });
     expect(seen).toContain('landlordDecided');
     expect(result.events?.some((event) => event.type === 'round')).toBe(true);
     expect(clock.sleeps).toEqual([5, 5, 5]);

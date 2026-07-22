@@ -9,6 +9,7 @@ export interface StorageKeys {
   readonly save: string;
   readonly stats: string;
   readonly records: string;
+  readonly matchLog: string;
 }
 
 export const STORAGE_KEYS = {
@@ -16,4 +17,5 @@ export const STORAGE_KEYS = {
   save: 'doudizhu.save',
   stats: 'doudizhu.stats',
   records: 'doudizhu.records',
+  matchLog: 'doudizhu.matchlog',
 } as const satisfies StorageKeys;

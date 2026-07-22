@@ -15,7 +15,9 @@ import {
   type Settings,
 } from '../../data';
 import { STORAGE_KEYS } from '../../data/storage-keys';
+import { loadMatchLog } from '../../data/match-log';
 import { cocosStorage } from '../../runtime/cocos-storage';
+import { exportJsonFile } from '../../runtime/export-file';
 import {
   deriveLobbyView,
   deriveRecordsDetailView,
@@ -221,6 +223,7 @@ export class LobbyScene extends Component {
     order: 'newest',
   };
   private readonly spriteFrames = new Map<string, SpriteFrame>();
+  private matchLogExportLabel = '导出对局记录';
 
   async onLoad(): Promise<void> {
     // 字体加载期间只保留编辑器内的静态背景：既避免最长 2 秒空白，也不暴露场景占位文字。
@@ -321,6 +324,17 @@ export class LobbyScene extends Component {
     });
   }
 
+  private async exportMatchLogState(): Promise<void> {
+    const state = loadMatchLog(cocosStorage());
+    const result = await exportJsonFile('ddz-match-logs.json', JSON.stringify(state));
+    this.matchLogExportLabel = result === 'download'
+      ? '导出对局记录 · 已导出'
+      : result === 'clipboard'
+        ? '导出对局记录 · 已复制'
+        : '导出对局记录 · 失败';
+    this.render();
+  }
+
   // v1.6 终审整改④⑤:大厅三区(战绩/难度/设置)合一为单居中面板——
   // 难度改单切换按钮(点击循环 简单→普通→困难);去教程/帮助入口;隐藏战绩/历史入口(渲染方法保留不迭代)。
   private renderHomeScreen(settings: Settings, home: HomeViewData): void {
@@ -328,7 +342,7 @@ export class LobbyScene extends Component {
     const settingsView = deriveSettingsView(settings);
     const canvas = this.canvasSize();
     const panelWidth = Math.min(380, canvas.width - 72);
-    const panelHeight = Math.min(312, canvas.height - 52);
+    const panelHeight = Math.min(338, canvas.height - 32);
     const half = panelHeight / 2;
     const btnWidth = Math.min(248, panelWidth - 76);
     const titleHeight = THEME.typography.display.lineHeight;
@@ -342,6 +356,7 @@ export class LobbyScene extends Component {
     const continueY = startY - startHeight / 2 - THEME.spacing.default - secondaryButtonHeight / 2;
     const difficultyY = continueY - secondaryButtonHeight - THEME.spacing.default;
     const togglesY = difficultyY - secondaryButtonHeight / 2 - THEME.spacing.section - toggleHeight / 2;
+    const exportY = togglesY - toggleHeight / 2 - THEME.spacing.default - toggleHeight / 2;
 
     const panel = this.ensureNode('home-panel', this.controlsRoot);
     panel.setPosition(0, 0, 0);
@@ -421,6 +436,18 @@ export class LobbyScene extends Component {
         `home-toggle-${toggle.key}`,
       );
     });
+    this.addButton(
+      this.matchLogExportLabel,
+      0,
+      exportY,
+      btnWidth,
+      toggleHeight,
+      true,
+      () => { void this.exportMatchLogState(); },
+      panel,
+      false,
+      'home-export-match-log',
+    );
   }
 
   private renderDifficultyPanel(current: AiLevel, x: number, y: number, panelWidth: number, panelHeight: number): void {

@@ -17,6 +17,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { AiLevel, chooseBidByLevel, strategyFor } from '../../assets/scripts/ai';
 import type { AiStrategy } from '../../assets/scripts/ai';
+import { __setTuningForOfflineSearch, type AiTuning } from '../../assets/scripts/ai/tuning';
 import { runHeadlessRound, type BidPolicy, type PlayPolicy } from '../../assets/scripts/flow';
 import { enumerateMoves, legalFollows } from '../../assets/scripts/rules';
 import { legacyBidByName, legacyStrategyByName, type LegacyLevelName } from '../fixtures/legacy-ai/legacy';
@@ -44,6 +45,38 @@ function parseArgs(argv: string[]): Map<string, string> {
     else out.set(raw.slice(2, eq), raw.slice(eq + 1));
   }
   return out;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function integerField(record: Record<string, unknown>, key: string): number {
+  const value = record[key];
+  if (typeof value !== 'number' || !Number.isInteger(value)) {
+    throw new Error(`--tuning field ${key} must be an integer`);
+  }
+  return value;
+}
+
+function loadTuning(path: string): AiTuning {
+  const parsed = JSON.parse(readFileSync(path, 'utf8')) as unknown;
+  const candidate = isRecord(parsed) && isRecord(parsed.tuning) ? parsed.tuning : parsed;
+  if (!isRecord(candidate) || !isRecord(candidate.passUnits)) {
+    throw new Error('--tuning must contain an AiTuning object or { tuning: AiTuning }');
+  }
+  return {
+    hardLeadShedWeight: integerField(candidate, 'hardLeadShedWeight'),
+    pimcLeadBand: integerField(candidate, 'pimcLeadBand'),
+    highCardSpendPressureMultiplier: integerField(candidate, 'highCardSpendPressureMultiplier'),
+    highCardSpendBaseMultiplier: integerField(candidate, 'highCardSpendBaseMultiplier'),
+    urgentThreshold: integerField(candidate, 'urgentThreshold'),
+    passUnits: {
+      landlord: integerField(candidate.passUnits, 'landlord'),
+      farmer: integerField(candidate.passUnits, 'farmer'),
+      highTopShift: integerField(candidate.passUnits, 'highTopShift'),
+    },
+  };
 }
 
 function levelOf(pairing: Pairing): AiLevel {
@@ -199,6 +232,8 @@ function judgeMerged(args: Map<string, string>): void {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
+  const tuningPath = args.get('tuning');
+  if (tuningPath) __setTuningForOfflineSearch(loadTuning(tuningPath));
   if (args.get('judge') === 'true') judgeMerged(args);
   else await runShard(args);
 }

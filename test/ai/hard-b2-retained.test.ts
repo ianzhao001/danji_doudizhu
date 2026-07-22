@@ -131,13 +131,13 @@ describe('W-AI-R3 B2 follow 有界代表', () => {
     pimcCapture.calls.length = 0;
   });
 
-  it('可采样跟牌同时保留结构 Q 对与 gray 2 对，pass 独立入仲裁', () => {
+  it('可采样紧急跟牌优先保留最低结构代价 2 对，pass 独立入仲裁', () => {
     const hard = hardStrategyWithProfile({ samples: 2, maxCandidates: 8 });
     hard(snapshot({
       turn: 2,
       landlord: 1,
       top: { seat: 1, pattern: recognize(cards('7 7'))! },
-      // 合成快照只用于捕获候选：hidden=37 守恒，地主 8 张使结构 fallback 为 Q 对。
+      // 合成快照只用于捕获候选：hidden=37 守恒，地主 8 张触发结构代价优先 fallback。
       handCounts: [29, 8, 17],
       viewerHand: cards('3 3 4 4 7 8 9 10 Q Q Q K K K 2 2 2'),
     }), createRng(5), []);
@@ -149,10 +149,9 @@ describe('W-AI-R3 B2 follow 有界代表', () => {
     expect(new Set(call.candidates.map((move) => move.cards.map((card) => `${card.rank}:${card.suit}`).sort().join('|'))).size)
       .toBe(call.candidates.length);
     expect(call.candidates.map((move) => [move.pattern.category, move.pattern.mainRank])).toEqual([
-      [Category.Pair, Rank.Q],
       [Category.Pair, Rank.R2],
     ]);
     expect(call.mustInclude?.pattern.category).toBe(Category.Pair);
-    expect(call.mustInclude?.pattern.mainRank).toBe(Rank.Q);
+    expect(call.mustInclude?.pattern.mainRank).toBe(Rank.R2);
   });
 });

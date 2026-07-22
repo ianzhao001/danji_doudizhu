@@ -13,6 +13,7 @@ import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { buildEntry } from './readme-changelog.mjs';
 
 const SOURCE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FIXED_TIME = '2026-07-13T12:34:56+08:00';
@@ -102,6 +103,20 @@ function setupRepository() {
 function occurrenceCount(content, needle) {
   return content.split(needle).length - 1;
 }
+
+test('buildEntry accepts a public summary without exposing commit subjects', () => {
+  const entry = buildEntry({
+    locale: 'zh',
+    timestamp: DISPLAY_TIME,
+    remote: 'origin',
+    branch: 'main',
+    head: 'a'.repeat(40),
+    summary: { subjects: ['internal task subject'] },
+    summaryText: '发布本地对局记录与 AI 边界修正。',
+  });
+  assert.match(entry, /本期更新：发布本地对局记录与 AI 边界修正。/);
+  assert.doesNotMatch(entry, /internal task subject/);
+});
 
 test('one command summarizes multiple commits, updates both READMEs, and is idempotent', () => {
   const fixture = setupRepository();

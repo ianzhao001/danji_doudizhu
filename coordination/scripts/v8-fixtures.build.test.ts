@@ -120,6 +120,7 @@ function playingRound(overrides: Partial<RoundState> = {}): RoundState {
     passesInARow: 0,
     winner: null,
     bombsPlayed: 1,
+    bottom: null,
     ...overrides,
   };
 }
