@@ -251,6 +251,13 @@ The update log starts at the formal v1.6 release baseline and does not backfill 
 
 <!-- readme-changelog-insert-here -->
 
+### 2026-07-22 18:23:57 +08:00
+
+- Target: `origin/main`
+- Covered commit: `af2172ab3d6520ee4611131f4d2fb0970c3ba6ad`
+- Summary: Released v1.9-R4 with local detailed match logs and JSON export, Hard-AI cooperation and search fixes, replay bad-case analysis, and a production typecheck gate.
+- Verification: see “Developer Verification” on this page and the matching release notes.
+
 ### 2026-07-20 13:55:00 +08:00
 
 - Target: `origin/main`
@@ -286,4 +293,4 @@ The update log starts at the formal v1.6 release baseline and does not backfill 
 - Summary: released v1.6 with final visual polish, interaction refinements, and landscape adaptation.
 - Verification: Cocos Creator 3.8.8 `web-mobile`, launch scene `lobby.scene`.
 
-<!-- readme-changelog-covered-through: c95075832c212e982e0ef221fbd98250b3177227 -->
+<!-- readme-changelog-covered-through: af2172ab3d6520ee4611131f4d2fb0970c3ba6ad -->

@@ -251,6 +251,13 @@ node scripts/push-with-readme.mjs
 
 <!-- readme-changelog-insert-here -->
 
+### 2026-07-22 18:23:57 +08:00
+
+- 目标：`origin/main`
+- 覆盖提交：`af2172ab3d6520ee4611131f4d2fb0970c3ba6ad`
+- 本期更新：发布 v1.9-R4：新增本地详细对局记录与 JSON 导出，修正困难 AI 协作、控牌和搜索边界，并加入回放坏例分析与产线类型门。
+- 验证：见本页“开发者验证”与对应版本发布说明。
+
 ### 2026-07-20 13:55:00 +08:00
 
 - 目标：`origin/main`
@@ -286,4 +293,4 @@ node scripts/push-with-readme.mjs
 - 本期更新：发布 v1.6，完成视觉收光、交互打磨和横屏适配。
 - 验证：Cocos Creator 3.8.8 `web-mobile`，启动场景 `lobby.scene`。
 
-<!-- readme-changelog-covered-through: c95075832c212e982e0ef221fbd98250b3177227 -->
+<!-- readme-changelog-covered-through: af2172ab3d6520ee4611131f4d2fb0970c3ba6ad -->
