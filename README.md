@@ -6,7 +6,7 @@
 
 当前发布版本为 v1.9-R4（新增本地对局记录与导出，并继续修正困难 AI 的协作、控牌和搜索行为，见 [发布说明](docs/RELEASE_NOTES.md)），目标是让普通玩家无需了解代码，也能下载源码并在 Cocos Creator 中运行游戏。
 
-本分支另包含尚未发布的 AI 模拟正确性与评测工具升级，详见 [当前升级候选](docs/TASKS.md#ai-升级候选2026-10-02未发布)。Cocos 冷构建与提示点击采证尚待完成，不将下述历史发布验证视为本分支验收结果。
+本分支另包含尚未发布的 AI 模拟、评测与残局搜索升级。最新候选在独立 2400 局固定叫牌镜像测试中，相对上一候选的胜率差为 +2.67 个百分点（95% 区间 +1.5 到 +4.0），各位置结果与限制见 [当前升级候选](docs/TASKS.md#ai-强度升级候选2026-10-02未发布)。Cocos 冷构建与提示点击采证尚待完成，不将下述历史发布验证视为本分支验收结果。
 
 ## 项目概览
 
@@ -81,7 +81,7 @@ AI 在「无外部 API、不跑本地模型」约束下使用 TypeScript 实现�
 | 类型 | 项目 | 许可证或性质 | 本项目中的实际边界 |
 | --- | --- | --- | --- |
 | 随项目分发 | Source Han Sans CN | [SIL Open Font License 1.1](assets/resources/fonts/LICENSE-SourceHanSans.txt) | 仓库包含 Regular 与 Heavy 字体文件，用于游戏中文字显示 |
-| 算法与评估参考 | [kwai/DouZero](https://github.com/kwai/DouZero) | Apache-2.0 | 参考镜像换位评估方法与 14 类牌型枚举口径；未使用其强化学习模型或源代码 |
+| 算法与评估参考 | [kwai/DouZero](https://github.com/kwai/DouZero) | Apache-2.0 | 参考固定发牌、角色评估与 14 类牌型枚举口径；镜像配对与聚类置信区间为本项目实现，未使用其强化学习模型或源代码 |
 | 算法思想参考 | [ZhouWeikuan/DouDiZhu](https://github.com/ZhouWeikuan/DouDiZhu) | Apache-2.0 | 参考权重拆牌和剩余手牌权重排序思想；本项目在自己的精确拆解引擎上独立实现 |
 | 基线调研参考 | [datamllab/rlcard](https://github.com/datamllab/rlcard) | MIT | 仅作为朴素规则 Agent 的基线参照；不是产品运行时依赖 |
 | 论文参考 | [DeltaDou](https://www.ijcai.org/proceedings/2019/0176.pdf) | IJCAI 2019 论文 | 参考对手建模中的过牌推断思想；加权采样与有效样本护栏由本项目实现 |

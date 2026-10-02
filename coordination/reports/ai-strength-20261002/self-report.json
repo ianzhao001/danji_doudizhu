@@ -1,0 +1,447 @@
+{
+  "manifest": {
+    "schema": "strength-increment-mirror-v1",
+    "mode": "self",
+    "parentSHA": "cb715ea265db26ec8d43aa1dd16cbfd604769942",
+    "candidateParentSHA": "cb715ea265db26ec8d43aa1dd16cbfd604769942",
+    "candidate": {
+      "scriptsSha256": "f9052f5102d5fcd17a3005f466a20231f3f03c5417b3fdf1209cd3bfe7f8f13b",
+      "aiSha256": "eaaf62b99e1329c7199f2a4a3904813624f745ace386779c4225eb0889fe679d",
+      "aiFiles": [
+        {
+          "path": "ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "ai/levels/hard.ts",
+          "sha256": "bda693def0c2fed02e0b3398b7a32445c1b7bd75037a711ae5e79451a472b7b2"
+        },
+        {
+          "path": "ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "ai/pimc.ts",
+          "sha256": "d4057ed1e6bd74f69023b35c11885eb5c2003083f55b7dd4146e25e86c8cfeae"
+        },
+        {
+          "path": "ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "ai/rollout.ts",
+          "sha256": "8ee5880b680a6083e7500f7f3f24b7ff863e13e5fbcf08df030121e46e0a35bc"
+        },
+        {
+          "path": "ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        }
+      ]
+    },
+    "baseline": {
+      "scriptsSha256": "f9052f5102d5fcd17a3005f466a20231f3f03c5417b3fdf1209cd3bfe7f8f13b",
+      "aiSha256": "eaaf62b99e1329c7199f2a4a3904813624f745ace386779c4225eb0889fe679d",
+      "aiFiles": [
+        {
+          "path": "ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "ai/levels/hard.ts",
+          "sha256": "bda693def0c2fed02e0b3398b7a32445c1b7bd75037a711ae5e79451a472b7b2"
+        },
+        {
+          "path": "ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "ai/pimc.ts",
+          "sha256": "d4057ed1e6bd74f69023b35c11885eb5c2003083f55b7dd4146e25e86c8cfeae"
+        },
+        {
+          "path": "ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "ai/rollout.ts",
+          "sha256": "8ee5880b680a6083e7500f7f3f24b7ff863e13e5fbcf08df030121e46e0a35bc"
+        },
+        {
+          "path": "ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        }
+      ]
+    },
+    "arenaLibSha256": "6654ea6e71823dd5eb7da9722ac073af86d6bef4e16c76f334658289ded81520",
+    "seeds": [
+      200001,
+      200002,
+      200003,
+      200004,
+      200005,
+      200006,
+      200007,
+      200008
+    ],
+    "fixedBid": "frozen-cb715ea-hard-all-seats",
+    "protocol": "same seed and targetSeat, candidate target vs cb715ea fillers; cb715ea target vs candidate fillers",
+    "flow": "candidate runHeadlessRound; default startSeat=0; baseScore=1; no thinking delay",
+    "metric": "mean target win difference (pp) and settlement score difference; seed-cluster bootstrap 95% CI",
+    "scope": "increment over pre-upgrade cb715ea; farmer mirror also replaces partner and landlord; no claim of isolated individual-agent effect"
+  },
+  "games": [
+    {"seed":200001,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":200001,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":200001,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":200001,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":200001,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":200001,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":200002,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":200002,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":200002,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":200002,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":200002,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":200002,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":200003,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":200003,"targetSeat":0,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":200003,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":200003,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":200003,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":200003,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":200004,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":200004,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":200004,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":200004,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":1},
+    {"seed":200004,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":200004,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":200005,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":200005,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":200005,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":200005,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":200005,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":200005,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":200006,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":200006,"targetSeat":0,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":200006,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":200006,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":200006,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":200006,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":200007,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":200007,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":200007,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":200007,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":1},
+    {"seed":200007,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":200007,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":200008,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":200008,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":200008,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":200008,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":200008,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":200008,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0}
+  ],
+  "summary": {
+    "pairs": 24,
+    "games": 48,
+    "complete": true,
+    "newWinRate": 0.375,
+    "legacyWinRate": 0.375,
+    "mirrorWinRateDiffPp": 0,
+    "avgPairedScoreDiff": 0,
+    "selfMismatchPairs": 0,
+    "seedClusters": 8,
+    "ciMethod": "seed-cluster-bootstrap",
+    "avgPairedScoreDiffCI": {
+      "lo": 0,
+      "hi": 0
+    },
+    "mirrorWinRateDiffPpCI": {
+      "lo": 0,
+      "hi": 0
+    },
+    "byRole": [
+      {
+        "role": "landlord",
+        "pairs": 8,
+        "mirrorWinRateDiffPp": 0,
+        "avgPairedScoreDiff": 0
+      },
+      {
+        "role": "upper",
+        "pairs": 8,
+        "mirrorWinRateDiffPp": 0,
+        "avgPairedScoreDiff": 0
+      },
+      {
+        "role": "lower",
+        "pairs": 8,
+        "mirrorWinRateDiffPp": 0,
+        "avgPairedScoreDiff": 0
+      }
+    ],
+    "landlordSplitPairs": 0
+  },
+  "roleSummaries": [
+    {
+      "role": "landlord",
+      "pairs": 8,
+      "games": 16,
+      "complete": true,
+      "newWinRate": 0.875,
+      "legacyWinRate": 0.875,
+      "mirrorWinRateDiffPp": 0,
+      "avgPairedScoreDiff": 0,
+      "selfMismatchPairs": 0,
+      "seedClusters": 8,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": 0,
+        "hi": 0
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": 0,
+        "hi": 0
+      },
+      "byRole": [
+        {
+          "role": "landlord",
+          "pairs": 8,
+          "mirrorWinRateDiffPp": 0,
+          "avgPairedScoreDiff": 0
+        }
+      ],
+      "landlordSplitPairs": 0
+    },
+    {
+      "role": "upper",
+      "pairs": 8,
+      "games": 16,
+      "complete": true,
+      "newWinRate": 0.125,
+      "legacyWinRate": 0.125,
+      "mirrorWinRateDiffPp": 0,
+      "avgPairedScoreDiff": 0,
+      "selfMismatchPairs": 0,
+      "seedClusters": 8,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": 0,
+        "hi": 0
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": 0,
+        "hi": 0
+      },
+      "byRole": [
+        {
+          "role": "upper",
+          "pairs": 8,
+          "mirrorWinRateDiffPp": 0,
+          "avgPairedScoreDiff": 0
+        }
+      ],
+      "landlordSplitPairs": 0
+    },
+    {
+      "role": "lower",
+      "pairs": 8,
+      "games": 16,
+      "complete": true,
+      "newWinRate": 0.125,
+      "legacyWinRate": 0.125,
+      "mirrorWinRateDiffPp": 0,
+      "avgPairedScoreDiff": 0,
+      "selfMismatchPairs": 0,
+      "seedClusters": 8,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": 0,
+        "hi": 0
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": 0,
+        "hi": 0
+      },
+      "byRole": [
+        {
+          "role": "lower",
+          "pairs": 8,
+          "mirrorWinRateDiffPp": 0,
+          "avgPairedScoreDiff": 0
+        }
+      ],
+      "landlordSplitPairs": 0
+    }
+  ],
+  "verdict": {
+    "pass": true,
+    "reasons": []
+  }
+}

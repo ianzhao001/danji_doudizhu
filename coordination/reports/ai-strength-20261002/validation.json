@@ -1,0 +1,372 @@
+{
+  "schema": "ai-strength-validation-v1",
+  "date": "2026-10-02",
+  "branch": "codex/ai-strength-upgrade",
+  "status": "strength-confirmed-runtime-release-validation-pending",
+  "baseline": {
+    "commit": "cb715ea265db26ec8d43aa1dd16cbfd604769942",
+    "tree": "3f37cbbf2cb6e7324eda32522c388eff3674e23b",
+    "verification": "baseline-verification.json"
+  },
+  "change": {
+    "module": "assets/scripts/ai/levels/hard.ts",
+    "behavior": "After direct finishes and proven wins, use bounded PIMC for public-card-conserving states with at most 16 total cards; include legal pass. Keep samples=0 behavior.",
+    "unchangedBudgets": {
+      "hardWorlds": 48,
+      "hardCandidates": 8,
+      "hardSolverCardMax": 12,
+      "hardSolverNodes": 120000,
+      "hintWorlds": 160,
+      "hintCandidates": 12,
+      "hintSolverCardMax": 15,
+      "hintSolverNodes": 300000
+    },
+    "runtimeDependenciesAdded": false,
+    "newModel": false,
+    "limits": [
+      "Only structurally shortlisted candidates are evaluated.",
+      "Triggering at 16 cards is not exact solving at 16 cards; some actions use exact sampled-world solutions while others fall back to rollout.",
+      "Information comes from public history and own cards; sampled-world results are not proofs across every hidden assignment."
+    ]
+  },
+  "protocol": {
+    "developmentSeeds": "200001..200064",
+    "developmentGamesPerCandidate": 384,
+    "developmentTrials": [
+      {
+        "candidate": "A12",
+        "selected": false,
+        "report": "dev-a12-report.json",
+        "source": "candidate-a12-hard.ts.txt",
+        "winRateDiffPp": 1.0417,
+        "winRateDiffPpCI": {
+          "lo": 0,
+          "hi": 2.6042
+        },
+        "pairedScoreDiff": 0.2083,
+        "pairedScoreDiffCI": {
+          "lo": 0,
+          "hi": 0.5833
+        }
+      },
+      {
+        "candidate": "A16",
+        "selected": true,
+        "report": "dev-a16-report.json",
+        "source": "assets/scripts/ai/levels/hard.ts",
+        "winRateDiffPp": 2.0833,
+        "winRateDiffPpCI": {
+          "lo": 0.5208,
+          "hi": 4.1667
+        },
+        "pairedScoreDiff": 0.2708,
+        "pairedScoreDiffCI": {
+          "lo": 0.0208,
+          "hi": 0.6667
+        }
+      },
+      {
+        "candidate": "B",
+        "selected": false,
+        "report": "dev-b-report.json",
+        "source": "candidate-b-pimc.ts.txt",
+        "winRateDiffPp": 0,
+        "winRateDiffPpCI": {
+          "lo": -4.6875,
+          "hi": 4.6875
+        },
+        "pairedScoreDiff": 0.1667,
+        "pairedScoreDiffCI": {
+          "lo": -1,
+          "hi": 1.5
+        }
+      }
+    ],
+    "holdoutSeeds": "300001..300400",
+    "holdoutGames": 2400,
+    "holdoutRuns": 1,
+    "postHoldoutProductTuning": false,
+    "fixedBidding": "frozen baseline hard on all seats",
+    "comparison": "same seed and target seat, candidate target vs baseline fillers, mirrored by swapping candidate and baseline on all seats",
+    "confidenceIntervals": "deterministic 2000-replicate seed-cluster bootstrap, 95% percentile intervals",
+    "primaryAcceptance": "both overall win-difference and paired-score-difference 95% lower bounds >0",
+    "roleIntervals": "exploratory, no multiplicity correction",
+    "roleCaveat": "A farmer mirror changes both its teammate and its opponent; this is not an isolated individual-agent treatment effect."
+  },
+  "holdout": {
+    "report": "holdout-report.json",
+    "candidateAiSha256": "06ab0d68040ce4a0d9865401558dc98a420ffc1b927aa79b780d0f1ea63798d9",
+    "summary": {
+      "pairs": 1200,
+      "games": 2400,
+      "complete": true,
+      "newWinRate": 0.4925,
+      "legacyWinRate": 0.4658,
+      "mirrorWinRateDiffPp": 2.6667,
+      "avgPairedScoreDiff": 0.8233,
+      "selfMismatchPairs": 94,
+      "seedClusters": 400,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": 0.3833,
+        "hi": 1.4133
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": 1.5,
+        "hi": 4
+      },
+      "byRole": [
+        {
+          "role": "landlord",
+          "pairs": 400,
+          "mirrorWinRateDiffPp": 6.75,
+          "avgPairedScoreDiff": 2.395
+        },
+        {
+          "role": "upper",
+          "pairs": 400,
+          "mirrorWinRateDiffPp": 2.75,
+          "avgPairedScoreDiff": 0.5525
+        },
+        {
+          "role": "lower",
+          "pairs": 400,
+          "mirrorWinRateDiffPp": -1.5,
+          "avgPairedScoreDiff": -0.4775
+        }
+      ],
+      "landlordSplitPairs": 0
+    },
+    "roles": [
+      {
+        "role": "landlord",
+        "pairs": 400,
+        "games": 800,
+        "complete": true,
+        "newWinRate": 0.6,
+        "legacyWinRate": 0.5325,
+        "mirrorWinRateDiffPp": 6.75,
+        "avgPairedScoreDiff": 2.395,
+        "selfMismatchPairs": 35,
+        "seedClusters": 400,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": 1.14,
+          "hi": 4.14
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 4,
+          "hi": 9.5
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 400,
+            "mirrorWinRateDiffPp": 6.75,
+            "avgPairedScoreDiff": 2.395
+          }
+        ],
+        "landlordSplitPairs": 0
+      },
+      {
+        "role": "upper",
+        "pairs": 400,
+        "games": 800,
+        "complete": true,
+        "newWinRate": 0.45,
+        "legacyWinRate": 0.4225,
+        "mirrorWinRateDiffPp": 2.75,
+        "avgPairedScoreDiff": 0.5525,
+        "selfMismatchPairs": 30,
+        "seedClusters": 400,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": -0.415,
+          "hi": 1.535
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 0.25,
+          "hi": 5.25
+        },
+        "byRole": [
+          {
+            "role": "upper",
+            "pairs": 400,
+            "mirrorWinRateDiffPp": 2.75,
+            "avgPairedScoreDiff": 0.5525
+          }
+        ],
+        "landlordSplitPairs": 0
+      },
+      {
+        "role": "lower",
+        "pairs": 400,
+        "games": 800,
+        "complete": true,
+        "newWinRate": 0.4275,
+        "legacyWinRate": 0.4425,
+        "mirrorWinRateDiffPp": -1.5,
+        "avgPairedScoreDiff": -0.4775,
+        "selfMismatchPairs": 29,
+        "seedClusters": 400,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": -1.465,
+          "hi": 0.4525
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": -4,
+          "hi": 1
+        },
+        "byRole": [
+          {
+            "role": "lower",
+            "pairs": 400,
+            "mirrorWinRateDiffPp": -1.5,
+            "avgPairedScoreDiff": -0.4775
+          }
+        ],
+        "landlordSplitPairs": 0
+      }
+    ],
+    "pass": true,
+    "interpretation": "Overall improvement over the immediate baseline under this protocol. Lower farmer point estimate is negative with interval crossing zero; do not claim all-role improvement, equivalence or non-inferiority."
+  },
+  "selfCheck": {
+    "report": "self-report.json",
+    "seeds": 8,
+    "games": 48,
+    "mismatchedPairs": 0,
+    "pass": true
+  },
+  "legacyGates": {
+    "report": "legacy/summary.json",
+    "hardSeeds": 200,
+    "selfSeeds": 20,
+    "crippledSeeds": 20,
+    "allPassed": true,
+    "runnerNote": "npm wrapper failed before producing a result because its exec cache was not writable; the installed vite-node executed the same arena.ts shards and judge with unchanged thresholds. Exact argv is archived in legacy/summary.json. Previous tracked reports were restored."
+  },
+  "fullTests": {
+    "command": "SELFPLAY_GATE=1 npm --prefix test test -- --maxWorkers=1 --minWorkers=1",
+    "exitCode": 1,
+    "files": {
+      "passed": 218,
+      "failed": 1,
+      "skipped": 2
+    },
+    "tests": {
+      "passed": 1370,
+      "failed": 3,
+      "skipped": 2
+    },
+    "durationSeconds": 306.96,
+    "log": "full-tests.log",
+    "failure": "Three existing historical hint-runtime-capture comparisons differ from current recommendations. The capture and assertions were preserved. No Creator cold build or new real-click probe was performed.",
+    "depthGate": {
+      "passed": true,
+      "result": {
+        "seeds": 100,
+        "g1HardSimpleDiff": 0.33999999999999997,
+        "g2LandlordDiff": 0.21999999999999997,
+        "g3HardNormalDiff": 0.10666666666666674,
+        "detail": {
+          "hardInNormal": {
+            "winRate": 0.56,
+            "landlordWinRate": 0.6
+          },
+          "normalInHard": {
+            "winRate": 0.4533333333333333,
+            "landlordWinRate": 0.38
+          },
+          "hardInSimple": {
+            "winRate": 0.6566666666666666,
+            "landlordWinRate": 0.74
+          },
+          "simpleInHard": {
+            "winRate": 0.31666666666666665,
+            "landlordWinRate": 0.19
+          }
+        }
+      },
+      "thresholds": {
+        "g1HardSimpleDiff": 0.25,
+        "g2LandlordDiff": 0.03,
+        "g3HardNormalDiff": 0.05
+      }
+    }
+  },
+  "typecheck": {
+    "command": "npm --prefix test run typecheck",
+    "exitCode": 0,
+    "productionStrictGate": "passed in the full run using official @cocos/creator-types@3.8.8 declarations"
+  },
+  "latency": {
+    "report": "latency.json",
+    "command": "cd test && ./node_modules/.bin/vite-node --config vitest.config.ts bench/ai-latency.ts",
+    "exitCode": 0,
+    "environment": {
+      "node": "v24.19.0",
+      "v8": "13.6.233.17-node.51",
+      "platform": "linux",
+      "release": "6.18.44",
+      "arch": "x64",
+      "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+      "cpuCount": 5,
+      "benchmarkConcurrency": 1
+    },
+    "corpusSha256": "3c70ec921cd685c27ff22a5301dec7183b46b2d31391f621427c5ef142d7970c",
+    "decision": {
+      "p50": 0.04,
+      "p95": 23.64,
+      "max": 49.41
+    },
+    "hint": {
+      "p50": 0.13,
+      "p95": 66.23,
+      "max": 78.5
+    },
+    "limits": "Serial server run, not a mobile measurement or evidence of a speedup over earlier runs."
+  },
+  "reproduction": {
+    "script": "comparison.ts.txt",
+    "scriptSha256": "b7e66516b36fd0273fa6ed9201cb7597054ab1646733e4ede76ab111ce9ab1df",
+    "notes": [
+      "The archived script is the exact executed experiment source and contains original absolute roots. It is not included in the product runtime.",
+      "On another machine, replace /workspace/danji_doudizhu with the current checkout absolute path and /tmp/ddz-strength-base with the frozen baseline checkout path, including import specifiers and root constants.",
+      "The original manifest records pre-commit HEAD plus working-tree hashes. Replaying after commit changes that provenance HEAD, while unchanged source should retain identical source hashes.",
+      "A12 can be reconstructed by replacing baseline assets/scripts/ai/levels/hard.ts with candidate-a12-hard.ts.txt. B replaces only baseline assets/scripts/ai/pimc.ts with candidate-b-pimc.ts.txt; B was not combined with A.",
+      "The selected A16 source is the committed product file. The entry in developmentTrials.source for A16 is repository-relative."
+    ],
+    "baselineSetup": "mkdir -p /tmp/ddz-strength-base; git archive cb715ea265db26ec8d43aa1dd16cbfd604769942 assets/scripts | tar -x -C /tmp/ddz-strength-base",
+    "copyRunner": "cp coordination/reports/ai-strength-20261002/comparison.ts.txt /tmp/ddz-strength-comparison.ts",
+    "runEachShard": "test/node_modules/.bin/vite-node --root /workspace/danji_doudizhu /tmp/ddz-strength-comparison.ts --mode=holdout --shard=N/4 --out=/tmp/ddz-a16-holdout-N.json (N=0,1,2,3)",
+    "judge": "test/node_modules/.bin/vite-node --root /workspace/danji_doudizhu /tmp/ddz-strength-comparison.ts --mode=holdout --judge --inputs=/tmp/ddz-a16-holdout-0.json,/tmp/ddz-a16-holdout-1.json,/tmp/ddz-a16-holdout-2.json,/tmp/ddz-a16-holdout-3.json --out=/tmp/ddz-a16-holdout-report.json"
+  },
+  "research": {
+    "adopted": "Reuse this project's existing bounded PIMC and team-aware world solver before high-risk heuristic early returns; no external source copied.",
+    "evaluatedNotAdopted": [
+      {
+        "project": "esrrhs/doudizhu_ai",
+        "commit": "1cb1cf3862b34080b5e9003b2090b9ef687f9dc6",
+        "license": "MIT",
+        "url": "https://github.com/esrrhs/doudizhu_ai/blob/1cb1cf3862b34080b5e9003b2090b9ef687f9dc6/src/main/java/com/doudizhu/ai/PassInference.java",
+        "result": "Inspired an independently implemented conservative cheap-follow likelihood candidate (B); development did not demonstrate improvement, so not adopted."
+      },
+      {
+        "project": "OpenSpiel ISMCTS",
+        "url": "https://github.com/google-deepmind/open_spiel/blob/master/open_spiel/python/algorithms/ismcts.py",
+        "result": "Information-set tree search needs broader redesign; not adopted this round."
+      }
+    ],
+    "evaluationReference": "https://github.com/kwai/DouZero/blob/main/douzero/evaluation/simulation.py",
+    "evaluationAttribution": "Fixed deals and role-based WP/ADP are referenced from DouZero; mirrored pairing and seed-cluster intervals are implemented by this project."
+  },
+  "releaseChecksRemaining": [
+    "Cold-build this candidate in Cocos Creator 3.8.8.",
+    "Serve the repository and run the existing real hint-click probe as documented in coordination/scripts/w-audit-hint-probe.mjs.",
+    "Review fresh captured evidence and rerun capture tests and the full suite.",
+    "Measure on target phones before making mobile performance claims."
+  ],
+  "publication": "Independent branch and draft PR on top of the preceding candidate; no main merge or validated release claim."
+}
