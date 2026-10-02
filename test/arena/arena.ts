@@ -15,22 +15,36 @@
  * 确定性：本文件零时基零随机（时间戳由 coordination/scripts/w-ai-arena.mjs 外层盖）。
  */
 import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { AiLevel, chooseBidByLevel, strategyFor } from '../../assets/scripts/ai';
 import type { AiStrategy } from '../../assets/scripts/ai';
-import { __setTuningForOfflineSearch, type AiTuning } from '../../assets/scripts/ai/tuning';
+import { __setTuningForOfflineSearch, getTuning, type AiTuning } from '../../assets/scripts/ai/tuning';
 import { runHeadlessRound, type BidPolicy, type PlayPolicy } from '../../assets/scripts/flow';
 import { enumerateMoves, legalFollows } from '../../assets/scripts/rules';
 import { legacyBidByName, legacyStrategyByName, type LegacyLevelName } from '../fixtures/legacy-ai/legacy';
 import { v19BidByName, v19StrategyByName } from '../fixtures/ai-v19/v19';
 import { judgeCrippledCaught, judgeSelftest, judgeStrength, judgeStrengthCI, summarizeMirror, type ArenaGame, type ArenaSide } from './arena-lib';
-
-type Pairing = 'hard' | 'normal' | 'simple' | 'self' | 'crippled';
-type Profile = 'full' | 'weights-only';
+import { hashArenaFiles, hashArenaValue, mergeArenaShards, validateArenaManifest, type ArenaManifest, type ArenaShard, type Baseline, type FixedBid, type Pairing, type Profile } from './arena-manifest';
 // W-AI-R3（B0 立度量）：新增基线选择与叫牌固定轴。
 // baseline：旧引擎一侧＝冻结的 pre-v1.8 legacy 或 v1.9（candidate-vs-v19 前向度量）。
 // fixed-bid：钉住叫牌引擎（所有席同一），只让出牌随目标席变 → 隔离出牌强度。
-type Baseline = 'legacy' | 'v19';
-type FixedBid = 'none' | 'new' | 'legacy' | 'v19';
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+
+function experimentHashes(manifest: Pick<ArenaManifest, 'pairing' | 'baseline' | 'fixedBid'>) {
+  const fixture = (baseline: Baseline) => `test/fixtures/${baseline === 'v19' ? 'ai-v19' : 'legacy-ai'}`;
+  const baselinePaths = manifest.pairing === 'self' ? ['assets/scripts/ai'] : [fixture(manifest.baseline)];
+  if (manifest.fixedBid === 'legacy' || manifest.fixedBid === 'v19') baselinePaths.push(fixture(manifest.fixedBid));
+  return {
+    sourceHash: hashArenaFiles(REPO_ROOT, [
+      'assets/scripts/ai', 'assets/scripts/rules', 'assets/scripts/game', 'assets/scripts/flow', 'assets/scripts/data',
+      'test/arena/arena.ts', 'test/arena/arena-lib.ts', 'test/arena/arena-manifest.ts',
+      'test/package.json', 'test/package-lock.json',
+    ]),
+    baselineHash: hashArenaFiles(REPO_ROOT, baselinePaths),
+    tuningHash: hashArenaValue(getTuning()),
+  };
+}
 
 // W-AI-R2 棘轮(BOARD 2026-07-17):hard 8→9(已交付 +10.17pp,R2 不得回吐;签收目标 +12)。
 const STRENGTH_GATE_PP: Record<'hard' | 'normal' | 'simple', number> = { hard: 9, normal: 8, simple: 10 };
@@ -127,7 +141,8 @@ function sidePolicies(
   const level = levelOf(pairing);
   const legacyName = (pairing === 'normal' ? 'normal' : pairing === 'simple' ? 'simple' : 'hard') as LegacyLevelName;
   const newPlay = newPlayStrategy(pairing, level, weightsOnlyHard);
-  const oldPlay = oldPlayStrategy(pairing, baseline, legacyName, level);
+  // Self checks must use the exact same profile on both sides, including weights-only.
+  const oldPlay = pairing === 'self' ? newPlay : oldPlayStrategy(pairing, baseline, legacyName, level);
   const oldBid = (hand: Parameters<BidPolicy>[0]['hand'], state: Parameters<BidPolicy>[0]['state']) => (
     baseline === 'v19' ? v19BidByName(hand, state, legacyName) : legacyBidByName(hand, state, legacyName)
   );
@@ -158,9 +173,19 @@ async function runShard(args: Map<string, string>): Promise<void> {
   const seedCount = Number(args.get('seeds') ?? 200);
   // 保留集：用大偏移（如 --seed-base=100000）跑与调参集(1..N)不相交的独立种子块。
   const seedBase = Number(args.get('seed-base') ?? 0);
-  const [shardIndex, shardTotal] = (args.get('shard') ?? '0/1').split('/').map(Number);
+  const shardArg = args.get('shard') ?? '0/1';
+  if (!/^\d+\/\d+$/.test(shardArg)) throw new Error('--shard must be index/total');
+  const [shardIndex, shardTotal] = shardArg.split('/').map(Number);
   const out = args.get('out');
   if (!out) throw new Error('--out required in run mode');
+  const manifest = validateArenaManifest({
+    version: 1, pairing, profile, baseline, fixedBid, seedBase, seedCount, shardTotal,
+    sourceHash: '0'.repeat(64), baselineHash: '0'.repeat(64), tuningHash: '0'.repeat(64),
+  });
+  if (!Number.isSafeInteger(shardIndex) || shardIndex < 0 || shardIndex >= shardTotal) {
+    throw new Error('--shard index must be between 0 and total - 1');
+  }
+  Object.assign(manifest, experimentHashes(manifest));
   const weightsOnlyHard = profile === 'weights-only' && levelOf(pairing) === AiLevel.Hard
     ? await resolveWeightsOnlyHard()
     : null;
@@ -184,7 +209,11 @@ async function runShard(args: Map<string, string>): Promise<void> {
       }
     }
   }
-  writeFileSync(out, `${JSON.stringify({ pairing, profile, baseline, fixedBid, seedBase, shard: `${shardIndex}/${shardTotal}`, games }, null, 1)}\n`);
+  if (hashArenaValue(experimentHashes(manifest)) !== hashArenaValue({
+    sourceHash: manifest.sourceHash, baselineHash: manifest.baselineHash, tuningHash: manifest.tuningHash,
+  })) throw new Error('arena source or tuning changed during this shard; rerun with stable inputs');
+  const result: ArenaShard = { manifest, shardIndex, games };
+  writeFileSync(out, `${JSON.stringify(result, null, 1)}\n`);
   console.log(`[arena] shard done pairing=${pairing} profile=${profile} baseline=${baseline} fixedBid=${fixedBid} seedBase=${seedBase} shard=${shardIndex}/${shardTotal} games=${games.length}`);
 }
 
@@ -196,16 +225,14 @@ function judgeMerged(args: Map<string, string>): void {
   const out = args.get('out');
   if (inputs.length === 0) throw new Error('--inputs required in judge mode');
 
-  const games: ArenaGame[] = [];
-  for (const path of inputs) {
-    const shard = JSON.parse(readFileSync(path, 'utf8')) as { pairing: Pairing; profile: Profile; baseline?: Baseline; games: ArenaGame[] };
-    const shardBaseline = shard.baseline ?? 'legacy';
-    if (shard.pairing !== pairing || shard.profile !== profile || shardBaseline !== baseline) {
-      throw new Error(`shard mismatch: ${path} is ${shard.pairing}/${shard.profile}/${shardBaseline}, expected ${pairing}/${profile}/${baseline}`);
-    }
-    games.push(...shard.games);
-  }
-  games.sort((a, b) => a.seed - b.seed || a.targetSeat - b.targetSeat || a.targetSide.localeCompare(b.targetSide));
+  // Omitted plan/bidding flags are read from the manifest, so existing SPSA judge commands remain valid.
+  const expected: Partial<ArenaManifest> = { pairing, profile, baseline };
+  if (args.has('fixed-bid')) expected.fixedBid = args.get('fixed-bid') as FixedBid;
+  if (args.has('seed-base')) expected.seedBase = Number(args.get('seed-base'));
+  if (args.has('seeds')) expected.seedCount = Number(args.get('seeds'));
+  if (args.has('shards')) expected.shardTotal = Number(args.get('shards'));
+  if (args.has('tuning')) expected.tuningHash = hashArenaValue(getTuning());
+  const { manifest, games } = mergeArenaShards(inputs.map((path) => JSON.parse(readFileSync(path, 'utf8')) as unknown), expected);
 
   const summary = summarizeMirror(games);
   const verdict = pairing === 'self'
@@ -220,7 +247,7 @@ function judgeMerged(args: Map<string, string>): void {
           ? WEIGHTS_ONLY_HARD_GATE_PP
           : STRENGTH_GATE_PP[pairing]);
 
-  const report = { pairing, profile, baseline, summary, verdict };
+  const report = { pairing, profile, baseline, fixedBid: manifest.fixedBid, manifest, summary, verdict };
   const rendered = `${JSON.stringify(report, null, 1)}\n`;
   if (out) writeFileSync(out, rendered);
   console.log(rendered.trimEnd());

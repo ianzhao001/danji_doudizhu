@@ -11,7 +11,7 @@
  *   node coordination/scripts/w-ai-arena.mjs --pairings=hard --profile=weights-only   # 消融档
  */
 import { spawn } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const args = new Map(process.argv.slice(2).filter((a) => a.startsWith('--')).map((a) => {
@@ -20,13 +20,36 @@ const args = new Map(process.argv.slice(2).filter((a) => a.startsWith('--')).map
 }));
 
 const SEEDS = Number(args.get('seeds') ?? 200);
-const WORKERS = Math.max(1, Number(args.get('workers') ?? 7));
+const WORKERS = Number(args.get('workers') ?? 7);
 const PROFILE = args.get('profile') ?? 'full';
+const BASELINE = args.get('baseline') ?? 'legacy';
+const FIXED_BID = args.get('fixed-bid') ?? 'none';
+const SEED_BASE = Number(args.get('seed-base') ?? 0);
+const TUNING = args.get('tuning');
 const PAIRINGS = (args.get('pairings') ?? 'hard,normal,simple,self,crippled').split(',').filter(Boolean);
 const SELF_SEEDS = Number(args.get('selfSeeds') ?? 20); // self/crippled 自证用小样本即可
 const OUT_DIR = join('coordination', 'reports', 'w-ai-arena');
 
+for (const [name, value] of [['seeds', SEEDS], ['workers', WORKERS], ['selfSeeds', SELF_SEEDS]]) {
+  if (!Number.isSafeInteger(value) || value < 1) throw new Error(`--${name} must be a positive integer`);
+}
+if (!Number.isSafeInteger(SEED_BASE) || SEED_BASE < 0 || SEED_BASE + Math.max(SEEDS, SELF_SEEDS) > 0xffff_ffff) {
+  throw new Error('--seed-base and seed counts must fit the unsigned 32-bit seed range');
+}
+if (!['full', 'weights-only'].includes(PROFILE)) throw new Error('invalid --profile');
+if (!['legacy', 'v19'].includes(BASELINE)) throw new Error('invalid --baseline');
+if (!['none', 'new', 'legacy', 'v19'].includes(FIXED_BID)) throw new Error('invalid --fixed-bid');
+if (PAIRINGS.length === 0 || new Set(PAIRINGS).size !== PAIRINGS.length
+  || PAIRINGS.some((pairing) => !['hard', 'normal', 'simple', 'self', 'crippled'].includes(pairing))) {
+  throw new Error('--pairings must contain unique valid pairing names');
+}
 mkdirSync(OUT_DIR, { recursive: true });
+// Each invocation owns its files, so a failed judge cannot accidentally read an older successful report.
+const RUN_DIR = mkdtempSync(join(OUT_DIR, 'run-'));
+const EXPERIMENT_ARGS = [
+  `--profile=${PROFILE}`, `--baseline=${BASELINE}`, `--fixed-bid=${FIXED_BID}`, `--seed-base=${SEED_BASE}`,
+  ...(TUNING ? [`--tuning=${TUNING}`] : []),
+];
 
 function tsx(argv) {
   return new Promise((resolve, reject) => {
@@ -44,12 +67,12 @@ async function runPairing(pairing) {
   const shardOuts = [];
   const jobs = [];
   for (let shard = 0; shard < workers; shard += 1) {
-    const out = join(OUT_DIR, `${pairing}-${PROFILE}-shard-${shard}.json`);
+    const out = join(RUN_DIR, `${pairing}-${PROFILE}-shard-${shard}.json`);
     shardOuts.push(out);
     jobs.push(tsx([
       'test/arena/arena.ts',
       `--pairing=${pairing}`,
-      `--profile=${PROFILE}`,
+      ...EXPERIMENT_ARGS,
       `--seeds=${seeds}`,
       `--shard=${shard}/${workers}`,
       `--out=${out}`,
@@ -57,22 +80,25 @@ async function runPairing(pairing) {
   }
   await Promise.all(jobs);
 
-  const report = join(OUT_DIR, `${pairing}-${PROFILE}-report.json`);
+  const report = join(RUN_DIR, `${pairing}-${PROFILE}-report.json`);
   let gatePassed = true;
   try {
     await tsx([
       'test/arena/arena.ts',
       '--judge',
       `--pairing=${pairing}`,
-      `--profile=${PROFILE}`,
+      ...EXPERIMENT_ARGS,
+      `--seeds=${seeds}`,
+      `--shards=${workers}`,
       `--inputs=${shardOuts.join(',')}`,
       `--out=${report}`,
     ]);
-  } catch {
+  } catch (error) {
+    if (!existsSync(report)) throw error;
     gatePassed = false;
   }
   const parsed = JSON.parse(readFileSync(report, 'utf8'));
-  return { pairing, seeds, report, gatePassed, summary: parsed.summary, verdict: parsed.verdict };
+  return { pairing, seeds, report, gatePassed, manifest: parsed.manifest, summary: parsed.summary, verdict: parsed.verdict };
 }
 
 const startedAt = new Date().toISOString();
@@ -90,6 +116,10 @@ const final = {
   startedAt,
   finishedAt: new Date().toISOString(),
   profile: PROFILE,
+  baseline: BASELINE,
+  fixedBid: FIXED_BID,
+  seedBase: SEED_BASE,
+  tuning: TUNING ?? null,
   seeds: SEEDS,
   workers: WORKERS,
   results,

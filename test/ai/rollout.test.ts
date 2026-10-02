@@ -102,14 +102,14 @@ describe('W-AI S3 rollout 廉价走子引擎', () => {
     expect(outcome.plays).toBe(1); // 本次模拟内的出牌手数（K 已在场外）：只有 A 落下。
   });
 
-  it('农民对队友 top 恒过：队友的对 9 不被我方压，地主压后局面继续（不 crash 且守恒）', () => {
+  it('不能直接清手时仍让队友 top：队友的对 9 不被我方压，地主压后局面继续', () => {
     const board: [number[], number[], number[]] = [counts('Q Q 2 2'), counts('10 10'), counts('K K 3')];
     const outcome = rolloutRound({
       counts: board,
       turn: 2,
       landlord: 0,
       top: recognize(cards('9 9'))!,
-      topSeat: 1, // 队友(农民 seat1)的 top，轮到农民 seat2 —— 恒过。
+      topSeat: 1, // 队友(农民 seat1)的 top，轮到农民 seat2；KK3 不能整手跟完。
       rng: createRng(4),
     });
     expect(outcome.winnerSide === 'landlord' || outcome.winnerSide === 'farmer').toBe(true);
@@ -129,6 +129,48 @@ describe('W-AI S3 rollout 廉价走子引擎', () => {
     expect(second).toEqual(first);
     expect(first.plays).toBeGreaterThan(0);
     expect(first.plays).toBeLessThanOrEqual(54);
+  });
+});
+
+describe('rollout 清手优先回归', () => {
+  it('五连裸飞机整手领出，不拆顺子让对手反杀', () => {
+    // 旧实现拆出 34567，被农民 89TJQ 一手压完，错误预测 farmer / plays=2。
+    const hand = cards('3 3 3 4 4 4 5 5 5 6 6 6 7 7 7');
+    expect(recognize(hand)?.length).toBe(hand.length);
+    const outcome = rolloutRound({
+      counts: [toRankCounts(hand), counts('8 9 10 J Q'), counts('K')],
+      turn: 0, landlord: 0, top: null, topSeat: null, rng: createRng(21),
+    });
+    expect(outcome).toEqual({ winnerSide: 'landlord', plays: 1 });
+  });
+
+  it.each([
+    ['K', 'Q', 'A'],
+    ['K K', 'Q Q', 'A A'],
+    ['5 5 5 5', 'Q', 'A'],
+    ['x X', 'Q', 'A'],
+  ])('队友顶牌时 %s 可整手压过 %s，立即清手而非让地主 %s 反杀', (hand, top, landlord) => {
+    const outcome = rolloutRound({
+      counts: [counts(landlord), counts('3 4'), counts(hand)],
+      turn: 2, landlord: 0, top: recognize(cards(top))!, topSeat: 1,
+      rng: createRng(22),
+    });
+    expect(outcome).toEqual({ winnerSide: 'farmer', plays: 1 });
+  });
+
+  it.each([
+    ['K 3', 'Q', 'A'], // 非整手不得抢队友牌权。
+    ['5 5 5 5 3', 'Q', 'A'], // 不为非清手动作炸队友。
+    ['K', 'A', '2'], // 整手较小，不能跟。
+    ['K K', 'Q', 'A'], // 整手类型不同，不能跟。
+    ['3 4 5 6 7 8', '3 4 5 6 7', '8 9 10 J Q'], // 同类型但长度不同，不能跟。
+  ])('队友顶牌时 %s 不能整手压过 %s，继续让牌', (hand, top, landlord) => {
+    const outcome = rolloutRound({
+      counts: [counts(landlord), counts('9 2'), counts(hand)],
+      turn: 2, landlord: 0, top: recognize(cards(top))!, topSeat: 1,
+      rng: createRng(23),
+    });
+    expect(outcome).toEqual({ winnerSide: 'landlord', plays: 1 });
   });
 });
 
@@ -200,7 +242,8 @@ describe('W-AI S3v2 四类复合牌型跟牌（修复 PIMC「虚假无敌」盲�
   });
 
   it('夹具G 最小可压择序自证：A 4 4 跟单 3 必出最小 4（地主 K 收官）；改最大 A 则农民反杀', () => {
-    const board: [number[], number[], number[]] = [counts('K'), counts('A 4 4'), counts('9')];
+    // 队友持 99 而非单 9，避免「压队友整手清完」新快路抢先终局，仍隔离最小/最大择序。
+    const board: [number[], number[], number[]] = [counts('K'), counts('A 4 4'), counts('9 9')];
     const outcome = rolloutRound({
       counts: board,
       turn: 1,

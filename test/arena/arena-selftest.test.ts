@@ -27,6 +27,28 @@ function mirroredSet(perPair: (seed: number, seat: 0 | 1 | 2) => { newScore: num
 }
 
 describe('W-AI S14 竞技场判定谓词', () => {
+  it('self 逐对漂移不能以正负抵消掩盖，缺失逐对证据也拒绝', () => {
+    const summary = summarizeMirror(mirroredSet((seed) => (
+      seed % 2 === 0 ? { newScore: 6, legacyScore: 2 } : { newScore: 2, legacyScore: 6 }
+    )));
+    expect(summary.avgPairedScoreDiff).toBe(0);
+    expect(summary.mirrorWinRateDiffPp).toBe(0);
+    expect(summary.selfMismatchPairs).toBe(12);
+    expect(judgeSelftest(summary).pass).toBe(false);
+    const identical = summarizeMirror(mirroredSet(() => ({ newScore: 2, legacyScore: 2 })));
+    delete identical.selfMismatchPairs;
+    expect(judgeSelftest(identical).pass).toBe(false);
+  });
+
+  it.each([
+    { seed: NaN }, { seed: 0x1_0000_0000 }, { targetSeat: 3 }, { targetSide: 'other' },
+    { targetScore: NaN }, { targetScore: Infinity }, { targetScore: 0 }, { landlord: 3 },
+  ])('拒绝非法样本 %j', (overrides) => {
+    const games = mirroredSet(() => ({ newScore: 2, legacyScore: -2 }));
+    Object.assign(games[0]!, overrides);
+    expect(() => summarizeMirror(games)).toThrow('Invalid arena game');
+  });
+
   it('summarizeMirror：完整镜像集的胜率/差值精确（手算对照）', () => {
     // 12 对：new 赢 9 对（+2），legacy 赢 3 对（+2）——差 50pp，配对分差 (9*4-3*4)/12 = 2。
     let index = 0;
@@ -110,6 +132,40 @@ function mirroredWithLandlord(
 }
 
 describe('W-AI-R3 竞技场角色分层 + 配对 CI 门', () => {
+  it('按 seed 整组 bootstrap：同发牌增加完全相关席位不能缩窄 CI', () => {
+    const allSeats = mirroredSet((seed) => seed <= 3
+      ? { newScore: 2, legacyScore: -2 } : { newScore: -2, legacyScore: 2 });
+    const oneSeat = summarizeMirror(allSeats.filter((game) => game.targetSeat === 0));
+    const threeSeats = summarizeMirror(allSeats);
+    expect(threeSeats.seedClusters).toBe(4);
+    expect(threeSeats.ciMethod).toBe('seed-cluster-bootstrap');
+    expect(threeSeats.avgPairedScoreDiffCI).toEqual(oneSeat.avgPairedScoreDiffCI);
+    expect(threeSeats.mirrorWinRateDiffPpCI).toEqual(oneSeat.mirrorWinRateDiffPpCI);
+    expect(summarizeMirror(allSeats.slice().reverse())).toEqual(threeSeats);
+  });
+
+  it('单 seed 无法给出发牌间 CI，不能因三席同胜而宣称显著增益', () => {
+    const summary = summarizeMirror(mirroredSet(() => ({ newScore: 2, legacyScore: -2 }))
+      .filter((game) => game.seed === 1));
+    expect(summary.seedClusters).toBe(1);
+    expect(summary.avgPairedScoreDiffCI).toBeUndefined();
+    expect(judgeStrengthCI(summary, 0).pass).toBe(false);
+  });
+
+  it.each(['avgPairedScoreDiffCI', 'mirrorWinRateDiffPpCI'] as const)('CI 门拒绝缺失或非法 %s', (key) => {
+    for (const ci of [undefined, { lo: NaN, hi: 4 }, { lo: 1, hi: Infinity }, { lo: 4, hi: 1 }]) {
+      const summary = summarizeMirror(mirroredSet(() => ({ newScore: 2, legacyScore: -2 })));
+      summary[key] = ci;
+      expect(judgeStrengthCI(summary, 0).pass).toBe(false);
+    }
+  });
+
+  it('仅一向有 landlord 不计入干净角色层', () => {
+    const games = mirroredWithLandlord(() => ({ newScore: 2, legacyScore: -2, landlord: 0 }));
+    for (const game of games) if (game.targetSide === 'legacy') delete game.landlord;
+    expect(summarizeMirror(games).byRole).toBeUndefined();
+  });
+
   it('roleOf：地主/下家((L+1)%3)/上家((L+2)%3) 精确', () => {
     expect(roleOf(0, 0)).toBe('landlord');
     expect(roleOf(1, 0)).toBe('lower');

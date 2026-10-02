@@ -1,4 +1,4 @@
-import { Category, Rank, isSequenceable, type Card, type HandPattern, type Rng } from '../rules';
+import { Category, Rank, beats, isSequenceable, type Card, type HandPattern, type Rng } from '../rules';
 
 const COUNTS_LENGTH = Rank.BigJoker + 1;
 
@@ -100,6 +100,10 @@ function wholePlay(counts: readonly number[]): CountPlay | null {
     ));
     if (consecutive) {
       const wingRanks = occupied.filter((rank) => !tripRanks.includes(rank));
+      if (total === tripRanks.length * 3) {
+        return take(Category.Airplane, tripRanks[tripRanks.length - 1],
+          tripRanks.map((rank) => [rank, 3] as const));
+      }
       if (total === tripRanks.length * 4 && wingRanks.length === tripRanks.length
         && wingRanks.every((rank) => counts[rank] === 1)) {
         return take(Category.AirplaneSingles, tripRanks[tripRanks.length - 1], [
@@ -336,6 +340,11 @@ export function rolloutRound(args: RolloutArgs): RolloutOutcome {
     const teammateTop = top !== null && topSeat !== null
       && turn !== args.landlord && topSeat !== args.landlord && topSeat !== turn;
     let chosen = top === null ? lead(board[turn]) : teammateTop ? null : follow(board[turn], top);
+    // 出完即胜优先于让队友；复用规则比较，保留同型同长及炸弹/火箭边界。
+    if (teammateTop && top !== null) {
+      const whole = wholePlay(board[turn]);
+      if (whole && beats({ ...whole, cards: [] }, { ...top, cards: [] })) chosen = whole;
+    }
     if (chosen === null && top !== null && !teammateTop && top.category !== Category.Bomb && top.category !== Category.Rocket) {
       const threatened = topSeat !== null && cardCount(board[topSeat]) <= 2;
       if (threatened) chosen = lowestBomb(board[turn]);
