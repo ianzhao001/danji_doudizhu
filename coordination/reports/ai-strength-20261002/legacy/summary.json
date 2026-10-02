@@ -1,0 +1,416 @@
+{
+  "elapsedSeconds": 61.22,
+  "allPassed": true,
+  "results": [
+    {
+      "pairing": "hard",
+      "seeds": 200,
+      "exitCode": 0,
+      "report": "hard-full-report.json",
+      "summary": {
+        "pairs": 600,
+        "games": 1200,
+        "complete": true,
+        "newWinRate": 0.5883,
+        "legacyWinRate": 0.4,
+        "mirrorWinRateDiffPp": 18.8333,
+        "avgPairedScoreDiff": 3.535,
+        "selfMismatchPairs": 371,
+        "seedClusters": 200,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": 1.5033,
+          "hi": 5.7483
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 12.6667,
+          "hi": 24.8333
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 173,
+            "mirrorWinRateDiffPp": 21.9653,
+            "avgPairedScoreDiff": 5.2486
+          },
+          {
+            "role": "upper",
+            "pairs": 172,
+            "mirrorWinRateDiffPp": 19.186,
+            "avgPairedScoreDiff": 2.4767
+          },
+          {
+            "role": "lower",
+            "pairs": 173,
+            "mirrorWinRateDiffPp": 16.763,
+            "avgPairedScoreDiff": 2.5665
+          }
+        ],
+        "landlordSplitPairs": 82
+      },
+      "verdict": {
+        "pass": true,
+        "reasons": []
+      },
+      "manifest": {
+        "version": 1,
+        "pairing": "hard",
+        "profile": "full",
+        "baseline": "legacy",
+        "fixedBid": "none",
+        "seedBase": 0,
+        "seedCount": 200,
+        "shardTotal": 4,
+        "sourceHash": "66b4cde02eaf102f181c873f578a4b1d51abf3f686abaa9edcfdabb37ad418aa",
+        "baselineHash": "d252de4b09e74a1b30b6bbbf00a9c732b14413ea28a1c615bf66ef4fc8a0be78",
+        "tuningHash": "2bf55800e324480e9daf57c2cbae4bb6330256e7ea59d838f9d1dd432157aa29"
+      }
+    },
+    {
+      "pairing": "self",
+      "seeds": 20,
+      "exitCode": 0,
+      "report": "self-full-report.json",
+      "summary": {
+        "pairs": 60,
+        "games": 120,
+        "complete": true,
+        "newWinRate": 0.5333,
+        "legacyWinRate": 0.5333,
+        "mirrorWinRateDiffPp": 0,
+        "avgPairedScoreDiff": 0,
+        "selfMismatchPairs": 0,
+        "seedClusters": 20,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": 0,
+          "hi": 0
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 0,
+          "hi": 0
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 20,
+            "mirrorWinRateDiffPp": 0,
+            "avgPairedScoreDiff": 0
+          },
+          {
+            "role": "upper",
+            "pairs": 20,
+            "mirrorWinRateDiffPp": 0,
+            "avgPairedScoreDiff": 0
+          },
+          {
+            "role": "lower",
+            "pairs": 20,
+            "mirrorWinRateDiffPp": 0,
+            "avgPairedScoreDiff": 0
+          }
+        ],
+        "landlordSplitPairs": 0
+      },
+      "verdict": {
+        "pass": true,
+        "reasons": []
+      },
+      "manifest": {
+        "version": 1,
+        "pairing": "self",
+        "profile": "full",
+        "baseline": "legacy",
+        "fixedBid": "none",
+        "seedBase": 0,
+        "seedCount": 20,
+        "shardTotal": 4,
+        "sourceHash": "66b4cde02eaf102f181c873f578a4b1d51abf3f686abaa9edcfdabb37ad418aa",
+        "baselineHash": "596f77323c654f3833c77fa1427b0cbe188fd86cf65f92aa75c125ea003b2430",
+        "tuningHash": "2bf55800e324480e9daf57c2cbae4bb6330256e7ea59d838f9d1dd432157aa29"
+      }
+    },
+    {
+      "pairing": "crippled",
+      "seeds": 20,
+      "exitCode": 0,
+      "report": "crippled-full-report.json",
+      "summary": {
+        "pairs": 60,
+        "games": 120,
+        "complete": true,
+        "newWinRate": 0.2167,
+        "legacyWinRate": 0.7667,
+        "mirrorWinRateDiffPp": -55,
+        "avgPairedScoreDiff": -8.6333,
+        "selfMismatchPairs": 44,
+        "seedClusters": 20,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": -15.8667,
+          "hi": -3.4
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": -73.3333,
+          "hi": -36.6667
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 18,
+            "mirrorWinRateDiffPp": -66.6667,
+            "avgPairedScoreDiff": -16.5556
+          },
+          {
+            "role": "upper",
+            "pairs": 18,
+            "mirrorWinRateDiffPp": -38.8889,
+            "avgPairedScoreDiff": -4.5556
+          },
+          {
+            "role": "lower",
+            "pairs": 18,
+            "mirrorWinRateDiffPp": -66.6667,
+            "avgPairedScoreDiff": -8.6667
+          }
+        ],
+        "landlordSplitPairs": 6
+      },
+      "verdict": {
+        "pass": true,
+        "reasons": []
+      },
+      "manifest": {
+        "version": 1,
+        "pairing": "crippled",
+        "profile": "full",
+        "baseline": "legacy",
+        "fixedBid": "none",
+        "seedBase": 0,
+        "seedCount": 20,
+        "shardTotal": 4,
+        "sourceHash": "66b4cde02eaf102f181c873f578a4b1d51abf3f686abaa9edcfdabb37ad418aa",
+        "baselineHash": "d252de4b09e74a1b30b6bbbf00a9c732b14413ea28a1c615bf66ef4fc8a0be78",
+        "tuningHash": "2bf55800e324480e9daf57c2cbae4bb6330256e7ea59d838f9d1dd432157aa29"
+      }
+    }
+  ],
+  "commands": [
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=hard",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--shard=0/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/hard-full-shard-0.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=hard",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--shard=1/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/hard-full-shard-1.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=hard",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--shard=2/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/hard-full-shard-2.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=hard",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--shard=3/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/hard-full-shard-3.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=hard",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--judge",
+      "--shards=4",
+      "--inputs=/tmp/ddz-strength-legacy-evidence/hard-full-shard-0.json,/tmp/ddz-strength-legacy-evidence/hard-full-shard-1.json,/tmp/ddz-strength-legacy-evidence/hard-full-shard-2.json,/tmp/ddz-strength-legacy-evidence/hard-full-shard-3.json",
+      "--out=/tmp/ddz-strength-legacy-evidence/hard-full-report.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=self",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=0/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/self-full-shard-0.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=self",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=1/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/self-full-shard-1.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=self",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=2/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/self-full-shard-2.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=self",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=3/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/self-full-shard-3.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=self",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--judge",
+      "--shards=4",
+      "--inputs=/tmp/ddz-strength-legacy-evidence/self-full-shard-0.json,/tmp/ddz-strength-legacy-evidence/self-full-shard-1.json,/tmp/ddz-strength-legacy-evidence/self-full-shard-2.json,/tmp/ddz-strength-legacy-evidence/self-full-shard-3.json",
+      "--out=/tmp/ddz-strength-legacy-evidence/self-full-report.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=crippled",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=0/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/crippled-full-shard-0.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=crippled",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=1/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/crippled-full-shard-1.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=crippled",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=2/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/crippled-full-shard-2.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=crippled",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=3/4",
+      "--out=/tmp/ddz-strength-legacy-evidence/crippled-full-shard-3.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=crippled",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--judge",
+      "--shards=4",
+      "--inputs=/tmp/ddz-strength-legacy-evidence/crippled-full-shard-0.json,/tmp/ddz-strength-legacy-evidence/crippled-full-shard-1.json,/tmp/ddz-strength-legacy-evidence/crippled-full-shard-2.json,/tmp/ddz-strength-legacy-evidence/crippled-full-shard-3.json",
+      "--out=/tmp/ddz-strength-legacy-evidence/crippled-full-report.json"
+    ]
+  ]
+}

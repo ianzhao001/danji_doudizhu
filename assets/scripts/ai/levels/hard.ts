@@ -667,6 +667,36 @@ export function hardStrategyWithProfile(profile: PimcProfile): AiStrategy {
       }
     }
 
+    // Small endgames need team-aware search before local rescue/pressure rules.
+    // Keep proven wins above this path and preserve zero-sample ablations.
+    if (profile.samples > 0
+      && snapshot.handCounts.reduce((sum, count) => sum + count, 0) <= 16
+      && canSampleWorld(snapshot, hand, history)) {
+      const ordered = moves.slice().sort((left, right) => {
+        const delta = moveOutcomeScore(ctx.decomposer, hand, left, toPressureContext(ctx, snapshot))
+          - moveOutcomeScore(ctx.decomposer, hand, right, toPressureContext(ctx, snapshot));
+        return delta !== 0 ? delta : compareMoves(left, right);
+      });
+      const candidates = ordered.slice(0, profile.maxCandidates);
+      const rank = () => pimcArbitrate({
+        snapshot,
+        history,
+        candidates,
+        includePass: snapshot.top !== null,
+        profile,
+        mustInclude: ordered[0],
+      });
+      const captured = hasDecisionSink() ? capturePimcRanks(rank) : null;
+      const verdict = captured ? captured.value : rank();
+      return finishDecision(
+        snapshot,
+        startedAt,
+        'endgame-pimc',
+        verdict === null ? { type: 'pass', seat: snapshot.turn } : toPlay(snapshot, verdict),
+        captured ? pimcDecisionDiag(captured.rankings, profile) : undefined,
+      );
+    }
+
     if (isTeammateTop(snapshot)) {
       if (snapshot.handCounts[snapshot.landlord] <= 2) {
         const rescue = moves.filter((move) => !isBombLike(move.pattern.category));

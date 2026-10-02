@@ -6,7 +6,7 @@ This is an offline, single-player Dou Dizhu project built with Cocos Creator 3.8
 
 The current release is v1.9-R4, adding local match logs and export while continuing to improve Hard-AI cooperation, power-card protection, and search behavior; see [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md). The repository is intended to be runnable from source by people who do not have a software-development background.
 
-This branch also contains an unreleased AI simulation and evaluation tooling upgrade; see [the current candidate](docs/TASKS.md). A fresh Cocos build and real hint-click capture are still required. The historical release checks below do not certify this candidate.
+This branch also contains unreleased AI simulation, evaluation and endgame-search upgrades. In an independent 2,400-game mirrored test with fixed bidding, the latest candidate improved the win-rate difference by 2.67 percentage points over the previous candidate (95% interval: +1.5 to +4.0). See [the current candidate](docs/TASKS.md) for role-specific results and limitations. A fresh Cocos build and real hint-click capture are still required. The historical release checks below do not certify this candidate.
 
 ## Project Overview
 
@@ -81,7 +81,7 @@ The AI is implemented in TypeScript under two constraints: no external API and n
 | Type | Project | License or nature | Actual boundary in this project |
 | --- | --- | --- | --- |
 | Bundled with the game | Source Han Sans CN | [SIL Open Font License 1.1](assets/resources/fonts/LICENSE-SourceHanSans.txt) | Regular and Heavy font files are included for in-game text |
-| Algorithm and evaluation reference | [kwai/DouZero](https://github.com/kwai/DouZero) | Apache-2.0 | Mirrored evaluation and the 14-pattern move-enumeration taxonomy were referenced; no reinforcement-learning model or source code is used |
+| Algorithm and evaluation reference | [kwai/DouZero](https://github.com/kwai/DouZero) | Apache-2.0 | Fixed deals, role-based evaluation and the 14-pattern move-enumeration taxonomy were referenced; mirrored pairing and clustered confidence intervals are implemented by this project. No reinforcement-learning model or source code is used |
 | Algorithm reference | [ZhouWeikuan/DouDiZhu](https://github.com/ZhouWeikuan/DouDiZhu) | Apache-2.0 | Weighted decomposition and remaining-hand ranking were referenced; the behavior is independently implemented on this project's exact decomposition engine |
 | Baseline research reference | [datamllab/rlcard](https://github.com/datamllab/rlcard) | MIT | Used only as a reference for a simple rule-agent baseline; it is not a product runtime dependency |
 | Paper reference | [DeltaDou](https://www.ijcai.org/proceedings/2019/0176.pdf) | IJCAI 2019 paper | The pass-inference idea informed opponent modeling; weighted sampling and effective-sample safeguards are implemented here |

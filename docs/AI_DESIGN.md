@@ -19,6 +19,12 @@
 
 本轮属于模拟正确性与评测可信度升级，不预先宣称胜率提升。历史 Cocos 提示点击记录仍保持原样；推荐变化必须在 Cocos Creator 3.8.8 冷构建后重跑真实点击探针，才能作为新版本发布证据。
 
+## 当前强度候选的搜索范围
+
+本轮强度候选在可直接清手及已证明必胜的路径之后，为公开牌数守恒、总剩牌不超过 16 张的局面统一运行 PIMC，再决定是否抢队友牌权、压制或保留牌型。仍只评估结构排序前 K 个候选，遵守原有世界数和节点预算；跟牌时保留过牌选项，零采样消融继续使用原启发式。
+
+16 张是仲裁触发范围，不是精确求解范围：困难档明牌求解仍以动作后总牌数不超过 12 张为入口，提示为 15 张，预算耗尽或超限回退 rollout。不同候选可能使用不同精度的估值，候选截断也可能漏掉战术动作；因此必须用独立保留集判断增益，不能仅凭扩大搜索范围认定变强。
+
 ## 设计约束与路线选择
 
 两条硬约束决定了整条技术路线：
@@ -52,7 +58,7 @@ PIMC 需要随机采样，但本仓库有三条铁律：AI 决策与注入随机
 
 ## 验收方法论（怎么证明"变强"）
 
-- **镜像换位竞技场**（借鉴 DouZero 的评估法）：把升级前的引擎逐字节冻结为基线（`test/fixtures/legacy-ai/`，sha256 防漂移），同一副牌同一席位新旧各打一向，配对分差在对内抵消发牌运气。门槛：困难/普通 ≥+8pp、简单 ≥+10pp。
+- **镜像换位竞技场**：参考 DouZero 的固定发牌与角色评估，本项目实现镜像配对和 seed 聚类置信区间。把升级前的引擎逐字节冻结为基线，同一副牌同一席位新旧各打一向以降低发牌差异的影响。现有 legacy 点估门槛为困难 ≥+9pp、普通 ≥+8pp、简单 ≥+10pp；本轮增量另与紧邻升级前提交固定叫牌对战，开发集与保留集分开。
 - **双自证**：self 配对（新 vs 新，镜像差必须精确 0——框架无偏差）与 crippled 配对（故意放弱桩，门必须抓得住——门不是摆设）。
 - **消融档**：`--profile=weights-only` 去掉 PIMC 单测权重核贡献，隔离证明 PIMC 净增益。
 - v1.8 实测：困难 **+10.17pp**、普通 **+8.33pp**、简单 **+32.17pp**；消融 +6.50pp（PIMC 净增 ≈+3.7pp）；三档分层保持单调（Hard−Normal +8.33pp、Normal−Simple +14.44pp）。
@@ -63,11 +69,13 @@ PIMC 需要随机采样，但本仓库有三条铁律：AI 决策与注入随机
 
 | 项目 | 许可证 | 借鉴内容 |
 | --- | --- | --- |
-| [kwai/DouZero](https://github.com/kwai/DouZero)（快手，ICML 2021） | Apache-2.0 | ① 镜像换位对战评估法（`evaluate.py` 思路）→ 本项目竞技场强度门的赛制；② 14 牌型完备枚举口径（`move_generator.py`）→ 着法枚举完备性守护门（全子集×识别器对照）。**未使用其强化学习模型** |
+| [kwai/DouZero](https://github.com/kwai/DouZero)（快手，ICML 2021） | Apache-2.0 | ① [固定发牌、角色配置和 WP/ADP 评估](https://github.com/kwai/DouZero/blob/main/douzero/evaluation/simulation.py)作为参照；镜像配对及聚类 CI 为本项目实现；② 14 牌型完备枚举口径（`move_generator.py`）→ 着法枚举完备性守护门（全子集×识别器对照）。**未使用其强化学习模型** |
 | [ZhouWeikuan/DouDiZhu](https://github.com/ZhouWeikuan/DouDiZhu)（云城 AI） | Apache-2.0 | 权重拆牌思想：组件 power/badness 与「剩余手牌权重最大化」的出牌排序 → `ai/handWeight.ts`。改造点：权重不走其 C++ 贪心近似，而是计在本项目精确最少手数分解的组件上 |
 | [datamllab/rlcard](https://github.com/datamllab/rlcard)（Rice/TAMU DATA Lab） | MIT | 斗地主规则 Agent 的拆牌骨架与保守跟牌基线作为参照（调研确认其为无配合的朴素规则，未进产品） |
 | [DeltaDou](https://www.ijcai.org/proceedings/2019/0176.pdf)（IJCAI'19，Jiang et al.） | 论文 | 对手建模中的「过牌推断」思想 → v1.9 过牌推断加权采样（`collectPassSignals` 识别非配合性过牌、`weighWorld` 对「本可免费同型压制却过牌」的矛盾世界降权、ESS 有效样本护栏防极端历史带偏）。PIMC 主干仍为自研通用实现 |
 
 自研部分（通用算法，不源于任何特定仓库）：PIMC 确定化蒙特卡洛（Perfect Information Monte Carlo）、残局对抗 negamax 与置换表、v1.9 的明牌世界两阵营极大极小求解器（`ai/worldSolver.ts`），以及毫手量纲评分核（`ai/handWeight.ts` 与 `ai/pressure.ts` 的超几何被压概率闭式）。
+
+2026-10-02 强度实验另核查了 [esrrhs/doudizhu_ai 的过牌推断](https://github.com/esrrhs/doudizhu_ai/blob/1cb1cf3862b34080b5e9003b2090b9ef687f9dc6/src/main/java/com/doudizhu/ai/PassInference.java)（[MIT](https://github.com/esrrhs/doudizhu_ai/blob/1cb1cf3862b34080b5e9003b2090b9ef687f9dc6/LICENSE)）及 [OpenSpiel ISMCTS](https://github.com/google-deepmind/open_spiel/blob/master/open_spiel/python/algorithms/ismcts.py)。独立实现的保守过牌推断候选在开发集未显示增益，未合入；ISMCTS 需要重构信息集搜索，未在本轮引入。当前产品改动复用本项目已有求解器，没有复制外部代码或新增运行时依赖。
 
 感谢以上开源项目作者与论文作者的工作。
