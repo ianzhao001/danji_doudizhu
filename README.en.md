@@ -6,6 +6,8 @@ This is an offline, single-player Dou Dizhu project built with Cocos Creator 3.8
 
 The current release is v1.9-R4, adding local match logs and export while continuing to improve Hard-AI cooperation, power-card protection, and search behavior; see [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md). The repository is intended to be runnable from source by people who do not have a software-development background.
 
+This branch also contains an unreleased AI simulation and evaluation tooling upgrade; see [the current candidate](docs/TASKS.md). A fresh Cocos build and real hint-click capture are still required. The historical release checks below do not certify this candidate.
+
 ## Project Overview
 
 | Item | Current configuration |
@@ -18,7 +20,7 @@ The current release is v1.9-R4, adding local match logs and export while continu
 | Launch scene | `assets/scene/lobby.scene` |
 | Build target | `web-mobile` |
 | AI levels | Simple, Normal, Hard |
-| Verification baseline | 215 test files and 1301 passing tests, 3 environment- or empty-directory-gated tests skipped, production typecheck passing |
+| Historical v1.9-R4 release checks | 215 test files and 1301 passing tests, 3 environment- or empty-directory-gated tests skipped, production typecheck passing |
 
 ## What Changed in v1.9-R4
 
@@ -183,7 +185,7 @@ npm --prefix test run typecheck
 git diff --check
 ```
 
-The isolated test project lives under `test/` and is not included in the Cocos build. The current baseline is 215 passing test files and 1301 passing tests, with 3 environment- or empty-directory-gated tests skipped. Production source is also checked by the strict TypeScript gate in `tsconfig-scan.json`.
+The isolated test project lives under `test/` and is not included in the Cocos build. Historical v1.9-R4 release checks recorded 215 passing test files and 1301 passing tests, with 3 environment- or empty-directory-gated tests skipped. See [TASKS](docs/TASKS.md) for this branch's candidate results. Production source is also checked by the strict TypeScript gate in `tsconfig-scan.json`.
 
 ## Troubleshooting
 

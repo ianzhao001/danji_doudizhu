@@ -1,0 +1,140 @@
+{
+  "schema": "ai-upgrade-validation-v1",
+  "date": "2026-10-02",
+  "status": "draft-candidate-runtime-validation-pending",
+  "parentCommit": "45f6c5fb76d01f633f49ff4fde93ece5e461f963",
+  "branch": "codex/ai-rollout-evaluation-upgrade",
+  "scope": [
+    "rollout whole bare airplane recognition",
+    "legal whole-hand finish over a teammate",
+    "per-pair self check and seed-cluster confidence intervals",
+    "experiment identity and complete shard/seed-plan validation",
+    "frozen stratified latency corpus"
+  ],
+  "environment": {
+    "node": "v24.19.0",
+    "creatorInstalled": false,
+    "productionTypes": "official @cocos/creator-types@3.8.8 engine declarations; local ignored temp/declarations link",
+    "creatorBuildPerformed": false,
+    "npmRuntimeDependenciesAdded": false
+  },
+  "fullTests": {
+    "command": "npm --prefix test test -- --maxWorkers=1 --minWorkers=1",
+    "exitCode": 1,
+    "files": {
+      "passed": 216,
+      "failed": 1,
+      "skipped": 3
+    },
+    "tests": {
+      "passed": 1365,
+      "failed": 3,
+      "skipped": 3
+    },
+    "durationSeconds": 165.64,
+    "log": "full-tests.log",
+    "failedFile": "test/verify/hint-runtime-capture.test.ts",
+    "failureReason": "Historical real Cocos first/second hint-click cards differ from the upgraded recommendation. Existing captured evidence and its assertions were preserved.",
+    "parentR4HintTests": {
+      "passed": 7,
+      "failed": 0
+    },
+    "interpretation": "Not an all-green release. Pure recomputation does not validate a new Cocos build or real UI clicks."
+  },
+  "typecheck": {
+    "command": "npm --prefix test run typecheck",
+    "exitCode": 0,
+    "productionStrictGate": "passed within full test run using official Creator 3.8.8 types"
+  },
+  "depthGate": {
+    "command": "SELFPLAY_GATE=1 npm --prefix test test -- selfplay/hard-depth2-gate.test.ts --maxWorkers=1 --minWorkers=1",
+    "exitCode": 0,
+    "result": {
+      "seeds": 100,
+      "g1HardSimpleDiff": 0.3433333333333333,
+      "g2LandlordDiff": 0.21999999999999997,
+      "g3HardNormalDiff": 0.11333333333333334,
+      "detail": {
+        "hardInNormal": {
+          "winRate": 0.5633333333333334,
+          "landlordWinRate": 0.61
+        },
+        "normalInHard": {
+          "winRate": 0.45,
+          "landlordWinRate": 0.39
+        },
+        "hardInSimple": {
+          "winRate": 0.6533333333333333,
+          "landlordWinRate": 0.76
+        },
+        "simpleInHard": {
+          "winRate": 0.31,
+          "landlordWinRate": 0.2
+        }
+      }
+    },
+    "thresholds": {
+      "g1HardSimpleDiff": 0.25,
+      "g2LandlordDiff": 0.03,
+      "g3HardNormalDiff": 0.05
+    }
+  },
+  "legacyArena": {
+    "command": "node coordination/scripts/w-ai-arena.mjs --seeds=200 --workers=4",
+    "exitCode": 0,
+    "report": "../w-ai-arena/w-ai-arena-full.json",
+    "scope": "hard/normal/simple 200 seeds each; self/crippled 20 each; baseline=legacy, fixedBid=none, seedBase=0. Existing point-estimate gates passed; not incremental strength over R4."
+  },
+  "weightsOnlyArena": {
+    "command": "node coordination/scripts/w-ai-arena.mjs --pairings=hard,self --profile=weights-only --seeds=200 --workers=1",
+    "exitCode": 0,
+    "report": "../w-ai-arena/w-ai-arena-weights-only.json",
+    "scope": "hard 200 seeds vs legacy and self 20 seeds. Existing point-estimate gate passed; win-difference CI lower bound is zero, so this is not a significant-gain claim."
+  },
+  "r4Increment": {
+    "report": "r4-increment-report.json",
+    "scriptSnapshot": "r4-comparison.ts.txt",
+    "scriptSha256": "bf966e285f199e66bee4909c1a51c1bc08ef43eebea9ec8dfe79b4d22a503038",
+    "scope": "fixed frozen R4 hard bidding, seeds 100001..100200, three target seats, mirrored opponents; 1200 games. Farmer mirror swaps both partner and landlord. Not an isolated individual-agent effect.",
+    "verdict": "No significant improvement detected; not an equivalence or non-inferiority proof.",
+    "mirrorWinDiffPp": -0.3333,
+    "mirrorWinDiffPpCI": {
+      "lo": -3.5,
+      "hi": 2.5
+    },
+    "pairedScoreDiff": -0.4167,
+    "pairedScoreDiffCI": {
+      "lo": -1.5467,
+      "hi": 0.5867
+    },
+    "reproduction": {
+      "note": "Exact executed experiment source is archived, not part of the runtime. Adjust its two absolute source roots when replaying elsewhere. Candidate manifest records the pre-commit HEAD and hashes the modified working tree. Reruns after commit naturally have different provenance HEAD.",
+      "baselineSetup": "mkdir -p /tmp/doudizhu-r4-baseline; git archive 45f6c5fb76d01f633f49ff4fde93ece5e461f963 assets/scripts | tar -x -C /tmp/doudizhu-r4-baseline",
+      "runnerSetup": "cp coordination/reports/ai-upgrade-20261002/r4-comparison.ts.txt /tmp/doudizhu-r4-comparison.ts",
+      "shardCommand": "test/node_modules/.bin/vite-node --root /workspace/danji_doudizhu /tmp/doudizhu-r4-comparison.ts --shard=N/4 --out=/tmp/r4-increment-N.json (N=0,1,2,3)",
+      "judgeCommand": "test/node_modules/.bin/vite-node --root /workspace/danji_doudizhu /tmp/doudizhu-r4-comparison.ts --judge --inputs=/tmp/r4-increment-0.json,/tmp/r4-increment-1.json,/tmp/r4-increment-2.json,/tmp/r4-increment-3.json --out=/tmp/r4-increment-report.json"
+    }
+  },
+  "latency": {
+    "command": "cd test && ./node_modules/.bin/vite-node --config vitest.config.ts bench/ai-latency.ts",
+    "exitCode": 0,
+    "report": "latency.json",
+    "decisionP95Ms": 27.4,
+    "hintP95Ms": 53.36,
+    "hintMaxMs": 71.8,
+    "interpretation": "Serial server measurement against fixed corpus; no mobile-performance or before/after speedup claim."
+  },
+  "publishToolingTests": {
+    "command": "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=init.defaultBranch GIT_CONFIG_VALUE_0=main node --test scripts/readme-changelog.test.mjs",
+    "passed": 6,
+    "failed": 0,
+    "note": "Process-local default branch is required by the existing test fixture; no repository/global git configuration changed."
+  },
+  "remainingReleaseChecks": [
+    "Cocos Creator 3.8.8 cold build web-mobile from candidate source.",
+    "Serve repository root at http://127.0.0.1:7788 and run the existing coordination/scripts/w-audit-hint-probe.mjs following its dependency/setup instructions.",
+    "Review fresh real-click evidence and rerun hint-runtime-capture plus the full suite.",
+    "Measure latency on target mobile devices before claiming mobile performance."
+  ],
+  "releaseDecision": "Push feature branch and open draft PR. Do not merge or declare a validated release while the real Cocos capture gate remains unresolved."
+}

@@ -1,0 +1,64 @@
+{
+ "pairing": "simple",
+ "profile": "full",
+ "baseline": "legacy",
+ "fixedBid": "none",
+ "manifest": {
+  "version": 1,
+  "pairing": "simple",
+  "profile": "full",
+  "baseline": "legacy",
+  "fixedBid": "none",
+  "seedBase": 0,
+  "seedCount": 200,
+  "shardTotal": 4,
+  "sourceHash": "9889b93e613949eae91fc75211f5be8924d874a3f165fddd40930c2f64f155c3",
+  "baselineHash": "d252de4b09e74a1b30b6bbbf00a9c732b14413ea28a1c615bf66ef4fc8a0be78",
+  "tuningHash": "2bf55800e324480e9daf57c2cbae4bb6330256e7ea59d838f9d1dd432157aa29"
+ },
+ "summary": {
+  "pairs": 600,
+  "games": 1200,
+  "complete": true,
+  "newWinRate": 0.6333,
+  "legacyWinRate": 0.3117,
+  "mirrorWinRateDiffPp": 32.1667,
+  "avgPairedScoreDiff": 3.6733,
+  "selfMismatchPairs": 505,
+  "seedClusters": 200,
+  "ciMethod": "seed-cluster-bootstrap",
+  "avgPairedScoreDiffCI": {
+   "lo": 2.73,
+   "hi": 4.72
+  },
+  "mirrorWinRateDiffPpCI": {
+   "lo": 24.8333,
+   "hi": 39
+  },
+  "byRole": [
+   {
+    "role": "landlord",
+    "pairs": 135,
+    "mirrorWinRateDiffPp": 25.1852,
+    "avgPairedScoreDiff": 4.4
+   },
+   {
+    "role": "upper",
+    "pairs": 136,
+    "mirrorWinRateDiffPp": 9.5588,
+    "avgPairedScoreDiff": 1.3824
+   },
+   {
+    "role": "lower",
+    "pairs": 137,
+    "mirrorWinRateDiffPp": 27.7372,
+    "avgPairedScoreDiff": 2.6934
+   }
+  ],
+  "landlordSplitPairs": 192
+ },
+ "verdict": {
+  "pass": true,
+  "reasons": []
+ }
+}
