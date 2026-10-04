@@ -1,0 +1,509 @@
+import {
+  Category,
+  Rank,
+  Suit,
+  createDeck,
+  createRng,
+  legalFollows,
+  type Card,
+  type HandPattern,
+  type Move,
+  type Rng,
+} from '../rules';
+import type { GameEvent, GameSnapshot, SeatIndex } from '../game';
+import { Decomposer } from './decompose';
+import { moveOutcomeScore } from './handWeight';
+import { compareMoves } from './levels/_shared';
+import { rolloutRound, toRankCounts } from './rollout';
+import { solveWorld, type WorldSolverBudget, type WorldWinner } from './worldSolver';
+import { getTuning } from './tuning';
+
+export interface PimcProfile {
+  samples: number;
+  maxCandidates: number;
+  solverCardMax?: number;
+  solverNodes?: number;
+  passInferenceCap?: number;
+}
+
+export interface RankedOption {
+  move: Move | null;
+  score: number;
+}
+
+export interface CapturedPimcRanks<T> {
+  value: T;
+  rankings: RankedOption[][];
+}
+
+// B3 提示合流：同步作用域内观察 Hard 已经完成的 PIMC 排名，供提示榜复用。
+// run 必须同步且不得返回 Promise；栈 + try/finally 保证嵌套调用和异常都不会泄漏观察器。
+const rankCaptureStack: RankedOption[][][] = [];
+
+function publishPimcRanking(options: RankedOption[]): RankedOption[] {
+  const capture = rankCaptureStack[rankCaptureStack.length - 1];
+  if (capture) capture.push(options.map((option) => ({ ...option })));
+  return options;
+}
+
+export function capturePimcRanks<T>(run: () => T): CapturedPimcRanks<T> {
+  const rankings: RankedOption[][] = [];
+  rankCaptureStack.push(rankings);
+  try {
+    return { value: run(), rankings };
+  } finally {
+    rankCaptureStack.pop();
+  }
+}
+
+function solverProfile(
+  samples: number,
+  maxCandidates: number,
+  solverCardMax: number,
+  solverNodes: number,
+): PimcProfile {
+  const profile: PimcProfile = { samples, maxCandidates };
+  // R2b extends the runtime profile while preserving the enumerable v1 shape
+  // locked by the pre-existing public profile contract.
+  Object.defineProperties(profile, {
+    solverCardMax: { value: solverCardMax, enumerable: false },
+    solverNodes: { value: solverNodes, enumerable: false },
+  });
+  return Object.freeze(profile);
+}
+
+export const HARD_PIMC: PimcProfile = solverProfile(48, 8, 16, 120_000);
+export const HINT_PIMC: PimcProfile = solverProfile(160, 12, 15, 300_000);
+
+export interface PassSignal {
+  seat: SeatIndex;
+  top: HandPattern;
+  playedAfter: number[];
+}
+
+function cardToken(card: Card): string {
+  return `${card.rank}:${card.suit}`;
+}
+
+function sortedCards(cards: readonly Card[] | null | undefined): string {
+  return (cards ?? []).map(cardToken).sort().join(',');
+}
+
+function eventToken(event: GameEvent): string {
+  switch (event.type) {
+    case 'play':
+      return `play:${event.seat}:${event.pattern.category}:${event.pattern.mainRank}:${event.pattern.length}:${sortedCards(event.pattern.cards)}`;
+    case 'pass': return `pass:${event.seat}`;
+    case 'bomb': return `bomb:${event.seat}`;
+    case 'rocket': return `rocket:${event.seat}`;
+    case 'reset': return `reset:${event.leader}`;
+    case 'win': return `win:${event.seat}:${event.side}`;
+    default: {
+      const exhaustive: never = event;
+      return exhaustive;
+    }
+  }
+}
+
+function fnv1a(input: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+export function deriveWorldSeed(snapshot: GameSnapshot, history: GameEvent[]): number {
+  const top = snapshot.top
+    ? `${snapshot.top.seat}:${snapshot.top.pattern.category}:${snapshot.top.pattern.mainRank}:${snapshot.top.pattern.length}:${sortedCards(snapshot.top.pattern.cards)}`
+    : '-';
+  const canonical = [
+    `turn=${snapshot.turn}`,
+    `landlord=${snapshot.landlord}`,
+    `handCounts=${snapshot.handCounts[0]},${snapshot.handCounts[1]},${snapshot.handCounts[2]}`,
+    `top=${top}`,
+    `viewerHand=${sortedCards(snapshot.viewerHand)}`,
+    `bottom=${sortedCards(snapshot.bottom)}`,
+    `history=${history.map(eventToken).join(';')}`,
+  ].join('|');
+  return fnv1a(canonical);
+}
+
+function sameFarmerTeam(left: SeatIndex, right: SeatIndex, landlord: SeatIndex): boolean {
+  return left !== landlord && right !== landlord && left !== right;
+}
+
+function clonePattern(pattern: HandPattern): HandPattern {
+  return { ...pattern, cards: pattern.cards.slice() };
+}
+
+export function collectPassSignals(snapshot: GameSnapshot, history: GameEvent[]): PassSignal[] {
+  const signals: PassSignal[] = [];
+  let top: HandPattern | null = null;
+  let topSeat: SeatIndex | null = null;
+  let passes = 0;
+
+  for (const event of history) {
+    if (event.type === 'play') {
+      for (const signal of signals) {
+        if (signal.seat !== event.seat) continue;
+        for (const card of event.pattern.cards) signal.playedAfter[card.rank] += 1;
+      }
+      top = event.pattern;
+      topSeat = event.seat;
+      passes = 0;
+      continue;
+    }
+    if (event.type === 'pass') {
+      if (top && topSeat !== null && !sameFarmerTeam(event.seat, topSeat, snapshot.landlord)) {
+        signals.push({
+          seat: event.seat,
+          top: clonePattern(top),
+          playedAfter: new Array<number>(Rank.BigJoker + 1).fill(0),
+        });
+      }
+      passes += 1;
+      if (passes >= 2) {
+        top = null;
+        topSeat = null;
+        passes = 0;
+      }
+      continue;
+    }
+    if (event.type === 'reset') {
+      top = null;
+      topSeat = null;
+      passes = 0;
+    }
+  }
+  return signals;
+}
+
+const SAMPLE_SUITS = [Suit.Spade, Suit.Heart, Suit.Club, Suit.Diamond] as const;
+
+function cardsForCounts(counts: readonly number[]): Card[] {
+  const cards: Card[] = [];
+  for (let rank = Rank.R3; rank <= Rank.R2; rank += 1) {
+    for (let index = 0; index < (counts[rank] ?? 0); index += 1) {
+      cards.push({ rank: rank as Rank, suit: SAMPLE_SUITS[index]! });
+    }
+  }
+  if ((counts[Rank.SmallJoker] ?? 0) > 0) cards.push({ rank: Rank.SmallJoker, suit: Suit.Joker });
+  if ((counts[Rank.BigJoker] ?? 0) > 0) cards.push({ rank: Rank.BigJoker, suit: Suit.Joker });
+  return cards;
+}
+
+function isFreeSameTypeBeat(counts: readonly number[], top: HandPattern): boolean {
+  const hasRocket = (counts[Rank.SmallJoker] ?? 0) > 0 && (counts[Rank.BigJoker] ?? 0) > 0;
+  return legalFollows(cardsForCounts(counts), top).some((move) => {
+    if (move.pattern.category !== top.category || move.pattern.length !== top.length) return false;
+    const used = new Array<number>(Rank.BigJoker + 1).fill(0);
+    for (const card of move.cards) used[card.rank] += 1;
+    for (let rank = Rank.R3; rank <= Rank.R2; rank += 1) {
+      if ((counts[rank] ?? 0) === 4 && used[rank] > 0 && used[rank] < 4) return false;
+    }
+    if (hasRocket && (used[Rank.SmallJoker] > 0 || used[Rank.BigJoker] > 0)
+      && move.pattern.category !== Category.Rocket) return false;
+    return true;
+  });
+}
+
+export function weighWorld(
+  signals: readonly PassSignal[],
+  worldCountsAtNow: readonly [number[], number[], number[]],
+  passInferenceCap = 4,
+  landlord?: SeatIndex,
+): number {
+  if (!Number.isInteger(passInferenceCap) || passInferenceCap < 0) {
+    throw new Error('INVALID_PASS_INFERENCE_CAP');
+  }
+  const tuning = getTuning();
+  let contradictionUnits = 0;
+  for (const signal of signals) {
+    const thenCounts = worldCountsAtNow[signal.seat].slice();
+    for (let rank = Rank.R3; rank <= Rank.BigJoker; rank += 1) {
+      thenCounts[rank] += signal.playedAfter[rank] ?? 0;
+    }
+    if (isFreeSameTypeBeat(thenCounts, signal.top)) {
+      const seatUnit = signal.seat === landlord
+        ? tuning.passUnits.landlord
+        : tuning.passUnits.farmer;
+      const highTop = signal.top.mainRank >= Rank.A;
+      contradictionUnits += seatUnit >> (highTop ? tuning.passUnits.highTopShift : 0);
+    }
+  }
+  const effectiveContradictions = Math.min(Math.round(contradictionUnits / 4), passInferenceCap);
+  return 2 ** (passInferenceCap - effectiveContradictions);
+}
+
+export function effectiveSampleDegrade(weights: readonly number[]): boolean {
+  if (weights.length === 0) return false;
+  let sum = 0;
+  let sumSquares = 0;
+  for (const weight of weights) {
+    if (!Number.isInteger(weight) || weight < 1) throw new Error('INVALID_PIMC_WEIGHT');
+    sum += weight;
+    sumSquares += weight * weight;
+  }
+  return sum * sum * 4 < weights.length * sumSquares;
+}
+
+export interface HiddenSplitArgs {
+  unseen: number[];
+  pinnedA: number[] | null;
+  needA: number;
+  needB: number;
+  rng: Rng;
+}
+
+export function sampleHiddenSplit(args: HiddenSplitArgs): { a: number[]; b: number[] } {
+  if (!Number.isInteger(args.needA) || !Number.isInteger(args.needB) || args.needA < 0 || args.needB < 0) {
+    throw new Error('INVALID_HIDDEN_NEED');
+  }
+  const a = new Array<number>(Rank.BigJoker + 1).fill(0);
+  const b = new Array<number>(Rank.BigJoker + 1).fill(0);
+  const pool: number[] = [];
+  let pinnedTotal = 0;
+  for (let rank = 0; rank <= Rank.BigJoker; rank += 1) {
+    const total = args.unseen[rank] ?? 0;
+    const pinned = args.pinnedA?.[rank] ?? 0;
+    if (!Number.isInteger(total) || !Number.isInteger(pinned) || pinned < 0 || pinned > total) {
+      throw new Error('INVALID_HIDDEN_COUNTS');
+    }
+    a[rank] = pinned;
+    pinnedTotal += pinned;
+    for (let index = pinned; index < total; index += 1) pool.push(rank);
+  }
+  if (pinnedTotal > args.needA || pinnedTotal + pool.length !== args.needA + args.needB) {
+    throw new Error('HIDDEN_COUNT_MISMATCH');
+  }
+  for (let index = pool.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(args.rng.next() * (index + 1));
+    const temp = pool[index];
+    pool[index] = pool[swap];
+    pool[swap] = temp;
+  }
+  const fillA = args.needA - pinnedTotal;
+  for (let index = 0; index < pool.length; index += 1) {
+    if (index < fillA) a[pool[index]] += 1;
+    else b[pool[index]] += 1;
+  }
+  return { a, b };
+}
+
+export function orderHiddenSeats(turn: SeatIndex, landlord: SeatIndex): [SeatIndex, SeatIndex] {
+  const hidden: SeatIndex[] = [];
+  for (let seat = 0 as SeatIndex; seat <= 2; seat = (seat + 1) as SeatIndex) {
+    if (seat !== turn) hidden.push(seat);
+  }
+  if (landlord !== turn && hidden[0] !== landlord) hidden.reverse();
+  return [hidden[0]!, hidden[1]!];
+}
+
+function remainingUnseen(snapshot: GameSnapshot, history: GameEvent[]): number[] {
+  const counts = toRankCounts(createDeck());
+  for (const card of snapshot.viewerHand ?? []) counts[card.rank] -= 1;
+  for (const event of history) {
+    if (event.type !== 'play') continue;
+    for (const card of event.pattern.cards) counts[card.rank] -= 1;
+  }
+  for (const count of counts) if (count < 0) throw new Error('PIMC_HISTORY_OVERDRAW');
+  return counts;
+}
+
+function pinnedLandlord(snapshot: GameSnapshot, history: GameEvent[]): number[] | null {
+  if (snapshot.turn === snapshot.landlord || !snapshot.bottom || snapshot.bottom.length === 0) return null;
+  const pinned = toRankCounts(snapshot.bottom);
+  for (const event of history) {
+    if (event.type !== 'play' || event.seat !== snapshot.landlord) continue;
+    for (const card of event.pattern.cards) if (pinned[card.rank] > 0) pinned[card.rank] -= 1;
+  }
+  return pinned;
+}
+
+function removeMove(counts: number[], move: Move): number[] {
+  const rest = counts.slice();
+  for (const card of move.cards) {
+    rest[card.rank] -= 1;
+    if (rest[card.rank] < 0) throw new Error('PIMC_MOVE_OVERDRAW');
+  }
+  return rest;
+}
+
+function optionOrder(decomposer: Decomposer, hand: Card[], left: RankedOption, right: RankedOption): number {
+  if (left.score !== right.score) return right.score - left.score;
+  if (left.move === null || right.move === null) return left.move === null ? -1 : 1;
+  const outcome = moveOutcomeScore(decomposer, hand, left.move) - moveOutcomeScore(decomposer, hand, right.move);
+  return outcome !== 0 ? outcome : compareMoves(left.move, right.move);
+}
+
+export interface PimcRankArgs {
+  snapshot: GameSnapshot;
+  history: GameEvent[];
+  candidates: Move[];
+  includePass: boolean;
+  profile: PimcProfile;
+  mustInclude?: Move;
+}
+
+function moveKey(move: Move): string {
+  return move.cards.map(cardToken).sort().join('|');
+}
+
+function countCards(counts: readonly number[]): number {
+  let total = 0;
+  for (let rank = Rank.R3; rank <= Rank.BigJoker; rank += 1) total += counts[rank] ?? 0;
+  return total;
+}
+
+interface SampledWorld {
+  counts: [number[], number[], number[]];
+  weight: number;
+}
+
+export function pimcRank(args: PimcRankArgs): RankedOption[] {
+  const hand = args.snapshot.viewerHand;
+  if (!hand || hand.length === 0) throw new Error('VIEWER_HAND_REQUIRED');
+  if (!Number.isInteger(args.profile.samples) || args.profile.samples < 1) throw new Error('INVALID_PIMC_SAMPLES');
+  if (!Number.isInteger(args.profile.maxCandidates) || args.profile.maxCandidates < 1) {
+    throw new Error('INVALID_PIMC_CANDIDATES');
+  }
+  const solverCardMax = args.profile.solverCardMax ?? 0;
+  const solverNodes = args.profile.solverNodes ?? 0;
+  const passInferenceCap = args.profile.passInferenceCap ?? 4;
+  if (!Number.isInteger(solverCardMax) || solverCardMax < 0
+    || !Number.isInteger(solverNodes) || solverNodes < 0
+    || !Number.isInteger(passInferenceCap) || passInferenceCap < 0) {
+    throw new Error('INVALID_PIMC_PROFILE');
+  }
+  const decomposer = new Decomposer();
+  const orderedCandidates = args.candidates.slice().sort((left, right) => {
+    const outcome = moveOutcomeScore(decomposer, hand, left) - moveOutcomeScore(decomposer, hand, right);
+    return outcome !== 0 ? outcome : compareMoves(left, right);
+  }).slice(0, args.profile.maxCandidates);
+  if (args.mustInclude) {
+    const key = moveKey(args.mustInclude);
+    if (!orderedCandidates.some((move) => moveKey(move) === key)) {
+      if (orderedCandidates.length < args.profile.maxCandidates) orderedCandidates.push(args.mustInclude);
+      else orderedCandidates[orderedCandidates.length - 1] = args.mustInclude;
+    }
+  }
+  const options: RankedOption[] = orderedCandidates.map((move) => ({ move, score: 0 }));
+  if (args.includePass) options.push({ move: null, score: 0 });
+  if (options.length === 0) throw new Error('NO_PIMC_OPTIONS');
+
+  const hiddenSeats = orderHiddenSeats(args.snapshot.turn, args.snapshot.landlord);
+  const unseen = remainingUnseen(args.snapshot, args.history);
+  const pinned = pinnedLandlord(args.snapshot, args.history);
+  const seed = deriveWorldSeed(args.snapshot, args.history);
+  const needA = args.snapshot.handCounts[hiddenSeats[0]];
+  const needB = args.snapshot.handCounts[hiddenSeats[1]];
+  const unseenTotal = unseen.reduce((sum, count) => sum + count, 0);
+  // Direct callers may provide deliberately synthetic, non-conserving snapshots.
+  // Hard's production path guards these before PIMC; the public ranker degrades
+  // deterministically to its structural order instead of throwing.
+  if (unseenTotal !== needA + needB) {
+    options.sort((left, right) => optionOrder(decomposer, hand, left, right));
+    return publishPimcRanking(options);
+  }
+
+  const signals = passInferenceCap > 0 ? collectPassSignals(args.snapshot, args.history) : [];
+  const sampled: SampledWorld[] = [];
+  for (let sample = 0; sample < args.profile.samples; sample += 1) {
+    const split = sampleHiddenSplit({
+      unseen,
+      pinnedA: pinned,
+      needA,
+      needB,
+      rng: createRng((seed + Math.imul(sample + 1, 0x9e3779b9)) >>> 0),
+    });
+    const board = [
+      new Array<number>(Rank.BigJoker + 1).fill(0),
+      new Array<number>(Rank.BigJoker + 1).fill(0),
+      new Array<number>(Rank.BigJoker + 1).fill(0),
+    ] as [number[], number[], number[]];
+    board[hiddenSeats[0]] = split.a.slice();
+    board[hiddenSeats[1]] = split.b.slice();
+    board[args.snapshot.turn] = toRankCounts(hand);
+    sampled.push({
+      counts: board,
+      weight: signals.length > 0 ? weighWorld(signals, board, passInferenceCap, args.snapshot.landlord) : 1,
+    });
+  }
+  if (effectiveSampleDegrade(sampled.map((world) => world.weight))) {
+    for (const world of sampled) world.weight = 1;
+  }
+
+  const perOptionNodes = solverNodes > 0 ? Math.max(1, Math.floor(solverNodes / options.length)) : 0;
+  const mySide = args.snapshot.turn === args.snapshot.landlord ? 'landlord' : 'farmer';
+  const sharedTable = new Map<string, WorldWinner>();
+  // 候选主序：每个候选拥有等额、独立的精确求解预算，并按同一批世界的固定顺序评估。
+  for (const option of options) {
+    const optionBudget: WorldSolverBudget = { nodes: perOptionNodes };
+    for (let sample = 0; sample < sampled.length; sample += 1) {
+      const world = sampled[sample]!;
+      const board = world.counts.map((row) => row.slice()) as [number[], number[], number[]];
+      board[args.snapshot.turn] = option.move
+        ? removeMove(board[args.snapshot.turn], option.move)
+        : board[args.snapshot.turn];
+      const nextPasses = option.move === null ? (args.snapshot.passesInARow ?? 0) + 1 : 0;
+      const trickClosed = option.move === null && nextPasses >= 2 && args.snapshot.top !== null;
+      const nextTurn = trickClosed
+        ? args.snapshot.top!.seat
+        : ((args.snapshot.turn + 1) % 3) as SeatIndex;
+      const top = option.move
+        ? option.move.pattern
+        : trickClosed
+          ? null
+          : args.snapshot.top?.pattern ?? null;
+      const topSeat = option.move
+        ? args.snapshot.turn
+        : trickClosed
+          ? null
+          : args.snapshot.top?.seat ?? null;
+      const passes = trickClosed ? 0 : nextPasses;
+      let winner: 'landlord' | 'farmer' | null = option.move && countCards(board[args.snapshot.turn]) === 0
+        ? mySide
+        : null;
+      const totalCards = board.reduce((sum, row) => sum + countCards(row), 0);
+      if (winner === null && solverCardMax > 0 && totalCards <= solverCardMax && optionBudget.nodes > 0) {
+        // Reserve an equal share for each remaining sampled world; unused
+        // nodes roll forward. Total consumption never exceeds the option cap.
+        const worldBudget: WorldSolverBudget = {
+          nodes: Math.floor(optionBudget.nodes / (sampled.length - sample)),
+        };
+        const allocatedNodes = worldBudget.nodes;
+        winner = solveWorld({
+          counts: board,
+          turn: nextTurn,
+          landlord: args.snapshot.landlord,
+          top,
+          topSeat,
+          passes,
+          budget: worldBudget,
+          table: sharedTable,
+        });
+        optionBudget.nodes -= allocatedNodes - worldBudget.nodes;
+      }
+      if (winner === null) {
+        winner = rolloutRound({
+          counts: board,
+          turn: nextTurn,
+          landlord: args.snapshot.landlord,
+          top,
+          topSeat,
+          passes,
+          rng: createRng((seed ^ sample) >>> 0),
+        }).winnerSide;
+      }
+      option.score += world.weight * (winner === mySide ? 1 : -1);
+    }
+  }
+  options.sort((left, right) => optionOrder(decomposer, hand, left, right));
+  return publishPimcRanking(options);
+}
+
+export function pimcArbitrate(args: PimcRankArgs): Move | null {
+  return pimcRank(args)[0]!.move;
+}

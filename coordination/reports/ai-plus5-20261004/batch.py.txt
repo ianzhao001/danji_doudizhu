@@ -1,0 +1,13 @@
+import subprocess,sys,time,json,pathlib
+mode=sys.argv[1];root=sys.argv[2];label=sys.argv[3]
+cmd=['/workspace/danji_doudizhu/test/node_modules/.bin/vite-node','--root','/workspace/danji_doudizhu','/tmp/ddz-plus5-comparison.ts',f'--mode={mode}',f'--candidate-root={root}']
+start=time.time();procs=[]
+for i in range(4):
+ f=open(f'/tmp/{label}-{i}.log','w');p=subprocess.Popen(cmd+[f'--shard={i}/4',f'--out=/tmp/{label}-{i}.json'],stdout=f,stderr=subprocess.STDOUT);procs.append((p,f))
+codes=[]
+for p,f in procs: codes.append(p.wait());f.close()
+if any(codes): raise SystemExit(f'failed {codes}')
+with open(f'/tmp/{label}-judge.log','w') as f:
+ subprocess.run(cmd+['--judge','--inputs='+','.join(f'/tmp/{label}-{i}.json' for i in range(4)),f'--out=/tmp/{label}-report.json'],stdout=f,stderr=subprocess.STDOUT,check=True)
+json.dump({'label':label,'seconds':round(time.time()-start,1),'mode':mode,'root':root},open(f'/tmp/{label}-timing.json','w'))
+r=json.load(open(f'/tmp/{label}-report.json'));print(json.dumps({'label':label,'seconds':round(time.time()-start,1),'summary':r['summary'],'roles':r['roleSummaries'],'verdict':r['verdict']}))

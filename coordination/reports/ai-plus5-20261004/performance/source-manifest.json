@@ -1,0 +1,1829 @@
+{
+  "baselineCommit": "78d125de080627a9cf7b0c2e07b10b4394c994ee",
+  "variants": {
+    "raw": {
+      "directoryAtRun": "/tmp/ddz-plus5-global54-solver16-tactics",
+      "typescriptTreeSha256": "751f439b82457608d4119848d361b92446ce99023d4853f6690800390291d9d2",
+      "treeHashAlgorithm": "SHA256(concatenation of sorted relativePath + NUL + file SHA256 + LF, UTF-8)",
+      "files": [
+        {
+          "path": "assets/scripts/ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "assets/scripts/ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "assets/scripts/ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "assets/scripts/ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "assets/scripts/ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "assets/scripts/ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "assets/scripts/ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "assets/scripts/ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "assets/scripts/ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "assets/scripts/ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "assets/scripts/ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "assets/scripts/ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "assets/scripts/ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "assets/scripts/ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "assets/scripts/ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "assets/scripts/ai/levels/hard.ts",
+          "sha256": "a089bc96911bacd90ca7a2070e028a5e9a972b85efd2c7651d1329ba70065429"
+        },
+        {
+          "path": "assets/scripts/ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "assets/scripts/ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "assets/scripts/ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "assets/scripts/ai/pimc.ts",
+          "sha256": "6cf9dcfe08e7942c4b19388371fc9151f4fdb1a40e091d84378be9dcde99c900"
+        },
+        {
+          "path": "assets/scripts/ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "assets/scripts/ai/rollout.ts",
+          "sha256": "9efd6bede84dd6f846082496af2539517efba56d058fa01235b5b6460a369410"
+        },
+        {
+          "path": "assets/scripts/ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "assets/scripts/ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "assets/scripts/ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        },
+        {
+          "path": "assets/scripts/data/aggregate.ts",
+          "sha256": "bbf48e1e2556f828a39c1a71da87fe716c32b2e36ef1839a039c25e7a6ec359c"
+        },
+        {
+          "path": "assets/scripts/data/difficultyConfig.ts",
+          "sha256": "2ea1afa1faeb60784d17afd27811ba8727e138ca76ce3af31b964fa0858b9240"
+        },
+        {
+          "path": "assets/scripts/data/index.ts",
+          "sha256": "ad604423170b476092ef404bc1ea26e8c99b48a920a7935f62641f984b34acd4"
+        },
+        {
+          "path": "assets/scripts/data/match-log.ts",
+          "sha256": "3f264b3eb1b9743172882adb3df19db5b63324c313aaa1c23be1913488d2f85d"
+        },
+        {
+          "path": "assets/scripts/data/records.ts",
+          "sha256": "10f9677aa5ff624ba93f04828a6a2298fa8850c795c80a503cdd7c0b3d9144a2"
+        },
+        {
+          "path": "assets/scripts/data/recordsQuery.ts",
+          "sha256": "35d7edf12a11a26f399e510995aafff58b11ab3c2acfde4d04607366170f1aaa"
+        },
+        {
+          "path": "assets/scripts/data/save.ts",
+          "sha256": "61490b99af73d1530b534bd7c858969146ebfc65622520ccc963b3dff9799a28"
+        },
+        {
+          "path": "assets/scripts/data/saveStorage.ts",
+          "sha256": "4d43d6629de355b6f69bab0a729a087d0cfcf0c519f1a6692bbba459239d73fd"
+        },
+        {
+          "path": "assets/scripts/data/session.ts",
+          "sha256": "09441540d153fb7704908917704fa6a2e27f01558a66eda26de9ce9c73e357cc"
+        },
+        {
+          "path": "assets/scripts/data/settings.ts",
+          "sha256": "12e759b0337248d30b53b7eaa8cc5c73a8976b026360d149d52b17a4390a983a"
+        },
+        {
+          "path": "assets/scripts/data/settingsCodec.ts",
+          "sha256": "bed2ffbafa58793965199f74b5a473aaafd8e2ca9679ace5b7b026f3b6e6a47f"
+        },
+        {
+          "path": "assets/scripts/data/settingsStorage.ts",
+          "sha256": "ab0e276f4aff9fb6c857d9f53ca49344e4fb55caf44d86403fa4a07206e9cfd1"
+        },
+        {
+          "path": "assets/scripts/data/stats.ts",
+          "sha256": "a464c533133f813bf29ddd6b597cefef90d8ff3ce36d99453eefa17410538422"
+        },
+        {
+          "path": "assets/scripts/data/statsCodec.ts",
+          "sha256": "e4c8c3fadf223dc6d75a20057d85e0cca9fb8781392795de75fe016b70b3fe2b"
+        },
+        {
+          "path": "assets/scripts/data/statsDigest.ts",
+          "sha256": "d3a4585f0bd95e22d47318cca2d08e4ebb4f563cec6fad1cea3ffaff6f6fab28"
+        },
+        {
+          "path": "assets/scripts/data/storage-keys.ts",
+          "sha256": "3e3c4b21dc72efbb6e38c56360a1fac0f978d951c8897576dc5445605ed3d4e6"
+        },
+        {
+          "path": "assets/scripts/flow/clock.ts",
+          "sha256": "d01867671381f645a10e30c9cd6eb94c2db3ed09916652f2d66ecf4aa3767d44"
+        },
+        {
+          "path": "assets/scripts/flow/driver.ts",
+          "sha256": "c7208b37fa4a9bf54fa1f413ac32c3a63a7e4f81591f5db7c873495fd07de722"
+        },
+        {
+          "path": "assets/scripts/flow/index.ts",
+          "sha256": "4621646668eecfab13278c17bdf0db8521633d0e98be1498ecbb8531de1c9f69"
+        },
+        {
+          "path": "assets/scripts/flow/policies.ts",
+          "sha256": "2cca0599ec37e095bfc04198c3716bc589fe31597860c87dcd1d135e9670f871"
+        },
+        {
+          "path": "assets/scripts/flow/round-runtime.ts",
+          "sha256": "6a938da8fea066572af9d80204cee624b4cecaaa0d4a91d12f44648800e3935b"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/bidding-driver.ts",
+          "sha256": "7c002480756f4b6e6f60f109e95b6630c0bc930524d2924ce20b22617230f888"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/event-replay.ts",
+          "sha256": "4743864066a13481a850bbb475962430475512d49072c049dd8f568f0dc1a3be"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/persistence.ts",
+          "sha256": "6bceced1c4cc8d51b0499114d6fc4244f322a7e5d4d8fd982818feda7bb54274"
+        },
+        {
+          "path": "assets/scripts/flow/types.ts",
+          "sha256": "dc0df93a2d05711cb6afe04324c3a9245cea312fe91e3913bb2b8d97853d3af8"
+        },
+        {
+          "path": "assets/scripts/game/bidding.ts",
+          "sha256": "5a831883a28e78287e4b39cafa6c606b5d96ecea88a8fd6fa432cbc4927bc737"
+        },
+        {
+          "path": "assets/scripts/game/core.ts",
+          "sha256": "4fb30186177a554daec2f60cb2bcba5d00d1f271e760d8684bb45951dbf9ee7d"
+        },
+        {
+          "path": "assets/scripts/game/index.ts",
+          "sha256": "6700a9697760f6716d60d6bc242222aedaa951bc3ce541ceeb6f64c032d703b0"
+        },
+        {
+          "path": "assets/scripts/game/replay-codec.ts",
+          "sha256": "f65effc9a11a59e9a9f704d4c731d6e7b7c27ec9e63d49403f7a97c07939b082"
+        },
+        {
+          "path": "assets/scripts/game/replay.ts",
+          "sha256": "9475c105216ff70efb8fd2f57a193e4422df65ea6ced07c22e2ad0f8ecee974b"
+        },
+        {
+          "path": "assets/scripts/game/resume.ts",
+          "sha256": "4d139ab72069e9b42aba793e15ad694b4413701be9a2ac30795b416a1f7b52d6"
+        },
+        {
+          "path": "assets/scripts/game/seat.ts",
+          "sha256": "63221039841cc89801c6ed85846aae4518da92cacb17dec53ca70a6280854b07"
+        },
+        {
+          "path": "assets/scripts/game/serialize.ts",
+          "sha256": "23e32036c04035f1bb6c8f087a9a1422d6c7f779d97a1fc64389407a18833cfc"
+        },
+        {
+          "path": "assets/scripts/game/settlement.ts",
+          "sha256": "92caa28c0c1ce8528a3483a82d7c8abd93ad759101066a6849df9263712eff4a"
+        },
+        {
+          "path": "assets/scripts/game/trick-replay.ts",
+          "sha256": "4866f416e6c7084d5af25aeaf6dbefecab7e9d7ba5d106a600c4cfbc1892a91f"
+        },
+        {
+          "path": "assets/scripts/game/types.ts",
+          "sha256": "c498a650d598348e95b501b1982f5005fd444aceee12a087688579f6a2bb4b00"
+        },
+        {
+          "path": "assets/scripts/rules/card.ts",
+          "sha256": "e36240e9197b7ab20b815b5c2d9c03c57d5c2403ec15ac7e15c25636ca5a9443"
+        },
+        {
+          "path": "assets/scripts/rules/compare.ts",
+          "sha256": "3b1d81579e15f114c5fe0b18eecc308053a1d768075d924706508c721d17f627"
+        },
+        {
+          "path": "assets/scripts/rules/deal.ts",
+          "sha256": "aedd4c0f04063ad6ba6eca407cba00dcf5aaa5e0385a278dee1b1a013de6a21b"
+        },
+        {
+          "path": "assets/scripts/rules/guards.ts",
+          "sha256": "d8ffe9b63c1c320cd8456cb0830a03b0177345e0157e7d3a7762ab84ff85c9bc"
+        },
+        {
+          "path": "assets/scripts/rules/index.ts",
+          "sha256": "a4d616fe13b3b814874fc6ba3d44b2921e740141826cdbad0dc8ddbf5459ee74"
+        },
+        {
+          "path": "assets/scripts/rules/moves.ts",
+          "sha256": "5122974c486884f5d165cb1fbba4f9a6d63fe7f2adeb9bafcc3c52f567c53560"
+        },
+        {
+          "path": "assets/scripts/rules/pattern.ts",
+          "sha256": "dbc4b4f183b745e981c3ea363b42de6533b27e5f3a2df2b942c948c122c183c5"
+        },
+        {
+          "path": "assets/scripts/rules/result.ts",
+          "sha256": "14c5dfdb31124735f1171bb2bea0c2b585a99de5f8395006c55724a4459f3cc8"
+        },
+        {
+          "path": "assets/scripts/rules/rng.ts",
+          "sha256": "5e6bf95e20088e4c9e0784a0990ee86bd01988059fa6ddfdbf47e4d8163882df"
+        },
+        {
+          "path": "assets/scripts/runtime/cocos-storage.ts",
+          "sha256": "08243412382998236f0543ca4e098d95129c2db32e19dc8368ce8ee2a8799855"
+        },
+        {
+          "path": "assets/scripts/runtime/export-file.ts",
+          "sha256": "b0bbf51c7f540cc53a10effcbd5e974ef4e4b1c67daf51e5e15ed9f014edc289"
+        },
+        {
+          "path": "assets/scripts/runtime/storage-adapter.ts",
+          "sha256": "6c081f11280d77ce0d791291918f3359adbb280ae813c44e4d379b5b6f9af3d9"
+        },
+        {
+          "path": "assets/scripts/ui/action-buttons.ts",
+          "sha256": "c2929df138b1e5cf2d58412b5cff245e126081ed0a9fb81bb808e9ef5aa13ae5"
+        },
+        {
+          "path": "assets/scripts/ui/ai-thinking-view.ts",
+          "sha256": "b754c377c4f4dbeeacc407696b7e90be6bd806e71458c043b06a2f12974e3ef9"
+        },
+        {
+          "path": "assets/scripts/ui/animation-params.ts",
+          "sha256": "cf511dbc763d0ef8d77f00a1fe2f47221ecf60b445e3fb693a2e16903763e20b"
+        },
+        {
+          "path": "assets/scripts/ui/asset-keys-rollback.ts",
+          "sha256": "02390531e3f069fb52641a78040e0f5cf9ba37c09479e56eb8d5b732775fa255"
+        },
+        {
+          "path": "assets/scripts/ui/asset-keys.ts",
+          "sha256": "f6cab2268c74f1274567ea69172c3769b1b82768f0d59d5ca6e4b30bb047e429"
+        },
+        {
+          "path": "assets/scripts/ui/audio-gate.ts",
+          "sha256": "517cd9a3e6021a18428965fa395c64388bc81cdd2265bcf7e4dca61f68a60357"
+        },
+        {
+          "path": "assets/scripts/ui/bidding-advice-view.ts",
+          "sha256": "5ed5b0741191b91ead8fe15445ae72d789cd259e16549140d5714f0efa26ccd5"
+        },
+        {
+          "path": "assets/scripts/ui/bidding-view.ts",
+          "sha256": "6ea353552efc6630462d310cc4455571733b848b8dbaed71a29774ce1974f8a8"
+        },
+        {
+          "path": "assets/scripts/ui/card-choreography.ts",
+          "sha256": "16238429de7c3d8c3fa37a57cf54f83e79ffde5cec86097d0d0a6f0e60e0427b"
+        },
+        {
+          "path": "assets/scripts/ui/card-memory-view.ts",
+          "sha256": "5f55b9253b6bf8f3a25a2eba6bfff431dd53b0bfa33f1b1de17edea383153542"
+        },
+        {
+          "path": "assets/scripts/ui/card-stage.ts",
+          "sha256": "a9d532504465ba86e8cba8ac4bad35a9c4dad991b2bfc2d4dceed10d9619f1d9"
+        },
+        {
+          "path": "assets/scripts/ui/card-view.ts",
+          "sha256": "112fb49e5937ca413e872af7d59b8a31ab5345df7a7b46075946d1fd30e13d73"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/audio-vibration.ts",
+          "sha256": "ca5b7229ad0bcfa6006b4512ac19737aaeb9579eb5c4f9726ccf68fa0f9c9785"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/bid-actions-renderer.ts",
+          "sha256": "495d2e95ac2c70577acd8f282fe8cb6f2ee8cb60d378db1482f499a762aa13af"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/card-animator.ts",
+          "sha256": "2c2baa92cdcd2bf1f3353eecb146495942c8d3d9e22afff36a50c04a0980da3d"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/card-node.ts",
+          "sha256": "5bbc49cd3bb74b06fa71dbd788f55ec24fb8a09d9f602248d31b112935709bec"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/font-loader.ts",
+          "sha256": "5142da941bb6531a95c08d758618c6d88999dcd97b2e51ce9c15f7471646901a"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/fx-program.ts",
+          "sha256": "be8b198d2177a040435d39a991957983961592ee02e31cf8e6a086910f6ecaf3"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/hud-renderer.ts",
+          "sha256": "104dd8bf1b06495be2004f6461c516a747c933ccbe6c3751d07f0c3c0202e0c0"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/match-log-recorder.ts",
+          "sha256": "f2cfe217250b1d8437e6e96393c22c2780f14abac2391f1d1922bf4ab2029f07"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/pause-overlay-renderer.ts",
+          "sha256": "0ceb4fcf594c6a6052545389947e25c6d3d9a7ea38635b2d2f8db6d9a381de81"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/play-area-renderer.ts",
+          "sha256": "40b2251673779687453805431cd5a8cc6deba7b4730978fc0ab277c2f0532e46"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/result-overlay-renderer.ts",
+          "sha256": "e981355626eaf23ed0be51be33e19581eb52bb1f0609786ac7fcd995d8430adb"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/runtime-feedback.ts",
+          "sha256": "05f388a078c678a8980d71ef2a6ce062441af9492e71d669b595dcda728c5ee0"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/seat-display.ts",
+          "sha256": "2958090dcf0c90c13034793600513cdeadcbfbc3fbe1d136b3a9fa52fc8a2045"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/seats-renderer.ts",
+          "sha256": "a406dd57cdcf2763bf6f8fecc58a5514c2724942b7e66c2953b2e4e06abad9bf"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/top-bar-renderer.ts",
+          "sha256": "674b4991daeaa1c6e64969df78bb8963d8a90e31d77d67a475817ecf8a140b1f"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/tween-helpers.ts",
+          "sha256": "436f93dd8927013c69c0f53776a5477f9ab89a0f855913e601be6fbf3a36b8d2"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/ui-runtime-helpers.ts",
+          "sha256": "43c22c780483f8c8d7fc4edd7ba13edfe11737d0efcb0391594713a8e06bf891"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene-skeleton.ts",
+          "sha256": "11258565f088a6477cb34e640668d1be616126ad066b986015664d255d60fced"
+        },
+        {
+          "path": "assets/scripts/ui/components/lobby-scene.ts",
+          "sha256": "10bf55ab2a0c177efbeca466ed6ef631ee1b193d48d29785ec9bdef7e3b221d4"
+        },
+        {
+          "path": "assets/scripts/ui/components/scene-transition.ts",
+          "sha256": "862d2584dc1d65a3e78d1c1e27a6b1ac7092a651478a2022f7b566c7ebcca26e"
+        },
+        {
+          "path": "assets/scripts/ui/components/ui-helpers.ts",
+          "sha256": "44c1f017552ee914ff28d61388aff80805d02e51fd36d8e2ee2b6e1c8928c290"
+        },
+        {
+          "path": "assets/scripts/ui/difficulty-picker-view.ts",
+          "sha256": "9be055085cfedba4f5666300d570dd70a84e59bf5c61af959cc2fb7a04354215"
+        },
+        {
+          "path": "assets/scripts/ui/event-cues.ts",
+          "sha256": "2c4d83f111e0931920b26ecdfe633c1881841babf8e1454c008e6cf688f837d2"
+        },
+        {
+          "path": "assets/scripts/ui/follow-ux.ts",
+          "sha256": "822147e82bad399646ff384a60f525aab7939e8a5a8ab73017336bb32a81fa73"
+        },
+        {
+          "path": "assets/scripts/ui/hand-interaction.ts",
+          "sha256": "432134a4207f1d658457239282cd4a2a20073ca268559800b04f47cc32171979"
+        },
+        {
+          "path": "assets/scripts/ui/hand-layout.ts",
+          "sha256": "7891b336e16f3215a974bc38a8dccba09fb9678bf051684685e0a41680149e68"
+        },
+        {
+          "path": "assets/scripts/ui/help-content.ts",
+          "sha256": "99017d5b17dbf0ff9c5ed0f210fa6b7efb0f14a254d2233c5c20fd8aa1b71906"
+        },
+        {
+          "path": "assets/scripts/ui/hint-flow.ts",
+          "sha256": "7277ba1179ff3e73d6602648ce4f9ea23c7609ee3926162bc855df3ac515a19b"
+        },
+        {
+          "path": "assets/scripts/ui/index.ts",
+          "sha256": "bc937aab5f4e0058010d0b5b58f131533e525907919deedeef8d312b1405d213"
+        },
+        {
+          "path": "assets/scripts/ui/insight-view.ts",
+          "sha256": "7a1dbb69d340b937be657f43918594ea46bd937fabac185b3a2c2057fdd0af99"
+        },
+        {
+          "path": "assets/scripts/ui/last-action-view.ts",
+          "sha256": "1a773fee6208ea96cc351e514565aaf1fdf5279fe1a7ca922602d1ee4b3cb72a"
+        },
+        {
+          "path": "assets/scripts/ui/last-play-view.ts",
+          "sha256": "fce3a3df25da7d0a09397644ab63d22068bcd24526ceb1c6ca90c66da9f5f481"
+        },
+        {
+          "path": "assets/scripts/ui/lobby-view.ts",
+          "sha256": "bc2541837d67b3abc057367b16163c3dc204403791c57e27b0ed783ddb7ad896"
+        },
+        {
+          "path": "assets/scripts/ui/pattern-label.ts",
+          "sha256": "8170c958ed1168dbf51557ed79ab6364c2346f37ee2fbb8733f6c50b285ae132"
+        },
+        {
+          "path": "assets/scripts/ui/pause-menu.ts",
+          "sha256": "23391ec279f060fc0a0efa3ce70aeccc0a3325abb6bc96e3ff2974bc0d5af58b"
+        },
+        {
+          "path": "assets/scripts/ui/records-detail-view.ts",
+          "sha256": "f44b5f6ee1d6ff7c6a1745c4d9f7b36d73753291d864ddc993aa079fc879320b"
+        },
+        {
+          "path": "assets/scripts/ui/records-view.ts",
+          "sha256": "7ae484cda78241637fc8effc4e4003adec5655a60ebaacedb5a1d207e0352e8a"
+        },
+        {
+          "path": "assets/scripts/ui/replay-view.ts",
+          "sha256": "36ca0134636dff958ca3ba4928e67277b4eb7af7fd40212472b86a31d34a98c2"
+        },
+        {
+          "path": "assets/scripts/ui/result-view.ts",
+          "sha256": "73abba5cd21d90b629723719fb6a9e8b3075a45f7f69f82369ad3a68ed787b62"
+        },
+        {
+          "path": "assets/scripts/ui/resume-rebuild.ts",
+          "sha256": "ae68d8f27f27c0ae63d347c5526aebf37a1b87d2a5c5c001fe3f10dbffcf23e7"
+        },
+        {
+          "path": "assets/scripts/ui/score-roll.ts",
+          "sha256": "70df15d49a68f901f446c730184950c6d756e4c2676d805264ce6b3c1db32124"
+        },
+        {
+          "path": "assets/scripts/ui/screen-view.ts",
+          "sha256": "c3e97eaa578d95e9eac44a04a3cce44b8b6f8c3e47d5d7faee27d143e95d7aa2"
+        },
+        {
+          "path": "assets/scripts/ui/selection.ts",
+          "sha256": "b61cfc6b73a543235e0bc8869ef2c950d901e038fa6226aa5f1eb55a5531e8a3"
+        },
+        {
+          "path": "assets/scripts/ui/session-score.ts",
+          "sha256": "f996c45c9800d1ac15b91318e4c5de77093b238149aa2cdbb414360ce62446ed"
+        },
+        {
+          "path": "assets/scripts/ui/settings-view.ts",
+          "sha256": "9cdc0e31f4d85bb34fc970864b44d163f546d6f19d3aae66260c4009b3e34fac"
+        },
+        {
+          "path": "assets/scripts/ui/settlement-reveal.ts",
+          "sha256": "d913d47722263ff13abe2afcfa22afb71402ff0782e3940cb7499f6ca5f8232a"
+        },
+        {
+          "path": "assets/scripts/ui/stats-detail-view.ts",
+          "sha256": "851aa7488f15329a73716d45483fa7c4db8e21f7e503d534989e2735d95d039d"
+        },
+        {
+          "path": "assets/scripts/ui/stats-view.ts",
+          "sha256": "dd3aa3797041be56914993af444f18730f9646f468f3ee48da4e8ea89ce6caf2"
+        },
+        {
+          "path": "assets/scripts/ui/strength-meter-view.ts",
+          "sha256": "e66541f1c84fa6c54f05fc692169adb5b875b8ea0f02e3d26b1688ceaee4a77b"
+        },
+        {
+          "path": "assets/scripts/ui/strings.ts",
+          "sha256": "a2270569a2e9aba7adf253350610977296c200c70b8875609caf08223e5a21b9"
+        },
+        {
+          "path": "assets/scripts/ui/table-layout.ts",
+          "sha256": "696eaee26d1d6b1c2fbe69b25b9f38cfc9ee56de6ab5ee0b46189bb3b08ee0f2"
+        },
+        {
+          "path": "assets/scripts/ui/table-zones.ts",
+          "sha256": "ec1ec799ac7c5fca3bab294605df388a058bdba2682aba5ab3dd0ddea16847cb"
+        },
+        {
+          "path": "assets/scripts/ui/termination-feedback-view.ts",
+          "sha256": "caacfddb02cfd20cd5b2f9fb9562ad0da2c9d1930d3e80fb2706dba09bd54012"
+        },
+        {
+          "path": "assets/scripts/ui/theme.ts",
+          "sha256": "1848e4769a98a49d1a988d7145c24e5eb72b91b71a003c6358ef249161f53ed7"
+        },
+        {
+          "path": "assets/scripts/ui/toast-queue.ts",
+          "sha256": "ec55c2664a9ec87f281660b58fd9a5f71e722366c6337c40ef59907f64acb726"
+        },
+        {
+          "path": "assets/scripts/ui/turn-timer.ts",
+          "sha256": "97a7fcb86ea51917372a3fad3ed7038610ee6d678ac67c65af0d48aac4fbdf4a"
+        },
+        {
+          "path": "assets/scripts/ui/tutorial-steps.ts",
+          "sha256": "2a332dd92b3a9cd1dfbf94b9cec846dc788597c150cbc9937b04df48dc2a2e0a"
+        },
+        {
+          "path": "assets/scripts/ui/ui-text-colors.ts",
+          "sha256": "9c6ee53e0e831a755ac94b445568030f842a1c4390c8a8aafd634db9b4717527"
+        }
+      ],
+      "changesFromBaseline": [
+        {
+          "path": "assets/scripts/ai/levels/hard.ts",
+          "archived": "sources/raw-assets_scripts_ai_levels_hard.ts.txt",
+          "sha256": "a089bc96911bacd90ca7a2070e028a5e9a972b85efd2c7651d1329ba70065429"
+        },
+        {
+          "path": "assets/scripts/ai/pimc.ts",
+          "archived": "sources/raw-assets_scripts_ai_pimc.ts.txt",
+          "sha256": "6cf9dcfe08e7942c4b19388371fc9151f4fdb1a40e091d84378be9dcde99c900"
+        },
+        {
+          "path": "assets/scripts/ai/rollout.ts",
+          "archived": "sources/raw-assets_scripts_ai_rollout.ts.txt",
+          "sha256": "9efd6bede84dd6f846082496af2539517efba56d058fa01235b5b6460a369410"
+        }
+      ]
+    },
+    "memo1": {
+      "directoryAtRun": "/tmp/ddz-plus5-global54-solver16-tactics-memo",
+      "typescriptTreeSha256": "0c97fbe12d5b0bf554b85c6981078770c890f29933c387664ff98ec9ec92c542",
+      "treeHashAlgorithm": "SHA256(concatenation of sorted relativePath + NUL + file SHA256 + LF, UTF-8)",
+      "files": [
+        {
+          "path": "assets/scripts/ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "assets/scripts/ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "assets/scripts/ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "assets/scripts/ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "assets/scripts/ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "assets/scripts/ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "assets/scripts/ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "assets/scripts/ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "assets/scripts/ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "assets/scripts/ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "assets/scripts/ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "assets/scripts/ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "assets/scripts/ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "assets/scripts/ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "assets/scripts/ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "assets/scripts/ai/levels/hard.ts",
+          "sha256": "a089bc96911bacd90ca7a2070e028a5e9a972b85efd2c7651d1329ba70065429"
+        },
+        {
+          "path": "assets/scripts/ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "assets/scripts/ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "assets/scripts/ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "assets/scripts/ai/pimc.ts",
+          "sha256": "9559247c44c86c81465b6b71f3f873317b229c810d913124dad29fcd78c36c6f"
+        },
+        {
+          "path": "assets/scripts/ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "assets/scripts/ai/rollout.ts",
+          "sha256": "29c42ab4eb3766db7b9bf8c9cb0f3c38fbfb2be3589520f0d8d7213ce9b40c4f"
+        },
+        {
+          "path": "assets/scripts/ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "assets/scripts/ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "assets/scripts/ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        },
+        {
+          "path": "assets/scripts/data/aggregate.ts",
+          "sha256": "bbf48e1e2556f828a39c1a71da87fe716c32b2e36ef1839a039c25e7a6ec359c"
+        },
+        {
+          "path": "assets/scripts/data/difficultyConfig.ts",
+          "sha256": "2ea1afa1faeb60784d17afd27811ba8727e138ca76ce3af31b964fa0858b9240"
+        },
+        {
+          "path": "assets/scripts/data/index.ts",
+          "sha256": "ad604423170b476092ef404bc1ea26e8c99b48a920a7935f62641f984b34acd4"
+        },
+        {
+          "path": "assets/scripts/data/match-log.ts",
+          "sha256": "3f264b3eb1b9743172882adb3df19db5b63324c313aaa1c23be1913488d2f85d"
+        },
+        {
+          "path": "assets/scripts/data/records.ts",
+          "sha256": "10f9677aa5ff624ba93f04828a6a2298fa8850c795c80a503cdd7c0b3d9144a2"
+        },
+        {
+          "path": "assets/scripts/data/recordsQuery.ts",
+          "sha256": "35d7edf12a11a26f399e510995aafff58b11ab3c2acfde4d04607366170f1aaa"
+        },
+        {
+          "path": "assets/scripts/data/save.ts",
+          "sha256": "61490b99af73d1530b534bd7c858969146ebfc65622520ccc963b3dff9799a28"
+        },
+        {
+          "path": "assets/scripts/data/saveStorage.ts",
+          "sha256": "4d43d6629de355b6f69bab0a729a087d0cfcf0c519f1a6692bbba459239d73fd"
+        },
+        {
+          "path": "assets/scripts/data/session.ts",
+          "sha256": "09441540d153fb7704908917704fa6a2e27f01558a66eda26de9ce9c73e357cc"
+        },
+        {
+          "path": "assets/scripts/data/settings.ts",
+          "sha256": "12e759b0337248d30b53b7eaa8cc5c73a8976b026360d149d52b17a4390a983a"
+        },
+        {
+          "path": "assets/scripts/data/settingsCodec.ts",
+          "sha256": "bed2ffbafa58793965199f74b5a473aaafd8e2ca9679ace5b7b026f3b6e6a47f"
+        },
+        {
+          "path": "assets/scripts/data/settingsStorage.ts",
+          "sha256": "ab0e276f4aff9fb6c857d9f53ca49344e4fb55caf44d86403fa4a07206e9cfd1"
+        },
+        {
+          "path": "assets/scripts/data/stats.ts",
+          "sha256": "a464c533133f813bf29ddd6b597cefef90d8ff3ce36d99453eefa17410538422"
+        },
+        {
+          "path": "assets/scripts/data/statsCodec.ts",
+          "sha256": "e4c8c3fadf223dc6d75a20057d85e0cca9fb8781392795de75fe016b70b3fe2b"
+        },
+        {
+          "path": "assets/scripts/data/statsDigest.ts",
+          "sha256": "d3a4585f0bd95e22d47318cca2d08e4ebb4f563cec6fad1cea3ffaff6f6fab28"
+        },
+        {
+          "path": "assets/scripts/data/storage-keys.ts",
+          "sha256": "3e3c4b21dc72efbb6e38c56360a1fac0f978d951c8897576dc5445605ed3d4e6"
+        },
+        {
+          "path": "assets/scripts/flow/clock.ts",
+          "sha256": "d01867671381f645a10e30c9cd6eb94c2db3ed09916652f2d66ecf4aa3767d44"
+        },
+        {
+          "path": "assets/scripts/flow/driver.ts",
+          "sha256": "c7208b37fa4a9bf54fa1f413ac32c3a63a7e4f81591f5db7c873495fd07de722"
+        },
+        {
+          "path": "assets/scripts/flow/index.ts",
+          "sha256": "4621646668eecfab13278c17bdf0db8521633d0e98be1498ecbb8531de1c9f69"
+        },
+        {
+          "path": "assets/scripts/flow/policies.ts",
+          "sha256": "2cca0599ec37e095bfc04198c3716bc589fe31597860c87dcd1d135e9670f871"
+        },
+        {
+          "path": "assets/scripts/flow/round-runtime.ts",
+          "sha256": "6a938da8fea066572af9d80204cee624b4cecaaa0d4a91d12f44648800e3935b"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/bidding-driver.ts",
+          "sha256": "7c002480756f4b6e6f60f109e95b6630c0bc930524d2924ce20b22617230f888"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/event-replay.ts",
+          "sha256": "4743864066a13481a850bbb475962430475512d49072c049dd8f568f0dc1a3be"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/persistence.ts",
+          "sha256": "6bceced1c4cc8d51b0499114d6fc4244f322a7e5d4d8fd982818feda7bb54274"
+        },
+        {
+          "path": "assets/scripts/flow/types.ts",
+          "sha256": "dc0df93a2d05711cb6afe04324c3a9245cea312fe91e3913bb2b8d97853d3af8"
+        },
+        {
+          "path": "assets/scripts/game/bidding.ts",
+          "sha256": "5a831883a28e78287e4b39cafa6c606b5d96ecea88a8fd6fa432cbc4927bc737"
+        },
+        {
+          "path": "assets/scripts/game/core.ts",
+          "sha256": "4fb30186177a554daec2f60cb2bcba5d00d1f271e760d8684bb45951dbf9ee7d"
+        },
+        {
+          "path": "assets/scripts/game/index.ts",
+          "sha256": "6700a9697760f6716d60d6bc242222aedaa951bc3ce541ceeb6f64c032d703b0"
+        },
+        {
+          "path": "assets/scripts/game/replay-codec.ts",
+          "sha256": "f65effc9a11a59e9a9f704d4c731d6e7b7c27ec9e63d49403f7a97c07939b082"
+        },
+        {
+          "path": "assets/scripts/game/replay.ts",
+          "sha256": "9475c105216ff70efb8fd2f57a193e4422df65ea6ced07c22e2ad0f8ecee974b"
+        },
+        {
+          "path": "assets/scripts/game/resume.ts",
+          "sha256": "4d139ab72069e9b42aba793e15ad694b4413701be9a2ac30795b416a1f7b52d6"
+        },
+        {
+          "path": "assets/scripts/game/seat.ts",
+          "sha256": "63221039841cc89801c6ed85846aae4518da92cacb17dec53ca70a6280854b07"
+        },
+        {
+          "path": "assets/scripts/game/serialize.ts",
+          "sha256": "23e32036c04035f1bb6c8f087a9a1422d6c7f779d97a1fc64389407a18833cfc"
+        },
+        {
+          "path": "assets/scripts/game/settlement.ts",
+          "sha256": "92caa28c0c1ce8528a3483a82d7c8abd93ad759101066a6849df9263712eff4a"
+        },
+        {
+          "path": "assets/scripts/game/trick-replay.ts",
+          "sha256": "4866f416e6c7084d5af25aeaf6dbefecab7e9d7ba5d106a600c4cfbc1892a91f"
+        },
+        {
+          "path": "assets/scripts/game/types.ts",
+          "sha256": "c498a650d598348e95b501b1982f5005fd444aceee12a087688579f6a2bb4b00"
+        },
+        {
+          "path": "assets/scripts/rules/card.ts",
+          "sha256": "e36240e9197b7ab20b815b5c2d9c03c57d5c2403ec15ac7e15c25636ca5a9443"
+        },
+        {
+          "path": "assets/scripts/rules/compare.ts",
+          "sha256": "3b1d81579e15f114c5fe0b18eecc308053a1d768075d924706508c721d17f627"
+        },
+        {
+          "path": "assets/scripts/rules/deal.ts",
+          "sha256": "aedd4c0f04063ad6ba6eca407cba00dcf5aaa5e0385a278dee1b1a013de6a21b"
+        },
+        {
+          "path": "assets/scripts/rules/guards.ts",
+          "sha256": "d8ffe9b63c1c320cd8456cb0830a03b0177345e0157e7d3a7762ab84ff85c9bc"
+        },
+        {
+          "path": "assets/scripts/rules/index.ts",
+          "sha256": "a4d616fe13b3b814874fc6ba3d44b2921e740141826cdbad0dc8ddbf5459ee74"
+        },
+        {
+          "path": "assets/scripts/rules/moves.ts",
+          "sha256": "5122974c486884f5d165cb1fbba4f9a6d63fe7f2adeb9bafcc3c52f567c53560"
+        },
+        {
+          "path": "assets/scripts/rules/pattern.ts",
+          "sha256": "dbc4b4f183b745e981c3ea363b42de6533b27e5f3a2df2b942c948c122c183c5"
+        },
+        {
+          "path": "assets/scripts/rules/result.ts",
+          "sha256": "14c5dfdb31124735f1171bb2bea0c2b585a99de5f8395006c55724a4459f3cc8"
+        },
+        {
+          "path": "assets/scripts/rules/rng.ts",
+          "sha256": "5e6bf95e20088e4c9e0784a0990ee86bd01988059fa6ddfdbf47e4d8163882df"
+        },
+        {
+          "path": "assets/scripts/runtime/cocos-storage.ts",
+          "sha256": "08243412382998236f0543ca4e098d95129c2db32e19dc8368ce8ee2a8799855"
+        },
+        {
+          "path": "assets/scripts/runtime/export-file.ts",
+          "sha256": "b0bbf51c7f540cc53a10effcbd5e974ef4e4b1c67daf51e5e15ed9f014edc289"
+        },
+        {
+          "path": "assets/scripts/runtime/storage-adapter.ts",
+          "sha256": "6c081f11280d77ce0d791291918f3359adbb280ae813c44e4d379b5b6f9af3d9"
+        },
+        {
+          "path": "assets/scripts/ui/action-buttons.ts",
+          "sha256": "c2929df138b1e5cf2d58412b5cff245e126081ed0a9fb81bb808e9ef5aa13ae5"
+        },
+        {
+          "path": "assets/scripts/ui/ai-thinking-view.ts",
+          "sha256": "b754c377c4f4dbeeacc407696b7e90be6bd806e71458c043b06a2f12974e3ef9"
+        },
+        {
+          "path": "assets/scripts/ui/animation-params.ts",
+          "sha256": "cf511dbc763d0ef8d77f00a1fe2f47221ecf60b445e3fb693a2e16903763e20b"
+        },
+        {
+          "path": "assets/scripts/ui/asset-keys-rollback.ts",
+          "sha256": "02390531e3f069fb52641a78040e0f5cf9ba37c09479e56eb8d5b732775fa255"
+        },
+        {
+          "path": "assets/scripts/ui/asset-keys.ts",
+          "sha256": "f6cab2268c74f1274567ea69172c3769b1b82768f0d59d5ca6e4b30bb047e429"
+        },
+        {
+          "path": "assets/scripts/ui/audio-gate.ts",
+          "sha256": "517cd9a3e6021a18428965fa395c64388bc81cdd2265bcf7e4dca61f68a60357"
+        },
+        {
+          "path": "assets/scripts/ui/bidding-advice-view.ts",
+          "sha256": "5ed5b0741191b91ead8fe15445ae72d789cd259e16549140d5714f0efa26ccd5"
+        },
+        {
+          "path": "assets/scripts/ui/bidding-view.ts",
+          "sha256": "6ea353552efc6630462d310cc4455571733b848b8dbaed71a29774ce1974f8a8"
+        },
+        {
+          "path": "assets/scripts/ui/card-choreography.ts",
+          "sha256": "16238429de7c3d8c3fa37a57cf54f83e79ffde5cec86097d0d0a6f0e60e0427b"
+        },
+        {
+          "path": "assets/scripts/ui/card-memory-view.ts",
+          "sha256": "5f55b9253b6bf8f3a25a2eba6bfff431dd53b0bfa33f1b1de17edea383153542"
+        },
+        {
+          "path": "assets/scripts/ui/card-stage.ts",
+          "sha256": "a9d532504465ba86e8cba8ac4bad35a9c4dad991b2bfc2d4dceed10d9619f1d9"
+        },
+        {
+          "path": "assets/scripts/ui/card-view.ts",
+          "sha256": "112fb49e5937ca413e872af7d59b8a31ab5345df7a7b46075946d1fd30e13d73"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/audio-vibration.ts",
+          "sha256": "ca5b7229ad0bcfa6006b4512ac19737aaeb9579eb5c4f9726ccf68fa0f9c9785"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/bid-actions-renderer.ts",
+          "sha256": "495d2e95ac2c70577acd8f282fe8cb6f2ee8cb60d378db1482f499a762aa13af"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/card-animator.ts",
+          "sha256": "2c2baa92cdcd2bf1f3353eecb146495942c8d3d9e22afff36a50c04a0980da3d"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/card-node.ts",
+          "sha256": "5bbc49cd3bb74b06fa71dbd788f55ec24fb8a09d9f602248d31b112935709bec"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/font-loader.ts",
+          "sha256": "5142da941bb6531a95c08d758618c6d88999dcd97b2e51ce9c15f7471646901a"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/fx-program.ts",
+          "sha256": "be8b198d2177a040435d39a991957983961592ee02e31cf8e6a086910f6ecaf3"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/hud-renderer.ts",
+          "sha256": "104dd8bf1b06495be2004f6461c516a747c933ccbe6c3751d07f0c3c0202e0c0"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/match-log-recorder.ts",
+          "sha256": "f2cfe217250b1d8437e6e96393c22c2780f14abac2391f1d1922bf4ab2029f07"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/pause-overlay-renderer.ts",
+          "sha256": "0ceb4fcf594c6a6052545389947e25c6d3d9a7ea38635b2d2f8db6d9a381de81"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/play-area-renderer.ts",
+          "sha256": "40b2251673779687453805431cd5a8cc6deba7b4730978fc0ab277c2f0532e46"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/result-overlay-renderer.ts",
+          "sha256": "e981355626eaf23ed0be51be33e19581eb52bb1f0609786ac7fcd995d8430adb"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/runtime-feedback.ts",
+          "sha256": "05f388a078c678a8980d71ef2a6ce062441af9492e71d669b595dcda728c5ee0"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/seat-display.ts",
+          "sha256": "2958090dcf0c90c13034793600513cdeadcbfbc3fbe1d136b3a9fa52fc8a2045"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/seats-renderer.ts",
+          "sha256": "a406dd57cdcf2763bf6f8fecc58a5514c2724942b7e66c2953b2e4e06abad9bf"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/top-bar-renderer.ts",
+          "sha256": "674b4991daeaa1c6e64969df78bb8963d8a90e31d77d67a475817ecf8a140b1f"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/tween-helpers.ts",
+          "sha256": "436f93dd8927013c69c0f53776a5477f9ab89a0f855913e601be6fbf3a36b8d2"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/ui-runtime-helpers.ts",
+          "sha256": "43c22c780483f8c8d7fc4edd7ba13edfe11737d0efcb0391594713a8e06bf891"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene-skeleton.ts",
+          "sha256": "11258565f088a6477cb34e640668d1be616126ad066b986015664d255d60fced"
+        },
+        {
+          "path": "assets/scripts/ui/components/lobby-scene.ts",
+          "sha256": "10bf55ab2a0c177efbeca466ed6ef631ee1b193d48d29785ec9bdef7e3b221d4"
+        },
+        {
+          "path": "assets/scripts/ui/components/scene-transition.ts",
+          "sha256": "862d2584dc1d65a3e78d1c1e27a6b1ac7092a651478a2022f7b566c7ebcca26e"
+        },
+        {
+          "path": "assets/scripts/ui/components/ui-helpers.ts",
+          "sha256": "44c1f017552ee914ff28d61388aff80805d02e51fd36d8e2ee2b6e1c8928c290"
+        },
+        {
+          "path": "assets/scripts/ui/difficulty-picker-view.ts",
+          "sha256": "9be055085cfedba4f5666300d570dd70a84e59bf5c61af959cc2fb7a04354215"
+        },
+        {
+          "path": "assets/scripts/ui/event-cues.ts",
+          "sha256": "2c4d83f111e0931920b26ecdfe633c1881841babf8e1454c008e6cf688f837d2"
+        },
+        {
+          "path": "assets/scripts/ui/follow-ux.ts",
+          "sha256": "822147e82bad399646ff384a60f525aab7939e8a5a8ab73017336bb32a81fa73"
+        },
+        {
+          "path": "assets/scripts/ui/hand-interaction.ts",
+          "sha256": "432134a4207f1d658457239282cd4a2a20073ca268559800b04f47cc32171979"
+        },
+        {
+          "path": "assets/scripts/ui/hand-layout.ts",
+          "sha256": "7891b336e16f3215a974bc38a8dccba09fb9678bf051684685e0a41680149e68"
+        },
+        {
+          "path": "assets/scripts/ui/help-content.ts",
+          "sha256": "99017d5b17dbf0ff9c5ed0f210fa6b7efb0f14a254d2233c5c20fd8aa1b71906"
+        },
+        {
+          "path": "assets/scripts/ui/hint-flow.ts",
+          "sha256": "7277ba1179ff3e73d6602648ce4f9ea23c7609ee3926162bc855df3ac515a19b"
+        },
+        {
+          "path": "assets/scripts/ui/index.ts",
+          "sha256": "bc937aab5f4e0058010d0b5b58f131533e525907919deedeef8d312b1405d213"
+        },
+        {
+          "path": "assets/scripts/ui/insight-view.ts",
+          "sha256": "7a1dbb69d340b937be657f43918594ea46bd937fabac185b3a2c2057fdd0af99"
+        },
+        {
+          "path": "assets/scripts/ui/last-action-view.ts",
+          "sha256": "1a773fee6208ea96cc351e514565aaf1fdf5279fe1a7ca922602d1ee4b3cb72a"
+        },
+        {
+          "path": "assets/scripts/ui/last-play-view.ts",
+          "sha256": "fce3a3df25da7d0a09397644ab63d22068bcd24526ceb1c6ca90c66da9f5f481"
+        },
+        {
+          "path": "assets/scripts/ui/lobby-view.ts",
+          "sha256": "bc2541837d67b3abc057367b16163c3dc204403791c57e27b0ed783ddb7ad896"
+        },
+        {
+          "path": "assets/scripts/ui/pattern-label.ts",
+          "sha256": "8170c958ed1168dbf51557ed79ab6364c2346f37ee2fbb8733f6c50b285ae132"
+        },
+        {
+          "path": "assets/scripts/ui/pause-menu.ts",
+          "sha256": "23391ec279f060fc0a0efa3ce70aeccc0a3325abb6bc96e3ff2974bc0d5af58b"
+        },
+        {
+          "path": "assets/scripts/ui/records-detail-view.ts",
+          "sha256": "f44b5f6ee1d6ff7c6a1745c4d9f7b36d73753291d864ddc993aa079fc879320b"
+        },
+        {
+          "path": "assets/scripts/ui/records-view.ts",
+          "sha256": "7ae484cda78241637fc8effc4e4003adec5655a60ebaacedb5a1d207e0352e8a"
+        },
+        {
+          "path": "assets/scripts/ui/replay-view.ts",
+          "sha256": "36ca0134636dff958ca3ba4928e67277b4eb7af7fd40212472b86a31d34a98c2"
+        },
+        {
+          "path": "assets/scripts/ui/result-view.ts",
+          "sha256": "73abba5cd21d90b629723719fb6a9e8b3075a45f7f69f82369ad3a68ed787b62"
+        },
+        {
+          "path": "assets/scripts/ui/resume-rebuild.ts",
+          "sha256": "ae68d8f27f27c0ae63d347c5526aebf37a1b87d2a5c5c001fe3f10dbffcf23e7"
+        },
+        {
+          "path": "assets/scripts/ui/score-roll.ts",
+          "sha256": "70df15d49a68f901f446c730184950c6d756e4c2676d805264ce6b3c1db32124"
+        },
+        {
+          "path": "assets/scripts/ui/screen-view.ts",
+          "sha256": "c3e97eaa578d95e9eac44a04a3cce44b8b6f8c3e47d5d7faee27d143e95d7aa2"
+        },
+        {
+          "path": "assets/scripts/ui/selection.ts",
+          "sha256": "b61cfc6b73a543235e0bc8869ef2c950d901e038fa6226aa5f1eb55a5531e8a3"
+        },
+        {
+          "path": "assets/scripts/ui/session-score.ts",
+          "sha256": "f996c45c9800d1ac15b91318e4c5de77093b238149aa2cdbb414360ce62446ed"
+        },
+        {
+          "path": "assets/scripts/ui/settings-view.ts",
+          "sha256": "9cdc0e31f4d85bb34fc970864b44d163f546d6f19d3aae66260c4009b3e34fac"
+        },
+        {
+          "path": "assets/scripts/ui/settlement-reveal.ts",
+          "sha256": "d913d47722263ff13abe2afcfa22afb71402ff0782e3940cb7499f6ca5f8232a"
+        },
+        {
+          "path": "assets/scripts/ui/stats-detail-view.ts",
+          "sha256": "851aa7488f15329a73716d45483fa7c4db8e21f7e503d534989e2735d95d039d"
+        },
+        {
+          "path": "assets/scripts/ui/stats-view.ts",
+          "sha256": "dd3aa3797041be56914993af444f18730f9646f468f3ee48da4e8ea89ce6caf2"
+        },
+        {
+          "path": "assets/scripts/ui/strength-meter-view.ts",
+          "sha256": "e66541f1c84fa6c54f05fc692169adb5b875b8ea0f02e3d26b1688ceaee4a77b"
+        },
+        {
+          "path": "assets/scripts/ui/strings.ts",
+          "sha256": "a2270569a2e9aba7adf253350610977296c200c70b8875609caf08223e5a21b9"
+        },
+        {
+          "path": "assets/scripts/ui/table-layout.ts",
+          "sha256": "696eaee26d1d6b1c2fbe69b25b9f38cfc9ee56de6ab5ee0b46189bb3b08ee0f2"
+        },
+        {
+          "path": "assets/scripts/ui/table-zones.ts",
+          "sha256": "ec1ec799ac7c5fca3bab294605df388a058bdba2682aba5ab3dd0ddea16847cb"
+        },
+        {
+          "path": "assets/scripts/ui/termination-feedback-view.ts",
+          "sha256": "caacfddb02cfd20cd5b2f9fb9562ad0da2c9d1930d3e80fb2706dba09bd54012"
+        },
+        {
+          "path": "assets/scripts/ui/theme.ts",
+          "sha256": "1848e4769a98a49d1a988d7145c24e5eb72b91b71a003c6358ef249161f53ed7"
+        },
+        {
+          "path": "assets/scripts/ui/toast-queue.ts",
+          "sha256": "ec55c2664a9ec87f281660b58fd9a5f71e722366c6337c40ef59907f64acb726"
+        },
+        {
+          "path": "assets/scripts/ui/turn-timer.ts",
+          "sha256": "97a7fcb86ea51917372a3fad3ed7038610ee6d678ac67c65af0d48aac4fbdf4a"
+        },
+        {
+          "path": "assets/scripts/ui/tutorial-steps.ts",
+          "sha256": "2a332dd92b3a9cd1dfbf94b9cec846dc788597c150cbc9937b04df48dc2a2e0a"
+        },
+        {
+          "path": "assets/scripts/ui/ui-text-colors.ts",
+          "sha256": "9c6ee53e0e831a755ac94b445568030f842a1c4390c8a8aafd634db9b4717527"
+        }
+      ],
+      "changesFromBaseline": [
+        {
+          "path": "assets/scripts/ai/levels/hard.ts",
+          "archived": "sources/memo1-assets_scripts_ai_levels_hard.ts.txt",
+          "sha256": "a089bc96911bacd90ca7a2070e028a5e9a972b85efd2c7651d1329ba70065429"
+        },
+        {
+          "path": "assets/scripts/ai/pimc.ts",
+          "archived": "sources/memo1-assets_scripts_ai_pimc.ts.txt",
+          "sha256": "9559247c44c86c81465b6b71f3f873317b229c810d913124dad29fcd78c36c6f"
+        },
+        {
+          "path": "assets/scripts/ai/rollout.ts",
+          "archived": "sources/memo1-assets_scripts_ai_rollout.ts.txt",
+          "sha256": "29c42ab4eb3766db7b9bf8c9cb0f3c38fbfb2be3589520f0d8d7213ce9b40c4f"
+        }
+      ]
+    },
+    "memo2": {
+      "directoryAtRun": "/tmp/ddz-plus5-global54-solver16-tactics-memo2",
+      "typescriptTreeSha256": "892550dc4a4e7e99554ceefb89829131f18d1eed73d9fe82e1231cf02bf142a9",
+      "treeHashAlgorithm": "SHA256(concatenation of sorted relativePath + NUL + file SHA256 + LF, UTF-8)",
+      "files": [
+        {
+          "path": "assets/scripts/ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "assets/scripts/ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "assets/scripts/ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "assets/scripts/ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "assets/scripts/ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "assets/scripts/ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "assets/scripts/ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "assets/scripts/ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "assets/scripts/ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "assets/scripts/ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "assets/scripts/ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "assets/scripts/ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "assets/scripts/ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "assets/scripts/ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "assets/scripts/ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "assets/scripts/ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "assets/scripts/ai/levels/hard.ts",
+          "sha256": "a089bc96911bacd90ca7a2070e028a5e9a972b85efd2c7651d1329ba70065429"
+        },
+        {
+          "path": "assets/scripts/ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "assets/scripts/ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "assets/scripts/ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "assets/scripts/ai/pimc.ts",
+          "sha256": "9559247c44c86c81465b6b71f3f873317b229c810d913124dad29fcd78c36c6f"
+        },
+        {
+          "path": "assets/scripts/ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "assets/scripts/ai/rollout.ts",
+          "sha256": "d088ce2e9853a80056cf10a9a86238bd8b3e788503b081a5ab722bedd20aea8b"
+        },
+        {
+          "path": "assets/scripts/ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "assets/scripts/ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "assets/scripts/ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        },
+        {
+          "path": "assets/scripts/data/aggregate.ts",
+          "sha256": "bbf48e1e2556f828a39c1a71da87fe716c32b2e36ef1839a039c25e7a6ec359c"
+        },
+        {
+          "path": "assets/scripts/data/difficultyConfig.ts",
+          "sha256": "2ea1afa1faeb60784d17afd27811ba8727e138ca76ce3af31b964fa0858b9240"
+        },
+        {
+          "path": "assets/scripts/data/index.ts",
+          "sha256": "ad604423170b476092ef404bc1ea26e8c99b48a920a7935f62641f984b34acd4"
+        },
+        {
+          "path": "assets/scripts/data/match-log.ts",
+          "sha256": "3f264b3eb1b9743172882adb3df19db5b63324c313aaa1c23be1913488d2f85d"
+        },
+        {
+          "path": "assets/scripts/data/records.ts",
+          "sha256": "10f9677aa5ff624ba93f04828a6a2298fa8850c795c80a503cdd7c0b3d9144a2"
+        },
+        {
+          "path": "assets/scripts/data/recordsQuery.ts",
+          "sha256": "35d7edf12a11a26f399e510995aafff58b11ab3c2acfde4d04607366170f1aaa"
+        },
+        {
+          "path": "assets/scripts/data/save.ts",
+          "sha256": "61490b99af73d1530b534bd7c858969146ebfc65622520ccc963b3dff9799a28"
+        },
+        {
+          "path": "assets/scripts/data/saveStorage.ts",
+          "sha256": "4d43d6629de355b6f69bab0a729a087d0cfcf0c519f1a6692bbba459239d73fd"
+        },
+        {
+          "path": "assets/scripts/data/session.ts",
+          "sha256": "09441540d153fb7704908917704fa6a2e27f01558a66eda26de9ce9c73e357cc"
+        },
+        {
+          "path": "assets/scripts/data/settings.ts",
+          "sha256": "12e759b0337248d30b53b7eaa8cc5c73a8976b026360d149d52b17a4390a983a"
+        },
+        {
+          "path": "assets/scripts/data/settingsCodec.ts",
+          "sha256": "bed2ffbafa58793965199f74b5a473aaafd8e2ca9679ace5b7b026f3b6e6a47f"
+        },
+        {
+          "path": "assets/scripts/data/settingsStorage.ts",
+          "sha256": "ab0e276f4aff9fb6c857d9f53ca49344e4fb55caf44d86403fa4a07206e9cfd1"
+        },
+        {
+          "path": "assets/scripts/data/stats.ts",
+          "sha256": "a464c533133f813bf29ddd6b597cefef90d8ff3ce36d99453eefa17410538422"
+        },
+        {
+          "path": "assets/scripts/data/statsCodec.ts",
+          "sha256": "e4c8c3fadf223dc6d75a20057d85e0cca9fb8781392795de75fe016b70b3fe2b"
+        },
+        {
+          "path": "assets/scripts/data/statsDigest.ts",
+          "sha256": "d3a4585f0bd95e22d47318cca2d08e4ebb4f563cec6fad1cea3ffaff6f6fab28"
+        },
+        {
+          "path": "assets/scripts/data/storage-keys.ts",
+          "sha256": "3e3c4b21dc72efbb6e38c56360a1fac0f978d951c8897576dc5445605ed3d4e6"
+        },
+        {
+          "path": "assets/scripts/flow/clock.ts",
+          "sha256": "d01867671381f645a10e30c9cd6eb94c2db3ed09916652f2d66ecf4aa3767d44"
+        },
+        {
+          "path": "assets/scripts/flow/driver.ts",
+          "sha256": "c7208b37fa4a9bf54fa1f413ac32c3a63a7e4f81591f5db7c873495fd07de722"
+        },
+        {
+          "path": "assets/scripts/flow/index.ts",
+          "sha256": "4621646668eecfab13278c17bdf0db8521633d0e98be1498ecbb8531de1c9f69"
+        },
+        {
+          "path": "assets/scripts/flow/policies.ts",
+          "sha256": "2cca0599ec37e095bfc04198c3716bc589fe31597860c87dcd1d135e9670f871"
+        },
+        {
+          "path": "assets/scripts/flow/round-runtime.ts",
+          "sha256": "6a938da8fea066572af9d80204cee624b4cecaaa0d4a91d12f44648800e3935b"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/bidding-driver.ts",
+          "sha256": "7c002480756f4b6e6f60f109e95b6630c0bc930524d2924ce20b22617230f888"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/event-replay.ts",
+          "sha256": "4743864066a13481a850bbb475962430475512d49072c049dd8f568f0dc1a3be"
+        },
+        {
+          "path": "assets/scripts/flow/runtime/persistence.ts",
+          "sha256": "6bceced1c4cc8d51b0499114d6fc4244f322a7e5d4d8fd982818feda7bb54274"
+        },
+        {
+          "path": "assets/scripts/flow/types.ts",
+          "sha256": "dc0df93a2d05711cb6afe04324c3a9245cea312fe91e3913bb2b8d97853d3af8"
+        },
+        {
+          "path": "assets/scripts/game/bidding.ts",
+          "sha256": "5a831883a28e78287e4b39cafa6c606b5d96ecea88a8fd6fa432cbc4927bc737"
+        },
+        {
+          "path": "assets/scripts/game/core.ts",
+          "sha256": "4fb30186177a554daec2f60cb2bcba5d00d1f271e760d8684bb45951dbf9ee7d"
+        },
+        {
+          "path": "assets/scripts/game/index.ts",
+          "sha256": "6700a9697760f6716d60d6bc242222aedaa951bc3ce541ceeb6f64c032d703b0"
+        },
+        {
+          "path": "assets/scripts/game/replay-codec.ts",
+          "sha256": "f65effc9a11a59e9a9f704d4c731d6e7b7c27ec9e63d49403f7a97c07939b082"
+        },
+        {
+          "path": "assets/scripts/game/replay.ts",
+          "sha256": "9475c105216ff70efb8fd2f57a193e4422df65ea6ced07c22e2ad0f8ecee974b"
+        },
+        {
+          "path": "assets/scripts/game/resume.ts",
+          "sha256": "4d139ab72069e9b42aba793e15ad694b4413701be9a2ac30795b416a1f7b52d6"
+        },
+        {
+          "path": "assets/scripts/game/seat.ts",
+          "sha256": "63221039841cc89801c6ed85846aae4518da92cacb17dec53ca70a6280854b07"
+        },
+        {
+          "path": "assets/scripts/game/serialize.ts",
+          "sha256": "23e32036c04035f1bb6c8f087a9a1422d6c7f779d97a1fc64389407a18833cfc"
+        },
+        {
+          "path": "assets/scripts/game/settlement.ts",
+          "sha256": "92caa28c0c1ce8528a3483a82d7c8abd93ad759101066a6849df9263712eff4a"
+        },
+        {
+          "path": "assets/scripts/game/trick-replay.ts",
+          "sha256": "4866f416e6c7084d5af25aeaf6dbefecab7e9d7ba5d106a600c4cfbc1892a91f"
+        },
+        {
+          "path": "assets/scripts/game/types.ts",
+          "sha256": "c498a650d598348e95b501b1982f5005fd444aceee12a087688579f6a2bb4b00"
+        },
+        {
+          "path": "assets/scripts/rules/card.ts",
+          "sha256": "e36240e9197b7ab20b815b5c2d9c03c57d5c2403ec15ac7e15c25636ca5a9443"
+        },
+        {
+          "path": "assets/scripts/rules/compare.ts",
+          "sha256": "3b1d81579e15f114c5fe0b18eecc308053a1d768075d924706508c721d17f627"
+        },
+        {
+          "path": "assets/scripts/rules/deal.ts",
+          "sha256": "aedd4c0f04063ad6ba6eca407cba00dcf5aaa5e0385a278dee1b1a013de6a21b"
+        },
+        {
+          "path": "assets/scripts/rules/guards.ts",
+          "sha256": "d8ffe9b63c1c320cd8456cb0830a03b0177345e0157e7d3a7762ab84ff85c9bc"
+        },
+        {
+          "path": "assets/scripts/rules/index.ts",
+          "sha256": "a4d616fe13b3b814874fc6ba3d44b2921e740141826cdbad0dc8ddbf5459ee74"
+        },
+        {
+          "path": "assets/scripts/rules/moves.ts",
+          "sha256": "5122974c486884f5d165cb1fbba4f9a6d63fe7f2adeb9bafcc3c52f567c53560"
+        },
+        {
+          "path": "assets/scripts/rules/pattern.ts",
+          "sha256": "dbc4b4f183b745e981c3ea363b42de6533b27e5f3a2df2b942c948c122c183c5"
+        },
+        {
+          "path": "assets/scripts/rules/result.ts",
+          "sha256": "14c5dfdb31124735f1171bb2bea0c2b585a99de5f8395006c55724a4459f3cc8"
+        },
+        {
+          "path": "assets/scripts/rules/rng.ts",
+          "sha256": "5e6bf95e20088e4c9e0784a0990ee86bd01988059fa6ddfdbf47e4d8163882df"
+        },
+        {
+          "path": "assets/scripts/runtime/cocos-storage.ts",
+          "sha256": "08243412382998236f0543ca4e098d95129c2db32e19dc8368ce8ee2a8799855"
+        },
+        {
+          "path": "assets/scripts/runtime/export-file.ts",
+          "sha256": "b0bbf51c7f540cc53a10effcbd5e974ef4e4b1c67daf51e5e15ed9f014edc289"
+        },
+        {
+          "path": "assets/scripts/runtime/storage-adapter.ts",
+          "sha256": "6c081f11280d77ce0d791291918f3359adbb280ae813c44e4d379b5b6f9af3d9"
+        },
+        {
+          "path": "assets/scripts/ui/action-buttons.ts",
+          "sha256": "c2929df138b1e5cf2d58412b5cff245e126081ed0a9fb81bb808e9ef5aa13ae5"
+        },
+        {
+          "path": "assets/scripts/ui/ai-thinking-view.ts",
+          "sha256": "b754c377c4f4dbeeacc407696b7e90be6bd806e71458c043b06a2f12974e3ef9"
+        },
+        {
+          "path": "assets/scripts/ui/animation-params.ts",
+          "sha256": "cf511dbc763d0ef8d77f00a1fe2f47221ecf60b445e3fb693a2e16903763e20b"
+        },
+        {
+          "path": "assets/scripts/ui/asset-keys-rollback.ts",
+          "sha256": "02390531e3f069fb52641a78040e0f5cf9ba37c09479e56eb8d5b732775fa255"
+        },
+        {
+          "path": "assets/scripts/ui/asset-keys.ts",
+          "sha256": "f6cab2268c74f1274567ea69172c3769b1b82768f0d59d5ca6e4b30bb047e429"
+        },
+        {
+          "path": "assets/scripts/ui/audio-gate.ts",
+          "sha256": "517cd9a3e6021a18428965fa395c64388bc81cdd2265bcf7e4dca61f68a60357"
+        },
+        {
+          "path": "assets/scripts/ui/bidding-advice-view.ts",
+          "sha256": "5ed5b0741191b91ead8fe15445ae72d789cd259e16549140d5714f0efa26ccd5"
+        },
+        {
+          "path": "assets/scripts/ui/bidding-view.ts",
+          "sha256": "6ea353552efc6630462d310cc4455571733b848b8dbaed71a29774ce1974f8a8"
+        },
+        {
+          "path": "assets/scripts/ui/card-choreography.ts",
+          "sha256": "16238429de7c3d8c3fa37a57cf54f83e79ffde5cec86097d0d0a6f0e60e0427b"
+        },
+        {
+          "path": "assets/scripts/ui/card-memory-view.ts",
+          "sha256": "5f55b9253b6bf8f3a25a2eba6bfff431dd53b0bfa33f1b1de17edea383153542"
+        },
+        {
+          "path": "assets/scripts/ui/card-stage.ts",
+          "sha256": "a9d532504465ba86e8cba8ac4bad35a9c4dad991b2bfc2d4dceed10d9619f1d9"
+        },
+        {
+          "path": "assets/scripts/ui/card-view.ts",
+          "sha256": "112fb49e5937ca413e872af7d59b8a31ab5345df7a7b46075946d1fd30e13d73"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/audio-vibration.ts",
+          "sha256": "ca5b7229ad0bcfa6006b4512ac19737aaeb9579eb5c4f9726ccf68fa0f9c9785"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/bid-actions-renderer.ts",
+          "sha256": "495d2e95ac2c70577acd8f282fe8cb6f2ee8cb60d378db1482f499a762aa13af"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/card-animator.ts",
+          "sha256": "2c2baa92cdcd2bf1f3353eecb146495942c8d3d9e22afff36a50c04a0980da3d"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/card-node.ts",
+          "sha256": "5bbc49cd3bb74b06fa71dbd788f55ec24fb8a09d9f602248d31b112935709bec"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/font-loader.ts",
+          "sha256": "5142da941bb6531a95c08d758618c6d88999dcd97b2e51ce9c15f7471646901a"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/fx-program.ts",
+          "sha256": "be8b198d2177a040435d39a991957983961592ee02e31cf8e6a086910f6ecaf3"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/hud-renderer.ts",
+          "sha256": "104dd8bf1b06495be2004f6461c516a747c933ccbe6c3751d07f0c3c0202e0c0"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/match-log-recorder.ts",
+          "sha256": "f2cfe217250b1d8437e6e96393c22c2780f14abac2391f1d1922bf4ab2029f07"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/pause-overlay-renderer.ts",
+          "sha256": "0ceb4fcf594c6a6052545389947e25c6d3d9a7ea38635b2d2f8db6d9a381de81"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/play-area-renderer.ts",
+          "sha256": "40b2251673779687453805431cd5a8cc6deba7b4730978fc0ab277c2f0532e46"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/result-overlay-renderer.ts",
+          "sha256": "e981355626eaf23ed0be51be33e19581eb52bb1f0609786ac7fcd995d8430adb"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/runtime-feedback.ts",
+          "sha256": "05f388a078c678a8980d71ef2a6ce062441af9492e71d669b595dcda728c5ee0"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/seat-display.ts",
+          "sha256": "2958090dcf0c90c13034793600513cdeadcbfbc3fbe1d136b3a9fa52fc8a2045"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/seats-renderer.ts",
+          "sha256": "a406dd57cdcf2763bf6f8fecc58a5514c2724942b7e66c2953b2e4e06abad9bf"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/top-bar-renderer.ts",
+          "sha256": "674b4991daeaa1c6e64969df78bb8963d8a90e31d77d67a475817ecf8a140b1f"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/tween-helpers.ts",
+          "sha256": "436f93dd8927013c69c0f53776a5477f9ab89a0f855913e601be6fbf3a36b8d2"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene/ui-runtime-helpers.ts",
+          "sha256": "43c22c780483f8c8d7fc4edd7ba13edfe11737d0efcb0391594713a8e06bf891"
+        },
+        {
+          "path": "assets/scripts/ui/components/game-scene-skeleton.ts",
+          "sha256": "11258565f088a6477cb34e640668d1be616126ad066b986015664d255d60fced"
+        },
+        {
+          "path": "assets/scripts/ui/components/lobby-scene.ts",
+          "sha256": "10bf55ab2a0c177efbeca466ed6ef631ee1b193d48d29785ec9bdef7e3b221d4"
+        },
+        {
+          "path": "assets/scripts/ui/components/scene-transition.ts",
+          "sha256": "862d2584dc1d65a3e78d1c1e27a6b1ac7092a651478a2022f7b566c7ebcca26e"
+        },
+        {
+          "path": "assets/scripts/ui/components/ui-helpers.ts",
+          "sha256": "44c1f017552ee914ff28d61388aff80805d02e51fd36d8e2ee2b6e1c8928c290"
+        },
+        {
+          "path": "assets/scripts/ui/difficulty-picker-view.ts",
+          "sha256": "9be055085cfedba4f5666300d570dd70a84e59bf5c61af959cc2fb7a04354215"
+        },
+        {
+          "path": "assets/scripts/ui/event-cues.ts",
+          "sha256": "2c4d83f111e0931920b26ecdfe633c1881841babf8e1454c008e6cf688f837d2"
+        },
+        {
+          "path": "assets/scripts/ui/follow-ux.ts",
+          "sha256": "822147e82bad399646ff384a60f525aab7939e8a5a8ab73017336bb32a81fa73"
+        },
+        {
+          "path": "assets/scripts/ui/hand-interaction.ts",
+          "sha256": "432134a4207f1d658457239282cd4a2a20073ca268559800b04f47cc32171979"
+        },
+        {
+          "path": "assets/scripts/ui/hand-layout.ts",
+          "sha256": "7891b336e16f3215a974bc38a8dccba09fb9678bf051684685e0a41680149e68"
+        },
+        {
+          "path": "assets/scripts/ui/help-content.ts",
+          "sha256": "99017d5b17dbf0ff9c5ed0f210fa6b7efb0f14a254d2233c5c20fd8aa1b71906"
+        },
+        {
+          "path": "assets/scripts/ui/hint-flow.ts",
+          "sha256": "7277ba1179ff3e73d6602648ce4f9ea23c7609ee3926162bc855df3ac515a19b"
+        },
+        {
+          "path": "assets/scripts/ui/index.ts",
+          "sha256": "bc937aab5f4e0058010d0b5b58f131533e525907919deedeef8d312b1405d213"
+        },
+        {
+          "path": "assets/scripts/ui/insight-view.ts",
+          "sha256": "7a1dbb69d340b937be657f43918594ea46bd937fabac185b3a2c2057fdd0af99"
+        },
+        {
+          "path": "assets/scripts/ui/last-action-view.ts",
+          "sha256": "1a773fee6208ea96cc351e514565aaf1fdf5279fe1a7ca922602d1ee4b3cb72a"
+        },
+        {
+          "path": "assets/scripts/ui/last-play-view.ts",
+          "sha256": "fce3a3df25da7d0a09397644ab63d22068bcd24526ceb1c6ca90c66da9f5f481"
+        },
+        {
+          "path": "assets/scripts/ui/lobby-view.ts",
+          "sha256": "bc2541837d67b3abc057367b16163c3dc204403791c57e27b0ed783ddb7ad896"
+        },
+        {
+          "path": "assets/scripts/ui/pattern-label.ts",
+          "sha256": "8170c958ed1168dbf51557ed79ab6364c2346f37ee2fbb8733f6c50b285ae132"
+        },
+        {
+          "path": "assets/scripts/ui/pause-menu.ts",
+          "sha256": "23391ec279f060fc0a0efa3ce70aeccc0a3325abb6bc96e3ff2974bc0d5af58b"
+        },
+        {
+          "path": "assets/scripts/ui/records-detail-view.ts",
+          "sha256": "f44b5f6ee1d6ff7c6a1745c4d9f7b36d73753291d864ddc993aa079fc879320b"
+        },
+        {
+          "path": "assets/scripts/ui/records-view.ts",
+          "sha256": "7ae484cda78241637fc8effc4e4003adec5655a60ebaacedb5a1d207e0352e8a"
+        },
+        {
+          "path": "assets/scripts/ui/replay-view.ts",
+          "sha256": "36ca0134636dff958ca3ba4928e67277b4eb7af7fd40212472b86a31d34a98c2"
+        },
+        {
+          "path": "assets/scripts/ui/result-view.ts",
+          "sha256": "73abba5cd21d90b629723719fb6a9e8b3075a45f7f69f82369ad3a68ed787b62"
+        },
+        {
+          "path": "assets/scripts/ui/resume-rebuild.ts",
+          "sha256": "ae68d8f27f27c0ae63d347c5526aebf37a1b87d2a5c5c001fe3f10dbffcf23e7"
+        },
+        {
+          "path": "assets/scripts/ui/score-roll.ts",
+          "sha256": "70df15d49a68f901f446c730184950c6d756e4c2676d805264ce6b3c1db32124"
+        },
+        {
+          "path": "assets/scripts/ui/screen-view.ts",
+          "sha256": "c3e97eaa578d95e9eac44a04a3cce44b8b6f8c3e47d5d7faee27d143e95d7aa2"
+        },
+        {
+          "path": "assets/scripts/ui/selection.ts",
+          "sha256": "b61cfc6b73a543235e0bc8869ef2c950d901e038fa6226aa5f1eb55a5531e8a3"
+        },
+        {
+          "path": "assets/scripts/ui/session-score.ts",
+          "sha256": "f996c45c9800d1ac15b91318e4c5de77093b238149aa2cdbb414360ce62446ed"
+        },
+        {
+          "path": "assets/scripts/ui/settings-view.ts",
+          "sha256": "9cdc0e31f4d85bb34fc970864b44d163f546d6f19d3aae66260c4009b3e34fac"
+        },
+        {
+          "path": "assets/scripts/ui/settlement-reveal.ts",
+          "sha256": "d913d47722263ff13abe2afcfa22afb71402ff0782e3940cb7499f6ca5f8232a"
+        },
+        {
+          "path": "assets/scripts/ui/stats-detail-view.ts",
+          "sha256": "851aa7488f15329a73716d45483fa7c4db8e21f7e503d534989e2735d95d039d"
+        },
+        {
+          "path": "assets/scripts/ui/stats-view.ts",
+          "sha256": "dd3aa3797041be56914993af444f18730f9646f468f3ee48da4e8ea89ce6caf2"
+        },
+        {
+          "path": "assets/scripts/ui/strength-meter-view.ts",
+          "sha256": "e66541f1c84fa6c54f05fc692169adb5b875b8ea0f02e3d26b1688ceaee4a77b"
+        },
+        {
+          "path": "assets/scripts/ui/strings.ts",
+          "sha256": "a2270569a2e9aba7adf253350610977296c200c70b8875609caf08223e5a21b9"
+        },
+        {
+          "path": "assets/scripts/ui/table-layout.ts",
+          "sha256": "696eaee26d1d6b1c2fbe69b25b9f38cfc9ee56de6ab5ee0b46189bb3b08ee0f2"
+        },
+        {
+          "path": "assets/scripts/ui/table-zones.ts",
+          "sha256": "ec1ec799ac7c5fca3bab294605df388a058bdba2682aba5ab3dd0ddea16847cb"
+        },
+        {
+          "path": "assets/scripts/ui/termination-feedback-view.ts",
+          "sha256": "caacfddb02cfd20cd5b2f9fb9562ad0da2c9d1930d3e80fb2706dba09bd54012"
+        },
+        {
+          "path": "assets/scripts/ui/theme.ts",
+          "sha256": "1848e4769a98a49d1a988d7145c24e5eb72b91b71a003c6358ef249161f53ed7"
+        },
+        {
+          "path": "assets/scripts/ui/toast-queue.ts",
+          "sha256": "ec55c2664a9ec87f281660b58fd9a5f71e722366c6337c40ef59907f64acb726"
+        },
+        {
+          "path": "assets/scripts/ui/turn-timer.ts",
+          "sha256": "97a7fcb86ea51917372a3fad3ed7038610ee6d678ac67c65af0d48aac4fbdf4a"
+        },
+        {
+          "path": "assets/scripts/ui/tutorial-steps.ts",
+          "sha256": "2a332dd92b3a9cd1dfbf94b9cec846dc788597c150cbc9937b04df48dc2a2e0a"
+        },
+        {
+          "path": "assets/scripts/ui/ui-text-colors.ts",
+          "sha256": "9c6ee53e0e831a755ac94b445568030f842a1c4390c8a8aafd634db9b4717527"
+        }
+      ],
+      "changesFromBaseline": [
+        {
+          "path": "assets/scripts/ai/levels/hard.ts",
+          "archived": "sources/memo2-assets_scripts_ai_levels_hard.ts.txt",
+          "sha256": "a089bc96911bacd90ca7a2070e028a5e9a972b85efd2c7651d1329ba70065429"
+        },
+        {
+          "path": "assets/scripts/ai/pimc.ts",
+          "archived": "sources/memo2-assets_scripts_ai_pimc.ts.txt",
+          "sha256": "9559247c44c86c81465b6b71f3f873317b229c810d913124dad29fcd78c36c6f"
+        },
+        {
+          "path": "assets/scripts/ai/rollout.ts",
+          "archived": "sources/memo2-assets_scripts_ai_rollout.ts.txt",
+          "sha256": "d088ce2e9853a80056cf10a9a86238bd8b3e788503b081a5ab722bedd20aea8b"
+        }
+      ]
+    }
+  }
+}

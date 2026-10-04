@@ -1,0 +1,384 @@
+{
+  "elapsedSeconds": 514.93,
+  "allPassed": true,
+  "results": [
+    {
+      "pairing": "normal",
+      "seeds": 200,
+      "exitCode": 0,
+      "report": "normal-full-report.json",
+      "summary": {
+        "pairs": 600,
+        "games": 1200,
+        "complete": true,
+        "newWinRate": 0.5,
+        "legacyWinRate": 0.39,
+        "mirrorWinRateDiffPp": 11,
+        "avgPairedScoreDiff": 3.8683,
+        "selfMismatchPairs": 295,
+        "seedClusters": 200,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": 2.0983,
+          "hi": 5.8167
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 5.6667,
+          "hi": 16.3333
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 170,
+            "mirrorWinRateDiffPp": 19.4118,
+            "avgPairedScoreDiff": 7.6
+          },
+          {
+            "role": "upper",
+            "pairs": 169,
+            "mirrorWinRateDiffPp": -0.5917,
+            "avgPairedScoreDiff": 0.6686
+          },
+          {
+            "role": "lower",
+            "pairs": 171,
+            "mirrorWinRateDiffPp": 9.3567,
+            "avgPairedScoreDiff": 1.6199
+          }
+        ],
+        "landlordSplitPairs": 90
+      },
+      "verdict": {
+        "pass": true,
+        "reasons": []
+      },
+      "manifest": {
+        "version": 1,
+        "pairing": "normal",
+        "profile": "full",
+        "baseline": "legacy",
+        "fixedBid": "none",
+        "seedBase": 0,
+        "seedCount": 200,
+        "shardTotal": 1,
+        "sourceHash": "d528b14154b5909155cc4bd7c586c2942341e2f3c88ad31477195c556d06b7c2",
+        "baselineHash": "d252de4b09e74a1b30b6bbbf00a9c732b14413ea28a1c615bf66ef4fc8a0be78",
+        "tuningHash": "2bf55800e324480e9daf57c2cbae4bb6330256e7ea59d838f9d1dd432157aa29"
+      }
+    },
+    {
+      "pairing": "hard",
+      "seeds": 200,
+      "exitCode": 0,
+      "report": "hard-full-report.json",
+      "summary": {
+        "pairs": 600,
+        "games": 1200,
+        "complete": true,
+        "newWinRate": 0.625,
+        "legacyWinRate": 0.3833,
+        "mirrorWinRateDiffPp": 24.1667,
+        "avgPairedScoreDiff": 4.3567,
+        "selfMismatchPairs": 412,
+        "seedClusters": 200,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": 3.045,
+          "hi": 5.8817
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 18.5,
+          "hi": 30
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 173,
+            "mirrorWinRateDiffPp": 36.4162,
+            "avgPairedScoreDiff": 8
+          },
+          {
+            "role": "upper",
+            "pairs": 172,
+            "mirrorWinRateDiffPp": 25.5814,
+            "avgPairedScoreDiff": 2.3372
+          },
+          {
+            "role": "lower",
+            "pairs": 173,
+            "mirrorWinRateDiffPp": 13.2948,
+            "avgPairedScoreDiff": 2.2601
+          }
+        ],
+        "landlordSplitPairs": 82
+      },
+      "verdict": {
+        "pass": true,
+        "reasons": []
+      },
+      "manifest": {
+        "version": 1,
+        "pairing": "hard",
+        "profile": "full",
+        "baseline": "legacy",
+        "fixedBid": "none",
+        "seedBase": 0,
+        "seedCount": 200,
+        "shardTotal": 1,
+        "sourceHash": "d528b14154b5909155cc4bd7c586c2942341e2f3c88ad31477195c556d06b7c2",
+        "baselineHash": "d252de4b09e74a1b30b6bbbf00a9c732b14413ea28a1c615bf66ef4fc8a0be78",
+        "tuningHash": "2bf55800e324480e9daf57c2cbae4bb6330256e7ea59d838f9d1dd432157aa29"
+      }
+    },
+    {
+      "pairing": "self",
+      "seeds": 20,
+      "exitCode": 0,
+      "report": "self-full-report.json",
+      "summary": {
+        "pairs": 60,
+        "games": 120,
+        "complete": true,
+        "newWinRate": 0.5,
+        "legacyWinRate": 0.5,
+        "mirrorWinRateDiffPp": 0,
+        "avgPairedScoreDiff": 0,
+        "selfMismatchPairs": 0,
+        "seedClusters": 20,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": 0,
+          "hi": 0
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 0,
+          "hi": 0
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 20,
+            "mirrorWinRateDiffPp": 0,
+            "avgPairedScoreDiff": 0
+          },
+          {
+            "role": "upper",
+            "pairs": 20,
+            "mirrorWinRateDiffPp": 0,
+            "avgPairedScoreDiff": 0
+          },
+          {
+            "role": "lower",
+            "pairs": 20,
+            "mirrorWinRateDiffPp": 0,
+            "avgPairedScoreDiff": 0
+          }
+        ],
+        "landlordSplitPairs": 0
+      },
+      "verdict": {
+        "pass": true,
+        "reasons": []
+      },
+      "manifest": {
+        "version": 1,
+        "pairing": "self",
+        "profile": "full",
+        "baseline": "legacy",
+        "fixedBid": "none",
+        "seedBase": 0,
+        "seedCount": 20,
+        "shardTotal": 1,
+        "sourceHash": "d528b14154b5909155cc4bd7c586c2942341e2f3c88ad31477195c556d06b7c2",
+        "baselineHash": "ed401bdcbc7bdfcc49dcf25be694cc97c37baf08d8ce93e5f90a57e2b0cf4e9d",
+        "tuningHash": "2bf55800e324480e9daf57c2cbae4bb6330256e7ea59d838f9d1dd432157aa29"
+      }
+    },
+    {
+      "pairing": "crippled",
+      "seeds": 20,
+      "exitCode": 0,
+      "report": "crippled-full-report.json",
+      "summary": {
+        "pairs": 60,
+        "games": 120,
+        "complete": true,
+        "newWinRate": 0.2167,
+        "legacyWinRate": 0.7667,
+        "mirrorWinRateDiffPp": -55,
+        "avgPairedScoreDiff": -8.6333,
+        "selfMismatchPairs": 44,
+        "seedClusters": 20,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": -15.8667,
+          "hi": -3.4
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": -73.3333,
+          "hi": -36.6667
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 18,
+            "mirrorWinRateDiffPp": -66.6667,
+            "avgPairedScoreDiff": -16.5556
+          },
+          {
+            "role": "upper",
+            "pairs": 18,
+            "mirrorWinRateDiffPp": -38.8889,
+            "avgPairedScoreDiff": -4.5556
+          },
+          {
+            "role": "lower",
+            "pairs": 18,
+            "mirrorWinRateDiffPp": -66.6667,
+            "avgPairedScoreDiff": -8.6667
+          }
+        ],
+        "landlordSplitPairs": 6
+      },
+      "verdict": {
+        "pass": true,
+        "reasons": []
+      },
+      "manifest": {
+        "version": 1,
+        "pairing": "crippled",
+        "profile": "full",
+        "baseline": "legacy",
+        "fixedBid": "none",
+        "seedBase": 0,
+        "seedCount": 20,
+        "shardTotal": 1,
+        "sourceHash": "d528b14154b5909155cc4bd7c586c2942341e2f3c88ad31477195c556d06b7c2",
+        "baselineHash": "d252de4b09e74a1b30b6bbbf00a9c732b14413ea28a1c615bf66ef4fc8a0be78",
+        "tuningHash": "2bf55800e324480e9daf57c2cbae4bb6330256e7ea59d838f9d1dd432157aa29"
+      }
+    }
+  ],
+  "commands": [
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=normal",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--shard=0/1",
+      "--out=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/normal-full-shard-0.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=normal",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--judge",
+      "--shards=1",
+      "--inputs=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/normal-full-shard-0.json",
+      "--out=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/normal-full-report.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=hard",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--shard=0/1",
+      "--out=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/hard-full-shard-0.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=hard",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=200",
+      "--judge",
+      "--shards=1",
+      "--inputs=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/hard-full-shard-0.json",
+      "--out=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/hard-full-report.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=self",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=0/1",
+      "--out=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/self-full-shard-0.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=self",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--judge",
+      "--shards=1",
+      "--inputs=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/self-full-shard-0.json",
+      "--out=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/self-full-report.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=crippled",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--shard=0/1",
+      "--out=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/crippled-full-shard-0.json"
+    ],
+    [
+      "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node",
+      "--root",
+      "/workspace/danji_doudizhu",
+      "/workspace/danji_doudizhu/test/arena/arena.ts",
+      "--pairing=crippled",
+      "--profile=full",
+      "--baseline=legacy",
+      "--fixed-bid=none",
+      "--seed-base=0",
+      "--seeds=20",
+      "--judge",
+      "--shards=1",
+      "--inputs=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/crippled-full-shard-0.json",
+      "--out=/workspace/danji_doudizhu/coordination/reports/ai-plus5-20261004/legacy/crippled-full-report.json"
+    ]
+  ]
+}

@@ -1,0 +1,2 @@
+Exact outcomes+every-turn trace equality 500
+Exact public decision+PIMC rankings equality 12

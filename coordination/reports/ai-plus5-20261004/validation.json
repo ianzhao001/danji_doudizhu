@@ -1,0 +1,352 @@
+{
+  "schema": "ai-plus5-validation-v1",
+  "date": "2026-10-04",
+  "branch": "codex/ai-plus5-upgrade",
+  "status": "additional-strength-goal-confirmed-runtime-release-validation-pending",
+  "baselineCommit": "78d125de080627a9cf7b0c2e07b10b4394c994ee",
+  "protocol": "protocol.json",
+  "experiments": "experiment-index.json",
+  "selection": {
+    "candidate1": "global54-solver16-tactics-memo2",
+    "candidate1RejectedReason": "Independent holdout passed strength, but existing opening candidate and Hard-vs-Normal quality regression gates failed. Do not ship this candidate.",
+    "candidate1Holdout": "experiments/final-holdout.json",
+    "candidate1FullTests": "regression/candidate1-full-tests.log",
+    "candidate2": "search53-solver16-tactics-memo2",
+    "candidate2Repair": "Keep the existing structural opening shortlist at 54 total cards, including its existing PIMC when applicable; expand unified arbitration only after the opening lead. This uses only public card count, with no seed or test identity condition.",
+    "development": "400001..400096",
+    "confirmation": "500001..500256; reused across candidates for selection, not independent acceptance",
+    "candidate2Holdout": "700001..701000; preregistered before execution, never reuses candidate1 holdout",
+    "confirmationCaveat": "Selected search53 confirmation WP +6.901pp CI[2.7344,11.3281], ADP +1.0039 CI[-0.082,2.0612]; the ADP interval includes zero. This is exploratory selection evidence, not an acceptance pass. Minimal opening repair was frozen for a fresh independent evaluation without further tuning.",
+    "candidate1HoldoutSummary": {
+      "pairs": 3000,
+      "games": 6000,
+      "complete": true,
+      "newWinRate": 0.5513,
+      "legacyWinRate": 0.4387,
+      "mirrorWinRateDiffPp": 11.2667,
+      "avgPairedScoreDiff": 2.879,
+      "selfMismatchPairs": 1605,
+      "seedClusters": 1000,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": 2.0863,
+        "hi": 3.7423
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": 8.8667,
+        "hi": 13.6
+      },
+      "byRole": [
+        {
+          "role": "landlord",
+          "pairs": 1000,
+          "mirrorWinRateDiffPp": 14.9,
+          "avgPairedScoreDiff": 5.218
+        },
+        {
+          "role": "upper",
+          "pairs": 1000,
+          "mirrorWinRateDiffPp": 15.2,
+          "avgPairedScoreDiff": 2.013
+        },
+        {
+          "role": "lower",
+          "pairs": 1000,
+          "mirrorWinRateDiffPp": 3.7,
+          "avgPairedScoreDiff": 1.406
+        }
+      ],
+      "landlordSplitPairs": 0
+    }
+  },
+  "implementation": {
+    "hardWorlds": 48,
+    "hardCandidates": 8,
+    "hardSolverCardMax": 16,
+    "hardSolverNodes": 120000,
+    "hintWorlds": 160,
+    "hintCandidates": 12,
+    "hintSolverCardMax": 15,
+    "hintSolverNodes": 300000,
+    "cacheLifetime": "one pimcRank call",
+    "handCacheLimit": 2048,
+    "followCacheLimitPerHand": 16,
+    "remainderCacheLimitPerHand": 20,
+    "externalCodeCopied": false,
+    "runtimeDependenciesAdded": false,
+    "modelAdded": false
+  },
+  "review": {
+    "publicInformation": "Opponent counts in rollout are sampled worlds generated from own cards and public history, not actual hidden hands.",
+    "cache": "Hand arrays are copied; keys encode rank counts or category/rank/length; role and enemy safety checks run against each current sampled board.",
+    "gatePolicy": "Existing thresholds and historical runtime evidence are preserved."
+  },
+  "targetedTests": {
+    "command": "npm --prefix test test -- --run ai/hard-endgame-pimc.test.ts ai/hard-b2-retained.test.ts ai/pimc-solver-boundary.test.ts ai/rollout-tactics.test.ts ai/rollout.test.ts --maxWorkers=1 --minWorkers=1",
+    "filesPassed": 5,
+    "testsPassed": 55,
+    "log": "regression/candidate2-focused.log"
+  },
+  "typecheck": {
+    "testCommand": "npm --prefix test run typecheck",
+    "testExitCode": 0,
+    "production": "Passed in candidate2 full suite with official Creator 3.8.8 declarations.",
+    "finalTestLog": "regression/final-typecheck.log"
+  },
+  "releaseChecksRemaining": [
+    "Cocos Creator 3.8.8 cold build and real hint-click recapture with the existing probe.",
+    "Rerun runtime capture tests using genuine fresh evidence.",
+    "Target-phone latency/GC measurement before mobile performance claims."
+  ],
+  "publication": "Authorized separate branch and draft PR above preceding candidate PR #2; no main merge or released-version claim.",
+  "latency": {
+    "report": "latency.json",
+    "log": "latency.log",
+    "command": "cd test && ./node_modules/.bin/vite-node --config vitest.config.ts bench/ai-latency.ts",
+    "exitCode": 0,
+    "decision": {
+      "p50": 0.09,
+      "p95": 54.63,
+      "max": 85.91
+    },
+    "hint": {
+      "p50": 22.78,
+      "p95": 152.62,
+      "max": 336.3
+    },
+    "corpusSha256": "3c70ec921cd685c27ff22a5301dec7183b46b2d31391f621427c5ef142d7970c",
+    "limits": "One worker, no other heavy task. Server measurement, not mobile performance. Low-end factor is an uncalibrated proxy."
+  },
+  "legacyGates": {
+    "report": "legacy/summary.json",
+    "allPassed": true,
+    "normalSeeds": 200,
+    "hardSeeds": 200,
+    "selfSeeds": 20,
+    "crippledSeeds": 20
+  },
+  "reproduction": {
+    "baselineSetup": "mkdir -p /tmp/ddz-plus5-base; git archive 78d125de080627a9cf7b0c2e07b10b4394c994ee assets/scripts test/arena/arena-lib.ts | tar -x -C /tmp/ddz-plus5-base",
+    "runnerSetup": "cp coordination/reports/ai-plus5-20261004/comparison-final.ts.txt /tmp/ddz-plus5-comparison-final.ts",
+    "runEachFinalShard": "test/node_modules/.bin/vite-node --root /workspace/danji_doudizhu /tmp/ddz-plus5-comparison-final.ts --mode=holdout --candidate-root=/workspace/danji_doudizhu --shard=N/4 --out=/tmp/replay-final-N.json (N=0,1,2,3)",
+    "judgeFinal": "test/node_modules/.bin/vite-node --root /workspace/danji_doudizhu /tmp/ddz-plus5-comparison-final.ts --mode=holdout --candidate-root=/workspace/danji_doudizhu --judge --inputs=/tmp/replay-final-0.json,/tmp/replay-final-1.json,/tmp/replay-final-2.json,/tmp/replay-final-3.json --out=/tmp/replay-final-report.json",
+    "otherCandidates": "For each experiment-index entry, reconstruct baseline assets/scripts in a separate directory and overwrite each changes[].path with the corresponding archived changes[].source. Verify file SHA256 against the entry. Pass that root to --candidate-root.",
+    "datasetWarning": "comparison.ts.txt and batch.py.txt use the original holdout 600001..601000. Candidate2 must use comparison-final.ts.txt for 700001..701000. Development and confirmation seeds match across runners. Do not silently edit original reports or combine shards from different roots/runners/manifests.",
+    "absolutePaths": "Archived scripts preserve original absolute roots. On another machine update root arguments and the baseline constant consistently before generating all shards. Manifest candidateRoot differs when paths change; replay point estimates should match, but do not mix new and old manifests.",
+    "sourceIdentity": "Full manifests record every production TypeScript file and the frozen arena-lib hash. Diagnostic/comment differences between exploratory search53 and final source are archived separately.",
+    "legacyCommands": "legacy/summary.json",
+    "latencyCommand": "cd test && ./node_modules/.bin/vite-node --config vitest.config.ts bench/ai-latency.ts",
+    "fullTestsCommand": "SELFPLAY_GATE=1 npm --prefix test test -- --maxWorkers=1 --minWorkers=1"
+  },
+  "archiveReview": {
+    "completedExperimentsBeforeFinal": 41,
+    "modes": {
+      "dev": 28,
+      "screen": 7,
+      "confirm": 4,
+      "holdout": 1,
+      "self": 1
+    },
+    "checks": "Original and archived SHA/JSON semantics, changed-source hashes, all 146 baseline files plus arena-lib vs git baseline, complete seed/seat/mirror identities, and independently recomputed WP/ADP point estimates passed.",
+    "completedExperimentsFinal": 42
+  },
+  "sourceIdentity": {
+    "file": "candidate2-identity.json",
+    "scriptsSha256": "b7911b57d7d7b03a7fd23cd4eca2de3f599d89b65c6e3b6705f4719e0989c11a",
+    "aiSha256": "8aef5ad3eb1546a3f35136fd9751623051ff3dd7f0aa358d7dcde503c182abf1"
+  },
+  "fullTests": {
+    "command": "SELFPLAY_GATE=1 npm --prefix test test -- --maxWorkers=1 --minWorkers=1",
+    "exitCode": 1,
+    "tests": {
+      "passed": 1390,
+      "failed": 4,
+      "skipped": 2
+    },
+    "files": {
+      "passed": 219,
+      "failed": 2,
+      "skipped": 2
+    },
+    "durationSeconds": 614.26,
+    "log": "regression/candidate2-full-tests.log",
+    "failures": [
+      "Three existing historical hint-runtime-capture comparisons differ from the upgraded recommendation; capture and assertions preserved.",
+      "One 40-round determinism test exceeded default 5000ms; resolved by an explicit whole-round test budget, then retested."
+    ],
+    "productionStrictTypecheck": "passed using official @cocos/creator-types@3.8.8",
+    "depthGate": {
+      "seeds": 100,
+      "g1HardSimpleDiff": 0.4,
+      "g2LandlordDiff": 0.4600000000000001,
+      "g3HardNormalDiff": 0.22000000000000003,
+      "thresholds": [
+        0.25,
+        0.03,
+        0.05
+      ],
+      "passed": true
+    },
+    "difficultyBudgetRepair": {
+      "file": "test/selfplay/difficulty.test.ts",
+      "change": "Set 60000ms for the two 20/40-round serial tests, matching existing selfplay-long and ai-no-starve tests; do not change seeds, assertions, product budgets or the independent latency gate.",
+      "command": "npm --prefix test test -- --run selfplay/difficulty.test.ts --maxWorkers=1 --minWorkers=1",
+      "log": "regression/difficulty-budget-verification.log",
+      "exitCode": 0,
+      "testsPassed": 3,
+      "twentyRoundMs": 4209,
+      "fortyRoundMs": 7166,
+      "review": "runHeadlessRound maxTurns=300/maxRedeals=10, rollout step cap and PIMC nodes remain bounded; no evidence of a new unbounded loop."
+    },
+    "remainingFailuresAfterTargetedRecheck": 3,
+    "remainingFailureScope": "Only Cocos historical hint runtime capture; not a fully green release test run.",
+    "rerunScope": "The complete suite ran once for candidate2. After the test-only timeout correction, only the affected file was rerun; no claim of a second full-suite pass."
+  },
+  "holdout": {
+    "report": "experiments/candidate2-holdout.json",
+    "identity": "candidate2-identity.json",
+    "sourceSnapshot": "candidate2-snapshot.json",
+    "summary": {
+      "pairs": 3000,
+      "games": 6000,
+      "complete": true,
+      "newWinRate": 0.5457,
+      "legacyWinRate": 0.4493,
+      "mirrorWinRateDiffPp": 9.6333,
+      "avgPairedScoreDiff": 1.339,
+      "selfMismatchPairs": 1511,
+      "seedClusters": 1000,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": 0.647,
+        "hi": 2.0323
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": 7.4667,
+        "hi": 11.8333
+      },
+      "byRole": [
+        {
+          "role": "landlord",
+          "pairs": 1000,
+          "mirrorWinRateDiffPp": 16.4,
+          "avgPairedScoreDiff": 2.04
+        },
+        {
+          "role": "upper",
+          "pairs": 1000,
+          "mirrorWinRateDiffPp": 12.7,
+          "avgPairedScoreDiff": 1.566
+        },
+        {
+          "role": "lower",
+          "pairs": 1000,
+          "mirrorWinRateDiffPp": -0.2,
+          "avgPairedScoreDiff": 0.411
+        }
+      ],
+      "landlordSplitPairs": 0
+    },
+    "roles": [
+      {
+        "role": "landlord",
+        "pairs": 1000,
+        "games": 2000,
+        "complete": true,
+        "newWinRate": 0.6,
+        "legacyWinRate": 0.436,
+        "mirrorWinRateDiffPp": 16.4,
+        "avgPairedScoreDiff": 2.04,
+        "selfMismatchPairs": 513,
+        "seedClusters": 1000,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": 0.348,
+          "hi": 3.722
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 12.9,
+          "hi": 20.2
+        },
+        "byRole": [
+          {
+            "role": "landlord",
+            "pairs": 1000,
+            "mirrorWinRateDiffPp": 16.4,
+            "avgPairedScoreDiff": 2.04
+          }
+        ],
+        "landlordSplitPairs": 0
+      },
+      {
+        "role": "upper",
+        "pairs": 1000,
+        "games": 2000,
+        "complete": true,
+        "newWinRate": 0.55,
+        "legacyWinRate": 0.423,
+        "mirrorWinRateDiffPp": 12.7,
+        "avgPairedScoreDiff": 1.566,
+        "selfMismatchPairs": 501,
+        "seedClusters": 1000,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": 0.848,
+          "hi": 2.342
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": 9.2,
+          "hi": 16.3
+        },
+        "byRole": [
+          {
+            "role": "upper",
+            "pairs": 1000,
+            "mirrorWinRateDiffPp": 12.7,
+            "avgPairedScoreDiff": 1.566
+          }
+        ],
+        "landlordSplitPairs": 0
+      },
+      {
+        "role": "lower",
+        "pairs": 1000,
+        "games": 2000,
+        "complete": true,
+        "newWinRate": 0.487,
+        "legacyWinRate": 0.489,
+        "mirrorWinRateDiffPp": -0.2,
+        "avgPairedScoreDiff": 0.411,
+        "selfMismatchPairs": 497,
+        "seedClusters": 1000,
+        "ciMethod": "seed-cluster-bootstrap",
+        "avgPairedScoreDiffCI": {
+          "lo": -0.517,
+          "hi": 1.482
+        },
+        "mirrorWinRateDiffPpCI": {
+          "lo": -3.6,
+          "hi": 3.4
+        },
+        "byRole": [
+          {
+            "role": "lower",
+            "pairs": 1000,
+            "mirrorWinRateDiffPp": -0.2,
+            "avgPairedScoreDiff": 0.411
+          }
+        ],
+        "landlordSplitPairs": 0
+      }
+    ],
+    "verdict": {
+      "pass": true,
+      "reasons": []
+    },
+    "strongFivePpEvidence": true,
+    "elapsedSeconds": 638.9,
+    "runs": 1,
+    "postHoldoutProductTuning": false,
+    "interpretation": "Overall additional gain over 78d125d under the fixed-bid mirrored protocol; WP lower confidence bound exceeds 5pp and both WP/ADP lower bounds are positive. Lower-farmer WP point estimate -0.2pp with interval [-3.6,3.4]; do not claim improvement or non-inferiority for all roles. Farmer mirroring changes both partner and opponent; role intervals are exploratory and unadjusted."
+  }
+}

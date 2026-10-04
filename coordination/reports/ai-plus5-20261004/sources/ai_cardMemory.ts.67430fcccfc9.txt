@@ -1,0 +1,61 @@
+import { createDeck, type Card } from '../rules';
+import type { GameEvent, GameSnapshot } from '../game';
+import { cardKey } from '../rules/guards';
+import { ALL_RANKS } from './handStrength';
+
+export interface CardMemory {
+  readonly remainingByRank: Readonly<Record<number, number>>;
+  readonly playedCount: number;
+}
+
+function initialRemaining(): Record<number, number> {
+  const remaining: Record<number, number> = {};
+  for (const rank of ALL_RANKS) remaining[rank] = 0;
+  for (const card of createDeck()) remaining[card.rank] += 1;
+  return remaining;
+}
+
+function decrement(remaining: Record<number, number>, cards: Card[]): number {
+  let deducted = 0;
+  for (const card of cards) {
+    const current = remaining[card.rank] ?? 0;
+    if (current <= 0) continue;
+    remaining[card.rank] = current - 1;
+    deducted += 1;
+  }
+  return deducted;
+}
+
+export function trackPlayed(events: GameEvent[], ownHand: Card[] = []): CardMemory {
+  const remainingByRank = initialRemaining();
+  let playedCount = 0;
+
+  decrement(remainingByRank, ownHand);
+
+  for (const event of events) {
+    if (event.type === 'play') {
+      playedCount += decrement(remainingByRank, event.pattern.cards);
+    }
+  }
+
+  return Object.freeze({ remainingByRank: Object.freeze(remainingByRank), playedCount });
+}
+
+/** Public bottom cards remain pinned until that exact rank/suit is played. */
+export function certainLandlordByRank(
+  snapshot: GameSnapshot,
+  history: GameEvent[],
+): Readonly<Record<number, number>> | null {
+  if (snapshot.turn === snapshot.landlord || !snapshot.bottom || snapshot.bottom.length === 0) return null;
+  const played = new Set<string>();
+  for (const event of history) {
+    if (event.type !== 'play' || event.seat !== snapshot.landlord) continue;
+    for (const card of event.pattern.cards) played.add(cardKey(card));
+  }
+  const certain: Record<number, number> = {};
+  for (const rank of ALL_RANKS) certain[rank] = 0;
+  for (const card of snapshot.bottom) {
+    if (!played.has(cardKey(card))) certain[card.rank] += 1;
+  }
+  return Object.freeze(certain);
+}

@@ -1,0 +1,8 @@
+{
+  "frozenRoot": "/tmp/ddz-plus5-final-candidate2",
+  "originalRoot": "/workspace/danji_doudizhu",
+  "sourceDigest": "b7911b57d7d7b03a7fd23cd4eca2de3f599d89b65c6e3b6705f4719e0989c11a",
+  "verifiedFiles": 146,
+  "runnerSha256": "e654c4100038b3a1dde7f733082917c1d393faf10c784d8a8722d3e1f42afdcc",
+  "report": "/tmp/ddz-plus5-candidate2-holdout-report.json"
+}
