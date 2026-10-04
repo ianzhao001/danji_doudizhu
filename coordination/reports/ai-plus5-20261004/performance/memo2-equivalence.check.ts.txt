@@ -1,0 +1,29 @@
+import assert from 'node:assert/strict';
+import { rolloutRound as base,rolloutTrace as bt,toRankCounts } from './base/assets/scripts/ai/rollout';
+import { rolloutRound as memo,rolloutTrace as mt,RolloutPolicyCache } from './memo/assets/scripts/ai/rollout';
+import { Rank,Suit,createRng, type Card,recognize } from './base/assets/scripts/rules';
+import { buildLatencyCorpus } from '/workspace/danji_doudizhu/test/bench/latency-corpus';
+import { strategyFor as bs } from '/tmp/ddz-plus5-global54-solver16-tactics/assets/scripts/ai';
+import { strategyFor as ms } from '/tmp/ddz-plus5-global54-solver16-tactics-memo2/assets/scripts/ai';
+import { capturePimcRanks as bc } from '/tmp/ddz-plus5-global54-solver16-tactics/assets/scripts/ai/pimc';
+import { capturePimcRanks as mc } from '/tmp/ddz-plus5-global54-solver16-tactics-memo2/assets/scripts/ai/pimc';
+const rng=createRng(777);const cache=new RolloutPolicyCache();let trials=0;
+for(let i=0;i<500;i++) {
+ const hands:Card[][]=[[],[],[]];
+ for(let r=Rank.R3;r<=Rank.BigJoker;r++)for(let j=0;j<(r>=Rank.SmallJoker?1:4);j++) {
+  const d=Math.floor(rng.next()*7);if(d<3)hands[d].push({rank:r,suit:r>=Rank.SmallJoker?Suit.Joker:j});
+ }
+ if(hands.some(x=>!x.length))continue;
+ const turn=i%3 as 0|1|2,landlord=Math.floor(i/3)%3 as 0|1|2;
+ const top=i%2?recognize([hands[(turn+2)%3][0]]):null;
+ const args={counts:hands.map(toRankCounts) as [number[],number[],number[]],turn,landlord,top,topSeat:top?((turn+2)%3 as 0|1|2):null,passes:0,rng:createRng(i)};
+ bt.length=0;mt.length=0;assert.deepEqual(memo({...args,policyCache:cache}),base(args));assert.deepEqual(mt,bt);trials++;
+}
+console.log('Exact outcomes+every-turn trace equality',trials);
+const corpus=await buildLatencyCorpus();let compared=0;
+for(const frame of corpus.frames.slice(0,12)) {
+ const x=bc(()=>bs('hard')(frame.snapshot,createRng(frame.seed),frame.history));
+ const y=mc(()=>ms('hard')(frame.snapshot,createRng(frame.seed),frame.history));
+ assert.deepEqual(y,x);compared++;
+}
+console.log('Exact public decision+PIMC rankings equality',compared);

@@ -1,0 +1,29 @@
+
+> doudizhu-rules-tests@0.0.0 pretest
+> node ensure-tsconfig-shim.cjs
+
+
+> doudizhu-rules-tests@0.0.0 test
+> vitest run --run selfplay/difficulty.test.ts --maxWorkers=1 --minWorkers=1
+
+▲ [WARNING] "3d" is not a valid value for the "type" field [package.json]
+
+    ../package.json:3:12:
+      3 │     "type": "3d",
+        ╵             ~~~~
+
+  The "type" field must be set to either "commonjs" or "module".
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v2.1.9 /workspace/danji_doudizhu/test
+
+ ✓ selfplay/difficulty.test.ts (3 tests) 11377ms
+   ✓ M4-04 难度差异 selfplay（不变量·架构种入） > 混合难度每局到达 settled、零和、无死循环（0<turns<300） 4209ms
+   ✓ M4-04 难度差异 selfplay（不变量·架构种入） > 可复现：同 levels+seeds 跑两次深相等 7166ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  13:41:49
+   Duration  11.91s (transform 272ms, setup 0ms, collect 357ms, tests 11.38s, environment 0ms, prepare 49ms)
+

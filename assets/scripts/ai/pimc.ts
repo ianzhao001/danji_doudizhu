@@ -14,7 +14,7 @@ import type { GameEvent, GameSnapshot, SeatIndex } from '../game';
 import { Decomposer } from './decompose';
 import { moveOutcomeScore } from './handWeight';
 import { compareMoves } from './levels/_shared';
-import { rolloutRound, toRankCounts } from './rollout';
+import { RolloutPolicyCache, rolloutRound, toRankCounts } from './rollout';
 import { solveWorld, type WorldSolverBudget, type WorldWinner } from './worldSolver';
 import { getTuning } from './tuning';
 
@@ -72,7 +72,7 @@ function solverProfile(
   return Object.freeze(profile);
 }
 
-export const HARD_PIMC: PimcProfile = solverProfile(48, 8, 12, 120_000);
+export const HARD_PIMC: PimcProfile = solverProfile(48, 8, 16, 120_000);
 export const HINT_PIMC: PimcProfile = solverProfile(160, 12, 15, 300_000);
 
 export interface PassSignal {
@@ -438,6 +438,7 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
   const perOptionNodes = solverNodes > 0 ? Math.max(1, Math.floor(solverNodes / options.length)) : 0;
   const mySide = args.snapshot.turn === args.snapshot.landlord ? 'landlord' : 'farmer';
   const sharedTable = new Map<string, WorldWinner>();
+  const rolloutPolicyCache = new RolloutPolicyCache();
   // 候选主序：每个候选拥有等额、独立的精确求解预算，并按同一批世界的固定顺序评估。
   for (const option of options) {
     const optionBudget: WorldSolverBudget = { nodes: perOptionNodes };
@@ -481,6 +482,7 @@ export function pimcRank(args: PimcRankArgs): RankedOption[] {
       }
       if (winner === null) {
         winner = rolloutRound({
+          policyCache: rolloutPolicyCache,
           counts: board,
           turn: nextTurn,
           landlord: args.snapshot.landlord,

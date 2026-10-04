@@ -1,0 +1,15 @@
+{
+  "candidate1FrozenRoot": "/tmp/ddz-plus5-final-candidate1",
+  "candidate1OriginalRoot": "/workspace/danji_doudizhu",
+  "candidate1SourceDigest": "bd95f332dcd0f5694f1c5f0f2fb12cd25f7ed603f3bb1d2be504994abafabc6f",
+  "verifiedFiles": 146,
+  "runners": {
+    "/tmp/ddz-plus5-comparison.ts": "ae0f6e5012e2da88bae4f3abd758a99dd03fe622ca4f3612a5e302c80306c77b",
+    "/tmp/ddz-plus5-comparison-final.ts": "e654c4100038b3a1dde7f733082917c1d393faf10c784d8a8722d3e1f42afdcc"
+  },
+  "candidate2Holdout": [
+    700001,
+    701000
+  ],
+  "candidate2Started": false
+}

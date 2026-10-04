@@ -160,7 +160,6 @@ describe('rollout 清手优先回归', () => {
 
   it.each([
     ['K 3', 'Q', 'A'], // 非整手不得抢队友牌权。
-    ['5 5 5 5 3', 'Q', 'A'], // 不为非清手动作炸队友。
     ['K', 'A', '2'], // 整手较小，不能跟。
     ['K K', 'Q', 'A'], // 整手类型不同，不能跟。
     ['3 4 5 6 7 8', '3 4 5 6 7', '8 9 10 J Q'], // 同类型但长度不同，不能跟。
@@ -171,6 +170,15 @@ describe('rollout 清手优先回归', () => {
       rng: createRng(23),
     });
     expect(outcome).toEqual({ winnerSide: 'landlord', plays: 1 });
+  });
+
+  it('队友顶牌时可证明炸弹控住后清手，接力而非让地主 A 收官', () => {
+    const outcome = rolloutRound({
+      counts: [counts('A'), counts('9 2'), counts('5 5 5 5 3')],
+      turn: 2, landlord: 0, top: recognize(cards('Q'))!, topSeat: 1,
+      rng: createRng(23),
+    });
+    expect(outcome).toEqual({ winnerSide: 'farmer', plays: 2 });
   });
 });
 
@@ -241,8 +249,8 @@ describe('W-AI S3v2 四类复合牌型跟牌（修复 PIMC「虚假无敌」盲�
     expect(outcome.plays).toBe(1);
   });
 
-  it('夹具G 最小可压择序自证：A 4 4 跟单 3 必出最小 4（地主 K 收官）；改最大 A 则农民反杀', () => {
-    // 队友持 99 而非单 9，避免「压队友整手清完」新快路抢先终局，仍隔离最小/最大择序。
+  it('夹具G：A 4 4 跟单 3 时以 A 控牌后出完对子，避免拆 4 放走地主 K', () => {
+    // 队友持 99 而非单 9，隔离自己两手清完与队友整手跟牌。
     const board: [number[], number[], number[]] = [counts('K'), counts('A 4 4'), counts('9 9')];
     const outcome = rolloutRound({
       counts: board,
@@ -252,9 +260,18 @@ describe('W-AI S3v2 四类复合牌型跟牌（修复 PIMC「虚假无敌」盲�
       topSeat: 0,
       rng: createRng(17),
     });
-    // minimal：4 → 地主 K 压并清手（landlord, plays=2）。maximal 变异：A 赢墩 → 领对 44 清手（farmer）。
-    expect(outcome.winnerSide).toBe('landlord');
+    // A 无敌且余牌为完整 44；固定最小跟牌会错误预测地主获胜。
+    expect(outcome.winnerSide).toBe('farmer');
     expect(outcome.plays).toBe(2);
+  });
+
+  it('夹具G反例：地主 2 可压 A 时，不把两手控制误判为必胜', () => {
+    const outcome = rolloutRound({
+      counts: [counts('2'), counts('A 4 4'), counts('9 9')],
+      turn: 1, landlord: 0, top: recognize(cards('3'))!, topSeat: 0,
+      rng: createRng(17),
+    });
+    expect(outcome).toEqual({ winnerSide: 'landlord', plays: 2 });
   });
 
   it('夹具H（D5）：整手飞机带单翼 5 5 5 6 6 6 7 8 领出一手清完 → landlord、plays=1', () => {

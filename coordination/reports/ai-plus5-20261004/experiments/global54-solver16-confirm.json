@@ -1,0 +1,3358 @@
+{
+  "manifest": {
+    "schema": "strength-plus5-mirror-v1",
+    "mode": "confirm",
+    "parentSHA": "78d125de080627a9cf7b0c2e07b10b4394c994ee",
+    "candidateRoot": "/tmp/ddz-plus5-global54-solver16",
+    "candidate": {
+      "scriptsSha256": "4e9a5392e4b9487b471d016a7afcf30a145c5a83837e1f3396f0446b6a0172d8",
+      "aiSha256": "9039f3f4317052ada4391dcbc76e6e19664ea61aed1f9791b06a3c212db38b60",
+      "aiFiles": [
+        {
+          "path": "ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "ai/levels/hard.ts",
+          "sha256": "a089bc96911bacd90ca7a2070e028a5e9a972b85efd2c7651d1329ba70065429"
+        },
+        {
+          "path": "ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "ai/pimc.ts",
+          "sha256": "6cf9dcfe08e7942c4b19388371fc9151f4fdb1a40e091d84378be9dcde99c900"
+        },
+        {
+          "path": "ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "ai/rollout.ts",
+          "sha256": "8ee5880b680a6083e7500f7f3f24b7ff863e13e5fbcf08df030121e46e0a35bc"
+        },
+        {
+          "path": "ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        }
+      ],
+      "allFiles": [
+        {
+          "path": "ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "ai/levels/hard.ts",
+          "sha256": "a089bc96911bacd90ca7a2070e028a5e9a972b85efd2c7651d1329ba70065429"
+        },
+        {
+          "path": "ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "ai/pimc.ts",
+          "sha256": "6cf9dcfe08e7942c4b19388371fc9151f4fdb1a40e091d84378be9dcde99c900"
+        },
+        {
+          "path": "ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "ai/rollout.ts",
+          "sha256": "8ee5880b680a6083e7500f7f3f24b7ff863e13e5fbcf08df030121e46e0a35bc"
+        },
+        {
+          "path": "ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        },
+        {
+          "path": "data/aggregate.ts",
+          "sha256": "bbf48e1e2556f828a39c1a71da87fe716c32b2e36ef1839a039c25e7a6ec359c"
+        },
+        {
+          "path": "data/difficultyConfig.ts",
+          "sha256": "2ea1afa1faeb60784d17afd27811ba8727e138ca76ce3af31b964fa0858b9240"
+        },
+        {
+          "path": "data/index.ts",
+          "sha256": "ad604423170b476092ef404bc1ea26e8c99b48a920a7935f62641f984b34acd4"
+        },
+        {
+          "path": "data/match-log.ts",
+          "sha256": "3f264b3eb1b9743172882adb3df19db5b63324c313aaa1c23be1913488d2f85d"
+        },
+        {
+          "path": "data/records.ts",
+          "sha256": "10f9677aa5ff624ba93f04828a6a2298fa8850c795c80a503cdd7c0b3d9144a2"
+        },
+        {
+          "path": "data/recordsQuery.ts",
+          "sha256": "35d7edf12a11a26f399e510995aafff58b11ab3c2acfde4d04607366170f1aaa"
+        },
+        {
+          "path": "data/save.ts",
+          "sha256": "61490b99af73d1530b534bd7c858969146ebfc65622520ccc963b3dff9799a28"
+        },
+        {
+          "path": "data/saveStorage.ts",
+          "sha256": "4d43d6629de355b6f69bab0a729a087d0cfcf0c519f1a6692bbba459239d73fd"
+        },
+        {
+          "path": "data/session.ts",
+          "sha256": "09441540d153fb7704908917704fa6a2e27f01558a66eda26de9ce9c73e357cc"
+        },
+        {
+          "path": "data/settings.ts",
+          "sha256": "12e759b0337248d30b53b7eaa8cc5c73a8976b026360d149d52b17a4390a983a"
+        },
+        {
+          "path": "data/settingsCodec.ts",
+          "sha256": "bed2ffbafa58793965199f74b5a473aaafd8e2ca9679ace5b7b026f3b6e6a47f"
+        },
+        {
+          "path": "data/settingsStorage.ts",
+          "sha256": "ab0e276f4aff9fb6c857d9f53ca49344e4fb55caf44d86403fa4a07206e9cfd1"
+        },
+        {
+          "path": "data/stats.ts",
+          "sha256": "a464c533133f813bf29ddd6b597cefef90d8ff3ce36d99453eefa17410538422"
+        },
+        {
+          "path": "data/statsCodec.ts",
+          "sha256": "e4c8c3fadf223dc6d75a20057d85e0cca9fb8781392795de75fe016b70b3fe2b"
+        },
+        {
+          "path": "data/statsDigest.ts",
+          "sha256": "d3a4585f0bd95e22d47318cca2d08e4ebb4f563cec6fad1cea3ffaff6f6fab28"
+        },
+        {
+          "path": "data/storage-keys.ts",
+          "sha256": "3e3c4b21dc72efbb6e38c56360a1fac0f978d951c8897576dc5445605ed3d4e6"
+        },
+        {
+          "path": "flow/clock.ts",
+          "sha256": "d01867671381f645a10e30c9cd6eb94c2db3ed09916652f2d66ecf4aa3767d44"
+        },
+        {
+          "path": "flow/driver.ts",
+          "sha256": "c7208b37fa4a9bf54fa1f413ac32c3a63a7e4f81591f5db7c873495fd07de722"
+        },
+        {
+          "path": "flow/index.ts",
+          "sha256": "4621646668eecfab13278c17bdf0db8521633d0e98be1498ecbb8531de1c9f69"
+        },
+        {
+          "path": "flow/policies.ts",
+          "sha256": "2cca0599ec37e095bfc04198c3716bc589fe31597860c87dcd1d135e9670f871"
+        },
+        {
+          "path": "flow/round-runtime.ts",
+          "sha256": "6a938da8fea066572af9d80204cee624b4cecaaa0d4a91d12f44648800e3935b"
+        },
+        {
+          "path": "flow/runtime/bidding-driver.ts",
+          "sha256": "7c002480756f4b6e6f60f109e95b6630c0bc930524d2924ce20b22617230f888"
+        },
+        {
+          "path": "flow/runtime/event-replay.ts",
+          "sha256": "4743864066a13481a850bbb475962430475512d49072c049dd8f568f0dc1a3be"
+        },
+        {
+          "path": "flow/runtime/persistence.ts",
+          "sha256": "6bceced1c4cc8d51b0499114d6fc4244f322a7e5d4d8fd982818feda7bb54274"
+        },
+        {
+          "path": "flow/types.ts",
+          "sha256": "dc0df93a2d05711cb6afe04324c3a9245cea312fe91e3913bb2b8d97853d3af8"
+        },
+        {
+          "path": "game/bidding.ts",
+          "sha256": "5a831883a28e78287e4b39cafa6c606b5d96ecea88a8fd6fa432cbc4927bc737"
+        },
+        {
+          "path": "game/core.ts",
+          "sha256": "4fb30186177a554daec2f60cb2bcba5d00d1f271e760d8684bb45951dbf9ee7d"
+        },
+        {
+          "path": "game/index.ts",
+          "sha256": "6700a9697760f6716d60d6bc242222aedaa951bc3ce541ceeb6f64c032d703b0"
+        },
+        {
+          "path": "game/replay-codec.ts",
+          "sha256": "f65effc9a11a59e9a9f704d4c731d6e7b7c27ec9e63d49403f7a97c07939b082"
+        },
+        {
+          "path": "game/replay.ts",
+          "sha256": "9475c105216ff70efb8fd2f57a193e4422df65ea6ced07c22e2ad0f8ecee974b"
+        },
+        {
+          "path": "game/resume.ts",
+          "sha256": "4d139ab72069e9b42aba793e15ad694b4413701be9a2ac30795b416a1f7b52d6"
+        },
+        {
+          "path": "game/seat.ts",
+          "sha256": "63221039841cc89801c6ed85846aae4518da92cacb17dec53ca70a6280854b07"
+        },
+        {
+          "path": "game/serialize.ts",
+          "sha256": "23e32036c04035f1bb6c8f087a9a1422d6c7f779d97a1fc64389407a18833cfc"
+        },
+        {
+          "path": "game/settlement.ts",
+          "sha256": "92caa28c0c1ce8528a3483a82d7c8abd93ad759101066a6849df9263712eff4a"
+        },
+        {
+          "path": "game/trick-replay.ts",
+          "sha256": "4866f416e6c7084d5af25aeaf6dbefecab7e9d7ba5d106a600c4cfbc1892a91f"
+        },
+        {
+          "path": "game/types.ts",
+          "sha256": "c498a650d598348e95b501b1982f5005fd444aceee12a087688579f6a2bb4b00"
+        },
+        {
+          "path": "rules/card.ts",
+          "sha256": "e36240e9197b7ab20b815b5c2d9c03c57d5c2403ec15ac7e15c25636ca5a9443"
+        },
+        {
+          "path": "rules/compare.ts",
+          "sha256": "3b1d81579e15f114c5fe0b18eecc308053a1d768075d924706508c721d17f627"
+        },
+        {
+          "path": "rules/deal.ts",
+          "sha256": "aedd4c0f04063ad6ba6eca407cba00dcf5aaa5e0385a278dee1b1a013de6a21b"
+        },
+        {
+          "path": "rules/guards.ts",
+          "sha256": "d8ffe9b63c1c320cd8456cb0830a03b0177345e0157e7d3a7762ab84ff85c9bc"
+        },
+        {
+          "path": "rules/index.ts",
+          "sha256": "a4d616fe13b3b814874fc6ba3d44b2921e740141826cdbad0dc8ddbf5459ee74"
+        },
+        {
+          "path": "rules/moves.ts",
+          "sha256": "5122974c486884f5d165cb1fbba4f9a6d63fe7f2adeb9bafcc3c52f567c53560"
+        },
+        {
+          "path": "rules/pattern.ts",
+          "sha256": "dbc4b4f183b745e981c3ea363b42de6533b27e5f3a2df2b942c948c122c183c5"
+        },
+        {
+          "path": "rules/result.ts",
+          "sha256": "14c5dfdb31124735f1171bb2bea0c2b585a99de5f8395006c55724a4459f3cc8"
+        },
+        {
+          "path": "rules/rng.ts",
+          "sha256": "5e6bf95e20088e4c9e0784a0990ee86bd01988059fa6ddfdbf47e4d8163882df"
+        },
+        {
+          "path": "runtime/cocos-storage.ts",
+          "sha256": "08243412382998236f0543ca4e098d95129c2db32e19dc8368ce8ee2a8799855"
+        },
+        {
+          "path": "runtime/export-file.ts",
+          "sha256": "b0bbf51c7f540cc53a10effcbd5e974ef4e4b1c67daf51e5e15ed9f014edc289"
+        },
+        {
+          "path": "runtime/storage-adapter.ts",
+          "sha256": "6c081f11280d77ce0d791291918f3359adbb280ae813c44e4d379b5b6f9af3d9"
+        },
+        {
+          "path": "ui/action-buttons.ts",
+          "sha256": "c2929df138b1e5cf2d58412b5cff245e126081ed0a9fb81bb808e9ef5aa13ae5"
+        },
+        {
+          "path": "ui/ai-thinking-view.ts",
+          "sha256": "b754c377c4f4dbeeacc407696b7e90be6bd806e71458c043b06a2f12974e3ef9"
+        },
+        {
+          "path": "ui/animation-params.ts",
+          "sha256": "cf511dbc763d0ef8d77f00a1fe2f47221ecf60b445e3fb693a2e16903763e20b"
+        },
+        {
+          "path": "ui/asset-keys-rollback.ts",
+          "sha256": "02390531e3f069fb52641a78040e0f5cf9ba37c09479e56eb8d5b732775fa255"
+        },
+        {
+          "path": "ui/asset-keys.ts",
+          "sha256": "f6cab2268c74f1274567ea69172c3769b1b82768f0d59d5ca6e4b30bb047e429"
+        },
+        {
+          "path": "ui/audio-gate.ts",
+          "sha256": "517cd9a3e6021a18428965fa395c64388bc81cdd2265bcf7e4dca61f68a60357"
+        },
+        {
+          "path": "ui/bidding-advice-view.ts",
+          "sha256": "5ed5b0741191b91ead8fe15445ae72d789cd259e16549140d5714f0efa26ccd5"
+        },
+        {
+          "path": "ui/bidding-view.ts",
+          "sha256": "6ea353552efc6630462d310cc4455571733b848b8dbaed71a29774ce1974f8a8"
+        },
+        {
+          "path": "ui/card-choreography.ts",
+          "sha256": "16238429de7c3d8c3fa37a57cf54f83e79ffde5cec86097d0d0a6f0e60e0427b"
+        },
+        {
+          "path": "ui/card-memory-view.ts",
+          "sha256": "5f55b9253b6bf8f3a25a2eba6bfff431dd53b0bfa33f1b1de17edea383153542"
+        },
+        {
+          "path": "ui/card-stage.ts",
+          "sha256": "a9d532504465ba86e8cba8ac4bad35a9c4dad991b2bfc2d4dceed10d9619f1d9"
+        },
+        {
+          "path": "ui/card-view.ts",
+          "sha256": "112fb49e5937ca413e872af7d59b8a31ab5345df7a7b46075946d1fd30e13d73"
+        },
+        {
+          "path": "ui/components/game-scene-skeleton.ts",
+          "sha256": "11258565f088a6477cb34e640668d1be616126ad066b986015664d255d60fced"
+        },
+        {
+          "path": "ui/components/game-scene/audio-vibration.ts",
+          "sha256": "ca5b7229ad0bcfa6006b4512ac19737aaeb9579eb5c4f9726ccf68fa0f9c9785"
+        },
+        {
+          "path": "ui/components/game-scene/bid-actions-renderer.ts",
+          "sha256": "495d2e95ac2c70577acd8f282fe8cb6f2ee8cb60d378db1482f499a762aa13af"
+        },
+        {
+          "path": "ui/components/game-scene/card-animator.ts",
+          "sha256": "2c2baa92cdcd2bf1f3353eecb146495942c8d3d9e22afff36a50c04a0980da3d"
+        },
+        {
+          "path": "ui/components/game-scene/card-node.ts",
+          "sha256": "5bbc49cd3bb74b06fa71dbd788f55ec24fb8a09d9f602248d31b112935709bec"
+        },
+        {
+          "path": "ui/components/game-scene/font-loader.ts",
+          "sha256": "5142da941bb6531a95c08d758618c6d88999dcd97b2e51ce9c15f7471646901a"
+        },
+        {
+          "path": "ui/components/game-scene/fx-program.ts",
+          "sha256": "be8b198d2177a040435d39a991957983961592ee02e31cf8e6a086910f6ecaf3"
+        },
+        {
+          "path": "ui/components/game-scene/hud-renderer.ts",
+          "sha256": "104dd8bf1b06495be2004f6461c516a747c933ccbe6c3751d07f0c3c0202e0c0"
+        },
+        {
+          "path": "ui/components/game-scene/match-log-recorder.ts",
+          "sha256": "f2cfe217250b1d8437e6e96393c22c2780f14abac2391f1d1922bf4ab2029f07"
+        },
+        {
+          "path": "ui/components/game-scene/pause-overlay-renderer.ts",
+          "sha256": "0ceb4fcf594c6a6052545389947e25c6d3d9a7ea38635b2d2f8db6d9a381de81"
+        },
+        {
+          "path": "ui/components/game-scene/play-area-renderer.ts",
+          "sha256": "40b2251673779687453805431cd5a8cc6deba7b4730978fc0ab277c2f0532e46"
+        },
+        {
+          "path": "ui/components/game-scene/result-overlay-renderer.ts",
+          "sha256": "e981355626eaf23ed0be51be33e19581eb52bb1f0609786ac7fcd995d8430adb"
+        },
+        {
+          "path": "ui/components/game-scene/runtime-feedback.ts",
+          "sha256": "05f388a078c678a8980d71ef2a6ce062441af9492e71d669b595dcda728c5ee0"
+        },
+        {
+          "path": "ui/components/game-scene/seat-display.ts",
+          "sha256": "2958090dcf0c90c13034793600513cdeadcbfbc3fbe1d136b3a9fa52fc8a2045"
+        },
+        {
+          "path": "ui/components/game-scene/seats-renderer.ts",
+          "sha256": "a406dd57cdcf2763bf6f8fecc58a5514c2724942b7e66c2953b2e4e06abad9bf"
+        },
+        {
+          "path": "ui/components/game-scene/top-bar-renderer.ts",
+          "sha256": "674b4991daeaa1c6e64969df78bb8963d8a90e31d77d67a475817ecf8a140b1f"
+        },
+        {
+          "path": "ui/components/game-scene/tween-helpers.ts",
+          "sha256": "436f93dd8927013c69c0f53776a5477f9ab89a0f855913e601be6fbf3a36b8d2"
+        },
+        {
+          "path": "ui/components/game-scene/ui-runtime-helpers.ts",
+          "sha256": "43c22c780483f8c8d7fc4edd7ba13edfe11737d0efcb0391594713a8e06bf891"
+        },
+        {
+          "path": "ui/components/lobby-scene.ts",
+          "sha256": "10bf55ab2a0c177efbeca466ed6ef631ee1b193d48d29785ec9bdef7e3b221d4"
+        },
+        {
+          "path": "ui/components/scene-transition.ts",
+          "sha256": "862d2584dc1d65a3e78d1c1e27a6b1ac7092a651478a2022f7b566c7ebcca26e"
+        },
+        {
+          "path": "ui/components/ui-helpers.ts",
+          "sha256": "44c1f017552ee914ff28d61388aff80805d02e51fd36d8e2ee2b6e1c8928c290"
+        },
+        {
+          "path": "ui/difficulty-picker-view.ts",
+          "sha256": "9be055085cfedba4f5666300d570dd70a84e59bf5c61af959cc2fb7a04354215"
+        },
+        {
+          "path": "ui/event-cues.ts",
+          "sha256": "2c4d83f111e0931920b26ecdfe633c1881841babf8e1454c008e6cf688f837d2"
+        },
+        {
+          "path": "ui/follow-ux.ts",
+          "sha256": "822147e82bad399646ff384a60f525aab7939e8a5a8ab73017336bb32a81fa73"
+        },
+        {
+          "path": "ui/hand-interaction.ts",
+          "sha256": "432134a4207f1d658457239282cd4a2a20073ca268559800b04f47cc32171979"
+        },
+        {
+          "path": "ui/hand-layout.ts",
+          "sha256": "7891b336e16f3215a974bc38a8dccba09fb9678bf051684685e0a41680149e68"
+        },
+        {
+          "path": "ui/help-content.ts",
+          "sha256": "99017d5b17dbf0ff9c5ed0f210fa6b7efb0f14a254d2233c5c20fd8aa1b71906"
+        },
+        {
+          "path": "ui/hint-flow.ts",
+          "sha256": "7277ba1179ff3e73d6602648ce4f9ea23c7609ee3926162bc855df3ac515a19b"
+        },
+        {
+          "path": "ui/index.ts",
+          "sha256": "bc937aab5f4e0058010d0b5b58f131533e525907919deedeef8d312b1405d213"
+        },
+        {
+          "path": "ui/insight-view.ts",
+          "sha256": "7a1dbb69d340b937be657f43918594ea46bd937fabac185b3a2c2057fdd0af99"
+        },
+        {
+          "path": "ui/last-action-view.ts",
+          "sha256": "1a773fee6208ea96cc351e514565aaf1fdf5279fe1a7ca922602d1ee4b3cb72a"
+        },
+        {
+          "path": "ui/last-play-view.ts",
+          "sha256": "fce3a3df25da7d0a09397644ab63d22068bcd24526ceb1c6ca90c66da9f5f481"
+        },
+        {
+          "path": "ui/lobby-view.ts",
+          "sha256": "bc2541837d67b3abc057367b16163c3dc204403791c57e27b0ed783ddb7ad896"
+        },
+        {
+          "path": "ui/pattern-label.ts",
+          "sha256": "8170c958ed1168dbf51557ed79ab6364c2346f37ee2fbb8733f6c50b285ae132"
+        },
+        {
+          "path": "ui/pause-menu.ts",
+          "sha256": "23391ec279f060fc0a0efa3ce70aeccc0a3325abb6bc96e3ff2974bc0d5af58b"
+        },
+        {
+          "path": "ui/records-detail-view.ts",
+          "sha256": "f44b5f6ee1d6ff7c6a1745c4d9f7b36d73753291d864ddc993aa079fc879320b"
+        },
+        {
+          "path": "ui/records-view.ts",
+          "sha256": "7ae484cda78241637fc8effc4e4003adec5655a60ebaacedb5a1d207e0352e8a"
+        },
+        {
+          "path": "ui/replay-view.ts",
+          "sha256": "36ca0134636dff958ca3ba4928e67277b4eb7af7fd40212472b86a31d34a98c2"
+        },
+        {
+          "path": "ui/result-view.ts",
+          "sha256": "73abba5cd21d90b629723719fb6a9e8b3075a45f7f69f82369ad3a68ed787b62"
+        },
+        {
+          "path": "ui/resume-rebuild.ts",
+          "sha256": "ae68d8f27f27c0ae63d347c5526aebf37a1b87d2a5c5c001fe3f10dbffcf23e7"
+        },
+        {
+          "path": "ui/score-roll.ts",
+          "sha256": "70df15d49a68f901f446c730184950c6d756e4c2676d805264ce6b3c1db32124"
+        },
+        {
+          "path": "ui/screen-view.ts",
+          "sha256": "c3e97eaa578d95e9eac44a04a3cce44b8b6f8c3e47d5d7faee27d143e95d7aa2"
+        },
+        {
+          "path": "ui/selection.ts",
+          "sha256": "b61cfc6b73a543235e0bc8869ef2c950d901e038fa6226aa5f1eb55a5531e8a3"
+        },
+        {
+          "path": "ui/session-score.ts",
+          "sha256": "f996c45c9800d1ac15b91318e4c5de77093b238149aa2cdbb414360ce62446ed"
+        },
+        {
+          "path": "ui/settings-view.ts",
+          "sha256": "9cdc0e31f4d85bb34fc970864b44d163f546d6f19d3aae66260c4009b3e34fac"
+        },
+        {
+          "path": "ui/settlement-reveal.ts",
+          "sha256": "d913d47722263ff13abe2afcfa22afb71402ff0782e3940cb7499f6ca5f8232a"
+        },
+        {
+          "path": "ui/stats-detail-view.ts",
+          "sha256": "851aa7488f15329a73716d45483fa7c4db8e21f7e503d534989e2735d95d039d"
+        },
+        {
+          "path": "ui/stats-view.ts",
+          "sha256": "dd3aa3797041be56914993af444f18730f9646f468f3ee48da4e8ea89ce6caf2"
+        },
+        {
+          "path": "ui/strength-meter-view.ts",
+          "sha256": "e66541f1c84fa6c54f05fc692169adb5b875b8ea0f02e3d26b1688ceaee4a77b"
+        },
+        {
+          "path": "ui/strings.ts",
+          "sha256": "a2270569a2e9aba7adf253350610977296c200c70b8875609caf08223e5a21b9"
+        },
+        {
+          "path": "ui/table-layout.ts",
+          "sha256": "696eaee26d1d6b1c2fbe69b25b9f38cfc9ee56de6ab5ee0b46189bb3b08ee0f2"
+        },
+        {
+          "path": "ui/table-zones.ts",
+          "sha256": "ec1ec799ac7c5fca3bab294605df388a058bdba2682aba5ab3dd0ddea16847cb"
+        },
+        {
+          "path": "ui/termination-feedback-view.ts",
+          "sha256": "caacfddb02cfd20cd5b2f9fb9562ad0da2c9d1930d3e80fb2706dba09bd54012"
+        },
+        {
+          "path": "ui/theme.ts",
+          "sha256": "1848e4769a98a49d1a988d7145c24e5eb72b91b71a003c6358ef249161f53ed7"
+        },
+        {
+          "path": "ui/toast-queue.ts",
+          "sha256": "ec55c2664a9ec87f281660b58fd9a5f71e722366c6337c40ef59907f64acb726"
+        },
+        {
+          "path": "ui/turn-timer.ts",
+          "sha256": "97a7fcb86ea51917372a3fad3ed7038610ee6d678ac67c65af0d48aac4fbdf4a"
+        },
+        {
+          "path": "ui/tutorial-steps.ts",
+          "sha256": "2a332dd92b3a9cd1dfbf94b9cec846dc788597c150cbc9937b04df48dc2a2e0a"
+        },
+        {
+          "path": "ui/ui-text-colors.ts",
+          "sha256": "9c6ee53e0e831a755ac94b445568030f842a1c4390c8a8aafd634db9b4717527"
+        }
+      ]
+    },
+    "baseline": {
+      "scriptsSha256": "8b579f966ce06274a7fe723a26b679f5e9ea4707bd1e6898a55d221946e9696d",
+      "aiSha256": "06ab0d68040ce4a0d9865401558dc98a420ffc1b927aa79b780d0f1ea63798d9",
+      "aiFiles": [
+        {
+          "path": "ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "ai/levels/hard.ts",
+          "sha256": "435bae008e097e14e24e9e33f9b2d985ed558f3ddac40cb56af7032b3e1ef0f7"
+        },
+        {
+          "path": "ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "ai/pimc.ts",
+          "sha256": "d4057ed1e6bd74f69023b35c11885eb5c2003083f55b7dd4146e25e86c8cfeae"
+        },
+        {
+          "path": "ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "ai/rollout.ts",
+          "sha256": "8ee5880b680a6083e7500f7f3f24b7ff863e13e5fbcf08df030121e46e0a35bc"
+        },
+        {
+          "path": "ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        }
+      ],
+      "allFiles": [
+        {
+          "path": "ai/baseline.ts",
+          "sha256": "d681166285eaa9adccee893400c76263f23c556b5decc2bd0e02fb256f89f384"
+        },
+        {
+          "path": "ai/bid-confidence.ts",
+          "sha256": "54d0c18cf689c80034347a27e852c0ece7eb1d95c1b9a7fc693eb8baa7b80cf6"
+        },
+        {
+          "path": "ai/bidding-advisor.ts",
+          "sha256": "163d7f76de5dd44b9d113ee9bf7cea34f7cd45ee0727ef7f16dc2f59559cc583"
+        },
+        {
+          "path": "ai/bidding-eval.ts",
+          "sha256": "9e103f2c97e04f9079ec21913fc95bc38173183d1c908183b966c9d01328beba"
+        },
+        {
+          "path": "ai/bidding-levels.ts",
+          "sha256": "c697e3b68cc33f07cd0427b95440cee2bb17a9b46ecc6260d12b9c326e3ab478"
+        },
+        {
+          "path": "ai/bidding.ts",
+          "sha256": "503e16ddb728df305969df3b753eb38fa805c3138560c6bcfdd02288025ac0a1"
+        },
+        {
+          "path": "ai/cardMemory.ts",
+          "sha256": "b19ab439e69b821b0c2d13f06049db2cf8996a9a2f41f65aa26afa04cfd0a3ae"
+        },
+        {
+          "path": "ai/decision-log.ts",
+          "sha256": "8ab48d9083006fc1846eb445a224a518314ef08d663ebfef17af99604cf70701"
+        },
+        {
+          "path": "ai/decompose.ts",
+          "sha256": "3f38b931d51ff0550130197e9dc63e792a9ac61ee6194f16b486d2915a069b63"
+        },
+        {
+          "path": "ai/endgame.ts",
+          "sha256": "3547c468a95bb663dc5b309ec0e86e828238fda7432245fa35c37265ce9acc4c"
+        },
+        {
+          "path": "ai/endgameSolver.ts",
+          "sha256": "8ed0f46e36bc60ab7ad95a1de4d4a4e0ac719634f59274c87e2c348af51fe3eb"
+        },
+        {
+          "path": "ai/handStrength.ts",
+          "sha256": "6fb83790bb5ca644b97779b7c4e91d7229744622f26b097c756a94812131f8dd"
+        },
+        {
+          "path": "ai/handWeight.ts",
+          "sha256": "c078d01bbbab41aaf4cf7beeb4b5220f64755ce3f83fbc226eea67c3942bb0b7"
+        },
+        {
+          "path": "ai/hint.ts",
+          "sha256": "fe34623035193241402b5770cef8882b00629a301ee660a70333c6ab68ef6976"
+        },
+        {
+          "path": "ai/hintRank.ts",
+          "sha256": "cca4b8fbccb950ea03e39602ba419d4d490d284b67d2d604381a3cd4ee8b80e3"
+        },
+        {
+          "path": "ai/index.ts",
+          "sha256": "3151ab22f918d6b09430016fa309d2c5452bbfbeb18ab020cbfd974c9288f253"
+        },
+        {
+          "path": "ai/insight.ts",
+          "sha256": "9c9dc967becc2ab38b962983d8993692919c48ae0f56ea2708de8b8ea3ff2e7f"
+        },
+        {
+          "path": "ai/levels/_shared.ts",
+          "sha256": "7bda30d491c945d68e9be560b1d5be07ce1a835afbca14dc886ff7f57fdb45bc"
+        },
+        {
+          "path": "ai/levels/hard.ts",
+          "sha256": "435bae008e097e14e24e9e33f9b2d985ed558f3ddac40cb56af7032b3e1ef0f7"
+        },
+        {
+          "path": "ai/levels/lead-score.ts",
+          "sha256": "38d0272e3934ba5a99c60b85854102c30af45a4749f1b89374b6974eebcde912"
+        },
+        {
+          "path": "ai/levels/normal.ts",
+          "sha256": "29671193b08446350cad6ca1b643e65e3fb1956f78cdd765a830d58d92494bc9"
+        },
+        {
+          "path": "ai/levels/simple.ts",
+          "sha256": "367cbe134e2669c17a66d1f66b97128529e437759131b20eced4437f51906010"
+        },
+        {
+          "path": "ai/pimc.ts",
+          "sha256": "d4057ed1e6bd74f69023b35c11885eb5c2003083f55b7dd4146e25e86c8cfeae"
+        },
+        {
+          "path": "ai/pressure.ts",
+          "sha256": "100b8d915a6c76efb51c6a8eae4cb885cfe7fb02d55ac4cd895093d278cf0775"
+        },
+        {
+          "path": "ai/rollout.ts",
+          "sha256": "8ee5880b680a6083e7500f7f3f24b7ff863e13e5fbcf08df030121e46e0a35bc"
+        },
+        {
+          "path": "ai/strategy.ts",
+          "sha256": "82201d77d5792a0e206c23c2b928220a6c445c9dc01f5c4aecd8c4df0814ea29"
+        },
+        {
+          "path": "ai/tuning.ts",
+          "sha256": "9c5c42e7d51cd991f2692303e52877c247b9b53ccbcdd56a2b60b3844fe935b9"
+        },
+        {
+          "path": "ai/worldSolver.ts",
+          "sha256": "aae500fa6cd60b8506a492027636c989d244cd2238c5d03442ac8f05687e26fa"
+        },
+        {
+          "path": "data/aggregate.ts",
+          "sha256": "bbf48e1e2556f828a39c1a71da87fe716c32b2e36ef1839a039c25e7a6ec359c"
+        },
+        {
+          "path": "data/difficultyConfig.ts",
+          "sha256": "2ea1afa1faeb60784d17afd27811ba8727e138ca76ce3af31b964fa0858b9240"
+        },
+        {
+          "path": "data/index.ts",
+          "sha256": "ad604423170b476092ef404bc1ea26e8c99b48a920a7935f62641f984b34acd4"
+        },
+        {
+          "path": "data/match-log.ts",
+          "sha256": "3f264b3eb1b9743172882adb3df19db5b63324c313aaa1c23be1913488d2f85d"
+        },
+        {
+          "path": "data/records.ts",
+          "sha256": "10f9677aa5ff624ba93f04828a6a2298fa8850c795c80a503cdd7c0b3d9144a2"
+        },
+        {
+          "path": "data/recordsQuery.ts",
+          "sha256": "35d7edf12a11a26f399e510995aafff58b11ab3c2acfde4d04607366170f1aaa"
+        },
+        {
+          "path": "data/save.ts",
+          "sha256": "61490b99af73d1530b534bd7c858969146ebfc65622520ccc963b3dff9799a28"
+        },
+        {
+          "path": "data/saveStorage.ts",
+          "sha256": "4d43d6629de355b6f69bab0a729a087d0cfcf0c519f1a6692bbba459239d73fd"
+        },
+        {
+          "path": "data/session.ts",
+          "sha256": "09441540d153fb7704908917704fa6a2e27f01558a66eda26de9ce9c73e357cc"
+        },
+        {
+          "path": "data/settings.ts",
+          "sha256": "12e759b0337248d30b53b7eaa8cc5c73a8976b026360d149d52b17a4390a983a"
+        },
+        {
+          "path": "data/settingsCodec.ts",
+          "sha256": "bed2ffbafa58793965199f74b5a473aaafd8e2ca9679ace5b7b026f3b6e6a47f"
+        },
+        {
+          "path": "data/settingsStorage.ts",
+          "sha256": "ab0e276f4aff9fb6c857d9f53ca49344e4fb55caf44d86403fa4a07206e9cfd1"
+        },
+        {
+          "path": "data/stats.ts",
+          "sha256": "a464c533133f813bf29ddd6b597cefef90d8ff3ce36d99453eefa17410538422"
+        },
+        {
+          "path": "data/statsCodec.ts",
+          "sha256": "e4c8c3fadf223dc6d75a20057d85e0cca9fb8781392795de75fe016b70b3fe2b"
+        },
+        {
+          "path": "data/statsDigest.ts",
+          "sha256": "d3a4585f0bd95e22d47318cca2d08e4ebb4f563cec6fad1cea3ffaff6f6fab28"
+        },
+        {
+          "path": "data/storage-keys.ts",
+          "sha256": "3e3c4b21dc72efbb6e38c56360a1fac0f978d951c8897576dc5445605ed3d4e6"
+        },
+        {
+          "path": "flow/clock.ts",
+          "sha256": "d01867671381f645a10e30c9cd6eb94c2db3ed09916652f2d66ecf4aa3767d44"
+        },
+        {
+          "path": "flow/driver.ts",
+          "sha256": "c7208b37fa4a9bf54fa1f413ac32c3a63a7e4f81591f5db7c873495fd07de722"
+        },
+        {
+          "path": "flow/index.ts",
+          "sha256": "4621646668eecfab13278c17bdf0db8521633d0e98be1498ecbb8531de1c9f69"
+        },
+        {
+          "path": "flow/policies.ts",
+          "sha256": "2cca0599ec37e095bfc04198c3716bc589fe31597860c87dcd1d135e9670f871"
+        },
+        {
+          "path": "flow/round-runtime.ts",
+          "sha256": "6a938da8fea066572af9d80204cee624b4cecaaa0d4a91d12f44648800e3935b"
+        },
+        {
+          "path": "flow/runtime/bidding-driver.ts",
+          "sha256": "7c002480756f4b6e6f60f109e95b6630c0bc930524d2924ce20b22617230f888"
+        },
+        {
+          "path": "flow/runtime/event-replay.ts",
+          "sha256": "4743864066a13481a850bbb475962430475512d49072c049dd8f568f0dc1a3be"
+        },
+        {
+          "path": "flow/runtime/persistence.ts",
+          "sha256": "6bceced1c4cc8d51b0499114d6fc4244f322a7e5d4d8fd982818feda7bb54274"
+        },
+        {
+          "path": "flow/types.ts",
+          "sha256": "dc0df93a2d05711cb6afe04324c3a9245cea312fe91e3913bb2b8d97853d3af8"
+        },
+        {
+          "path": "game/bidding.ts",
+          "sha256": "5a831883a28e78287e4b39cafa6c606b5d96ecea88a8fd6fa432cbc4927bc737"
+        },
+        {
+          "path": "game/core.ts",
+          "sha256": "4fb30186177a554daec2f60cb2bcba5d00d1f271e760d8684bb45951dbf9ee7d"
+        },
+        {
+          "path": "game/index.ts",
+          "sha256": "6700a9697760f6716d60d6bc242222aedaa951bc3ce541ceeb6f64c032d703b0"
+        },
+        {
+          "path": "game/replay-codec.ts",
+          "sha256": "f65effc9a11a59e9a9f704d4c731d6e7b7c27ec9e63d49403f7a97c07939b082"
+        },
+        {
+          "path": "game/replay.ts",
+          "sha256": "9475c105216ff70efb8fd2f57a193e4422df65ea6ced07c22e2ad0f8ecee974b"
+        },
+        {
+          "path": "game/resume.ts",
+          "sha256": "4d139ab72069e9b42aba793e15ad694b4413701be9a2ac30795b416a1f7b52d6"
+        },
+        {
+          "path": "game/seat.ts",
+          "sha256": "63221039841cc89801c6ed85846aae4518da92cacb17dec53ca70a6280854b07"
+        },
+        {
+          "path": "game/serialize.ts",
+          "sha256": "23e32036c04035f1bb6c8f087a9a1422d6c7f779d97a1fc64389407a18833cfc"
+        },
+        {
+          "path": "game/settlement.ts",
+          "sha256": "92caa28c0c1ce8528a3483a82d7c8abd93ad759101066a6849df9263712eff4a"
+        },
+        {
+          "path": "game/trick-replay.ts",
+          "sha256": "4866f416e6c7084d5af25aeaf6dbefecab7e9d7ba5d106a600c4cfbc1892a91f"
+        },
+        {
+          "path": "game/types.ts",
+          "sha256": "c498a650d598348e95b501b1982f5005fd444aceee12a087688579f6a2bb4b00"
+        },
+        {
+          "path": "rules/card.ts",
+          "sha256": "e36240e9197b7ab20b815b5c2d9c03c57d5c2403ec15ac7e15c25636ca5a9443"
+        },
+        {
+          "path": "rules/compare.ts",
+          "sha256": "3b1d81579e15f114c5fe0b18eecc308053a1d768075d924706508c721d17f627"
+        },
+        {
+          "path": "rules/deal.ts",
+          "sha256": "aedd4c0f04063ad6ba6eca407cba00dcf5aaa5e0385a278dee1b1a013de6a21b"
+        },
+        {
+          "path": "rules/guards.ts",
+          "sha256": "d8ffe9b63c1c320cd8456cb0830a03b0177345e0157e7d3a7762ab84ff85c9bc"
+        },
+        {
+          "path": "rules/index.ts",
+          "sha256": "a4d616fe13b3b814874fc6ba3d44b2921e740141826cdbad0dc8ddbf5459ee74"
+        },
+        {
+          "path": "rules/moves.ts",
+          "sha256": "5122974c486884f5d165cb1fbba4f9a6d63fe7f2adeb9bafcc3c52f567c53560"
+        },
+        {
+          "path": "rules/pattern.ts",
+          "sha256": "dbc4b4f183b745e981c3ea363b42de6533b27e5f3a2df2b942c948c122c183c5"
+        },
+        {
+          "path": "rules/result.ts",
+          "sha256": "14c5dfdb31124735f1171bb2bea0c2b585a99de5f8395006c55724a4459f3cc8"
+        },
+        {
+          "path": "rules/rng.ts",
+          "sha256": "5e6bf95e20088e4c9e0784a0990ee86bd01988059fa6ddfdbf47e4d8163882df"
+        },
+        {
+          "path": "runtime/cocos-storage.ts",
+          "sha256": "08243412382998236f0543ca4e098d95129c2db32e19dc8368ce8ee2a8799855"
+        },
+        {
+          "path": "runtime/export-file.ts",
+          "sha256": "b0bbf51c7f540cc53a10effcbd5e974ef4e4b1c67daf51e5e15ed9f014edc289"
+        },
+        {
+          "path": "runtime/storage-adapter.ts",
+          "sha256": "6c081f11280d77ce0d791291918f3359adbb280ae813c44e4d379b5b6f9af3d9"
+        },
+        {
+          "path": "ui/action-buttons.ts",
+          "sha256": "c2929df138b1e5cf2d58412b5cff245e126081ed0a9fb81bb808e9ef5aa13ae5"
+        },
+        {
+          "path": "ui/ai-thinking-view.ts",
+          "sha256": "b754c377c4f4dbeeacc407696b7e90be6bd806e71458c043b06a2f12974e3ef9"
+        },
+        {
+          "path": "ui/animation-params.ts",
+          "sha256": "cf511dbc763d0ef8d77f00a1fe2f47221ecf60b445e3fb693a2e16903763e20b"
+        },
+        {
+          "path": "ui/asset-keys-rollback.ts",
+          "sha256": "02390531e3f069fb52641a78040e0f5cf9ba37c09479e56eb8d5b732775fa255"
+        },
+        {
+          "path": "ui/asset-keys.ts",
+          "sha256": "f6cab2268c74f1274567ea69172c3769b1b82768f0d59d5ca6e4b30bb047e429"
+        },
+        {
+          "path": "ui/audio-gate.ts",
+          "sha256": "517cd9a3e6021a18428965fa395c64388bc81cdd2265bcf7e4dca61f68a60357"
+        },
+        {
+          "path": "ui/bidding-advice-view.ts",
+          "sha256": "5ed5b0741191b91ead8fe15445ae72d789cd259e16549140d5714f0efa26ccd5"
+        },
+        {
+          "path": "ui/bidding-view.ts",
+          "sha256": "6ea353552efc6630462d310cc4455571733b848b8dbaed71a29774ce1974f8a8"
+        },
+        {
+          "path": "ui/card-choreography.ts",
+          "sha256": "16238429de7c3d8c3fa37a57cf54f83e79ffde5cec86097d0d0a6f0e60e0427b"
+        },
+        {
+          "path": "ui/card-memory-view.ts",
+          "sha256": "5f55b9253b6bf8f3a25a2eba6bfff431dd53b0bfa33f1b1de17edea383153542"
+        },
+        {
+          "path": "ui/card-stage.ts",
+          "sha256": "a9d532504465ba86e8cba8ac4bad35a9c4dad991b2bfc2d4dceed10d9619f1d9"
+        },
+        {
+          "path": "ui/card-view.ts",
+          "sha256": "112fb49e5937ca413e872af7d59b8a31ab5345df7a7b46075946d1fd30e13d73"
+        },
+        {
+          "path": "ui/components/game-scene-skeleton.ts",
+          "sha256": "11258565f088a6477cb34e640668d1be616126ad066b986015664d255d60fced"
+        },
+        {
+          "path": "ui/components/game-scene/audio-vibration.ts",
+          "sha256": "ca5b7229ad0bcfa6006b4512ac19737aaeb9579eb5c4f9726ccf68fa0f9c9785"
+        },
+        {
+          "path": "ui/components/game-scene/bid-actions-renderer.ts",
+          "sha256": "495d2e95ac2c70577acd8f282fe8cb6f2ee8cb60d378db1482f499a762aa13af"
+        },
+        {
+          "path": "ui/components/game-scene/card-animator.ts",
+          "sha256": "2c2baa92cdcd2bf1f3353eecb146495942c8d3d9e22afff36a50c04a0980da3d"
+        },
+        {
+          "path": "ui/components/game-scene/card-node.ts",
+          "sha256": "5bbc49cd3bb74b06fa71dbd788f55ec24fb8a09d9f602248d31b112935709bec"
+        },
+        {
+          "path": "ui/components/game-scene/font-loader.ts",
+          "sha256": "5142da941bb6531a95c08d758618c6d88999dcd97b2e51ce9c15f7471646901a"
+        },
+        {
+          "path": "ui/components/game-scene/fx-program.ts",
+          "sha256": "be8b198d2177a040435d39a991957983961592ee02e31cf8e6a086910f6ecaf3"
+        },
+        {
+          "path": "ui/components/game-scene/hud-renderer.ts",
+          "sha256": "104dd8bf1b06495be2004f6461c516a747c933ccbe6c3751d07f0c3c0202e0c0"
+        },
+        {
+          "path": "ui/components/game-scene/match-log-recorder.ts",
+          "sha256": "f2cfe217250b1d8437e6e96393c22c2780f14abac2391f1d1922bf4ab2029f07"
+        },
+        {
+          "path": "ui/components/game-scene/pause-overlay-renderer.ts",
+          "sha256": "0ceb4fcf594c6a6052545389947e25c6d3d9a7ea38635b2d2f8db6d9a381de81"
+        },
+        {
+          "path": "ui/components/game-scene/play-area-renderer.ts",
+          "sha256": "40b2251673779687453805431cd5a8cc6deba7b4730978fc0ab277c2f0532e46"
+        },
+        {
+          "path": "ui/components/game-scene/result-overlay-renderer.ts",
+          "sha256": "e981355626eaf23ed0be51be33e19581eb52bb1f0609786ac7fcd995d8430adb"
+        },
+        {
+          "path": "ui/components/game-scene/runtime-feedback.ts",
+          "sha256": "05f388a078c678a8980d71ef2a6ce062441af9492e71d669b595dcda728c5ee0"
+        },
+        {
+          "path": "ui/components/game-scene/seat-display.ts",
+          "sha256": "2958090dcf0c90c13034793600513cdeadcbfbc3fbe1d136b3a9fa52fc8a2045"
+        },
+        {
+          "path": "ui/components/game-scene/seats-renderer.ts",
+          "sha256": "a406dd57cdcf2763bf6f8fecc58a5514c2724942b7e66c2953b2e4e06abad9bf"
+        },
+        {
+          "path": "ui/components/game-scene/top-bar-renderer.ts",
+          "sha256": "674b4991daeaa1c6e64969df78bb8963d8a90e31d77d67a475817ecf8a140b1f"
+        },
+        {
+          "path": "ui/components/game-scene/tween-helpers.ts",
+          "sha256": "436f93dd8927013c69c0f53776a5477f9ab89a0f855913e601be6fbf3a36b8d2"
+        },
+        {
+          "path": "ui/components/game-scene/ui-runtime-helpers.ts",
+          "sha256": "43c22c780483f8c8d7fc4edd7ba13edfe11737d0efcb0391594713a8e06bf891"
+        },
+        {
+          "path": "ui/components/lobby-scene.ts",
+          "sha256": "10bf55ab2a0c177efbeca466ed6ef631ee1b193d48d29785ec9bdef7e3b221d4"
+        },
+        {
+          "path": "ui/components/scene-transition.ts",
+          "sha256": "862d2584dc1d65a3e78d1c1e27a6b1ac7092a651478a2022f7b566c7ebcca26e"
+        },
+        {
+          "path": "ui/components/ui-helpers.ts",
+          "sha256": "44c1f017552ee914ff28d61388aff80805d02e51fd36d8e2ee2b6e1c8928c290"
+        },
+        {
+          "path": "ui/difficulty-picker-view.ts",
+          "sha256": "9be055085cfedba4f5666300d570dd70a84e59bf5c61af959cc2fb7a04354215"
+        },
+        {
+          "path": "ui/event-cues.ts",
+          "sha256": "2c4d83f111e0931920b26ecdfe633c1881841babf8e1454c008e6cf688f837d2"
+        },
+        {
+          "path": "ui/follow-ux.ts",
+          "sha256": "822147e82bad399646ff384a60f525aab7939e8a5a8ab73017336bb32a81fa73"
+        },
+        {
+          "path": "ui/hand-interaction.ts",
+          "sha256": "432134a4207f1d658457239282cd4a2a20073ca268559800b04f47cc32171979"
+        },
+        {
+          "path": "ui/hand-layout.ts",
+          "sha256": "7891b336e16f3215a974bc38a8dccba09fb9678bf051684685e0a41680149e68"
+        },
+        {
+          "path": "ui/help-content.ts",
+          "sha256": "99017d5b17dbf0ff9c5ed0f210fa6b7efb0f14a254d2233c5c20fd8aa1b71906"
+        },
+        {
+          "path": "ui/hint-flow.ts",
+          "sha256": "7277ba1179ff3e73d6602648ce4f9ea23c7609ee3926162bc855df3ac515a19b"
+        },
+        {
+          "path": "ui/index.ts",
+          "sha256": "bc937aab5f4e0058010d0b5b58f131533e525907919deedeef8d312b1405d213"
+        },
+        {
+          "path": "ui/insight-view.ts",
+          "sha256": "7a1dbb69d340b937be657f43918594ea46bd937fabac185b3a2c2057fdd0af99"
+        },
+        {
+          "path": "ui/last-action-view.ts",
+          "sha256": "1a773fee6208ea96cc351e514565aaf1fdf5279fe1a7ca922602d1ee4b3cb72a"
+        },
+        {
+          "path": "ui/last-play-view.ts",
+          "sha256": "fce3a3df25da7d0a09397644ab63d22068bcd24526ceb1c6ca90c66da9f5f481"
+        },
+        {
+          "path": "ui/lobby-view.ts",
+          "sha256": "bc2541837d67b3abc057367b16163c3dc204403791c57e27b0ed783ddb7ad896"
+        },
+        {
+          "path": "ui/pattern-label.ts",
+          "sha256": "8170c958ed1168dbf51557ed79ab6364c2346f37ee2fbb8733f6c50b285ae132"
+        },
+        {
+          "path": "ui/pause-menu.ts",
+          "sha256": "23391ec279f060fc0a0efa3ce70aeccc0a3325abb6bc96e3ff2974bc0d5af58b"
+        },
+        {
+          "path": "ui/records-detail-view.ts",
+          "sha256": "f44b5f6ee1d6ff7c6a1745c4d9f7b36d73753291d864ddc993aa079fc879320b"
+        },
+        {
+          "path": "ui/records-view.ts",
+          "sha256": "7ae484cda78241637fc8effc4e4003adec5655a60ebaacedb5a1d207e0352e8a"
+        },
+        {
+          "path": "ui/replay-view.ts",
+          "sha256": "36ca0134636dff958ca3ba4928e67277b4eb7af7fd40212472b86a31d34a98c2"
+        },
+        {
+          "path": "ui/result-view.ts",
+          "sha256": "73abba5cd21d90b629723719fb6a9e8b3075a45f7f69f82369ad3a68ed787b62"
+        },
+        {
+          "path": "ui/resume-rebuild.ts",
+          "sha256": "ae68d8f27f27c0ae63d347c5526aebf37a1b87d2a5c5c001fe3f10dbffcf23e7"
+        },
+        {
+          "path": "ui/score-roll.ts",
+          "sha256": "70df15d49a68f901f446c730184950c6d756e4c2676d805264ce6b3c1db32124"
+        },
+        {
+          "path": "ui/screen-view.ts",
+          "sha256": "c3e97eaa578d95e9eac44a04a3cce44b8b6f8c3e47d5d7faee27d143e95d7aa2"
+        },
+        {
+          "path": "ui/selection.ts",
+          "sha256": "b61cfc6b73a543235e0bc8869ef2c950d901e038fa6226aa5f1eb55a5531e8a3"
+        },
+        {
+          "path": "ui/session-score.ts",
+          "sha256": "f996c45c9800d1ac15b91318e4c5de77093b238149aa2cdbb414360ce62446ed"
+        },
+        {
+          "path": "ui/settings-view.ts",
+          "sha256": "9cdc0e31f4d85bb34fc970864b44d163f546d6f19d3aae66260c4009b3e34fac"
+        },
+        {
+          "path": "ui/settlement-reveal.ts",
+          "sha256": "d913d47722263ff13abe2afcfa22afb71402ff0782e3940cb7499f6ca5f8232a"
+        },
+        {
+          "path": "ui/stats-detail-view.ts",
+          "sha256": "851aa7488f15329a73716d45483fa7c4db8e21f7e503d534989e2735d95d039d"
+        },
+        {
+          "path": "ui/stats-view.ts",
+          "sha256": "dd3aa3797041be56914993af444f18730f9646f468f3ee48da4e8ea89ce6caf2"
+        },
+        {
+          "path": "ui/strength-meter-view.ts",
+          "sha256": "e66541f1c84fa6c54f05fc692169adb5b875b8ea0f02e3d26b1688ceaee4a77b"
+        },
+        {
+          "path": "ui/strings.ts",
+          "sha256": "a2270569a2e9aba7adf253350610977296c200c70b8875609caf08223e5a21b9"
+        },
+        {
+          "path": "ui/table-layout.ts",
+          "sha256": "696eaee26d1d6b1c2fbe69b25b9f38cfc9ee56de6ab5ee0b46189bb3b08ee0f2"
+        },
+        {
+          "path": "ui/table-zones.ts",
+          "sha256": "ec1ec799ac7c5fca3bab294605df388a058bdba2682aba5ab3dd0ddea16847cb"
+        },
+        {
+          "path": "ui/termination-feedback-view.ts",
+          "sha256": "caacfddb02cfd20cd5b2f9fb9562ad0da2c9d1930d3e80fb2706dba09bd54012"
+        },
+        {
+          "path": "ui/theme.ts",
+          "sha256": "1848e4769a98a49d1a988d7145c24e5eb72b91b71a003c6358ef249161f53ed7"
+        },
+        {
+          "path": "ui/toast-queue.ts",
+          "sha256": "ec55c2664a9ec87f281660b58fd9a5f71e722366c6337c40ef59907f64acb726"
+        },
+        {
+          "path": "ui/turn-timer.ts",
+          "sha256": "97a7fcb86ea51917372a3fad3ed7038610ee6d678ac67c65af0d48aac4fbdf4a"
+        },
+        {
+          "path": "ui/tutorial-steps.ts",
+          "sha256": "2a332dd92b3a9cd1dfbf94b9cec846dc788597c150cbc9937b04df48dc2a2e0a"
+        },
+        {
+          "path": "ui/ui-text-colors.ts",
+          "sha256": "9c6ee53e0e831a755ac94b445568030f842a1c4390c8a8aafd634db9b4717527"
+        }
+      ]
+    },
+    "arenaLibSha256": "6654ea6e71823dd5eb7da9722ac073af86d6bef4e16c76f334658289ded81520",
+    "seeds": [
+      500001,
+      500002,
+      500003,
+      500004,
+      500005,
+      500006,
+      500007,
+      500008,
+      500009,
+      500010,
+      500011,
+      500012,
+      500013,
+      500014,
+      500015,
+      500016,
+      500017,
+      500018,
+      500019,
+      500020,
+      500021,
+      500022,
+      500023,
+      500024,
+      500025,
+      500026,
+      500027,
+      500028,
+      500029,
+      500030,
+      500031,
+      500032,
+      500033,
+      500034,
+      500035,
+      500036,
+      500037,
+      500038,
+      500039,
+      500040,
+      500041,
+      500042,
+      500043,
+      500044,
+      500045,
+      500046,
+      500047,
+      500048,
+      500049,
+      500050,
+      500051,
+      500052,
+      500053,
+      500054,
+      500055,
+      500056,
+      500057,
+      500058,
+      500059,
+      500060,
+      500061,
+      500062,
+      500063,
+      500064,
+      500065,
+      500066,
+      500067,
+      500068,
+      500069,
+      500070,
+      500071,
+      500072,
+      500073,
+      500074,
+      500075,
+      500076,
+      500077,
+      500078,
+      500079,
+      500080,
+      500081,
+      500082,
+      500083,
+      500084,
+      500085,
+      500086,
+      500087,
+      500088,
+      500089,
+      500090,
+      500091,
+      500092,
+      500093,
+      500094,
+      500095,
+      500096,
+      500097,
+      500098,
+      500099,
+      500100,
+      500101,
+      500102,
+      500103,
+      500104,
+      500105,
+      500106,
+      500107,
+      500108,
+      500109,
+      500110,
+      500111,
+      500112,
+      500113,
+      500114,
+      500115,
+      500116,
+      500117,
+      500118,
+      500119,
+      500120,
+      500121,
+      500122,
+      500123,
+      500124,
+      500125,
+      500126,
+      500127,
+      500128,
+      500129,
+      500130,
+      500131,
+      500132,
+      500133,
+      500134,
+      500135,
+      500136,
+      500137,
+      500138,
+      500139,
+      500140,
+      500141,
+      500142,
+      500143,
+      500144,
+      500145,
+      500146,
+      500147,
+      500148,
+      500149,
+      500150,
+      500151,
+      500152,
+      500153,
+      500154,
+      500155,
+      500156,
+      500157,
+      500158,
+      500159,
+      500160,
+      500161,
+      500162,
+      500163,
+      500164,
+      500165,
+      500166,
+      500167,
+      500168,
+      500169,
+      500170,
+      500171,
+      500172,
+      500173,
+      500174,
+      500175,
+      500176,
+      500177,
+      500178,
+      500179,
+      500180,
+      500181,
+      500182,
+      500183,
+      500184,
+      500185,
+      500186,
+      500187,
+      500188,
+      500189,
+      500190,
+      500191,
+      500192,
+      500193,
+      500194,
+      500195,
+      500196,
+      500197,
+      500198,
+      500199,
+      500200,
+      500201,
+      500202,
+      500203,
+      500204,
+      500205,
+      500206,
+      500207,
+      500208,
+      500209,
+      500210,
+      500211,
+      500212,
+      500213,
+      500214,
+      500215,
+      500216,
+      500217,
+      500218,
+      500219,
+      500220,
+      500221,
+      500222,
+      500223,
+      500224,
+      500225,
+      500226,
+      500227,
+      500228,
+      500229,
+      500230,
+      500231,
+      500232,
+      500233,
+      500234,
+      500235,
+      500236,
+      500237,
+      500238,
+      500239,
+      500240,
+      500241,
+      500242,
+      500243,
+      500244,
+      500245,
+      500246,
+      500247,
+      500248,
+      500249,
+      500250,
+      500251,
+      500252,
+      500253,
+      500254,
+      500255,
+      500256
+    ],
+    "fixedBid": "frozen-78d125d-hard-all-seats",
+    "protocol": "same seed and targetSeat, candidate target vs 78d125d fillers; 78d125d target vs candidate fillers",
+    "flow": "frozen baseline runHeadlessRound; default startSeat=0; baseScore=1; no thinking delay",
+    "metric": "mean target win difference (pp) and settlement score difference; seed-cluster bootstrap 95% CI",
+    "scope": "increment over pre-upgrade 78d125d; farmer mirror also replaces partner and landlord; no claim of isolated individual-agent effect"
+  },
+  "games": [
+    {"seed":500001,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500001,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500001,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500001,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500001,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500001,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500002,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500002,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500002,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500002,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500002,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500002,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500003,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500003,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500003,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500003,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500003,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500003,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500004,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500004,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500004,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500004,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500004,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500004,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":500005,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500005,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500005,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500005,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500005,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500005,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500006,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500006,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500006,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500006,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500006,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500006,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500007,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500007,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500007,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500007,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500007,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500007,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500008,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500008,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500008,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500008,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500008,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500008,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500009,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500009,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500009,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500009,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500009,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500009,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500010,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500010,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500010,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500010,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500010,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500010,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500011,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500011,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500011,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500011,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500011,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500011,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500012,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500012,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500012,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500012,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500012,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500012,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500013,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500013,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500013,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500013,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500013,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500013,"targetSeat":2,"targetSide":"new","targetScore":1,"landlord":1},
+    {"seed":500014,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500014,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500014,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500014,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500014,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":2},
+    {"seed":500014,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500015,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500015,"targetSeat":0,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500015,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500015,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500015,"targetSeat":2,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500015,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500016,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500016,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500016,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500016,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500016,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500016,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500017,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500017,"targetSeat":0,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500017,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500017,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500017,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500017,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500018,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500018,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500018,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500018,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500018,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500018,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500019,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500019,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500019,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500019,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500019,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500019,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500020,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500020,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500020,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500020,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500020,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500020,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500021,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500021,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500021,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500021,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500021,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500021,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500022,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500022,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500022,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500022,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500022,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500022,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500023,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500023,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500023,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500023,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500023,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500023,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500024,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500024,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500024,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500024,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500024,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500024,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500025,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500025,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500025,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500025,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500025,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500025,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500026,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500026,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500026,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500026,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500026,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500026,"targetSeat":2,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500027,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500027,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500027,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500027,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500027,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500027,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500028,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500028,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500028,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500028,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500028,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500028,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500029,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500029,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500029,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500029,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500029,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500029,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500030,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500030,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500030,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500030,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500030,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500030,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500031,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500031,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500031,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500031,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500031,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500031,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500032,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500032,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500032,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500032,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500032,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500032,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500033,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500033,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500033,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500033,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500033,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500033,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500034,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500034,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500034,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500034,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500034,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500034,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500035,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500035,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500035,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500035,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500035,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500035,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500036,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500036,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500036,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500036,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500036,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500036,"targetSeat":2,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500037,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500037,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500037,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500037,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500037,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500037,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":500038,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500038,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500038,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500038,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500038,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500038,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500039,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500039,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500039,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500039,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":1},
+    {"seed":500039,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500039,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500040,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500040,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500040,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500040,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500040,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500040,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500041,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500041,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500041,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500041,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500041,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500041,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500042,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500042,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500042,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500042,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500042,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500042,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500043,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500043,"targetSeat":0,"targetSide":"new","targetScore":1,"landlord":1},
+    {"seed":500043,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500043,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500043,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500043,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500044,"targetSeat":0,"targetSide":"legacy","targetScore":64,"landlord":0},
+    {"seed":500044,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500044,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500044,"targetSeat":1,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500044,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500044,"targetSeat":2,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500045,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500045,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500045,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500045,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500045,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500045,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500046,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500046,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500046,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500046,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500046,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500046,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500047,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500047,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500047,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500047,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500047,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500047,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500048,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500048,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500048,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500048,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500048,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500048,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":500049,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500049,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500049,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500049,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500049,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500049,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500050,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500050,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500050,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500050,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500050,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500050,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500051,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500051,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500051,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500051,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500051,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500051,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500052,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500052,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500052,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500052,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500052,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500052,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500053,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500053,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500053,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500053,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500053,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":2},
+    {"seed":500053,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500054,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500054,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500054,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500054,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500054,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500054,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500055,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500055,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500055,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500055,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500055,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":2},
+    {"seed":500055,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":2},
+    {"seed":500056,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500056,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500056,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500056,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500056,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500056,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500057,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500057,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500057,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500057,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500057,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500057,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500058,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500058,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500058,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500058,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500058,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500058,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500059,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500059,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500059,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500059,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500059,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500059,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500060,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500060,"targetSeat":0,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500060,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500060,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500060,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500060,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500061,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500061,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500061,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500061,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500061,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500061,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500062,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500062,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500062,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500062,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500062,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500062,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500063,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500063,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500063,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500063,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500063,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500063,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500064,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500064,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500064,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500064,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500064,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500064,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500065,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500065,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500065,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500065,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500065,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500065,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500066,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500066,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500066,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500066,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500066,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500066,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500067,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500067,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500067,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500067,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500067,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500067,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500068,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500068,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500068,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500068,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500068,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500068,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500069,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500069,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500069,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500069,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500069,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500069,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500070,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500070,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500070,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500070,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500070,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500070,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500071,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500071,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500071,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500071,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500071,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500071,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500072,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500072,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500072,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500072,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500072,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500072,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500073,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500073,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500073,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500073,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500073,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500073,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500074,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500074,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500074,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500074,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500074,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500074,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500075,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500075,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500075,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500075,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":1},
+    {"seed":500075,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500075,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500076,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500076,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500076,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500076,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500076,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500076,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500077,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500077,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500077,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500077,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":1},
+    {"seed":500077,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500077,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500078,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500078,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500078,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500078,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500078,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500078,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500079,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500079,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500079,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500079,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500079,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500079,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500080,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500080,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500080,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500080,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500080,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500080,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500081,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500081,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500081,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500081,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500081,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500081,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500082,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500082,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500082,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500082,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500082,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500082,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500083,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500083,"targetSeat":0,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500083,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500083,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":2},
+    {"seed":500083,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500083,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500084,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500084,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500084,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500084,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500084,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500084,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500085,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500085,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500085,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500085,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500085,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500085,"targetSeat":2,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500086,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500086,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500086,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500086,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500086,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500086,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500087,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500087,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500087,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500087,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500087,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500087,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500088,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500088,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500088,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500088,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500088,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500088,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":500089,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500089,"targetSeat":0,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500089,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500089,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500089,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500089,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500090,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500090,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500090,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500090,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500090,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500090,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500091,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500091,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500091,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500091,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500091,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500091,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500092,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500092,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500092,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500092,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500092,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500092,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500093,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500093,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500093,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500093,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500093,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500093,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500094,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500094,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500094,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500094,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500094,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":2},
+    {"seed":500094,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":2},
+    {"seed":500095,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500095,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500095,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500095,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500095,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500095,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500096,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500096,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500096,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500096,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500096,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500096,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500097,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500097,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500097,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500097,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500097,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500097,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500098,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500098,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500098,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500098,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500098,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500098,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500099,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500099,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500099,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500099,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500099,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500099,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500100,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500100,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500100,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500100,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500100,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500100,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500101,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500101,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500101,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500101,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500101,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500101,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500102,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500102,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500102,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500102,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500102,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500102,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500103,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500103,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500103,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500103,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500103,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500103,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500104,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500104,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500104,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500104,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500104,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500104,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500105,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500105,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500105,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500105,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500105,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500105,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500106,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500106,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500106,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500106,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500106,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500106,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500107,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500107,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500107,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500107,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500107,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500107,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500108,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500108,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500108,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500108,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500108,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500108,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500109,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500109,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500109,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500109,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500109,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500109,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500110,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500110,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500110,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500110,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500110,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500110,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500111,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500111,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500111,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500111,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500111,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500111,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500112,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500112,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500112,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500112,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500112,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500112,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":500113,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500113,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500113,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500113,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500113,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500113,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500114,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500114,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500114,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500114,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500114,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500114,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500115,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500115,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500115,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500115,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500115,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500115,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500116,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500116,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500116,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500116,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500116,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500116,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500117,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500117,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500117,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500117,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500117,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500117,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500118,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500118,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500118,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500118,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500118,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500118,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500119,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500119,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500119,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500119,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500119,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500119,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500120,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500120,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500120,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500120,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500120,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500120,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500121,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500121,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500121,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500121,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500121,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500121,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500122,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500122,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500122,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500122,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500122,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500122,"targetSeat":2,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500123,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500123,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":2},
+    {"seed":500123,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500123,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":2},
+    {"seed":500123,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500123,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500124,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500124,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500124,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500124,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500124,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500124,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500125,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500125,"targetSeat":0,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500125,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500125,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500125,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500125,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500126,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500126,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500126,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500126,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500126,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500126,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500127,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500127,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500127,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500127,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500127,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500127,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500128,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500128,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500128,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500128,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500128,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500128,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500129,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500129,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500129,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500129,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500129,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500129,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500130,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500130,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500130,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500130,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500130,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500130,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500131,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500131,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500131,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500131,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500131,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500131,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500132,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500132,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500132,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500132,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500132,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500132,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500133,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500133,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500133,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500133,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500133,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500133,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500134,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500134,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500134,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500134,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":1},
+    {"seed":500134,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500134,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500135,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500135,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500135,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500135,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500135,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":2},
+    {"seed":500135,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500136,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500136,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500136,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500136,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500136,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500136,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500137,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500137,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500137,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500137,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500137,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500137,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500138,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500138,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500138,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500138,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500138,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500138,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500139,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500139,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500139,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500139,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500139,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500139,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500140,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500140,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500140,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500140,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500140,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500140,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500141,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500141,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500141,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500141,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500141,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500141,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500142,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500142,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500142,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500142,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500142,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500142,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500143,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500143,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500143,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500143,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500143,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500143,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500144,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500144,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500144,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500144,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500144,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500144,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500145,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500145,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":1},
+    {"seed":500145,"targetSeat":1,"targetSide":"legacy","targetScore":-32,"landlord":1},
+    {"seed":500145,"targetSeat":1,"targetSide":"new","targetScore":32,"landlord":1},
+    {"seed":500145,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500145,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":1},
+    {"seed":500146,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500146,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500146,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500146,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500146,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500146,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500147,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500147,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500147,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500147,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500147,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500147,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":2},
+    {"seed":500148,"targetSeat":0,"targetSide":"legacy","targetScore":-64,"landlord":0},
+    {"seed":500148,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500148,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500148,"targetSeat":1,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500148,"targetSeat":2,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500148,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500149,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500149,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500149,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500149,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500149,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500149,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500150,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500150,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500150,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500150,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500150,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500150,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500151,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500151,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500151,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500151,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500151,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500151,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500152,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500152,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500152,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500152,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500152,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500152,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500153,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500153,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500153,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500153,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500153,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500153,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500154,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500154,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500154,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500154,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500154,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500154,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500155,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500155,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500155,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500155,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500155,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500155,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500156,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500156,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500156,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500156,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500156,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500156,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500157,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500157,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500157,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500157,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500157,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500157,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500158,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500158,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500158,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500158,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":1},
+    {"seed":500158,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500158,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500159,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500159,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500159,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500159,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500159,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500159,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500160,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500160,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500160,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500160,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500160,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500160,"targetSeat":2,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500161,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500161,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500161,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500161,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500161,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500161,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500162,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500162,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500162,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500162,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500162,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500162,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500163,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500163,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":500163,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500163,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":2},
+    {"seed":500163,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":2},
+    {"seed":500163,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":500164,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500164,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500164,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500164,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500164,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500164,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500165,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500165,"targetSeat":0,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500165,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500165,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500165,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500165,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500166,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500166,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500166,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500166,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500166,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500166,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500167,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500167,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500167,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500167,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500167,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500167,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500168,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500168,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500168,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500168,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500168,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500168,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500169,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500169,"targetSeat":0,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500169,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500169,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500169,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500169,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500170,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500170,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500170,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500170,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500170,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500170,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500171,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500171,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500171,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500171,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500171,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500171,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500172,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500172,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500172,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500172,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500172,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":2},
+    {"seed":500172,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500173,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500173,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500173,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500173,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500173,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500173,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500174,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500174,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500174,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500174,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500174,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500174,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500175,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500175,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500175,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500175,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500175,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500175,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500176,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500176,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500176,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500176,"targetSeat":1,"targetSide":"new","targetScore":-64,"landlord":0},
+    {"seed":500176,"targetSeat":2,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500176,"targetSeat":2,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500177,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500177,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":2},
+    {"seed":500177,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500177,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500177,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500177,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500178,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500178,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500178,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500178,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500178,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500178,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500179,"targetSeat":0,"targetSide":"legacy","targetScore":-64,"landlord":0},
+    {"seed":500179,"targetSeat":0,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500179,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500179,"targetSeat":1,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500179,"targetSeat":2,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500179,"targetSeat":2,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500180,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500180,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500180,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500180,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500180,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500180,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500181,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500181,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500181,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500181,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500181,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500181,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500182,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500182,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500182,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500182,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500182,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500182,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500183,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500183,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500183,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500183,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500183,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500183,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500184,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500184,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500184,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500184,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500184,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500184,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500185,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500185,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500185,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500185,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500185,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500185,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500186,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500186,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500186,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500186,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500186,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500186,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500187,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500187,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500187,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500187,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500187,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500187,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500188,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500188,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500188,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500188,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500188,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500188,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500189,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500189,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500189,"targetSeat":1,"targetSide":"legacy","targetScore":2,"landlord":1},
+    {"seed":500189,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500189,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500189,"targetSeat":2,"targetSide":"new","targetScore":1,"landlord":1},
+    {"seed":500190,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500190,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500190,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500190,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500190,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500190,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500191,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500191,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500191,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500191,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500191,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500191,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500192,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500192,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500192,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500192,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500192,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500192,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500193,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500193,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500193,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500193,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500193,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500193,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500194,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500194,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500194,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500194,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500194,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500194,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500195,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500195,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500195,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500195,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500195,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500195,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500196,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500196,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500196,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500196,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500196,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500196,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500197,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500197,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500197,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500197,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500197,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500197,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500198,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500198,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":2},
+    {"seed":500198,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500198,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":2},
+    {"seed":500198,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":2},
+    {"seed":500198,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500199,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500199,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500199,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500199,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500199,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500199,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500200,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500200,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500200,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500200,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500200,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500200,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":2},
+    {"seed":500201,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500201,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500201,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500201,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500201,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500201,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500202,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500202,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":2},
+    {"seed":500202,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500202,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":2},
+    {"seed":500202,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":2},
+    {"seed":500202,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":2},
+    {"seed":500203,"targetSeat":0,"targetSide":"legacy","targetScore":2,"landlord":0},
+    {"seed":500203,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500203,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500203,"targetSeat":1,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500203,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500203,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":0},
+    {"seed":500204,"targetSeat":0,"targetSide":"legacy","targetScore":-128,"landlord":0},
+    {"seed":500204,"targetSeat":0,"targetSide":"new","targetScore":-64,"landlord":0},
+    {"seed":500204,"targetSeat":1,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500204,"targetSeat":1,"targetSide":"new","targetScore":-128,"landlord":0},
+    {"seed":500204,"targetSeat":2,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500204,"targetSeat":2,"targetSide":"new","targetScore":128,"landlord":0},
+    {"seed":500205,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500205,"targetSeat":0,"targetSide":"new","targetScore":1,"landlord":1},
+    {"seed":500205,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500205,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500205,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500205,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500206,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500206,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500206,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500206,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500206,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500206,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500207,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500207,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500207,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500207,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500207,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500207,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500208,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500208,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500208,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500208,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500208,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500208,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500209,"targetSeat":0,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500209,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500209,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500209,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500209,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500209,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500210,"targetSeat":0,"targetSide":"legacy","targetScore":-128,"landlord":0},
+    {"seed":500210,"targetSeat":0,"targetSide":"new","targetScore":-64,"landlord":0},
+    {"seed":500210,"targetSeat":1,"targetSide":"legacy","targetScore":64,"landlord":0},
+    {"seed":500210,"targetSeat":1,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500210,"targetSeat":2,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500210,"targetSeat":2,"targetSide":"new","targetScore":64,"landlord":0},
+    {"seed":500211,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500211,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500211,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500211,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500211,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500211,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500212,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500212,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500212,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500212,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500212,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500212,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500213,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500213,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500213,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500213,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500213,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500213,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500214,"targetSeat":0,"targetSide":"legacy","targetScore":-32,"landlord":0},
+    {"seed":500214,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500214,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500214,"targetSeat":1,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500214,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500214,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500215,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500215,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500215,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500215,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500215,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500215,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500216,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500216,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":2},
+    {"seed":500216,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500216,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500216,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":2},
+    {"seed":500216,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500217,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500217,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500217,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500217,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500217,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500217,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500218,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500218,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500218,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500218,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500218,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500218,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500219,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500219,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500219,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500219,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500219,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500219,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500220,"targetSeat":0,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500220,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500220,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500220,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500220,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":0},
+    {"seed":500220,"targetSeat":2,"targetSide":"new","targetScore":1,"landlord":0},
+    {"seed":500221,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500221,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":1},
+    {"seed":500221,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500221,"targetSeat":1,"targetSide":"new","targetScore":32,"landlord":1},
+    {"seed":500221,"targetSeat":2,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500221,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500222,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500222,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500222,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500222,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500222,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500222,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500223,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500223,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500223,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500223,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500223,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500223,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500224,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500224,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500224,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500224,"targetSeat":1,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500224,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500224,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500225,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":1},
+    {"seed":500225,"targetSeat":0,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500225,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":1},
+    {"seed":500225,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500225,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500225,"targetSeat":2,"targetSide":"new","targetScore":-1,"landlord":1},
+    {"seed":500226,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500226,"targetSeat":0,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500226,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500226,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500226,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500226,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500227,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500227,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500227,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500227,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500227,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500227,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500228,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500228,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500228,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500228,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500228,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500228,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500229,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500229,"targetSeat":0,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500229,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500229,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500229,"targetSeat":2,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500229,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500230,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500230,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500230,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500230,"targetSeat":1,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500230,"targetSeat":2,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500230,"targetSeat":2,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500231,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500231,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500231,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500231,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500231,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500231,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500232,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500232,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500232,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":1},
+    {"seed":500232,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500232,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500232,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500233,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500233,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500233,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500233,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500233,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500233,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500234,"targetSeat":0,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500234,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500234,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500234,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500234,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500234,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500235,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500235,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500235,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500235,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500235,"targetSeat":2,"targetSide":"legacy","targetScore":-1,"landlord":0},
+    {"seed":500235,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500236,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500236,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500236,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500236,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500236,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500236,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500237,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500237,"targetSeat":0,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500237,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500237,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":1},
+    {"seed":500237,"targetSeat":2,"targetSide":"legacy","targetScore":1,"landlord":1},
+    {"seed":500237,"targetSeat":2,"targetSide":"new","targetScore":2,"landlord":1},
+    {"seed":500238,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500238,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":0},
+    {"seed":500238,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500238,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500238,"targetSeat":2,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500238,"targetSeat":2,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500239,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500239,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500239,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500239,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":1},
+    {"seed":500239,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500239,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500240,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500240,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500240,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500240,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500240,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500240,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500241,"targetSeat":0,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500241,"targetSeat":0,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500241,"targetSeat":1,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500241,"targetSeat":1,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500241,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":2},
+    {"seed":500241,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500242,"targetSeat":0,"targetSide":"legacy","targetScore":1,"landlord":2},
+    {"seed":500242,"targetSeat":0,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500242,"targetSeat":1,"targetSide":"legacy","targetScore":-1,"landlord":2},
+    {"seed":500242,"targetSeat":1,"targetSide":"new","targetScore":1,"landlord":2},
+    {"seed":500242,"targetSeat":2,"targetSide":"legacy","targetScore":2,"landlord":2},
+    {"seed":500242,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":2},
+    {"seed":500243,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500243,"targetSeat":0,"targetSide":"new","targetScore":16,"landlord":1},
+    {"seed":500243,"targetSeat":1,"targetSide":"legacy","targetScore":-32,"landlord":1},
+    {"seed":500243,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":1},
+    {"seed":500243,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500243,"targetSeat":2,"targetSide":"new","targetScore":16,"landlord":1},
+    {"seed":500244,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500244,"targetSeat":0,"targetSide":"new","targetScore":-16,"landlord":0},
+    {"seed":500244,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500244,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500244,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500244,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500245,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500245,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500245,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500245,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500245,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500245,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500246,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500246,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":1},
+    {"seed":500246,"targetSeat":1,"targetSide":"legacy","targetScore":-16,"landlord":1},
+    {"seed":500246,"targetSeat":1,"targetSide":"new","targetScore":-16,"landlord":1},
+    {"seed":500246,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500246,"targetSeat":2,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500247,"targetSeat":0,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500247,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500247,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500247,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500247,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500247,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500248,"targetSeat":0,"targetSide":"legacy","targetScore":32,"landlord":0},
+    {"seed":500248,"targetSeat":0,"targetSide":"new","targetScore":-32,"landlord":0},
+    {"seed":500248,"targetSeat":1,"targetSide":"legacy","targetScore":16,"landlord":0},
+    {"seed":500248,"targetSeat":1,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500248,"targetSeat":2,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500248,"targetSeat":2,"targetSide":"new","targetScore":32,"landlord":0},
+    {"seed":500249,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500249,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500249,"targetSeat":1,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500249,"targetSeat":1,"targetSide":"new","targetScore":2,"landlord":0},
+    {"seed":500249,"targetSeat":2,"targetSide":"legacy","targetScore":-2,"landlord":0},
+    {"seed":500249,"targetSeat":2,"targetSide":"new","targetScore":-2,"landlord":0},
+    {"seed":500250,"targetSeat":0,"targetSide":"legacy","targetScore":-16,"landlord":0},
+    {"seed":500250,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500250,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":0},
+    {"seed":500250,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500250,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500250,"targetSeat":2,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500251,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500251,"targetSeat":0,"targetSide":"new","targetScore":4,"landlord":1},
+    {"seed":500251,"targetSeat":1,"targetSide":"legacy","targetScore":-8,"landlord":1},
+    {"seed":500251,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500251,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500251,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500252,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500252,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500252,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500252,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500252,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500252,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500253,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500253,"targetSeat":0,"targetSide":"new","targetScore":-8,"landlord":0},
+    {"seed":500253,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500253,"targetSeat":1,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500253,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500253,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500254,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500254,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500254,"targetSeat":1,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500254,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500254,"targetSeat":2,"targetSide":"legacy","targetScore":4,"landlord":0},
+    {"seed":500254,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500255,"targetSeat":0,"targetSide":"legacy","targetScore":-8,"landlord":0},
+    {"seed":500255,"targetSeat":0,"targetSide":"new","targetScore":8,"landlord":0},
+    {"seed":500255,"targetSeat":1,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500255,"targetSeat":1,"targetSide":"new","targetScore":4,"landlord":0},
+    {"seed":500255,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":0},
+    {"seed":500255,"targetSeat":2,"targetSide":"new","targetScore":-4,"landlord":0},
+    {"seed":500256,"targetSeat":0,"targetSide":"legacy","targetScore":4,"landlord":1},
+    {"seed":500256,"targetSeat":0,"targetSide":"new","targetScore":-4,"landlord":1},
+    {"seed":500256,"targetSeat":1,"targetSide":"legacy","targetScore":8,"landlord":1},
+    {"seed":500256,"targetSeat":1,"targetSide":"new","targetScore":-8,"landlord":1},
+    {"seed":500256,"targetSeat":2,"targetSide":"legacy","targetScore":-4,"landlord":1},
+    {"seed":500256,"targetSeat":2,"targetSide":"new","targetScore":4,"landlord":1}
+  ],
+  "summary": {
+    "pairs": 768,
+    "games": 1536,
+    "complete": true,
+    "newWinRate": 0.5182,
+    "legacyWinRate": 0.4714,
+    "mirrorWinRateDiffPp": 4.6875,
+    "avgPairedScoreDiff": 0.9271,
+    "selfMismatchPairs": 423,
+    "seedClusters": 256,
+    "ciMethod": "seed-cluster-bootstrap",
+    "avgPairedScoreDiffCI": {
+      "lo": 0.0026,
+      "hi": 1.9479
+    },
+    "mirrorWinRateDiffPpCI": {
+      "lo": 0.5208,
+      "hi": 9.2448
+    },
+    "byRole": [
+      {
+        "role": "landlord",
+        "pairs": 256,
+        "mirrorWinRateDiffPp": 8.5938,
+        "avgPairedScoreDiff": 2.2656
+      },
+      {
+        "role": "upper",
+        "pairs": 256,
+        "mirrorWinRateDiffPp": 6.25,
+        "avgPairedScoreDiff": 1.5352
+      },
+      {
+        "role": "lower",
+        "pairs": 256,
+        "mirrorWinRateDiffPp": -0.7812,
+        "avgPairedScoreDiff": -1.0195
+      }
+    ],
+    "landlordSplitPairs": 0
+  },
+  "roleSummaries": [
+    {
+      "role": "landlord",
+      "pairs": 256,
+      "games": 512,
+      "complete": true,
+      "newWinRate": 0.5547,
+      "legacyWinRate": 0.4688,
+      "mirrorWinRateDiffPp": 8.5938,
+      "avgPairedScoreDiff": 2.2656,
+      "selfMismatchPairs": 136,
+      "seedClusters": 256,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": 0.2813,
+        "hi": 4.5156
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": 2.3438,
+        "hi": 14.8438
+      },
+      "byRole": [
+        {
+          "role": "landlord",
+          "pairs": 256,
+          "mirrorWinRateDiffPp": 8.5938,
+          "avgPairedScoreDiff": 2.2656
+        }
+      ],
+      "landlordSplitPairs": 0
+    },
+    {
+      "role": "upper",
+      "pairs": 256,
+      "games": 512,
+      "complete": true,
+      "newWinRate": 0.5273,
+      "legacyWinRate": 0.4648,
+      "mirrorWinRateDiffPp": 6.25,
+      "avgPairedScoreDiff": 1.5352,
+      "selfMismatchPairs": 138,
+      "seedClusters": 256,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": 0.1875,
+        "hi": 3.0508
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": -0.3906,
+        "hi": 12.8906
+      },
+      "byRole": [
+        {
+          "role": "upper",
+          "pairs": 256,
+          "mirrorWinRateDiffPp": 6.25,
+          "avgPairedScoreDiff": 1.5352
+        }
+      ],
+      "landlordSplitPairs": 0
+    },
+    {
+      "role": "lower",
+      "pairs": 256,
+      "games": 512,
+      "complete": true,
+      "newWinRate": 0.4727,
+      "legacyWinRate": 0.4805,
+      "mirrorWinRateDiffPp": -0.7812,
+      "avgPairedScoreDiff": -1.0195,
+      "selfMismatchPairs": 149,
+      "seedClusters": 256,
+      "ciMethod": "seed-cluster-bootstrap",
+      "avgPairedScoreDiffCI": {
+        "lo": -2.918,
+        "hi": 0.4688
+      },
+      "mirrorWinRateDiffPpCI": {
+        "lo": -7.8125,
+        "hi": 7.0313
+      },
+      "byRole": [
+        {
+          "role": "lower",
+          "pairs": 256,
+          "mirrorWinRateDiffPp": -0.7812,
+          "avgPairedScoreDiff": -1.0195
+        }
+      ],
+      "landlordSplitPairs": 0
+    }
+  ],
+  "verdict": {
+    "pass": false,
+    "reasons": [
+      "镜像胜率差不足: 4.6875pp < 5pp"
+    ]
+  },
+  "strongFivePpEvidence": false
+}

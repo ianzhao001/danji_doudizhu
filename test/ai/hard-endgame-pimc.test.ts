@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { hardStrategy, hardStrategyWithProfile } from '../../assets/scripts/ai/levels/hard';
 import { installDecisionSink, uninstallDecisionSink } from '../../assets/scripts/ai/decision-log';
-import { capturePimcRanks } from '../../assets/scripts/ai/pimc';
+import { HARD_PIMC, HINT_PIMC, capturePimcRanks } from '../../assets/scripts/ai/pimc';
 import { certainLandlordByRank } from '../../assets/scripts/ai/cardMemory';
 import { solveWorld } from '../../assets/scripts/ai/worldSolver';
 import { toRankCounts } from '../../assets/scripts/ai/rollout';
-import { Rank, createDeck, legalFollows, recognize, type Card } from '../../assets/scripts/rules';
-import { GamePhase, type GameEvent, type GameSnapshot } from '../../assets/scripts/game';
+import { Rank, createDeck, createRng, deal, legalFollows, recognize, type Card } from '../../assets/scripts/rules';
+import { GamePhase, apply, createPlayingRound, snapshot as publicSnapshot, type GameEvent, type GameSnapshot } from '../../assets/scripts/game';
 import { runHeadlessRound } from '../../assets/scripts/flow';
 import { v19BidByName, v19StrategyByName } from '../fixtures/ai-v19/v19';
 import { cards } from '../rules/_util';
@@ -51,7 +51,7 @@ function teammatePairFixture(): { snapshot: GameSnapshot; history: GameEvent[] }
   };
 }
 
-describe('hard endgame team-aware arbitration', () => {
+describe('hard public-world team-aware arbitration', () => {
   it('passes a safe teammate top to preserve its winning pair instead of stealing the lead', () => {
     const { snapshot, history } = teammatePairFixture();
     const plays = history.filter((event): event is Extract<GameEvent, { type: 'play' }> => event.type === 'play');
@@ -92,7 +92,7 @@ describe('hard endgame team-aware arbitration', () => {
     expect(incomplete.value).toEqual(ablation.value);
   });
 
-  it('opens the new arbitration at 16 cards but preserves the prior path at 17 in a real replay', async () => {
+  it('arbitrates both 16-card and 17-card positions in a real public replay', async () => {
     const paths: Array<{ total: number; path: string }> = [];
     let turn = 0;
     const frozen = v19StrategyByName('hard');
@@ -115,9 +115,116 @@ describe('hard endgame team-aware arbitration', () => {
       },
     });
     expect(paths).toEqual([
-      { total: 17, path: 'pressing-lead' },
-      { total: 16, path: 'endgame-pimc' },
+      { total: 17, path: 'world-pimc' },
+      { total: 16, path: 'world-pimc' },
     ]);
+  });
+
+  it('keeps opening lead search at 54 cards and switches to world arbitration after the first single', () => {
+    const initial = createPlayingRound(deal(createRng(14)), 0);
+    const originalDeck = initial.seats.flatMap(seat => seat.hand);
+    expect(originalDeck).toHaveLength(54);
+    expect(new Set(originalDeck.map(key)).size).toBe(54);
+    const opening = publicSnapshot(initial, initial.turn);
+    const leadCard = initial.seats[initial.turn]!.hand.slice().sort((a, b) => a.rank - b.rank)[0]!;
+    // Apply a legal single through the production state machine, rather than
+    // synthesizing a lower handCount or inventing a public-history event.
+    const next = apply(initial, { type: 'play', seat: initial.turn, cards: [leadCard] });
+    const following = publicSnapshot(next.state, next.state.turn);
+    const played = next.events.flatMap(event => event.type === 'play' ? event.pattern.cards : []);
+    const accounted = [...next.state.seats.flatMap(seat => seat.hand), ...played];
+    expect(accounted.map(key).sort()).toEqual(originalDeck.map(key).sort());
+    expect(new Set(accounted.map(key)).size).toBe(54);
+    expect(opening.handCounts.reduce((a, b) => a + b, 0)).toBe(54);
+    expect(following.handCounts.reduce((a, b) => a + b, 0)).toBe(53);
+    const frames = [
+      { state: initial, snapshot: opening, history: [] as GameEvent[], path: 'lead-pimc' },
+      { state: next.state, snapshot: following, history: next.events, path: 'world-pimc' },
+    ];
+    for (const frame of frames) {
+      const before = JSON.stringify(frame);
+      const paths: string[] = [];
+      installDecisionSink({ publish: decision => { paths.push(decision.path); } });
+      let loggedAction: ReturnType<typeof hardStrategy>;
+      try { loggedAction = hardStrategy(frame.snapshot, rng, frame.history); }
+      finally { uninstallDecisionSink(); }
+      const result = capturePimcRanks(() => hardStrategy(frame.snapshot, rng, frame.history));
+      expect(result.value).toEqual(loggedAction);
+      expect(paths).toEqual([frame.path]);
+      expect(result.rankings).toHaveLength(1);
+      const ranked = result.rankings[0]!;
+      expect(ranked.filter(option => option.move !== null).length).toBeLessThanOrEqual(HARD_PIMC.maxCandidates);
+      expect(ranked.some(option => option.move === null)).toBe(frame.snapshot.top !== null);
+      expect(result.value).toEqual(ranked[0]!.move === null
+        ? { type: 'pass', seat: frame.snapshot.turn }
+        : { type: 'play', seat: frame.snapshot.turn, cards: ranked[0]!.move!.cards });
+      // Production apply validates ownership, card shape, beating the top,
+      // turn ownership, and the prohibition on passing an empty trick.
+      expect(() => apply(frame.state, result.value)).not.toThrow();
+      expect(hardStrategy(frame.snapshot, { next: () => { throw new Error('external RNG consumed'); } }, frame.history))
+        .toEqual(result.value);
+      expect(JSON.stringify(frame)).toBe(before);
+    }
+  });
+
+  it('arbitrates public middle-game frames with legal actions matching its ranking', async () => {
+    const frames: Array<{ snapshot: GameSnapshot; history: GameEvent[] }> = [];
+    let turn = 0;
+    const frozen = v19StrategyByName('hard');
+    await runHeadlessRound({
+      seed: 14,
+      bidPolicy: ({ state, hand }) => v19BidByName(hand, state, 'hard'),
+      playPolicy: ({ snapshot, history, rng: roundRng }) => {
+        if ([10, 20].includes(turn)) frames.push(JSON.parse(JSON.stringify({ snapshot, history })));
+        turn += 1;
+        return frozen(snapshot, roundRng, history);
+      },
+    });
+    expect(frames).toHaveLength(2);
+    for (const frame of frames) {
+      const { snapshot, history } = frame;
+      expect(snapshot.handCounts.reduce((sum, count) => sum + count, 0)).toBeGreaterThan(16);
+      const before = JSON.stringify(frame);
+      const decisions: string[] = [];
+      installDecisionSink({ publish: decision => { decisions.push(decision.path); } });
+      try { hardStrategy(snapshot, rng, history); }
+      finally { uninstallDecisionSink(); }
+      const result = capturePimcRanks(() => hardStrategy(snapshot, rng, history));
+      expect(decisions).toEqual(['world-pimc']);
+      expect(result.rankings).toHaveLength(1);
+      const ranked = result.rankings[0]!;
+      expect(ranked.filter(option => option.move !== null).length).toBeLessThanOrEqual(HARD_PIMC.maxCandidates);
+      expect(ranked.some(option => option.move === null)).toBe(snapshot.top !== null);
+      const best = ranked[0]!;
+      const action = result.value;
+      expect(action).toEqual(best.move === null
+        ? { type: 'pass', seat: snapshot.turn }
+        : { type: 'play', seat: snapshot.turn, cards: best.move.cards });
+      if (action.type === 'pass') {
+        expect(snapshot.top).not.toBeNull();
+      } else if (action.type === 'play') {
+        expect(recognize(action.cards)).not.toBeNull();
+        const held = new Set(snapshot.viewerHand!.map(key));
+        expect(action.cards.every(card => held.has(key(card)))).toBe(true);
+        if (snapshot.top) expect(legalFollows(snapshot.viewerHand!, snapshot.top.pattern)
+          .some(move => move.cards.map(key).sort().join('|') === action.cards.map(key).sort().join('|'))).toBe(true);
+      }
+      expect(hardStrategy(snapshot, { next: () => { throw new Error('external RNG consumed'); } }, history)).toEqual(action);
+      const zeroSample = hardStrategyWithProfile({ samples: 0, maxCandidates: 8 });
+      expect(capturePimcRanks(() => zeroSample(snapshot, rng, history)).rankings).toHaveLength(0);
+      if (history.some(event => event.type === 'play')) {
+        expect(capturePimcRanks(() => hardStrategy(snapshot, rng, [])).rankings).toHaveLength(0);
+      }
+      expect(JSON.stringify(frame)).toBe(before);
+    }
+  });
+
+  it('extends exact-world coverage without raising sampling, candidate or node budgets', () => {
+    expect(HARD_PIMC).toEqual({ samples: 48, maxCandidates: 8 });
+    expect(HARD_PIMC.solverCardMax).toBe(16);
+    expect(HARD_PIMC.solverNodes).toBe(120_000);
+    expect(HINT_PIMC).toEqual({ samples: 160, maxCandidates: 12 });
+    expect(HINT_PIMC.solverNodes).toBe(300_000);
   });
 
   it('keeps real frozen-policy replay decisions legal, deterministic and within the candidate cap', async () => {

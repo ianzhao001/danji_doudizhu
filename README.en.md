@@ -6,7 +6,7 @@ This is an offline, single-player Dou Dizhu project built with Cocos Creator 3.8
 
 The current release is v1.9-R4, adding local match logs and export while continuing to improve Hard-AI cooperation, power-card protection, and search behavior; see [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md). The repository is intended to be runnable from source by people who do not have a software-development background.
 
-This branch also contains unreleased AI simulation, evaluation and endgame-search upgrades. In an independent 2,400-game mirrored test with fixed bidding, the latest candidate improved the win-rate difference by 2.67 percentage points over the previous candidate (95% interval: +1.5 to +4.0). See [the current candidate](docs/TASKS.md) for role-specific results and limitations. A fresh Cocos build and real hint-click capture are still required. The historical release checks below do not certify this candidate.
+This branch also contains unreleased AI simulation, evaluation and search upgrades. On 1,000 independent seeds / 6,000 mirrored games with fixed bidding, the latest candidate improved win-rate difference by **9.63 percentage points** over the immediately preceding candidate `78d125d` (95% interval: **+7.47 to +11.83**), exceeding the additional +5pp goal. The lower-farmer subgroup did not establish improvement. See [the current candidate](docs/TASKS.md) for role-specific results and limitations. A fresh Cocos build and real hint-click capture are still required. The historical release checks below do not certify this candidate.
 
 ## Project Overview
 

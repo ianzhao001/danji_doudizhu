@@ -667,10 +667,11 @@ export function hardStrategyWithProfile(profile: PimcProfile): AiStrategy {
       }
     }
 
-    // Small endgames need team-aware search before local rescue/pressure rules.
-    // Keep proven wins above this path and preserve zero-sample ablations.
+    // After the opening lead, compare sampled worlds before local rescue/pressure
+    // rules. Keep the opening structural candidate filter and proven wins;
+    // zero-sample ablations and incomplete public histories retain the old path.
     if (profile.samples > 0
-      && snapshot.handCounts.reduce((sum, count) => sum + count, 0) <= 16
+      && snapshot.handCounts.reduce((sum, count) => sum + count, 0) <= 53
       && canSampleWorld(snapshot, hand, history)) {
       const ordered = moves.slice().sort((left, right) => {
         const delta = moveOutcomeScore(ctx.decomposer, hand, left, toPressureContext(ctx, snapshot))
@@ -691,7 +692,7 @@ export function hardStrategyWithProfile(profile: PimcProfile): AiStrategy {
       return finishDecision(
         snapshot,
         startedAt,
-        'endgame-pimc',
+        'world-pimc',
         verdict === null ? { type: 'pass', seat: snapshot.turn } : toPlay(snapshot, verdict),
         captured ? pimcDecisionDiag(captured.rankings, profile) : undefined,
       );

@@ -1,0 +1,118 @@
+import { createHash } from 'node:crypto';
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
+const parentSHA = '78d125de080627a9cf7b0c2e07b10b4394c994ee';
+const args = new Map(process.argv.slice(2).filter(x => x.startsWith('--')).map(x => {
+  const at = x.indexOf('=');
+  return at < 0 ? [x.slice(2), 'true'] : [x.slice(2, at), x.slice(at + 1)];
+}));
+const root = args.get('candidate-root') ?? '/workspace/danji_doudizhu';
+const baseline = '/tmp/ddz-plus5-base';
+const mode = args.get('mode') ?? 'dev';
+if (!['self', 'screen', 'dev', 'confirm', 'holdout'].includes(mode)) throw new Error('invalid mode');
+const count = ({ self: 8, screen: 32, dev: 96, confirm: 256, holdout: 1000 } as Record<string, number>)[mode];
+const base = mode === 'holdout' ? 700000 : mode === 'confirm' ? 500000 : 400000;
+const seeds = Array.from({ length: count }, (_, i) => base + i + 1);
+const { AiLevel, strategyFor } = await import(root + '/assets/scripts/ai/index.ts');
+const { AiLevel: OldLevel, strategyFor: oldStrategyFor, chooseBidByLevel: oldBid } = await import(baseline + '/assets/scripts/ai/index.ts');
+const { runHeadlessRound } = await import(baseline + '/assets/scripts/flow/index.ts');
+const { summarizeMirror, judgeStrengthCI, judgeSelftest, roleOf } = await import(baseline + '/test/arena/arena-lib.ts');
+type ArenaGame = { seed: number; targetSeat: 0 | 1 | 2; targetSide: 'new' | 'legacy'; targetScore: number; landlord: 0 | 1 | 2 };
+function sha(data: string | Buffer) { return createHash('sha256').update(data).digest('hex'); }
+function sourceDigest(base: string) {
+  function walk(dir: string): string[] {
+    return readdirSync(dir, { withFileTypes: true }).flatMap(entry => entry.isDirectory()
+      ? walk(join(dir, entry.name)) : entry.name.endsWith('.ts') ? [join(dir, entry.name)] : []);
+  }
+  const scripts = join(base, 'assets/scripts');
+  const files = walk(scripts).sort().map(path => ({ path: relative(scripts, path), sha256: sha(readFileSync(path)) }));
+  const ai = files.filter(file => file.path.startsWith('ai/'));
+  return { scriptsSha256: sha(JSON.stringify(files)), aiSha256: sha(JSON.stringify(ai)), aiFiles: ai, allFiles: files };
+}
+function manifest() {
+  return {
+    schema: 'strength-plus5-mirror-v1', mode, parentSHA,
+    candidateRoot: root,
+    candidate: sourceDigest(mode === 'self' ? baseline : root), baseline: sourceDigest(baseline),
+    arenaLibSha256: sha(readFileSync(join(baseline, 'test/arena/arena-lib.ts'))),
+    seeds, fixedBid: 'frozen-78d125d-hard-all-seats',
+    protocol: 'same seed and targetSeat, candidate target vs 78d125d fillers; 78d125d target vs candidate fillers',
+    flow: 'frozen baseline runHeadlessRound; default startSeat=0; baseScore=1; no thinking delay',
+    metric: 'mean target win difference (pp) and settlement score difference; seed-cluster bootstrap 95% CI',
+    scope: 'increment over pre-upgrade 78d125d; farmer mirror also replaces partner and landlord; no claim of isolated individual-agent effect',
+  };
+}
+
+async function main() {
+  const currentManifest = manifest();
+  if (args.has('prepare-only')) {
+    console.log(JSON.stringify({ ready: true, manifest: currentManifest }, null, 2));
+    return;
+  }
+  const out = args.get('out');
+  if (!out) throw new Error('--out required');
+  if (args.has('judge')) {
+    const paths = (args.get('inputs') ?? '').split(',').filter(Boolean);
+    if (!paths.length) throw new Error('--inputs required');
+    const chunks = paths.map(path => JSON.parse(readFileSync(path, 'utf8')));
+    const reference = JSON.stringify(chunks[0].manifest);
+    if (reference !== JSON.stringify(currentManifest)) throw new Error('sources changed since experiment');
+    const total = chunks[0].shardTotal;
+    if (!Number.isInteger(total) || total < 1 || chunks.length !== total) throw new Error('missing shard');
+    const indices = new Set<number>();
+    const games: ArenaGame[] = [];
+    for (const chunk of chunks) {
+      if (JSON.stringify(chunk.manifest) !== reference || chunk.shardTotal !== total
+        || !Number.isInteger(chunk.shardIndex) || chunk.shardIndex < 0 || chunk.shardIndex >= total
+        || indices.has(chunk.shardIndex)) throw new Error('mixed or duplicate shard');
+      indices.add(chunk.shardIndex);
+      const wanted = seeds.filter((_, index) => index % total === chunk.shardIndex);
+      const expected = new Set(wanted.flatMap(seed => [0, 1, 2].flatMap(seat => ['new', 'legacy'].map(side => `${seed}|${seat}|${side}`))));
+      for (const game of chunk.games as ArenaGame[]) {
+        if (!expected.delete(`${game.seed}|${game.targetSeat}|${game.targetSide}`)) throw new Error('unexpected or duplicate game');
+        games.push(game);
+      }
+      if (expected.size) throw new Error('incomplete shard games');
+    }
+    games.sort((a, b) => a.seed - b.seed || a.targetSeat - b.targetSeat || a.targetSide.localeCompare(b.targetSide));
+    const summary = summarizeMirror(games);
+    const verdict = mode === 'self' ? judgeSelftest(summary) : judgeStrengthCI(summary, 5);
+    const roleSummaries = ['landlord', 'upper', 'lower'].map(role => ({
+      role, ...summarizeMirror(games.filter(game => game.landlord !== undefined && roleOf(game.targetSeat, game.landlord) === role)),
+    }));
+    for (const role of roleSummaries) {
+      if (!role.complete || role.pairs !== count || role.seedClusters !== count || !role.mirrorWinRateDiffPpCI || !role.avgPairedScoreDiffCI) throw new Error('incomplete role CI');
+    }
+    if (summary.landlordSplitPairs !== 0) throw new Error('fixed bidding produced split landlord');
+    writeFileSync(out, JSON.stringify({ manifest: currentManifest, games, summary, roleSummaries, verdict, strongFivePpEvidence: (summary.mirrorWinRateDiffPpCI?.lo ?? -Infinity) >= 5 }, null, 2) + '\n');
+    console.log(JSON.stringify({ summary, roleSummaries, verdict, strongFivePpEvidence: (summary.mirrorWinRateDiffPpCI?.lo ?? -Infinity) >= 5 }, null, 2));
+    // An inconclusive/negative result is a valid experiment result, not an execution failure.
+    return;
+  }
+  const [shardIndex, shardTotal] = (args.get('shard') ?? '0/1').split('/').map(Number);
+  if (!Number.isInteger(shardIndex) || !Number.isInteger(shardTotal) || shardTotal < 1
+    || shardTotal > seeds.length || shardIndex < 0 || shardIndex >= shardTotal) throw new Error('invalid shard');
+  const candidatePlay = mode === 'self' ? oldStrategyFor(OldLevel.Hard) : strategyFor(AiLevel.Hard);
+  const baselinePlay = oldStrategyFor(OldLevel.Hard);
+  const games: ArenaGame[] = [];
+  for (let index = 0; index < seeds.length; index++) {
+    if (index % shardTotal !== shardIndex) continue;
+    const seed = seeds[index];
+    for (const targetSeat of [0, 1, 2] as const) for (const targetSide of ['new', 'legacy'] as const) {
+      const result = await runHeadlessRound({
+        seed,
+        bidPolicy: ({ hand, state }) => oldBid(hand, state, OldLevel.Hard),
+        playPolicy: ({ snapshot, rng, history }) => {
+          const candidateSeat = snapshot.turn === targetSeat ? targetSide === 'new' : targetSide !== 'new';
+          return (candidateSeat ? candidatePlay : baselinePlay)(snapshot, rng, history ?? []);
+        },
+      });
+      games.push({ seed, targetSeat, targetSide, targetScore: result.settlement.scores[targetSeat], landlord: result.landlord });
+    }
+    if (games.length % 60 === 0) console.log(`[strength-comparison] shard=${shardIndex}/${shardTotal} games=${games.length}`);
+  }
+  if (JSON.stringify(manifest()) !== JSON.stringify(currentManifest)) throw new Error('sources changed during run');
+  writeFileSync(out, JSON.stringify({ manifest: currentManifest, shardIndex, shardTotal, games }, null, 2) + '\n');
+  console.log(`[strength-comparison] wrote ${out}, games=${games.length}`);
+}
+void main();

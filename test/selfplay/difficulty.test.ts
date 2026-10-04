@@ -11,6 +11,8 @@ import { cards } from '../rules/_util';
 import { runDifficultyMatchup } from './difficulty';
 
 const SEEDS = Array.from({ length: 20 }, (_, i) => i + 1); // 1..20
+// 20/40 serial rounds need a whole-game budget; latency has its own fixed-corpus gate.
+const ROUND_TEST_TIMEOUT_MS = 60_000;
 
 describe('M4-04 难度差异 selfplay（不变量·架构种入）', () => {
   it('混合难度每局到达 settled、零和、无死循环（0<turns<300）', async () => {
@@ -23,14 +25,14 @@ describe('M4-04 难度差异 selfplay（不变量·架构种入）', () => {
       expect(r.turns).toBeGreaterThan(0);
       expect(r.turns).toBeLessThan(300);
     }
-  });
+  }, ROUND_TEST_TIMEOUT_MS);
 
   it('可复现：同 levels+seeds 跑两次深相等', async () => {
     const levels: [AiLevel, AiLevel, AiLevel] = [AiLevel.Simple, AiLevel.Hard, AiLevel.Normal];
     const a = await runDifficultyMatchup(levels, SEEDS);
     const b = await runDifficultyMatchup(levels, SEEDS);
     expect(a).toEqual(b);
-  });
+  }, ROUND_TEST_TIMEOUT_MS);
 });
 
 describe('M4-04 难度信号（实现方新增·受控场景）', () => {

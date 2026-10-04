@@ -1,0 +1,92 @@
+{
+ "frames": 60,
+ "hintFrames": 24,
+ "corpus": {
+  "source": "ai-v19-hard-bid-and-play/role-phase-v1",
+  "seeds": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "sha256": "3c70ec921cd685c27ff22a5301dec7183b46b2d31391f621427c5ef142d7970c",
+  "collectedFrames": 159,
+  "phaseDefinition": "opening: total cards >36; middle: 19..36; endgame: <=18",
+  "decisionCoverage": {
+   "opening/landlord": 7,
+   "opening/lower": 7,
+   "opening/upper": 7,
+   "middle/landlord": 7,
+   "middle/lower": 7,
+   "middle/upper": 7,
+   "endgame/landlord": 6,
+   "endgame/lower": 6,
+   "endgame/upper": 6
+  },
+  "hintCoverage": {
+   "opening/landlord": 3,
+   "opening/lower": 3,
+   "opening/upper": 3,
+   "middle/landlord": 3,
+   "middle/lower": 3,
+   "middle/upper": 3,
+   "endgame/landlord": 2,
+   "endgame/lower": 2,
+   "endgame/upper": 2
+  }
+ },
+ "environment": {
+  "node": "v24.19.0",
+  "v8": "13.6.233.17-node.51",
+  "platform": "linux",
+  "release": "6.18.44",
+  "arch": "x64",
+  "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+  "cpuCount": 5,
+  "benchmarkConcurrency": 1
+ },
+ "measurement": {
+  "decisionAndHint": "first traversal; no candidate warm-up; includes first call",
+  "firstCall": "first candidate decision after frozen corpus generation; shared rules already exercised",
+  "firstHint": "first hint after the decision traversal; shared candidate code already exercised",
+  "warm": "3 repeated traversals of the identical corpus, after both first traversals",
+  "gate": "first-traversal decision/hint only; historical M4 ceilings, host results are not mobile measurements",
+  "percentile": "sorted[min(n-1, floor(q*n))], retained for historical compatibility"
+ },
+ "firstCallMs": {
+  "decision": 150.66,
+  "hint": 47.46
+ },
+ "decision": {
+  "p50": 0.04,
+  "p95": 105.83,
+  "max": 150.66
+ },
+ "hint": {
+  "p50": 20.93,
+  "p95": 325.6,
+  "max": 454.54
+ },
+ "warm": {
+  "passes": 3,
+  "decisionCalls": 180,
+  "hintCalls": 72,
+  "decision": {
+   "p50": 0.04,
+   "p95": 87.14,
+   "max": 108.65
+  },
+  "hint": {
+   "p50": 18.2,
+   "p95": 339.91,
+   "max": 468.22
+  }
+ },
+ "lowEndFactor": 4,
+ "lowEnd": {
+  "decisionP95": 423.32,
+  "hintMax": 1818.16
+ },
+ "lowEndIsEstimate": true
+}
+[latency] GATE FAIL (M4 基线天花板): 决策 p95 回归: 105.83ms ≥ 60ms ; 提示 max 回归: 454.54ms ≥ 400ms

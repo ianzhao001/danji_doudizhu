@@ -1,0 +1,51 @@
+{
+  "schema": "ai-plus5-protocol-v1",
+  "baselineCommit": "78d125de080627a9cf7b0c2e07b10b4394c994ee",
+  "objective": "Additional mirrored win-rate improvement of at least 5 percentage points over the immediately preceding candidate, not a cumulative improvement over R4.",
+  "fixedBidding": "Frozen baseline Hard for all seats",
+  "gameFlow": "Frozen baseline runHeadlessRound, default start seat 0 and base score 1",
+  "pairing": "Each seed and target seat plays candidate target against baseline fillers, then baseline target against candidate fillers; 6 games per seed.",
+  "datasets": {
+    "self": {
+      "firstSeed": 400001,
+      "seeds": 8
+    },
+    "screen": {
+      "firstSeed": 400001,
+      "seeds": 32
+    },
+    "development": {
+      "firstSeed": 400001,
+      "seeds": 96
+    },
+    "confirmation": {
+      "firstSeed": 500001,
+      "seeds": 256
+    },
+    "holdout": {
+      "firstSeed": 600001,
+      "seeds": 1000,
+      "candidate": "candidate1: global54 solver16 tactics memo2"
+    },
+    "holdoutAfterQualityFix": {
+      "firstSeed": 700001,
+      "seeds": 1000,
+      "status": "preregistered before execution; only after fresh source freeze and regression repair"
+    }
+  },
+  "selection": "Screen and development overlap and are exploratory. Keep all rejected results. Confirmation may inform candidate selection; holdout must remain unused until candidate source is frozen. Candidate1 later failed existing Hard-vs-Normal quality regression; its completed holdout must be archived, never reused as independent acceptance after source changes. Candidate2 uses the separately preregistered dataset.",
+  "acceptance": {
+    "observedWinRateDifferencePpAtLeast": 5,
+    "seedCluster95CIWinRateLowerBoundAbove": 0,
+    "seedCluster95CIScoreDifferenceLowerBoundAbove": 0,
+    "strongerClaim": "A confidence lower bound of at least 5pp is reported separately; a 5pp point estimate with a positive lower bound does not establish that stronger claim."
+  },
+  "integrity": "Source hashes, frozen baseline hashes, arena hash, seed list, complete shards, game identities, role coverage and fixed landlord identity are checked before judging.",
+  "latency": "Frozen repository corpus; decision p95 <60ms and max <250ms, hint max <400ms. Server results are not mobile measurements.",
+  "limitations": [
+    "Role intervals are exploratory and are not adjusted for multiple comparisons.",
+    "Farmer mirror changes both partner and landlord; it does not isolate a single agent's causal improvement.",
+    "Development gains cannot substitute for independent holdout evidence.",
+    "Existing Cocos hint runtime capture failures require a new Creator build and genuine click capture before release."
+  ]
+}

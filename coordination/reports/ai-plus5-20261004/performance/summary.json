@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "baselineCommit": "78d125de080627a9cf7b0c2e07b10b4394c994ee",
+  "scope": "Archived existing exploratory optimization evidence for global54-solver16-tactics; no timing or equivalence experiment was rerun during archival. These measurements do not certify a later threshold-53 or other final candidate.",
+  "units": "milliseconds",
+  "gate": {
+    "decisionP95ExclusiveMax": 60,
+    "decisionMaxExclusiveMax": 250,
+    "hintMaxExclusiveMax": 400,
+    "warm": "reported separately, not silently combined with initial traversal"
+  },
+  "variants": [
+    {
+      "variant": "raw",
+      "candidate": "global54-solver16-tactics",
+      "typescriptTreeSha256": "751f439b82457608d4119848d361b92446ce99023d4853f6690800390291d9d2",
+      "log": "raw-latency.log",
+      "logSha256": "ddcdb25dd5d702cc9aaa3f310b1843e2f5ca45db5407c3999851ea2b5da6ed62",
+      "runner": "raw-latency.runner.ts.txt",
+      "runnerSha256": "0004943f1a0abf647e8ae18fb4c4f98dc798f52c54b6591ed5d212b555f4327c",
+      "reportedGateOutput": "[latency] GATE FAIL (M4 基线天花板): 决策 p95 回归: 105.83ms ≥ 60ms ; 提示 max 回归: 454.54ms ≥ 400ms",
+      "passedExistingLatencyGate": false,
+      "decision": {
+        "p50": 0.04,
+        "p95": 105.83,
+        "max": 150.66
+      },
+      "hint": {
+        "p50": 20.93,
+        "p95": 325.6,
+        "max": 454.54
+      },
+      "warm": {
+        "passes": 3,
+        "decisionCalls": 180,
+        "hintCalls": 72,
+        "decision": {
+          "p50": 0.04,
+          "p95": 87.14,
+          "max": 108.65
+        },
+        "hint": {
+          "p50": 18.2,
+          "p95": 339.91,
+          "max": 468.22
+        }
+      },
+      "corpusSha256": "3c70ec921cd685c27ff22a5301dec7183b46b2d31391f621427c5ef142d7970c",
+      "environment": {
+        "node": "v24.19.0",
+        "v8": "13.6.233.17-node.51",
+        "platform": "linux",
+        "release": "6.18.44",
+        "arch": "x64",
+        "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+        "cpuCount": 5,
+        "benchmarkConcurrency": 1
+      }
+    },
+    {
+      "variant": "memo1",
+      "candidate": "global54-solver16-tactics-memo",
+      "typescriptTreeSha256": "0c97fbe12d5b0bf554b85c6981078770c890f29933c387664ff98ec9ec92c542",
+      "log": "memo1-latency.log",
+      "logSha256": "27aaf51fcb6c463e5c822f72d5fe690ad04de80ca888e165627a327da37c725b",
+      "runner": "memo1-latency.runner.ts.txt",
+      "runnerSha256": "e8bdebba5c1bd8370dd00d35ed33474f7658425a3b43a57aab1e9c6ea4fc8122",
+      "reportedGateOutput": "[latency] GATE FAIL (M4 基线天花板): 决策 p95 回归: 69.27ms ≥ 60ms ; 提示 max 回归: 545.25ms ≥ 400ms",
+      "passedExistingLatencyGate": false,
+      "decision": {
+        "p50": 0.03,
+        "p95": 69.27,
+        "max": 91.67
+      },
+      "hint": {
+        "p50": 22.25,
+        "p95": 230.54,
+        "max": 545.25
+      },
+      "warm": {
+        "passes": 3,
+        "decisionCalls": 180,
+        "hintCalls": 72,
+        "decision": {
+          "p50": 0.04,
+          "p95": 57.85,
+          "max": 71.71
+        },
+        "hint": {
+          "p50": 18.91,
+          "p95": 236.45,
+          "max": 563.37
+        }
+      },
+      "corpusSha256": "3c70ec921cd685c27ff22a5301dec7183b46b2d31391f621427c5ef142d7970c",
+      "environment": {
+        "node": "v24.19.0",
+        "v8": "13.6.233.17-node.51",
+        "platform": "linux",
+        "release": "6.18.44",
+        "arch": "x64",
+        "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+        "cpuCount": 5,
+        "benchmarkConcurrency": 1
+      }
+    },
+    {
+      "variant": "memo2",
+      "candidate": "global54-solver16-tactics-memo2",
+      "typescriptTreeSha256": "892550dc4a4e7e99554ceefb89829131f18d1eed73d9fe82e1231cf02bf142a9",
+      "log": "memo2-latency.log",
+      "logSha256": "ccea720d3f6f1fb16eef2b84df0ceb05c5a54dace4463157082c216e0121048a",
+      "runner": "memo2-latency.runner.ts.txt",
+      "runnerSha256": "25042da56cc06a8e79dca9e936702aa4faeec6f7c8843131dc2408227ee527c4",
+      "reportedGateOutput": "[latency] PASS (M4 基线天花板)；低端代理见 lowEnd，需真机校准",
+      "passedExistingLatencyGate": true,
+      "decision": {
+        "p50": 0.08,
+        "p95": 52.43,
+        "max": 80.23
+      },
+      "hint": {
+        "p50": 24.82,
+        "p95": 141.83,
+        "max": 310.53
+      },
+      "warm": {
+        "passes": 3,
+        "decisionCalls": 180,
+        "hintCalls": 72,
+        "decision": {
+          "p50": 0.04,
+          "p95": 41.64,
+          "max": 75.49
+        },
+        "hint": {
+          "p50": 18.44,
+          "p95": 159.91,
+          "max": 325.13
+        }
+      },
+      "corpusSha256": "3c70ec921cd685c27ff22a5301dec7183b46b2d31391f621427c5ef142d7970c",
+      "environment": {
+        "node": "v24.19.0",
+        "v8": "13.6.233.17-node.51",
+        "platform": "linux",
+        "release": "6.18.44",
+        "arch": "x64",
+        "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+        "cpuCount": 5,
+        "benchmarkConcurrency": 1
+      }
+    }
+  ],
+  "equivalence": {
+    "candidate": "memo2",
+    "against": "raw global54-solver16-tactics",
+    "verifiedRolloutWorlds": 500,
+    "checked": "exact RolloutOutcome and every-turn {turn, chosen} trace; shared cache across all generated worlds",
+    "publicSnapshots": 12,
+    "publicChecked": "capturePimcRanks return value and complete rankings deep equality on first 12 fixed-corpus frames",
+    "scopeLimit": "finite deterministic regression evidence, not an exhaustive proof; no full previous rollout fixture is added to executable test suite",
+    "runner": "memo2-equivalence.check.ts.txt",
+    "runnerSha256": "22c506f58ee56ada1a5028f49f7f4186ee30e51658ddfab8bc19edb705622428",
+    "traceProbeSources": [
+      {
+        "side": "base",
+        "source": "sources/equivalence-base-instrumented-rollout.ts.txt",
+        "sha256": "d5c57273452aa9379a2bc1427c9ef65e65fee3f0174989590100d8aea9ca17f5"
+      },
+      {
+        "side": "memo",
+        "source": "sources/equivalence-memo-instrumented-rollout.ts.txt",
+        "sha256": "a565ead6937279fbfd7bf611c6d9b16c1146b0b75f21a6debdb602fb91c48a7e"
+      }
+    ],
+    "stdout": "memo2-equivalence.stdout-transcript.txt",
+    "stdoutProvenance": "Verbatim transcription of tool-captured stdout from the successful prior execution; no redirected log file existed. It is explicitly not a newly executed result.",
+    "originalInvocation": "/workspace/danji_doudizhu/test/node_modules/.bin/vite-node --root /workspace/danji_doudizhu /tmp/ddz-rollout-memo2-check/check.ts",
+    "reproduction": "Restore baseline 78d125d assets/scripts in raw and memo2 temp directories, apply sources manifests changes, recreate both instrumented trace trees using archived probe sources, restore absolute paths referenced in the archived script or rewrite them consistently, then use the same vite-node invocation."
+  },
+  "sourceManifest": "source-manifest.json",
+  "corpusGenerator": {
+    "source": "latency-corpus.ts.txt",
+    "sha256": "4ad6494ed0477ead9b57c2c4a895705a103d926e84319701c31406b1ee1a9b29"
+  },
+  "limitations": [
+    "Server CPU measurements; not mobile-device measurements.",
+    "One recorded timing run per variant; no statistical speedup claim.",
+    "Raw and memo1 failed the unchanged gate. Their logs are retained, including failures.",
+    "Source identities were calculated during archival from the preserved candidate directories; the original timing runners did not themselves record pre/post source hashes. Candidate directories had been frozen for the reported measurements.",
+    "The root task may alter the final candidate threshold; its final performance validation must be recorded separately."
+  ]
+}

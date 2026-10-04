@@ -19,6 +19,7 @@ export interface RolloutArgs {
   /** B2 校准接缝：B1' 只保留 legacy 领出，不启用非整手复合牌型领出。 */
   leadPolicy?: 'legacy';
   rng: Rng;
+  policyCache?: RolloutPolicyCache;
 }
 
 export interface RolloutOutcome {
@@ -316,6 +317,153 @@ function follow(counts: readonly number[], top: CountPlay): CountPlay | null {
   return same;
 }
 
+/** Immutable hand snapshot with lazily memoized pure policy results. */
+class HandPolicy {
+  private readonly counts: readonly number[];
+  readonly total: number;
+  private wholeValue?: CountPlay | null;
+  private leadValue?: CountPlay;
+  private bombValue?: CountPlay | null;
+  private controlsValue?: CountPlay[];
+  private readonly follows = new Map<number, CountPlay | null>();
+  private readonly remainders = new Map<CountPlay, boolean>();
+
+  constructor(counts: readonly number[]) {
+    this.counts = counts.slice();
+    this.total = cardCount(this.counts);
+  }
+
+  whole(): CountPlay | null {
+    if (this.wholeValue === undefined) this.wholeValue = wholePlay(this.counts);
+    return this.wholeValue;
+  }
+
+  lead(): CountPlay {
+    if (this.leadValue === undefined) this.leadValue = lead(this.counts);
+    return this.leadValue;
+  }
+
+  bomb(): CountPlay | null {
+    if (this.bombValue === undefined) this.bombValue = lowestBomb(this.counts);
+    return this.bombValue;
+  }
+
+  follow(top: CountPlay): CountPlay | null {
+    if (!Number.isInteger(top.category) || top.category < Category.Single || top.category > Category.Rocket
+      || !Number.isInteger(top.mainRank) || top.mainRank < Rank.R3 || top.mainRank > Rank.BigJoker
+      || !Number.isInteger(top.length) || top.length < 1 || top.length > 54) return follow(this.counts, top);
+    const key = top.category * 2048 + top.mainRank * 64 + top.length;
+    if (this.follows.has(key)) return this.follows.get(key)!;
+    const result = follow(this.counts, top);
+    if (this.follows.size < 16) this.follows.set(key, result);
+    return result;
+  }
+
+  remainderIsWhole(play: CountPlay): boolean {
+    if (this.remainders.has(play)) return this.remainders.get(play)!;
+    const remaining = this.counts.slice();
+    apply(remaining, play);
+    const result = wholePlay(remaining) !== null;
+    if (this.remainders.size < 20) this.remainders.set(play, result);
+    return result;
+  }
+
+  controls(): CountPlay[] {
+    if (this.controlsValue !== undefined) return this.controlsValue;
+    const counts = this.counts;
+    const candidates: CountPlay[] = [];
+    if (cardCount(counts) <= 8) {
+      const append = (candidate: CountPlay): void => {
+        const remainder = counts.slice();
+        apply(remainder, candidate);
+        if (wholePlay(remainder)) candidates.push(candidate);
+      };
+      for (let rank = Rank.R3; rank <= Rank.BigJoker; rank += 1) {
+        for (const size of [3, 2, 1]) {
+          if (usable(counts, rank) >= size) append(take(
+            size === 3 ? Category.Trips : size === 2 ? Category.Pair : Category.Single,
+            rank, [[rank, size]],
+          ));
+        }
+        if (rank <= Rank.R2 && counts[rank] === 4) append(take(Category.Bomb, rank, [[rank, 4]]));
+      }
+      if (counts[Rank.SmallJoker] && counts[Rank.BigJoker]) {
+        append(take(Category.Rocket, Rank.BigJoker, [[Rank.SmallJoker, 1], [Rank.BigJoker, 1]]));
+      }
+    }
+    this.controlsValue = candidates;
+    return candidates;
+  }
+}
+
+/** One PIMC ranking owns this cache; no state survives the ranking. */
+export class RolloutPolicyCache {
+  // <= 2048 immutable hands. Each hand retains <= 48 control moves,
+  // 16 follow entries, 20 remainder entries and 3 scalar moves.
+  private readonly records = new Map<number, HandPolicy>();
+
+  hand(counts: readonly number[]): HandPolicy {
+    if (counts.length > COUNTS_LENGTH) return new HandPolicy(counts);
+    let key = 0;
+    for (let rank = Rank.R3; rank <= Rank.BigJoker; rank += 1) {
+      const count = counts[rank] ?? 0;
+      if (!Number.isInteger(count) || count < 0 || count > 4) return new HandPolicy(counts);
+      key = key * 5 + count;
+    }
+    const prior = this.records.get(key);
+    if (prior) return prior;
+    const entry = new HandPolicy(counts);
+    if (this.records.size < 2048) this.records.set(key, entry);
+    return entry;
+  }
+}
+
+function canBeat(policy: HandPolicy, top: CountPlay): boolean {
+  if (policy.follow(top)) return true;
+  return top.category !== Category.Bomb && top.category !== Category.Rocket && policy.bomb() !== null;
+}
+
+/** Sampled-world tactics: take an immediate finish or a proved two-move finish. */
+function tacticalPlay(
+  board: readonly number[][], turn: number, landlord: number, top: CountPlay | null, policies: readonly HandPolicy[],
+): CountPlay | null {
+  const counts = board[turn];
+  const policy = policies[turn];
+  const whole = policy.whole();
+  const legal = (play: CountPlay): boolean => top === null
+    || beats({ ...play, cards: [] }, { ...top, cards: [] });
+  if (whole && legal(whole)) return whole;
+  if (policy.total <= 8) {
+    const candidates: CountPlay[] = [];
+    const standard = top ? policy.follow(top) : policy.lead();
+    if (standard && policy.remainderIsWhole(standard)) candidates.push(standard);
+    candidates.push(...policy.controls());
+    for (const candidate of candidates) {
+      if (!legal(candidate)) continue;
+      const enemyCanBeat = policies.some((enemy, seat) => seat !== turn
+        && (turn === landlord || seat === landlord) && canBeat(enemy, candidate));
+      if (!enemyCanBeat) return candidate;
+    }
+  }
+  if (top === null && turn !== landlord) {
+    const teammate = 3 - turn - landlord;
+    const finish = policies[teammate].whole();
+    if (finish && (finish.category === Category.Single || finish.category === Category.Pair
+      || finish.category === Category.Trips)) {
+      for (let rank = Rank.R3; rank < finish.mainRank; rank += 1) {
+        if (usable(counts, rank) < finish.length) continue;
+        const feed = take(finish.category, rank, [[rank, finish.length]]);
+        if ((turn + 1) % 3 === teammate) return feed;
+        // The landlord acts before the teammate: exclude an immediate finish or an overcall.
+        const enemyWhole = policies[landlord].whole();
+        if (enemyWhole && beats({ ...enemyWhole, cards: [] }, { ...feed, cards: [] })) continue;
+        if (!canBeat(policies[landlord], finish)) return feed;
+      }
+    }
+  }
+  return null;
+}
+
 function apply(counts: number[], play: CountPlay): void {
   for (const [rank, amount] of play.takes) {
     counts[rank] -= amount;
@@ -334,21 +482,25 @@ export function rolloutRound(args: RolloutArgs): RolloutOutcome {
   let topSeat = args.topSeat;
   let passes = args.passes ?? 0;
   let plays = 0;
+  const cache = args.policyCache ?? new RolloutPolicyCache();
+  const policies = board.map((counts) => cache.hand(counts));
   void args.rng;
 
   for (let guard = 0; guard < 256; guard += 1) {
     const teammateTop = top !== null && topSeat !== null
       && turn !== args.landlord && topSeat !== args.landlord && topSeat !== turn;
-    let chosen = top === null ? lead(board[turn]) : teammateTop ? null : follow(board[turn], top);
+    let chosen = top === null ? policies[turn].lead() : teammateTop ? null : policies[turn].follow(top);
     // 出完即胜优先于让队友；复用规则比较，保留同型同长及炸弹/火箭边界。
     if (teammateTop && top !== null) {
-      const whole = wholePlay(board[turn]);
+      const whole = policies[turn].whole();
       if (whole && beats({ ...whole, cards: [] }, { ...top, cards: [] })) chosen = whole;
     }
     if (chosen === null && top !== null && !teammateTop && top.category !== Category.Bomb && top.category !== Category.Rocket) {
-      const threatened = topSeat !== null && cardCount(board[topSeat]) <= 2;
-      if (threatened) chosen = lowestBomb(board[turn]);
+      const threatened = topSeat !== null && policies[topSeat].total <= 2;
+      if (threatened) chosen = policies[turn].bomb();
     }
+
+    chosen = tacticalPlay(board, turn, args.landlord, top, policies) ?? chosen;
 
     if (chosen) {
       apply(board[turn], chosen);
@@ -356,6 +508,7 @@ export function rolloutRound(args: RolloutArgs): RolloutOutcome {
       if (cardCount(board[turn]) === 0) {
         return { winnerSide: turn === args.landlord ? 'landlord' : 'farmer', plays };
       }
+      policies[turn] = cache.hand(board[turn]);
       top = chosen;
       topSeat = turn;
       passes = 0;
